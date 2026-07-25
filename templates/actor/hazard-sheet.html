@@ -1,0 +1,72 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Hazard Name" />
+      <div class="subline">{{categoryLabel}}</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Details</h2>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row">
+        <div class="stat-label">Category</div>
+        <select name="system.category">
+          <option value="hazard" {{#if (eq system.category "hazard")}}selected{{/if}}>Hazard</option>
+          <option value="hunt" {{#if isHunt}}selected{{/if}}>Hunt</option>
+        </select>
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Stat</div>
+        <select name="system.stat">
+          <option value="strong" {{#if (eq system.stat "strong")}}selected{{/if}}>Strong</option>
+          <option value="hard" {{#if (eq system.stat "hard")}}selected{{/if}}>Hard</option>
+          <option value="quick" {{#if (eq system.stat "quick")}}selected{{/if}}>Quick</option>
+          <option value="sharp" {{#if (eq system.stat "sharp")}}selected{{/if}}>Sharp</option>
+          <option value="wise" {{#if (eq system.stat "wise")}}selected{{/if}}>Wise</option>
+        </select>
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">TN</div>
+        <input type="number" name="system.tn" value="{{system.tn}}" />
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Targeting</div>
+        <select name="system.targetMode">
+          <option value="any" {{#if (eq system.targetMode "any")}}selected{{/if}}>Any Hunter must pass</option>
+          <option value="all" {{#if (eq system.targetMode "all")}}selected{{/if}}>All Hunters must pass</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Consequences</h2>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row">
+        <div class="stat-label">Resolve Damage on Success</div>
+        <input type="number" name="system.damageSuccessResolve" value="{{system.damageSuccessResolve}}" />
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Wound Damage on Failure</div>
+        <input type="number" name="system.damageFailureWounds" value="{{system.damageFailureWounds}}" />
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Doom on Failure</div>
+        <input type="number" name="system.doomOnFailure" value="{{system.doomOnFailure}}" />
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Notes</h2>
+    <textarea name="system.notes" rows="6">{{system.notes}}</textarea>
+  </section>
+
+  <section class="sheet-section">
+    <button type="button" class="stat-roll" data-action="useHazard">Send to Chat</button>
+  </section>
+</form>

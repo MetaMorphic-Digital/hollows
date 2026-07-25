@@ -1,0 +1,144 @@
+.hollows-entity {
+  background:
+    radial-gradient(800px 380px at 20% -120px, rgba(184, 74, 58, 0.22), transparent 60%),
+    radial-gradient(900px 420px at 90% -160px, rgba(109, 124, 138, 0.2), transparent 65%),
+    linear-gradient(180deg, #141217 0%, #0f0f12 100%);
+}
+
+.hollows.sheet.actor.entity .window-content {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.hollows.sheet.actor.entity .window-content > form.hollows-sheet {
+  min-height: 100%;
+}
+
+.hollows.sheet.actor.entity .sheet-header,
+.hollows.sheet.actor.entity .rune-bar,
+.hollows.sheet.actor.entity .sheet-tabs[data-group='mainTabs'] {
+  flex: 0 0 auto;
+}
+
+.hollows-entity .name {
+  background: #1a1b20;
+  color: #f6f1e8;
+}
+
+.hollows-entity .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.hollows-entity .checkbox-group .checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: #efe6d8;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
+}
+
+.hollows-entity .checkbox-group .checkbox input + span,
+.hollows-entity .checkbox-group .checkbox,
+.hollows-entity .curse-engine .checkbox {
+  color: #efe6d8 !important;
+}
+
+.hollows-entity select,
+.hollows-entity .hollows-form-row select,
+.hollows-entity .stat-grid select {
+  background: #1a1c22 !important;
+  color: #f3e7d6 !important;
+  border: 1px solid #3b3430;
+}
+
+.hollows-entity .curse-engine input[type="number"],
+.hollows-entity .curse-engine input[type="text"],
+.hollows-entity .curse-engine select {
+  background: #1a1c22 !important;
+  color: #f3e7d6 !important;
+  border: 1px solid #3b3430;
+}
+
+.hollows-entity .curse-engine .stat-label {
+  color: #efe6d8 !important;
+}
+
+.hollows-entity select option {
+  background: #1a1c22;
+  color: #f3e7d6;
+}
+
+.hollows-entity .ability-card,
+.hollows-entity .ability-card input {
+  color: #efe6d8;
+}
+
+.hollows-entity .ability-card .stat-label {
+  color: #efe6d8;
+}
+
+.hollows-entity .checkbox-group label {
+  color: #f6f1e8;
+}
+
+.hollows-entity .entity-quick-actions .ability-row {
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.hollows-entity .entity-quick-actions .ability-actions {
+  display: flex;
+  gap: 6px;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.hollows-entity .entity-quick-actions .ability-actions .stat-roll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  font-size: 11px;
+  padding: 4px 8px;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.threat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.threat-row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 8px;
+  align-items: center;
+}
+
+.threat .health-label,
+.terrain .health-label {
+  color: #f9f2e6;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+.threat input[type="number"],
+.terrain input[type="number"] {
+  background: #20232b;
+  color: #ffffff;
+  border: 1px solid #5a4f49;
+}

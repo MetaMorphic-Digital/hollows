@@ -1,0 +1,420 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header hollow-header" {{#if system.headerImg}}style="--hollow-header-image: url('{{system.headerImg}}');"{{/if}}>
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Hollow Name" />
+      <div class="subline">Hollows</div>
+      <div class="header-row">
+        <label>Status</label>
+        <select name="system.status">
+          {{#each statusOptions as |s|}}
+            <option value="{{s}}" {{#if (eq ../system.status s)}}selected{{/if}}>{{s}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="header-row">
+        <label>Malignancy</label>
+        <select name="system.malignancy">
+          {{#each malignancyOptions as |m|}}
+            <option value="{{m}}" {{#if (eq ../system.malignancy m)}}selected{{/if}}>{{m}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="header-row">
+        <label>Lord</label>
+        <select name="system.lordId">
+          <option value="">None</option>
+          {{#each entityOptions as |e|}}
+            <option value="{{e.ref}}" {{#if e.selected}}selected{{/if}}>{{e.name}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="header-row">
+        <label>Summary</label>
+        <input type="text" name="system.summary" value="{{system.summary}}" placeholder="Short description" />
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="doom-box">
+        <div class="doom-label">Doom</div>
+        <div class="doom-counter-frame">
+          <div class="doom-counter-segment doom-current">
+            <span class="doom-counter-caption">Current</span>
+            <input type="number" name="system.doom.current" value="{{system.doom.current}}" {{#unless isActive}}disabled{{/unless}} />
+          </div>
+          <div class="doom-divider">/</div>
+          <div class="doom-counter-segment doom-cap">
+            <span class="doom-counter-caption">Cap</span>
+            <input type="number" name="system.doom.cap" value="{{system.doom.cap}}" {{#unless isActive}}disabled{{/unless}} />
+          </div>
+        </div>
+        <label class="doom-show-toggle">
+          <input type="checkbox" name="system.doom.show" {{checked system.doom.show}} />
+          <span>Show Doom</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="hollowTabs">
+    <a class="item {{tabs.incursion.cssClass}}" data-action="tab" data-group="hollowTabs" data-tab="incursion">Incursion and History</a>
+    <a class="item {{tabs.scenes.cssClass}}" data-action="tab" data-group="hollowTabs" data-tab="scenes">Scenes</a>
+    <a class="item {{tabs.thralls.cssClass}}" data-action="tab" data-group="hollowTabs" data-tab="thralls">Entities, Thralls and Hazards</a>
+    <a class="item {{tabs.rumours.cssClass}}" data-action="tab" data-group="hollowTabs" data-tab="rumours">Rumours and Relics</a>
+  </nav>
+
+  <section class="hollow-tabs-content">
+    <div class="tab {{tabs.incursion.cssClass}}" data-tab="incursion" data-group="hollowTabs">
+      <section class="sheet-section">
+        <h2>Incursion Steps</h2>
+        <div class="abilities-list">
+          {{#each incursionSteps as |s|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label">
+                  {{s.label}}
+                  {{#if s.data.done}}
+                    <span class="ability-duration-badge">Done</span>
+                  {{else}}
+                    <span class="ability-duration-badge muted">Pending</span>
+                  {{/if}}
+                </div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll" data-action="incursionStep" data-step-id="{{s.id}}" data-step-label="{{s.label}}">Clear</button>
+                  <button type="button" class="stat-roll muted" data-action="incursionRoll" data-step-id="{{s.id}}" data-step-label="{{s.label}}">Roll</button>
+                {{/if}}
+              </div>
+              {{#if s.data.performerName}}
+                <div class="token-chip incursion-performer-chip">
+                  {{#if s.data.performerImg}}
+                    <img src="{{s.data.performerImg}}" alt="{{s.data.performerName}}" />
+                  {{/if}}
+                  <span class="performer-name">{{s.data.performerName}}</span>
+                </div>
+              {{else}}
+                <div class="muted">No Hunter assigned yet.</div>
+              {{/if}}
+              <textarea
+                class="incursion-note"
+                name="system.incursion.steps.{{s.id}}.notes"
+                rows="2"
+                placeholder="Narrative note (optional)">{{s.data.notes}}</textarea>
+            </div>
+          {{/each}}
+          {{#if canManageVisibility}}
+            <div class="ability-row">
+              <button type="button" class="stat-roll danger" data-action="incursionClear">Clear Status</button>
+            </div>
+          {{/if}}
+        </div>
+      </section>
+      <section class="sheet-section">
+        <h2>Omens</h2>
+        <textarea name="system.incursion.omensText" rows="6">{{system.incursion.omensText}}</textarea>
+      </section>
+      <section class="sheet-section">
+        <h2>History</h2>
+        <textarea name="system.incursion.historyText" rows="8">{{system.incursion.historyText}}</textarea>
+      </section>
+    </div>
+
+    <div class="tab {{tabs.scenes.cssClass}}" data-tab="scenes" data-group="hollowTabs">
+      <section class="sheet-section">
+        <div class="section-header">
+          <h2>Scenes</h2>
+          {{#if canManageVisibility}}
+            <button type="button" class="stat-roll" data-action="sceneAdd">Add Scene</button>
+          {{/if}}
+        </div>
+        {{#each scenes as |scene|}}
+          <div class="ability-card scene-card" {{#if @root.canManageVisibility}}data-scene-drop{{/if}} data-scene-index="{{scene.index}}">
+            <div class="ability-row">
+              {{#if scene.thumb}}
+                <img class="scene-thumb" src="{{scene.thumb}}" alt="{{scene.displayName}}" />
+              {{/if}}
+              {{#if scene.sceneId}}
+                <div class="scene-title-text">{{scene.displayName}}</div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll" data-action="openScene" data-scene-id="{{scene.sceneId}}">Open</button>
+                  <button type="button" class="stat-roll muted" data-action="editScene" data-scene-id="{{scene.sceneId}}">Edit</button>
+                {{/if}}
+              {{else}}
+                {{#if @root.canManageVisibility}}
+                  <input class="scene-name-input" type="text" name="system.scenes.{{scene.index}}.name" value="{{scene.name}}" placeholder="Scene name" />
+                {{else}}
+                  <div class="scene-title-text">{{scene.displayName}}</div>
+                {{/if}}
+              {{/if}}
+              {{#if @root.canManageVisibility}}
+                <button type="button" class="stat-roll compact reveal-toggle {{#if scene.revealed}}active{{else}}muted{{/if}}" data-action="sceneReveal" data-scene-index="{{scene.index}}" title="{{#if scene.revealed}}Hide from Limited{{else}}Reveal to Limited{{/if}}">
+                  <i class="fas {{#if scene.revealed}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                </button>
+                <button type="button" class="stat-roll muted" data-action="sceneAddDoc" data-scene-index="{{scene.index}}">Add</button>
+                <button type="button" class="stat-roll danger" data-action="sceneRemove" data-scene-index="{{scene.index}}">Remove</button>
+              {{/if}}
+            </div>
+            {{#if @root.canManageVisibility}}
+              <textarea name="system.scenes.{{scene.index}}.notes" rows="3" placeholder="Scene notes">{{scene.notes}}</textarea>
+            {{else}}
+              <div class="ability-text">{{scene.notes}}</div>
+            {{/if}}
+
+            {{#if scene.hazards.length}}
+              <div class="scene-block">
+                <div class="scene-title">Hazards</div>
+                <div class="token-row">
+                  {{#each scene.hazards as |h|}}
+                    <div class="token-chip {{#if @root.canManageVisibility}}draggable{{/if}}" title="{{h.system.notes}}" {{#if @root.canManageVisibility}}data-action="openDoc" data-kind="hazard" data-id="{{h.ref}}" data-uuid="{{h.uuid}}"{{/if}}>
+                      <img class="token-icon" src="{{h.img}}" alt="{{h.name}}" />
+                      {{h.name}}
+                      {{#if @root.canManageVisibility}}
+                        <button type="button" class="chip-button" data-action="sceneRollHazard" data-id="{{h.ref}}">Roll</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="hazard" data-id="{{h.ref}}">x</button>
+                      {{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{#if scene.entities.length}}
+              <div class="scene-block">
+                <div class="scene-title">Entities</div>
+                <div class="token-row">
+                  {{#each scene.entities as |e|}}
+                    <div class="token-chip {{#if @root.canManageVisibility}}draggable{{/if}}" title="{{e.system.description}}" {{#if @root.canManageVisibility}}data-action="openDoc" data-kind="entity" data-id="{{e.ref}}" data-uuid="{{e.uuid}}"{{/if}}>
+                      <img class="token-icon" src="{{e.img}}" alt="{{e.name}}" />
+                      {{e.name}}
+                      {{#if @root.canManageVisibility}}
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="entity" data-id="{{e.ref}}">x</button>
+                      {{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{#if scene.thralls.length}}
+              <div class="scene-block">
+                <div class="scene-title">Thralls</div>
+                <div class="token-row">
+                  {{#each scene.thralls as |t|}}
+                    <div class="token-chip {{#if @root.canManageVisibility}}draggable{{/if}}" title="{{t.system.notes}}" {{#if @root.canManageVisibility}}data-action="openDoc" data-kind="thrall" data-id="{{t.ref}}" data-uuid="{{t.uuid}}"{{/if}}>
+                      <img class="token-icon" src="{{t.img}}" alt="{{t.name}}" />
+                      {{t.name}}
+                      {{#if @root.canManageVisibility}}
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="thrall" data-id="{{t.ref}}">x</button>
+                      {{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{#if scene.rumours.length}}
+              <div class="scene-block">
+                <div class="scene-title">Rumours</div>
+                <div class="token-row">
+                  {{#each scene.rumours as |r|}}
+                    <div class="token-chip {{#if @root.canManageVisibility}}draggable{{/if}}" title="{{r.system.text}}" {{#if @root.canManageVisibility}}data-action="openDoc" data-kind="rumour" data-id="{{r.ref}}" data-uuid="{{r.uuid}}"{{/if}}>
+                      <img class="token-icon" src="{{r.img}}" alt="{{r.name}}" />
+                      {{r.name}}
+                      {{#if @root.canManageVisibility}}
+                        <button type="button" class="chip-button" data-action="useRumour" data-id="{{r.ref}}">Use</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="rumour" data-id="{{r.ref}}">x</button>
+                      {{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+
+            {{#if scene.relics.length}}
+              <div class="scene-block">
+                <div class="scene-title">Relics</div>
+                <div class="token-row">
+                  {{#each scene.relics as |r|}}
+                    <div class="token-chip {{#if @root.canManageVisibility}}draggable{{/if}}" title="{{r.system.text}}" {{#if @root.canManageVisibility}}data-action="openDoc" data-kind="relic" data-id="{{r.ref}}" data-uuid="{{r.uuid}}"{{/if}}>
+                      <img class="token-icon" src="{{r.img}}" alt="{{r.name}}" />
+                      {{r.name}}
+                      {{#if @root.canManageVisibility}}
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="relic" data-id="{{r.ref}}">x</button>
+                      {{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        {{/each}}
+      </section>
+    </div>
+
+    <div class="tab {{tabs.thralls.cssClass}}" data-tab="thralls" data-group="hollowTabs">
+      <section class="sheet-section">
+        <div class="section-header">
+          <h2>Hazards</h2>
+          {{#if canManageVisibility}}
+            <div class="button-row">
+              <button type="button" class="stat-roll" data-action="linkedAdd" data-kind="hazard">Add Existing</button>
+              <button type="button" class="stat-roll muted" data-action="linkedAdd" data-kind="hazard" data-create="true">Create</button>
+            </div>
+          {{/if}}
+        </div>
+        <div class="abilities-list">
+          {{#each trackedHazards as |h|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label {{#if @root.canManageVisibility}}draggable{{/if}}" {{#if @root.canManageVisibility}}data-kind="hazard" data-id="{{h.ref}}" data-uuid="{{h.uuid}}"{{/if}}>
+                  <img class="token-icon" src="{{h.img}}" alt="{{h.name}}" />
+                  {{h.name}}
+                </div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll compact reveal-toggle {{#if h.revealed}}active{{else}}muted{{/if}}" data-action="linkReveal" data-kind="hazard" data-id="{{h.ref}}" title="{{#if h.revealed}}Hide from Limited{{else}}Reveal to Limited{{/if}}">
+                    <i class="fas {{#if h.revealed}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                  </button>
+                  <button type="button" class="stat-roll" data-action="openDoc" data-kind="hazard" data-id="{{h.ref}}">Open</button>
+                  <button type="button" class="stat-roll danger" data-action="linkedRemove" data-kind="hazard" data-id="{{h.ref}}">Remove</button>
+                {{/if}}
+              </div>
+              <div class="muted">Stat: {{h.stat}} | TN {{h.tn}} | Damage {{h.damageSuccessResolve}}/{{h.damageFailureWounds}} | Doom {{h.doomOnFailure}}</div>
+              <div class="ability-text">{{h.notes}}</div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+      <section class="sheet-section">
+        <div class="section-header">
+          <h2>Thralls</h2>
+          {{#if canManageVisibility}}
+            <div class="button-row">
+              <button type="button" class="stat-roll" data-action="linkedAdd" data-kind="thrall">Add Existing</button>
+              <button type="button" class="stat-roll muted" data-action="linkedAdd" data-kind="thrall" data-create="true">Create</button>
+            </div>
+          {{/if}}
+        </div>
+        <div class="abilities-list">
+          {{#each trackedThralls as |t|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label {{#if @root.canManageVisibility}}draggable{{/if}}" {{#if @root.canManageVisibility}}data-kind="thrall" data-id="{{t.ref}}" data-uuid="{{t.uuid}}"{{/if}}>
+                  <img class="token-icon" src="{{t.img}}" alt="{{t.name}}" />
+                  {{t.name}}
+                </div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll compact reveal-toggle {{#if t.revealed}}active{{else}}muted{{/if}}" data-action="linkReveal" data-kind="thrall" data-id="{{t.ref}}" title="{{#if t.revealed}}Hide from Limited{{else}}Reveal to Limited{{/if}}">
+                    <i class="fas {{#if t.revealed}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                  </button>
+                  <button type="button" class="stat-roll" data-action="openDoc" data-kind="thrall" data-id="{{t.ref}}">Open</button>
+                  <button type="button" class="stat-roll danger" data-action="linkedRemove" data-kind="thrall" data-id="{{t.ref}}">Remove</button>
+                {{/if}}
+              </div>
+              <div class="muted">Stat: {{t.stat}} | TN {{t.tn}} | Damage {{t.damage.resolve}}/{{t.damage.wounds}}</div>
+              <div class="muted">Health: R {{t.health.resolve.value}}/{{t.health.resolve.max}} | W {{t.health.wounds.value}}/{{t.health.wounds.max}}</div>
+              <div class="ability-text">{{t.notes}}</div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+      <section class="sheet-section">
+        <div class="section-header">
+          <h2>Entities</h2>
+          {{#if canManageVisibility}}
+            <div class="button-row">
+              <button type="button" class="stat-roll" data-action="linkedAdd" data-kind="entity">Add Existing</button>
+              <button type="button" class="stat-roll muted" data-action="linkedAdd" data-kind="entity" data-create="true">Create</button>
+            </div>
+          {{/if}}
+        </div>
+        <div class="abilities-list">
+          {{#each trackedEntities as |e|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label {{#if @root.canManageVisibility}}draggable{{/if}}" {{#if @root.canManageVisibility}}data-kind="entity" data-id="{{e.ref}}" data-uuid="{{e.uuid}}"{{/if}}>
+                  <img class="token-icon" src="{{e.img}}" alt="{{e.name}}" />
+                  {{e.name}}
+                </div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll compact reveal-toggle {{#if e.revealed}}active{{else}}muted{{/if}}" data-action="linkReveal" data-kind="entity" data-id="{{e.ref}}" title="{{#if e.revealed}}Hide from Limited{{else}}Reveal to Limited{{/if}}">
+                    <i class="fas {{#if e.revealed}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                  </button>
+                  <button type="button" class="stat-roll" data-action="openDoc" data-kind="entity" data-id="{{e.ref}}">Open</button>
+                  <button type="button" class="stat-roll danger" data-action="linkedRemove" data-kind="entity" data-id="{{e.ref}}">Remove</button>
+                {{/if}}
+              </div>
+              <div class="muted">Defences: Close {{e.defences.close}} | Ranged {{e.defences.ranged}} | Wyrd {{e.defences.wyrd}}</div>
+              <div class="muted">Health: R {{e.health.resolve.value}}/{{e.health.resolve.max}} | W {{e.health.wounds.value}}/{{e.health.wounds.max}}</div>
+              <div class="ability-text">{{e.description}}</div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+    </div>
+
+    <div class="tab {{tabs.rumours.cssClass}}" data-tab="rumours" data-group="hollowTabs">
+      <section class="sheet-section">
+        <div class="section-header">
+          <h2>Rumours</h2>
+          {{#if canManageVisibility}}
+            <div class="button-row">
+              <button type="button" class="stat-roll" data-action="linkedAdd" data-kind="rumour">Add Existing</button>
+              <button type="button" class="stat-roll muted" data-action="linkedAdd" data-kind="rumour" data-create="true">Create</button>
+            </div>
+          {{/if}}
+        </div>
+        <div class="abilities-list">
+          {{#each rumours as |r|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label {{#if @root.canManageVisibility}}draggable{{/if}}" {{#if @root.canManageVisibility}}data-kind="rumour" data-id="{{r.ref}}" data-uuid="{{r.uuid}}"{{/if}}>
+                  <img class="token-icon" src="{{r.img}}" alt="{{r.name}}" />
+                  {{r.name}}
+                </div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll compact reveal-toggle {{#if r.revealed}}active{{else}}muted{{/if}}" data-action="linkReveal" data-kind="rumour" data-id="{{r.ref}}" title="{{#if r.revealed}}Hide from Limited{{else}}Reveal to Limited{{/if}}">
+                    <i class="fas {{#if r.revealed}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                  </button>
+                  <button type="button" class="stat-roll" data-action="useRumour" data-id="{{r.ref}}">Use</button>
+                  <button type="button" class="stat-roll" data-action="openDoc" data-kind="rumour" data-id="{{r.ref}}">Open</button>
+                  <button type="button" class="stat-roll danger" data-action="linkedRemove" data-kind="rumour" data-id="{{r.ref}}">Remove</button>
+                {{/if}}
+              </div>
+              <div class="ability-text">{{r.system.text}}</div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+      <section class="sheet-section">
+        <div class="section-header">
+          <h2>Relics</h2>
+          {{#if canManageVisibility}}
+            <div class="button-row">
+              <button type="button" class="stat-roll" data-action="linkedAdd" data-kind="relic">Add Existing</button>
+              <button type="button" class="stat-roll muted" data-action="linkedAdd" data-kind="relic" data-create="true">Create</button>
+            </div>
+          {{/if}}
+        </div>
+        <div class="abilities-list">
+          {{#each relics as |r|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label {{#if @root.canManageVisibility}}draggable{{/if}}" {{#if @root.canManageVisibility}}data-kind="relic" data-id="{{r.ref}}" data-uuid="{{r.uuid}}"{{/if}}>
+                  <img class="token-icon" src="{{r.img}}" alt="{{r.name}}" />
+                  {{r.name}}
+                </div>
+                {{#if @root.canManageVisibility}}
+                  <button type="button" class="stat-roll compact reveal-toggle {{#if r.revealed}}active{{else}}muted{{/if}}" data-action="linkReveal" data-kind="relic" data-id="{{r.ref}}" title="{{#if r.revealed}}Hide from Limited{{else}}Reveal to Limited{{/if}}">
+                    <i class="fas {{#if r.revealed}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                  </button>
+                  <button type="button" class="stat-roll" data-action="openDoc" data-kind="relic" data-id="{{r.ref}}">Open</button>
+                  <button type="button" class="stat-roll danger" data-action="linkedRemove" data-kind="relic" data-id="{{r.ref}}">Remove</button>
+                {{/if}}
+              </div>
+              <div class="ability-text">{{r.system.text}}</div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+    </div>
+  </section>
+</form>
+

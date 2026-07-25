@@ -1,0 +1,438 @@
+<form class="hollows-sheet hollows-entity" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Entity Name" />
+      <div class="subline">Hollows Entity</div>
+      <div class="header-actions"></div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    </div>
+  </header>
+
+  <div class="rune-bar" aria-hidden="true"></div>
+
+  <nav class="sheet-tabs tabs" data-group="mainTabs">
+    <a class="item" data-tab="stats">Stats</a>
+    <a class="item" data-tab="attacks">Attacks</a>
+    <a class="item" data-tab="actions">Actions</a>
+    <a class="item" data-tab="edges">Edges &amp; Enhancements</a>
+    <a class="item" data-tab="about">About</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab" data-tab="stats" data-group="mainTabs">
+      <section class="sheet-section entity-quick-actions">
+        <h2>Entity Actions</h2>
+        <div class="abilities-list">
+          <div class="ability-card">
+            <div class="ability-row">
+              <div class="stat-label">Attacks</div>
+              <div class="ability-actions">
+                {{#each entityAttacks as |ability|}}
+                  <button type="button" class="stat-roll" data-attack-roll data-ability-hover data-item-id="{{ability.id}}" {{#if (lookup @root.abilityBlocks ability.id)}}disabled title="Blocked by {{lookup @root.abilityBlocks ability.id}}"{{/if}}>{{ability.name}}</button>
+                {{/each}}
+                {{#unless entityAttacks.length}}
+                  <div class="muted">No attacks.</div>
+                {{/unless}}
+              </div>
+            </div>
+            <div class="ability-row">
+              <div class="stat-label">Interrupts</div>
+              <div class="ability-actions">
+                {{#each entityInterrupts as |ability|}}
+                  <button type="button" class="stat-roll" data-interrupt-use data-ability-hover data-item-id="{{ability.id}}" {{#if (lookup @root.abilityBlocks ability.id)}}disabled title="Blocked by {{lookup @root.abilityBlocks ability.id}}"{{/if}}>{{ability.name}}</button>
+                {{/each}}
+                {{#unless entityInterrupts.length}}
+                  <div class="muted">No interrupts.</div>
+                {{/unless}}
+              </div>
+            </div>
+            <div class="ability-row">
+              <div class="stat-label">Specials</div>
+              <div class="ability-actions">
+                {{#each entitySpecials as |ability|}}
+                  <button type="button" class="stat-roll" data-ability-chat data-ability-hover data-item-id="{{ability.id}}" {{#if (lookup @root.abilityBlocks ability.id)}}disabled title="Blocked by {{lookup @root.abilityBlocks ability.id}}"{{/if}}>{{ability.name}}</button>
+                {{/each}}
+                {{#unless entitySpecials.length}}
+                  <div class="muted">No specials.</div>
+                {{/unless}}
+              </div>
+            </div>
+            <div class="ability-row">
+              <div class="stat-label">Manoeuvres</div>
+              <div class="ability-actions">
+                {{#each entityManoeuvres as |ability|}}
+                  <button type="button" class="stat-roll" data-manoeuvre-use data-ability-hover data-item-id="{{ability.id}}" {{#if (lookup @root.abilityBlocks ability.id)}}disabled title="Blocked by {{lookup @root.abilityBlocks ability.id}}"{{/if}}>{{ability.name}}</button>
+                {{/each}}
+                {{#unless entityManoeuvres.length}}
+                  <div class="muted">No manoeuvres.</div>
+                {{/unless}}
+              </div>
+            </div>
+            <div class="ability-row">
+              <div class="stat-label">Default</div>
+              <div class="ability-actions">
+                <button type="button" class="stat-roll" data-entity-manoeuvre="prowl">Prowl</button>
+                <button type="button" class="stat-roll" data-entity-manoeuvre="shrug">Shrug Off</button>
+                <button type="button" class="stat-roll" data-entity-manoeuvre="turn">Turn Around</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet-section defences">
+        <h2>Defences</h2>
+        <div class="stat-grid">
+          {{#each system.defences as |value key|}}
+            <div class="stat-row">
+              <div class="stat-label">{{lookup ../defenceLabels key}}</div>
+              <input class="stat-input" type="number" name="system.defences.{{key}}" value="{{value}}" />
+              <div class="stat-roll muted">TN</div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+
+      <section class="sheet-section health">
+        <h2>Health</h2>
+        <div class="health-grid">
+          <div class="health-row">
+            <div class="health-label">Resolve</div>
+            <input type="number" name="system.health.resolve.value" value="{{system.health.resolve.value}}" />
+            <span class="slash">/</span>
+            <input type="number" name="system.health.resolve.max" value="{{system.health.resolve.max}}" />
+          </div>
+          <div class="health-row">
+            <div class="health-label">Wounds</div>
+            <input type="number" name="system.health.wounds.value" value="{{system.health.wounds.value}}" />
+            <span class="slash">/</span>
+            <input type="number" name="system.health.wounds.max" value="{{system.health.wounds.max}}" />
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet-section threat">
+        <h2>Threat</h2>
+        <div class="threat-grid">
+          <div class="threat-row">
+            <div class="health-label">Per Round</div>
+            <input type="number" name="system.threat.perRound" value="{{system.threat.perRound}}" />
+          </div>
+          <div class="threat-row">
+            <div class="health-label">Max</div>
+            <input type="number" name="system.threat.max" value="{{system.threat.max}}" />
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet-section terrain">
+        <h2>Terrain Pool</h2>
+        <div class="threat-grid">
+          <div class="threat-row">
+            <div class="health-label">Elevated</div>
+            <input type="number" name="system.terrainPool.elevated" value="{{system.terrainPool.elevated}}" />
+          </div>
+          <div class="threat-row">
+            <div class="health-label">Sheltered</div>
+            <input type="number" name="system.terrainPool.sheltered" value="{{system.terrainPool.sheltered}}" />
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet-section terrain-engine">
+        <h2>Terrain Engine</h2>
+        <div class="hollows-form-row">
+          <div class="stat-label">Enable Terrain Engine</div>
+          <label class="checkbox">
+            <input type="checkbox" name="system.terrainEngineEnabled" {{#if system.terrainEngineEnabled}}checked{{/if}} />
+            Enabled
+          </label>
+        </div>
+        {{#if system.terrainEngineEnabled}}
+          <div class="hollows-form-row">
+            <div class="stat-label">Entity Terrain (Elevated / Sheltered)</div>
+            <div class="weapon-capacity">
+              <input class="stat-input" type="number" min="0" name="system.terrain.elevated" value="{{system.terrain.elevated}}" />
+              <span class="slash">/</span>
+              <input class="stat-input" type="number" min="0" name="system.terrain.sheltered" value="{{system.terrain.sheltered}}" />
+            </div>
+          </div>
+        {{/if}}
+      </section>
+
+      <section class="sheet-section curse-engine">
+        <h2>Curse Engine</h2>
+        <div class="hollows-form-row">
+          <div class="stat-label">Enable Curse Engine</div>
+          <label class="checkbox">
+            <input type="checkbox" name="system.curse.enabled" {{#if system.curse.enabled}}checked{{/if}} />
+            Enabled
+          </label>
+        </div>
+        {{#if system.curse.enabled}}
+          <div class="hollows-form-row">
+            <div class="stat-label">Allowed Curse Targets</div>
+            <div class="checkbox-group">
+              <label class="checkbox">
+                <input type="checkbox" name="system.curse.targets.hunter" {{#if system.curse.targets.hunter}}checked{{/if}} />
+                <span>Hunters</span>
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" name="system.curse.targets.entity" {{#if system.curse.targets.entity}}checked{{/if}} />
+                <span>Entity</span>
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" name="system.curse.targets.zone" {{#if system.curse.targets.zone}}checked{{/if}} />
+                <span>Zones</span>
+              </label>
+            </div>
+          </div>
+          {{#if system.curse.targets.entity}}
+            <div class="hollows-form-row">
+              <div class="stat-label">Entity Curse</div>
+              <input type="number" name="system.curse.value" min="0" max="6" value="{{system.curse.value}}" />
+            </div>
+          {{/if}}
+        {{/if}}
+      </section>
+    </div>
+
+    <div class="tab" data-tab="attacks" data-group="mainTabs">
+      <section class="sheet-section entity-attacks">
+        <div class="abilities-header">
+          <h2>Attacks</h2>
+          <button type="button" class="stat-roll" data-entity-ability-add="attack">Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entityAttacks as |ability|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{ability.name}}" data-entity-ability-edit data-item-id="{{ability.id}}" data-drag="true" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-attack-roll data-item-id="{{ability.id}}">Roll</button>
+                  <button type="button" class="stat-roll" data-ability-chat data-item-id="{{ability.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-entity-ability-edit data-item-id="{{ability.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-entity-ability-delete data-item-id="{{ability.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless entityAttacks.length}}
+            <div class="muted">No attacks added yet.</div>
+          {{/unless}}
+        </div>
+      </section>
+    </div>
+
+    <div class="tab" data-tab="actions" data-group="mainTabs">
+      <section class="sheet-section entity-manoeuvres">
+        <div class="abilities-header">
+          <h2>Manoeuvres</h2>
+          <button type="button" class="stat-roll" data-entity-ability-add="manoeuvre">Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entityManoeuvres as |ability|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{ability.name}}" data-entity-ability-edit data-item-id="{{ability.id}}" data-drag="true" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-manoeuvre-use data-item-id="{{ability.id}}">Use</button>
+                  <button type="button" class="stat-roll" data-ability-chat data-item-id="{{ability.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-entity-ability-edit data-item-id="{{ability.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-entity-ability-delete data-item-id="{{ability.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless entityManoeuvres.length}}
+            <div class="muted">No manoeuvres added yet.</div>
+          {{/unless}}
+        </div>
+      </section>
+
+      <section class="sheet-section entity-interrupts">
+        <div class="abilities-header">
+          <h2>Interrupt Actions</h2>
+          <button type="button" class="stat-roll" data-entity-ability-add="interrupt">Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entityInterrupts as |ability|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{ability.name}}" data-entity-ability-edit data-item-id="{{ability.id}}" data-drag="true" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-interrupt-use data-item-id="{{ability.id}}">Use</button>
+                  <button type="button" class="stat-roll" data-ability-chat data-item-id="{{ability.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-entity-ability-edit data-item-id="{{ability.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-entity-ability-delete data-item-id="{{ability.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless entityInterrupts.length}}
+            <div class="muted">No interrupts added yet.</div>
+          {{/unless}}
+        </div>
+      </section>
+
+      <section class="sheet-section abilities">
+        <div class="abilities-header">
+          <h2>Specials</h2>
+          <button type="button" class="stat-roll" data-entity-ability-add="special">Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entitySpecials as |ability|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{ability.name}}" data-entity-ability-edit data-item-id="{{ability.id}}" data-drag="true" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-ability-chat data-item-id="{{ability.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-entity-ability-edit data-item-id="{{ability.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-entity-ability-delete data-item-id="{{ability.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless entitySpecials.length}}
+            <div class="muted">No specials added yet.</div>
+          {{/unless}}
+        </div>
+      </section>
+
+      <section class="sheet-section abilities">
+        <div class="abilities-header">
+          <h2>When Broken</h2>
+          <button type="button" class="stat-roll" data-entity-ability-add="whenBroken">Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entityWhenBroken as |ability|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{ability.name}}" data-entity-ability-edit data-item-id="{{ability.id}}" data-drag="true" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-ability-chat data-item-id="{{ability.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-entity-ability-edit data-item-id="{{ability.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-entity-ability-delete data-item-id="{{ability.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless entityWhenBroken.length}}
+            <div class="muted">No entries.</div>
+          {{/unless}}
+        </div>
+      </section>
+
+      <section class="sheet-section abilities">
+        <div class="abilities-header">
+          <h2>Doom</h2>
+          <button type="button" class="stat-roll" data-entity-ability-add="doom">Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entityDoom as |ability|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{ability.name}}" data-entity-ability-edit data-item-id="{{ability.id}}" data-drag="true" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-ability-chat data-item-id="{{ability.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-entity-ability-edit data-item-id="{{ability.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-entity-ability-delete data-item-id="{{ability.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless entityDoom.length}}
+            <div class="muted">No entries.</div>
+          {{/unless}}
+        </div>
+      </section>
+    </div>
+
+    <div class="tab" data-tab="edges" data-group="mainTabs">
+      <section class="sheet-section abilities">
+        <div class="abilities-header">
+          <h2>Active Edges</h2>
+        </div>
+        <div class="abilities-list">
+          {{#each activeEdges as |edge|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <div class="stat-label">
+                  {{edge.name}}
+                  {{#if edge.extra}}
+                    <span class="ability-duration-badge">Superior</span>
+                  {{/if}}
+                </div>
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll danger" data-edge-delete="{{edge.index}}">Delete</button>
+                </div>
+              </div>
+              {{#if edge.description}}
+                <div class="ability-text">{{edge.description}}</div>
+              {{/if}}
+
+            </div>
+          {{/each}}
+          {{#unless activeEdges.length}}
+            <div class="muted">No active Edges.</div>
+          {{/unless}}
+        </div>
+      </section>
+
+      <section class="sheet-section abilities">
+        <div class="abilities-header">
+          <h2>Enhancements</h2>
+          <button type="button" class="stat-roll" data-enhancement-add>Add</button>
+        </div>
+        <div class="abilities-list">
+          {{#each entityEnhancements as |item|}}
+            <div class="ability-card">
+              <div class="ability-row">
+                <input type="text" value="{{item.name}}" data-item-id="{{item.id}}" readonly />
+                <div class="ability-actions">
+                  <button type="button" class="stat-roll" data-enhancement-chat data-item-id="{{item.id}}">Chat</button>
+                  <button type="button" class="stat-roll" data-enhancement-edit data-item-id="{{item.id}}">Edit</button>
+                  <button type="button" class="stat-roll danger" data-enhancement-delete data-item-id="{{item.id}}">Delete</button>
+                </div>
+              </div>
+              {{#if item.system.category}}
+                <div class="muted">Category: {{item.system.category}}</div>
+              {{/if}}
+              {{#if item.system.text}}
+                <div class="ability-text">{{item.system.text}}</div>
+              {{/if}}
+            </div>
+          {{/each}}
+          {{#unless entityEnhancements.length}}
+            <div class="muted">No Enhancements added yet.</div>
+          {{/unless}}
+        </div>
+      </section>
+    </div>
+    <div class="tab" data-tab="about" data-group="mainTabs">
+      <section class="sheet-section entity-about">
+        <h2>About</h2>
+        <div class="hollows-form-section">
+          <h3>Appearance</h3>
+          <textarea name="system.description" rows="5">{{system.description}}</textarea>
+        </div>
+        <div class="hollows-form-section">
+          <h3>Behavior</h3>
+          <textarea name="system.descriptionBehavior" rows="5">{{system.descriptionBehavior}}</textarea>
+        </div>
+        <div class="hollows-form-section">
+          <h3>Notes</h3>
+          <textarea name="system.descriptionNotes" rows="5">{{system.descriptionNotes}}</textarea>
+        </div>
+      </section>
+    </div>
+  </section>
+</form>
+
+
+
+
+
+

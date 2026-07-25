@@ -1,0 +1,12 @@
+<div class="hollows-chat hollows-entity-attack">
+  <div class="attack-title">{{{titleHtml}}}</div>
+  <div><strong>Check:</strong> {{statLabel}}{{tnLabel}}</div>
+  {{{detailsHtml}}}
+  {{#if conditionText}}
+    <div><strong>Condition:</strong> {{conditionText}}</div>
+  {{/if}}
+  {{#if effectText}}
+    <div><strong>Effect:</strong> {{effectText}}</div>
+  {{/if}}
+  <button type="button" class="hollows-entity-test">{{buttonLabel}}</button>
+</div>

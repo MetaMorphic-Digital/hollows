@@ -1,0 +1,31 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Rumour Name" />
+      <div class="subline">Rumour</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Play text</h2>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row"><div class="stat-label">Description</div><textarea name="system.text" rows="4">{{system.text}}</textarea></div>
+      <div class="hollows-form-row"><div class="stat-label">GM Notes</div><textarea name="system.gmText" rows="3">{{system.gmText}}</textarea></div>
+      <div class="hollows-form-row"><div class="stat-label">Combat Reminder</div><input type="text" name="system.combatReminder" value="{{system.combatReminder}}" /></div>
+      <div class="hollows-form-row"><div class="stat-label">Narrative Setup</div><textarea name="system.narrativeSetup" rows="2">{{system.narrativeSetup}}</textarea></div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Effects</h2>
+    {{#each system.groups as |group i|}}
+      {{> "systems/hollows/templates/item/parts/effect-group.html" group=group i=i groupsPath="groups"
+          choices=../choices zoneList=../zoneList conditionChoices=../conditionChoices
+          entityChoices=../entityChoices entityAbilityMap=../entityAbilityMap}}
+    {{/each}}
+    <button type="button" class="stat-roll" data-action="addGroup" data-groups-path="groups">+ Add effect group</button>
+  </section>
+</form>

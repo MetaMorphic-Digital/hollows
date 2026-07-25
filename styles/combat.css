@@ -1,0 +1,148 @@
+.hollows-setup-init,
+.hollows-pass-init,
+.hollows-end-combat,
+.hollows-add-combatant {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.hollows-setup-init {
+  margin-left: 6px;
+  background: linear-gradient(180deg, #493f3a 0%, #2d2826 100%);
+  color: #f3e7d6;
+  border: 1px solid #3a3330;
+}
+
+.hollows-setup-init.disabled {
+  opacity: 0.6;
+  cursor: default;
+  filter: grayscale(40%);
+}
+
+.hollows-pass-init {
+  background: linear-gradient(180deg, #3a4346 0%, #262b2e 100%);
+  color: #f0ebe1;
+  border: 1px solid #33393d;
+}
+
+.hollows-end-combat {
+  background: linear-gradient(180deg, #57413a 0%, #302320 100%);
+  color: #f5e7d0;
+  border: 1px solid #3f2f29;
+}
+
+.hollows-add-combatant {
+  background: linear-gradient(180deg, #465246 0%, #283128 100%);
+  color: #edf3e7;
+  border: 1px solid #344034;
+}
+
+/* Hide default Foundry combat controls */
+.combat-controls .combat-control.roll,
+.combat-controls .combat-control.rollAll,
+.combat-controls [data-control*="roll" i],
+.combat-controls [data-control*="turn" i],
+.combat-control.endturn,
+.combat-control.endTurn,
+.combat-control.end-turn,
+#combat .combatant-control,
+#combat-popout .combatant-control {
+  display: none !important;
+}
+
+.combat-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.hollows-bracket-tag {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #2a2624;
+  border: 1px solid #3a3330;
+  color: #f0e6d8;
+}
+
+.hollows-bracket-tag.before {
+  border-color: #8ecda0;
+  color: #bfe4c6;
+}
+
+.hollows-bracket-tag.after {
+  border-color: #b89252;
+  color: #e2c590;
+}
+
+.hollows-acted {
+  opacity: 0.6;
+}
+
+.hollows-acted .token-name,
+.hollows-acted .combatant-name {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: rgba(191, 180, 160, 0.6);
+}
+
+.hollows-scene-lair {
+  border: 1px solid #3b3430;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(26, 24, 28, 0.8) 0%, rgba(20, 19, 22, 0.8) 100%);
+}
+
+.hollows-scene-lair legend {
+  padding: 0 6px;
+  color: #f3e7d6;
+  font-weight: 700;
+}
+
+.hollows-add-combatant-dialog .hollows-add-combatant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.hollows-add-combatant-dialog .hollows-add-combatant-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid #3a3330;
+  border-radius: 8px;
+}
+
+.hollows-add-combatant-dialog .hollows-add-combatant-row .checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.hollows-add-combatant-dialog .hollows-add-combatant-meta,
+.hollows-add-combatant-dialog .hollows-add-combatant-note {
+  font-size: 12px;
+}
+
+.hollows-add-combatant-dialog .hollows-add-combatant-bracket {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}

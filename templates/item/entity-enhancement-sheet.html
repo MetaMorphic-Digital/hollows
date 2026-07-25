@@ -1,0 +1,336 @@
+<form class="hollows-sheet hollows-entity-enhancement" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Enhancement Name" />
+      <div class="subline">Hollows Entity Enhancement</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Details</h2>
+    <div class="form-group">
+      <label>Category</label>
+      <div class="form-fields">
+        <select name="system.category">
+          <option value="default" {{#if (eq system.category "default")}}selected{{/if}}>Default</option><option value="dominion" {{#if (eq system.category "dominion")}}selected{{/if}}>Dominion</option><option value="fury" {{#if (eq system.category "fury")}}selected{{/if}}>Fury</option><option value="hunger" {{#if (eq system.category "hunger")}}selected{{/if}}>Hunger</option><option value="fear" {{#if (eq system.category "fear")}}selected{{/if}}>Fear</option><option value="grief" {{#if (eq system.category "grief")}}selected{{/if}}>Grief</option><option value="pride" {{#if (eq system.category "pride")}}selected{{/if}}>Pride</option><option value="custom" {{#if (eq system.category "custom")}}selected{{/if}}>Custom</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group stacked">
+      <label>Text</label>
+      <textarea name="system.text" rows="5">{{system.text}}</textarea>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Builder</h2>
+    <div class="form-group">
+      <label>Add Rule</label>
+      <div class="form-fields">
+        <select data-enhancement-rule-type>{{selectOptions choices.ruleType selected="triggeredEffect" localize=false}}</select>
+        <button type="button" class="stat-roll" data-action="addRule">Add Rule</button>
+      </div>
+    </div>
+    {{#unless hasRules}}
+      <p class="notes">No builder rules yet.</p>
+    {{/unless}}
+  </section>
+
+  {{#if statModifiers.length}}
+  <section class="sheet-section">
+    <h3>Entity Stats</h3>
+    {{#each statModifiers as |entry|}}
+    <div class="group-card">
+      <div class="group-head">
+        <strong>Modify Entity Stat {{@index}}</strong>
+        <a class="group-remove" data-action="removeRule" data-array-path="system.builder.statModifiers" data-index="{{@index}}">x</a>
+      </div>
+      <div class="form-group stacked">
+        <label>Stats</label>
+        <div class="cond-grid">
+          {{#each @root.choices.stat as |label key|}}
+          <label class="zone-chip {{#if (includes entry.stat key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.builder.statModifiers.{{@../index}}.stat" data-value="{{key}}" {{#if (includes entry.stat key)}}checked{{/if}} />{{label}}</label>
+          {{/each}}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Amount</label>
+        <div class="form-fields">
+          <select name="system.builder.statModifiers.{{@index}}.mode">{{selectOptions @root.choices.amountMode selected=entry.mode localize=false}}</select>
+          {{#if (eq entry.mode "dynamic")}}
+            <select name="system.builder.statModifiers.{{@index}}.source">{{selectOptions @root.choices.statAmountSource selected=entry.source localize=false}}</select>
+          {{else}}
+            <input type="number" name="system.builder.statModifiers.{{@index}}.amount" value="{{entry.amount}}" />
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </section>
+  {{/if}}
+
+  {{#if actionModifiers.length}}
+  <section class="sheet-section">
+    <h3>Entity Abilities</h3>
+    {{#each actionModifiers as |entry|}}
+    <div class="group-card">
+      <div class="group-head">
+        <strong>Modify Entity Ability {{@index}}</strong>
+        <a class="group-remove" data-action="removeRule" data-array-path="system.builder.actionModifiers" data-index="{{@index}}">x</a>
+      </div>
+      <div class="form-group">
+        <label>Scope</label>
+        <div class="form-fields">
+          <select name="system.builder.actionModifiers.{{@index}}.scope">{{selectOptions @root.choices.actionScope selected=entry.scope localize=false}}</select>
+        </div>
+      </div>
+      {{#if (eq entry.scope "selectedAbility")}}
+      <div class="form-group sub">
+        <label>Ability</label>
+        <div class="form-fields">
+          <select name="system.builder.actionModifiers.{{@index}}.selectedAbilityId">{{selectOptions @root.entityAbilityChoices selected=entry.selectedAbilityId localize=false}}</select>
+        </div>
+      </div>
+      {{/if}}
+      {{#unless (eq entry.scope "selectedAbility")}}
+      <div class="form-group stacked">
+        <label>Ability Kinds</label>
+        <div class="cond-grid">
+          {{#each @root.choices.actionKind as |label key|}}
+          <label class="zone-chip {{#if (includes entry.actionKind key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.builder.actionModifiers.{{@../index}}.actionKind" data-value="{{key}}" {{#if (includes entry.actionKind key)}}checked{{/if}} />{{label}}</label>
+          {{/each}}
+        </div>
+      </div>
+      {{/unless}}
+      <div class="form-group">
+        <label>Damage Delta</label>
+        <div class="form-fields">
+          <input type="number" class="dmg" name="system.builder.actionModifiers.{{@index}}.damage.resolve" value="{{entry.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.builder.actionModifiers.{{@index}}.damage.wounds" value="{{entry.damage.wounds}}" /><span class="hint">R / W</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>TN / Cost</label>
+        <div class="form-fields">
+          <input type="number" class="dmg" name="system.builder.actionModifiers.{{@index}}.tn" value="{{entry.tn}}" title="TN delta" />
+          <input type="number" class="dmg" name="system.builder.actionModifiers.{{@index}}.cost.threat" value="{{entry.cost.threat}}" title="Threat cost delta" />
+          <span class="hint">TN / Threat</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Targeting</label>
+        <div class="form-fields">
+          <select name="system.builder.actionModifiers.{{@index}}.targetMode">{{selectOptions @root.choices.modifierTargetMode selected=entry.targetMode localize=false}}</select>
+        </div>
+      </div>
+      {{#if (eq entry.targetMode "adjacentZones")}}
+      <div class="form-group sub">
+        <label>Adjacent</label>
+        <div class="form-fields">
+          <select name="system.builder.actionModifiers.{{@index}}.adjacentScope">{{selectOptions @root.choices.adjacentScope selected=entry.adjacentScope localize=false}}</select>
+          <select name="system.builder.actionModifiers.{{@index}}.adjacentCount">{{selectOptions @root.choices.adjacentCount selected=entry.adjacentCount localize=false}}</select>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+    {{/each}}
+  </section>
+  {{/if}}
+
+  {{#if generatedAbility}}
+  <section class="sheet-section">
+    <h3>Generated Ability</h3>
+    {{#with generatedAbility as |entry|}}
+    <div class="group-card">
+      <div class="group-head">
+        <strong>Generated Ability</strong>
+        <a class="group-remove" data-action="removeRule" data-rule-path="system.builder.generatedAbility">x</a>
+      </div>
+      <div class="form-group">
+        <label>Mode</label>
+        <div class="form-fields"><select name="system.builder.generatedAbility.mode">{{selectOptions @root.choices.generatedMode selected=entry.mode localize=false}}</select><input type="text" name="system.builder.generatedAbility.name" value="{{entry.name}}" placeholder="Ability Name" /></div>
+      </div>
+      {{#if (eq entry.mode "useExistingManoeuvre")}}
+      <div class="form-group sub">
+        <label>Manoeuvre</label>
+        <div class="form-fields"><select name="system.builder.generatedAbility.manoeuvre.choice">{{selectOptions @root.manoeuvreChoices selected=entry.manoeuvre.choice localize=false}}</select>{{#if (eq entry.manoeuvre.choice "basic:prowl")}}<input type="number" class="dmg" name="system.builder.generatedAbility.manoeuvre.threatCost" value="{{entry.manoeuvre.threatCost}}" title="Threat Cost" />{{/if}}</div>
+      </div>
+      {{/if}}
+      {{#if (eq entry.mode "cloneSelectedAbility")}}
+      <div class="form-group sub">
+        <label>Clone</label>
+        <div class="form-fields"><input type="text" name="system.builder.generatedAbility.namePrefix" value="{{entry.namePrefix}}" placeholder="Name Prefix" /><select name="system.builder.generatedAbility.overrides.profile.targetMode">{{selectOptions @root.choices.generatedTargetMode selected=entry.overrides.profile.targetMode localize=false}}</select></div>
+      </div>
+      {{#if (eq entry.overrides.profile.targetMode "adjacentZones")}}
+      <div class="form-group sub">
+        <label>Adjacent</label>
+        <div class="form-fields"><select name="system.builder.generatedAbility.overrides.profile.adjacentScope">{{selectOptions @root.choices.adjacentScope selected=entry.overrides.profile.adjacentScope localize=false}}</select><select name="system.builder.generatedAbility.overrides.profile.adjacentCount">{{selectOptions @root.choices.adjacentCount selected=entry.overrides.profile.adjacentCount localize=false}}</select></div>
+      </div>
+      {{/if}}
+      <div class="form-group sub">
+        <label>Ability Prompt Title</label>
+        <div class="form-fields"><input type="text" name="system.builder.configure.action.label" value="{{@root.builder.configure.action.label}}" placeholder="Choose Ability" /></div>
+      </div>
+      <div class="form-group sub stacked">
+        <label>Eligible Kinds</label>
+        <div class="cond-grid">
+          {{#each @root.choices.actionKind as |label key|}}
+          <label class="zone-chip {{#if (includes @root.configureActionKinds key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.builder.configure.action.kinds" data-value="{{key}}" {{#if (includes @root.configureActionKinds key)}}checked{{/if}} />{{label}}</label>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+      {{#if (eq entry.mode "template")}}
+      <div class="form-group">
+        <label>Kind / Type</label>
+        <div class="form-fields"><select name="system.builder.generatedAbility.kind">{{selectOptions @root.choices.actionKind selected=entry.kind localize=false}}</select><select name="system.builder.generatedAbility.system.profile.actionType">{{selectOptions @root.actionChoices.actionType selected=entry.system.profile.actionType localize=false}}</select><select name="system.builder.generatedAbility.system.profile.targetMode">{{selectOptions @root.actionChoices.targetMode selected=entry.system.profile.targetMode localize=false}}</select></div>
+      </div>
+      {{#if (eq entry.system.profile.targetMode "adjacentZones")}}
+      <div class="form-group sub">
+        <label>Adjacent</label>
+        <div class="form-fields"><select name="system.builder.generatedAbility.system.profile.adjacentScope">{{selectOptions @root.actionChoices.targetAdjacentScope selected=entry.system.profile.adjacentScope localize=false}}</select><select name="system.builder.generatedAbility.system.profile.adjacentCount">{{selectOptions @root.actionChoices.targetAdjacentCount selected=entry.system.profile.adjacentCount localize=false}}</select></div>
+      </div>
+      {{/if}}
+      <div class="form-group">
+        <label>Defence / TN</label>
+        <div class="form-fields"><select name="system.builder.generatedAbility.system.profile.defenceStat">{{selectOptions @root.statChoices selected=entry.system.profile.defenceStat localize=false}}</select><input type="number" class="dmg" name="system.builder.generatedAbility.system.profile.tn" value="{{entry.system.profile.tn}}" /><label class="checkbox"><input type="checkbox" name="system.builder.generatedAbility.defenceStatFromSelected" {{#if entry.defenceStatFromSelected}}checked{{/if}} /> Prompt for Defence</label></div>
+      </div>
+      {{#if entry.defenceStatFromSelected}}
+      <div class="form-group sub">
+        <label>Stat Prompt</label>
+        <div class="form-fields">
+          <input type="text" name="system.builder.configure.stat.title" value="{{@root.builder.configure.stat.title}}" placeholder="Choose Stat" />
+          <select name="system.builder.configure.stat.default">{{selectOptions @root.statChoices selected=@root.builder.configure.stat.default localize=false}}</select>
+        </div>
+      </div>
+      {{/if}}
+      <div class="form-group">
+        <label>Damage</label>
+        <div class="form-fields">
+          <input type="number" class="dmg" name="system.builder.generatedAbility.system.profile.damage.resolve" value="{{entry.system.profile.damage.resolve}}" />
+          <span class="dmg-sep">/</span>
+          <input type="number" class="dmg" name="system.builder.generatedAbility.system.profile.damage.wounds" value="{{entry.system.profile.damage.wounds}}" />
+          <span class="hint">R / W</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Cost</label>
+        <div class="form-fields">
+          <label class="checkbox"><input type="checkbox" name="system.builder.generatedAbility.system.cost.enabled" {{#if entry.system.cost.enabled}}checked{{/if}} /> Enabled</label>
+          <select name="system.builder.generatedAbility.system.cost.type">{{selectOptions @root.actionChoices.costType selected=entry.system.cost.type localize=false}}</select>
+          <input type="number" class="dmg" name="system.builder.generatedAbility.system.cost.amount" value="{{entry.system.cost.amount}}" />
+        </div>
+      </div>
+      <div class="form-group stacked"><label>Effect Text</label><textarea name="system.builder.generatedAbility.system.profile.effectText" rows="2">{{entry.system.profile.effectText}}</textarea></div>
+      <div class="form-group stacked"><label>Text</label><textarea name="system.builder.generatedAbility.system.profile.text" rows="2">{{entry.system.profile.text}}</textarea></div>
+      {{/if}}
+    </div>
+    {{/with}}
+  </section>
+  {{/if}}
+
+  {{#if triggers.length}}
+  <section class="sheet-section">
+    <h3>Triggered Effects</h3>
+    {{#each triggers as |entry|}}
+    <div class="group-card">
+      <div class="group-head">
+        <strong>Triggered Effect {{entry.index}}</strong>
+        <a class="group-remove" data-action="removeRule" data-array-path="system.builder.triggers" data-index="{{entry.index}}">x</a>
+      </div>
+      <div class="form-group">
+        <label>When</label>
+        <div class="form-fields">
+          <select name="system.builder.triggers.{{entry.index}}.hook">{{selectOptions @root.choices.triggerHook selected=entry.hook localize=false}}</select>
+          {{#if (eq entry.hook "afterHunterDamage")}}
+          <select name="system.builder.triggers.{{entry.index}}.stage">{{selectOptions @root.choices.triggerStage selected=entry.stage localize=false}}</select>
+          {{/if}}
+        </div>
+      </div>
+      {{#if (eq entry.hook "afterHunterDamage")}}
+      <div class="form-group">
+        <label>Damage Gate</label>
+        <div class="form-fields">
+          <select name="system.builder.triggers.{{entry.index}}.damageType">{{selectOptions @root.choices.damageType selected=entry.damageType localize=false}}</select>
+          <input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.minDamage" value="{{entry.minDamage}}" placeholder="Min" />
+          <select name="system.builder.triggers.{{entry.index}}.condition">{{selectOptions @root.choices.triggerCondition selected=entry.condition localize=false}}</select>
+        </div>
+      </div>
+      {{/if}}
+      {{#if (eq entry.hook "onEntityInflictsDamage")}}
+      <div class="form-group"><label>Damage Type</label><div class="form-fields"><select name="system.builder.triggers.{{entry.index}}.damageType">{{selectOptions @root.choices.damageType selected=entry.damageType localize=false}}</select></div></div>
+      {{/if}}
+      {{#if (eq entry.hook "onAttackResolved")}}
+      <div class="form-group">
+        <label>Condition</label>
+        <div class="form-fields">
+          <select name="system.builder.triggers.{{entry.index}}.condition">{{selectOptions @root.choices.triggerCondition selected=entry.condition localize=false}}</select>
+        </div>
+      </div>
+      {{/if}}
+
+      {{#each entry.effects as |effect|}}
+      <div class="group-card">
+        <div class="group-head">
+          <span>Effect {{@index}}</span>
+          <a class="group-remove" data-action="removeEffect" data-trigger-index="{{entry.index}}" data-effect-index="{{@index}}">x</a>
+        </div>
+        <div class="form-group">
+          <label>Effect</label>
+          <div class="form-fields">
+            <select name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.operation">{{selectOptions entry.effectChoices selected=effect.operation localize=false}}</select>
+          </div>
+        </div>
+
+        {{#if (eq effect.operation "chat")}}
+        <div class="form-group stacked"><label>Message</label><textarea name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.text" rows="2">{{effect.text}}</textarea></div>
+        {{/if}}
+        {{#if (eq effect.operation "damageHuntersInZones")}}
+        <div class="form-group stacked">
+          <label>Zones</label>
+          <div class="zone-grid">
+            {{#each @root.zoneList as |zone|}}
+            <label class="zone-chip {{#if (includes effect.zones zone)}}on{{/if}}">
+              <input type="checkbox" class="array-toggle" data-array-path="system.builder.triggers.{{@../../index}}.effects.{{@../index}}.zones" data-value="{{zone}}" {{#if (includes effect.zones zone)}}checked{{/if}} />{{zone}}
+            </label>
+            {{/each}}
+          </div>
+        </div>
+        <div class="form-group"><label>Damage</label><div class="form-fields"><input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.damage.resolve" value="{{effect.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.damage.wounds" value="{{effect.damage.wounds}}" /><span class="hint">R / W</span></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "promptShiftHunter")}}
+        <div class="form-group"><label>Title</label><div class="form-fields"><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.title" value="{{effect.title}}" /></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "damageEventHunter")}}
+        <div class="form-group"><label>Damage</label><div class="form-fields"><input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.damage.resolve" value="{{effect.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.damage.wounds" value="{{effect.damage.wounds}}" /><span class="hint">R / W</span></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "addThreatToEventZone")}}
+        <div class="form-group"><label>Threat</label><div class="form-fields"><input type="number" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.amount" value="{{effect.amount}}" /></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "entityResource")}}
+        <div class="form-group"><label>Amount</label><div class="form-fields"><select name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.amountMode">{{selectOptions @root.choices.amountMode selected=effect.amountMode localize=false}}</select>{{#if (eq effect.amountMode "dynamic")}}<select name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.amountSource">{{selectOptions @root.choices.amountSource selected=effect.amountSource localize=false}}</select>{{/if}}</div></div>
+        <div class="form-group sub"><label>Resolve / Wounds</label><div class="form-fields"><input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.resolve" value="{{effect.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.wounds" value="{{effect.wounds}}" /><span class="hint">+ restore, - damage</span></div></div>
+        <div class="form-group sub"><label>Limit</label><div class="form-fields"><label class="checkbox"><input type="checkbox" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.oncePerRound" {{#if effect.oncePerRound}}checked{{/if}} /> Once per round</label><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.onceKey" value="{{effect.onceKey}}" placeholder="key" /><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.chatLabel" value="{{effect.chatLabel}}" placeholder="chat label" /></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "promptEntityResolveCost")}}
+        <div class="form-group"><label>Prompt</label><div class="form-fields"><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.prompt" value="{{effect.prompt}}" /></div></div>
+        <div class="form-group"><label>Resolve Cost</label><div class="form-fields"><input type="number" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.amount" value="{{effect.amount}}" /></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "runEntityAbilityAgainstEventHunter")}}
+        <div class="form-group"><label>Title</label><div class="form-fields"><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.title" value="{{effect.title}}" /></div></div>
+        {{/if}}
+        {{#if (eq effect.operation "stagedBreakRepositionReminder")}}
+        <div class="form-group"><label>Title / State</label><div class="form-fields"><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.title" value="{{effect.title}}" /><input type="text" name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.stateKey" value="{{effect.stateKey}}" /></div></div>
+        <div class="form-group stacked"><label>First Break</label><textarea name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.firstText" rows="2">{{effect.firstText}}</textarea></div>
+        <div class="form-group stacked"><label>Later Breaks</label><textarea name="system.builder.triggers.{{entry.index}}.effects.{{@index}}.laterText" rows="2">{{effect.laterText}}</textarea></div>
+        {{/if}}
+      </div>
+      {{/each}}
+      <a class="group-add" data-action="addEffect" data-trigger-index="{{entry.index}}">+ Add Effect</a>
+    </div>
+    {{/each}}
+  </section>
+  {{/if}}
+</form>

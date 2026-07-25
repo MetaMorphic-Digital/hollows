@@ -1,0 +1,71 @@
+{
+  "id": "hollows",
+  "title": "Hollows RPG (by Grighoul)",
+  "description": "Tactical combat and brisk gameplay in a dying world. D20 Blackjack engine.",
+  "version": "0.3.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "Grighoul"
+    }
+  ],
+  "esmodules": [
+    "code/main.js"
+  ],
+  "styles": [
+    "styles/hollows.css"
+  ],
+  "packs": [
+    {
+      "name": "weapons",
+      "label": "Hollows - Weapons",
+      "path": "packs/weapons",
+      "type": "Item",
+      "system": "hollows"
+    },
+    {
+      "name": "weapon-abilities",
+      "label": "Hollows - Weapon Abilities",
+      "path": "packs/weapon-abilities.db",
+      "type": "Item",
+      "system": "hollows"
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "System Compendiums",
+      "sorting": "a",
+      "packs": [
+        "weapons",
+        "weapon-abilities"
+      ]
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "hunter": {},
+      "entity": {},
+      "npc": {},
+      "refuge": {},
+      "thrall": {},
+      "hollow": {},
+      "hazard": {}
+    },
+    "Item": {
+      "weapon": {},
+      "weapon-ability": {},
+      "equipment": {},
+      "echo": {},
+      "entity-ability": {},
+      "entity-enhancement": {},
+      "relic": {},
+      "rumour": {}
+    }
+  },
+  "url": "https://github.com/grighoul/fvtt-hollows",
+  "manifest": "https://raw.githubusercontent.com/grighoul/fvtt-hollows/main/system.json",
+  "download": ""
+}

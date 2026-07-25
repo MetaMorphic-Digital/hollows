@@ -1,0 +1,22 @@
+<section class="sheet-section">
+  <h2>Unlocked Exploration Equipment</h2>
+  <div class="checkbox-group">
+    {{#each unlockExplorationOptions as |e|}}
+      <label class="checkbox" title="{{e.text}}">
+        <input type="checkbox" data-unlock-kind="exploration" data-unlock-id="{{e.id}}" data-unlock-doc-id="{{e.docId}}" {{#if e.unlocked}}checked{{/if}} />
+        <span>{{e.name}}</span>
+      </label>
+    {{/each}}
+  </div>
+</section>
+<section class="sheet-section">
+  <h2>Unlocked Battle Equipment</h2>
+  <div class="checkbox-group">
+    {{#each unlockBattleOptions as |e|}}
+      <label class="checkbox" title="{{e.text}}">
+        <input type="checkbox" data-unlock-kind="battle" data-unlock-id="{{e.id}}" data-unlock-doc-id="{{e.docId}}" {{#if e.unlocked}}checked{{/if}} />
+        <span>{{e.name}}</span>
+      </label>
+    {{/each}}
+  </div>
+</section>

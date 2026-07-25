@@ -1,0 +1,429 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Hunter Name" />
+      <div class="subline-row">
+        <div class="subline">Hollows Hunter</div>
+        <div class="header-health">
+          <div class="health-chip resolve">Resolve: {{system.health.resolve.value}}/{{system.health.resolve.max}}</div>
+          <div class="health-chip wounds">Wounds: {{system.health.wounds.value}}/{{system.health.wounds.max}}</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        {{#if isNewHunter}}
+          <button type="button" class="stat-roll attack-primary begin-character-creation" data-action="begin-character-creation">Begin Character Creation</button>
+        {{else}}
+          {{#if isDead}}
+            <div class="muted">Dead</div>
+          {{else}}
+            {{#if isDying}}
+              <button type="button" class="stat-roll attack-primary" data-action="cling-to-life">Cling to Life</button>
+            {{else}}
+              <div class="header-action-row">
+                <button type="button" class="stat-roll attack-primary" data-action="attack-entity">Attack</button>
+                {{#if hasReloadableWeapons}}
+                  <button type="button" class="stat-roll attack-primary" data-action="reload-weapon">Reload</button>
+                  <div class="capacity-list">
+                    {{#each reloadableWeapons as |w|}}
+                      <div class="capacity-chip" data-weapon-id="{{w.id}}">
+                        <span class="capacity-name">{{w.name}}</span>
+                        {{#if w.isShotgun}}
+                          <span class="capacity-value">{{w.loaded}}</span>
+                        {{else}}
+                          <span class="capacity-value">{{w.current}}/{{w.max}}</span>
+                        {{/if}}
+                      </div>
+                    {{/each}}
+                  </div>
+                {{/if}}
+                {{#if hasRifle}}
+                  <div class="focus-counter" title="Focus">
+                    <div class="focus-label">Focus</div>
+                    <div class="focus-value">{{focusCount}} / {{focusLimit}}</div>
+                  </div>
+                {{/if}}
+              </div>
+              <div class="hunter-action-stack">
+                {{#if canFocus}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="focus">Focus</button></div>
+                {{/if}}
+                {{#if canGuard}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="guard">Guard</button></div>
+                {{/if}}
+                {{#each activatedManoeuvres}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="activated-ability" data-ability-key="{{this.key}}">{{this.name}}</button></div>
+                {{/each}}
+                {{#if hasArmour}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="expend-ready">Expend Ready</button></div>
+                {{/if}}
+                <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="take-cover">Take Cover</button></div>
+                {{#if canUse}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="use">Use</button></div>
+                {{/if}}
+                <div class="hunter-action-stack-row"><button type="button" class="stat-roll {{#unless isInSupport}}muted{{/unless}}" data-action="support-recover" {{#unless isInSupport}}disabled{{/unless}}>Recover</button></div>
+                <div class="hunter-action-stack-row"><button type="button" class="stat-roll {{#unless isInSupport}}muted{{/unless}}" data-action="support-heal" {{#unless isInSupport}}disabled{{/unless}}>Heal</button></div>
+              </div>
+            {{/if}}
+          {{/if}}
+          
+        {{/if}}
+      </div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    </div>
+  </header>
+
+  <div class="rune-bar" aria-hidden="true"></div>
+
+  <nav class="sheet-tabs tabs" data-group="mainTabs">
+    <a class="item" data-tab="stats">Stats</a>
+    <a class="item" data-tab="weapons">Weapons</a>
+    <a class="item" data-tab="echoes">Echoes</a>
+    <a class="item" data-tab="bio">Bio</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab" data-tab="stats" data-group="mainTabs">
+      <section class="sheet-section stats">
+        <h2>Stats</h2>
+        <div class="stat-grid">
+          {{#each system.stats as |value key|}}
+            <div class="stat-row">
+              <div class="stat-label">{{lookup ../statLabels key}}</div>
+              <div class="stat-total">{{lookup ../statsTotal key}}</div>
+              <div class="stat-base">
+                <div class="stat-base-label">Base</div>
+                <input class="stat-input" type="number" name="system.stats.{{key}}" value="{{value}}" />
+              </div>
+              <div class="stat-marks" data-stat="{{key}}">
+                {{#with (lookup ../system.statsMarks key) as |marks|}}
+                  <span class="stat-mark {{#if (gt marks 0)}}filled{{/if}}"></span>
+                  <span class="stat-mark {{#if (gt marks 1)}}filled{{/if}}"></span>
+                  <span class="stat-mark {{#if (gt marks 2)}}filled{{/if}}"></span>
+                {{/with}}
+              </div>
+              <button type="button" class="stat-roll" data-roll="{{key}}">Roll</button>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+
+      <section class="sheet-section equipment">
+        <h2>Equipment</h2>
+        <div class="hollows-form-section">
+          <h3>Exploration</h3>
+          {{#if equipmentSlots.exploration}}
+            <div class="hollows-form-value"><strong>{{equipmentSlots.exploration.name}}</strong></div>
+            <div class="hollows-form-value multiline">{{equipmentSlots.exploration.system.text}}</div>
+          {{else}}
+            <div class="muted">None selected.</div>
+          {{/if}}
+        </div>
+        <div class="hollows-form-section">
+          <h3>Battle</h3>
+          {{#if equipmentSlots.battle}}
+            <div class="hollows-form-value"><strong>{{equipmentSlots.battle.name}}</strong></div>
+            <div class="hollows-form-value multiline">{{equipmentSlots.battle.system.text}}</div>
+            <div class="equipment-actions">
+              <button type="button" class="stat-roll danger compact" data-action="delete-equipment" data-slot="battle">Delete</button>
+            </div>
+          {{else}}
+            <div class="muted">None selected.</div>
+          {{/if}}
+        </div>
+        <div class="hollows-form-section">
+          <h3>Relic</h3>
+          {{#if equipmentSlots.relic}}
+            <div class="hollows-form-value"><strong>{{equipmentSlots.relic.name}}</strong></div>
+            <div class="hollows-form-value multiline">{{relicText}}</div>
+            <div class="equipment-actions">
+              {{#if relicHasUse}}
+                <button type="button" class="stat-roll compact" data-action="use-relic" {{#if system.equipment.relic.used}}disabled{{/if}}>Use</button>
+              {{else}}
+                <button type="button" class="stat-roll compact" data-action="chat-relic">Chat</button>
+              {{/if}}
+              <button type="button" class="stat-roll danger compact" data-action="delete-equipment" data-slot="relic">Delete</button>
+            </div>
+          {{else}}
+            <div class="muted">None selected.</div>
+          {{/if}}
+        </div>
+      </section>
+
+      <section class="sheet-section health">
+        <h2>Health</h2>
+        <div class="health-grid">
+          <div class="health-row">
+            <div class="health-label">Resolve</div>
+            <input type="number" name="system.health.resolve.value" value="{{system.health.resolve.value}}" />
+            <span class="slash">/</span>
+            <input type="number" name="system.health.resolve.max" value="{{system.health.resolve.max}}" />
+          </div>
+          <div class="health-row">
+            <div class="health-label">Wounds</div>
+            <input type="number" name="system.health.wounds.value" value="{{system.health.wounds.value}}" />
+            <span class="slash">/</span>
+            <input type="number" name="system.health.wounds.max" value="{{system.health.wounds.max}}" />
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet-section corruption">
+        <h2>Corruption</h2>
+        <input type="number" name="system.corruption.value" value="{{system.corruption.value}}" />
+      </section>
+
+    </div>
+
+    <div class="tab" data-tab="weapons" data-group="mainTabs">
+      <section class="sheet-section weapons">
+        <div class="abilities-header">
+          <h2>Weapons</h2>
+          <button type="button" class="stat-roll" data-action="add-weapon">Add From Compendium</button>
+        </div>
+        {{#if weaponsWithAbilities.length}}
+          <nav class="sheet-tabs tabs" data-group="weaponTabs">
+            {{#each weaponsWithAbilities as |entry index|}}
+              <a class="item" data-tab="weapon-{{index}}">{{#if entry.weapon.name}}{{entry.weapon.name}}{{else}}Weapon {{index}}{{/if}}</a>
+            {{/each}}
+          </nav>
+          <section class="weapon-tabs-content">
+            {{#each weaponsWithAbilities as |entry index|}}
+              {{#with entry.weapon as |weapon|}}
+                <div class="tab weapon-tab weapon-bg" data-tab="weapon-{{../index}}" data-group="weaponTabs" style="--weapon-bg: url('{{weapon.img}}')">
+                  <div class="weapon-actions">
+                    <button type="button" class="stat-roll" data-action="edit-weapon" data-item-id="{{weapon.id}}">Edit</button>
+                    <button type="button" class="stat-roll" data-action="replace-weapon" data-item-id="{{weapon.id}}">Replace</button>
+                    <button type="button" class="stat-roll danger" data-action="remove-weapon" data-item-id="{{weapon.id}}">Remove</button>
+                  </div>
+                  <div class="hollows-form-row">
+                    <div class="stat-label">Name</div>
+                    <div class="hollows-form-value">{{weapon.name}}</div>
+                  </div>
+
+                  <div class="hollows-form-section">
+                    <h3>Selected Form</h3>
+                    {{#if entry.activeForm}}
+                      <div class="hollows-form-value"><strong>{{entry.activeForm.name}}</strong></div>
+                      <div class="hollows-form-value multiline">{{entry.activeForm.text}}</div>
+                      {{#if entry.activeForm.damage}}
+                        <div class="hollows-form-value">Damage: {{entry.activeForm.damage.resolve}} / {{entry.activeForm.damage.wounds}}</div>
+                      {{/if}}
+                    {{else}}
+                      <div class="muted">No form selected.</div>
+                    {{/if}}
+                    {{#if entry.availableForms.length}}
+                      <div class="muted">Available: {{entry.availableForms}}</div>
+                    {{/if}}
+                  </div>
+
+                  <div class="hollows-form-section">
+                    <h3>Attack Profiles</h3>
+                    {{#if entry.attackProfiles.length}}
+                      <div class="attack-profiles">
+                        {{#each entry.attackProfiles as |atk|}}
+                          <div class="hollows-form-value">
+                            {{atk.range}} / {{atk.stat}} vs {{atk.defence}}
+                            {{#if atk.form}} � Form: {{atk.form}}{{/if}}
+                            {{#if atk.condition}} � {{atk.condition}}{{/if}}
+                          </div>
+                        {{/each}}
+                      </div>
+                    {{else}}
+                      <div class="muted">No attack profiles set yet.</div>
+                    {{/if}}
+                  </div>
+
+                  <div class="hollows-form-section">
+                    <h3>Abilities</h3>
+                    {{#if weapon.system.coreAbility}}
+                      <div class="ability-card">
+                        <div class="ability-row">
+                          <div class="stat-label">Core Ability</div>
+                        </div>
+                        <div class="ability-text">{{weapon.system.coreAbility}}</div>
+                      </div>
+                    {{/if}}
+                    <div class="abilities-list">
+                      {{#each ../abilities as |ability|}}
+                        <div class="ability-card">
+                          <div class="ability-row">
+                            <div class="stat-label">
+                              {{ability.name}}
+                              <span class="ability-duration-badge">{{#if (eq ability.system.durationType "temporary")}}Temporary{{else}}Permanent{{/if}}</span>
+                            </div>
+                            <button type="button" class="stat-roll" data-ability-chat data-ability-id="{{ability.id}}">Chat</button>
+                          </div>
+                          <div class="ability-text">{{ability.system.text}}</div>
+                        </div>
+                      {{/each}}
+                      {{#unless ../entry.abilities.length}}
+                        <div class="muted">No abilities for this weapon yet.</div>
+                      {{/unless}}
+                    </div>
+                  </div>
+                </div>
+              {{/with}}
+            {{/each}}
+          </section>
+        {{else}}
+          <div class="muted">No weapons on this Hunter yet. Add two weapon items to start.</div>
+        {{/if}}
+      </section>
+    </div>
+
+    <div class="tab" data-tab="echoes" data-group="mainTabs">
+      <section class="sheet-section echoes">
+        <div class="abilities-header">
+          <h2>Echoes</h2>
+          <div class="button-row">
+            {{#if canRollEcho}}
+            <button type="button" class="stat-roll" data-action="roll-echo">Roll Echo</button>
+            {{/if}}
+            {{#if isGM}}
+              <button type="button" class="stat-roll" data-action="add-echo">Add Echo</button>
+              <button type="button" class="stat-roll" data-action="echo-reset">Reset Per Hollow</button>
+            {{/if}}
+          </div>
+        </div>
+        {{#if malignancy}}
+          <div class="muted">Malignancy: <strong>{{malignancy}}</strong></div>
+        {{/if}}
+
+        <div class="echo-columns">
+          <div class="echo-column">
+            <h3>Boons ({{echoCounts.boon}}/2)</h3>
+            {{#if echoes.boons.length}}
+              {{#each echoes.boons as |echo|}}
+                <div class="echo-card {{#if echo.system.suppressed}}suppressed{{/if}}">
+                  <div class="echo-header">
+                    <div class="echo-name">{{echo.name}}</div>
+                    <div class="echo-tags">
+                      <span class="echo-tag">{{echo.system.category}}</span>
+                      {{#if echo.system.onePerHollow}}
+                        <span class="echo-tag">Once per Hollow</span>
+                      {{/if}}
+                      {{#if echo.system.usedThisHollow}}
+                        <span class="echo-tag">Used</span>
+                      {{/if}}
+                    </div>
+                    <div class="echo-actions">
+                      <button type="button" class="stat-roll" data-action="echo-toggle" data-echo-id="{{echo.id}}">
+                        {{#if echo.system.suppressed}}Unsuppress{{else}}Suppress{{/if}}
+                      </button>
+                      {{#if echo.system.onePerHollow}}
+                        <button type="button" class="stat-roll" data-action="echo-trigger" data-echo-id="{{echo.id}}" {{#if echo.system.usedThisHollow}}disabled{{/if}}>Trigger</button>
+                      {{/if}}
+                      {{#if ../isGM}}
+                        <button type="button" class="stat-roll danger" data-action="echo-delete" data-echo-id="{{echo.id}}">Delete</button>
+                      {{/if}}
+                    </div>
+                  </div>
+                  <div class="echo-text multiline">{{echo.system.text}}</div>
+                  {{#if ../isGM}}
+                    {{#if echo.system.gmText}}
+                      <div class="echo-text multiline gm">{{echo.system.gmText}}</div>
+                    {{/if}}
+                  {{/if}}
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="muted">No Boons.</div>
+            {{/if}}
+          </div>
+
+          <div class="echo-column">
+            <h3>Banes ({{echoCounts.bane}}/2)</h3>
+            {{#if echoes.banes.length}}
+              {{#each echoes.banes as |echo|}}
+                <div class="echo-card {{#if echo.system.suppressed}}suppressed{{/if}}">
+                  <div class="echo-header">
+                    <div class="echo-name">{{echo.name}}</div>
+                    <div class="echo-tags">
+                      <span class="echo-tag">{{echo.system.category}}</span>
+                      {{#if echo.system.onePerHollow}}
+                        <span class="echo-tag">Once per Hollow</span>
+                      {{/if}}
+                      {{#if echo.system.usedThisHollow}}
+                        <span class="echo-tag">Used</span>
+                      {{/if}}
+                    </div>
+                    <div class="echo-actions">
+                      <button type="button" class="stat-roll" data-action="echo-toggle" data-echo-id="{{echo.id}}">
+                        {{#if echo.system.suppressed}}Unsuppress{{else}}Suppress{{/if}}
+                      </button>
+                      {{#if echo.system.onePerHollow}}
+                        <button type="button" class="stat-roll" data-action="echo-trigger" data-echo-id="{{echo.id}}" {{#if echo.system.usedThisHollow}}disabled{{/if}}>Trigger</button>
+                      {{/if}}
+                      {{#if ../isGM}}
+                        <button type="button" class="stat-roll danger" data-action="echo-delete" data-echo-id="{{echo.id}}">Delete</button>
+                      {{/if}}
+                    </div>
+                  </div>
+                  <div class="echo-text multiline">{{echo.system.text}}</div>
+                  {{#if ../isGM}}
+                    {{#if echo.system.gmText}}
+                      <div class="echo-text multiline gm">{{echo.system.gmText}}</div>
+                    {{/if}}
+                  {{/if}}
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="muted">No Banes.</div>
+            {{/if}}
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab" data-tab="bio" data-group="mainTabs">
+      <section class="sheet-section bio">
+        <h2>Identity</h2>
+        <div class="hollows-form-section">
+          <h3>Faction</h3>
+          <input type="text" name="system.identity.faction" value="{{system.identity.faction}}" />
+          <textarea name="system.identity.factionText" rows="4">{{system.identity.factionText}}</textarea>
+        </div>
+        <div class="hollows-form-section">
+          <h3>Origin</h3>
+          <input type="text" name="system.identity.origin" value="{{system.identity.origin}}" />
+          <textarea name="system.identity.originText" rows="4">{{system.identity.originText}}</textarea>
+        </div>
+        <div class="hollows-form-section">
+          <h3>Seed</h3>
+          <input type="text" name="system.identity.seed" value="{{system.identity.seed}}" />
+          <textarea name="system.identity.seedText" rows="4">{{system.identity.seedText}}</textarea>
+        </div>
+
+        <h2>Biography</h2>
+        <div class="hollows-form-section">
+          <h3>Appearance</h3>
+          <textarea name="system.bio.appearance" rows="3">{{system.bio.appearance}}</textarea>
+        </div>
+        <div class="hollows-form-section">
+          <h3>Notes</h3>
+          <textarea name="system.bio.notes" rows="4">{{system.bio.notes}}</textarea>
+        </div>
+      </section>
+    </div>
+  </section>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

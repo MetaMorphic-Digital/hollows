@@ -1,0 +1,190 @@
+#chat-notifications .chat-notification,
+#chat-notification .chat-notification,
+#chat-notifications .chat-notification p,
+#chat-notification .chat-notification p {
+  color: #f6f1e8;
+}
+
+.chat-message .message-content,
+.chat-message .message-content * {
+  color: #f6f1e8;
+}
+
+.hollows-chat {
+  background:
+    radial-gradient(180px 80px at 10% -20%, rgba(255, 255, 255, 0.06), transparent 70%),
+    linear-gradient(180deg, #1a181c 0%, #141316 100%);
+  border: 1px solid #3b3430;
+  padding: 10px 12px;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.hollows-chat h3 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #f3e7d6;
+}
+
+.hollows-chat .attack-title {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #f3e7d6;
+}
+
+.hollows-chat.success {
+  border-color: #b89252;
+  box-shadow:
+    inset 0 0 0 1px rgba(184, 146, 82, 0.2),
+    0 0 0 1px rgba(184, 146, 82, 0.25),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.hollows-chat.superior-success {
+  border-color: #8ecda0;
+  box-shadow:
+    inset 0 0 0 1px rgba(142, 205, 160, 0.2),
+    0 0 0 1px rgba(142, 205, 160, 0.25),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.hollows-chat.failure {
+  border-color: #b1463c;
+  box-shadow:
+    inset 0 0 0 1px rgba(177, 70, 60, 0.2),
+    0 0 0 1px rgba(177, 70, 60, 0.25),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.hollows-chat.critical-failure {
+  border-color: #7a56c9;
+  box-shadow:
+    inset 0 0 0 1px rgba(122, 86, 201, 0.22),
+    0 0 0 1px rgba(122, 86, 201, 0.28),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.hollows-chat.critical-success {
+  border-color: #37d97b;
+  box-shadow:
+    inset 0 0 0 1px rgba(55, 217, 123, 0.25),
+    0 0 0 1px rgba(55, 217, 123, 0.32),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.hollows-apply-damage,
+.hollows-defend,
+.hollows-entity-test,
+.hollows-apply-hunter-damage {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.hollows-apply-damage {
+  background: linear-gradient(180deg, #b84a3a 0%, #8d3b2f 100%);
+  color: #f6efe6;
+  border: 1px solid #4a2a26;
+}
+
+.hollows-defend,
+.hollows-entity-test {
+  background: linear-gradient(180deg, #42505a 0%, #2a3138 100%);
+  color: #f2ece2;
+  border: 1px solid #2a2f35;
+}
+
+.hollows-apply-hunter-damage {
+  background: linear-gradient(180deg, #8d3b2f 0%, #5b261e 100%);
+  color: #f6efe6;
+  border: 1px solid #3a1d19;
+}
+
+.hollows-setup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hollows-setup-roll,
+.hollows-setup-choice {
+  background: linear-gradient(180deg, #47413f 0%, #2f2a29 100%);
+  color: #f2ece2;
+  border: 1px solid #3a3330;
+  padding: 6px 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.hollows-setup-choices {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.hollows-apply-damage[disabled],
+.hollows-apply-hunter-damage[disabled],
+.hollows-setup-choice.disabled,
+.hollows-setup-choice[disabled],
+.hollows-setup-roll[disabled] {
+  opacity: 0.6;
+  cursor: default;
+  filter: grayscale(40%);
+}
+
+/* Foundry chat panel theme */
+#chat-log .message,
+#chat-log .chat-message,
+#chat .message,
+#chat .chat-message {
+  background:
+    linear-gradient(180deg, rgba(24, 22, 26, 0.95), rgba(16, 15, 18, 0.95)),
+    radial-gradient(200px 60px at 20% -30%, rgba(255, 255, 255, 0.04), transparent 70%);
+  color: #efe6d8 !important;
+  border: 1px solid #3b3430;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+#chat-log .message-header,
+#chat-log .message-sender,
+#chat-log .message-timestamp,
+#chat .message-header,
+#chat .message-sender,
+#chat .message-timestamp {
+  color: #cbbfae !important;
+}
+
+#chat-log .message-content,
+#chat .message-content {
+  color: #efe6d8 !important;
+}
+
+#chat-log .message a,
+#chat-log .chat-message a,
+#chat .message a,
+#chat .chat-message a {
+  color: #f0d9a3 !important;
+}
+
+#chat,
+#chat-controls,
+#chat-form,
+#chat-message,
+#chat-log,
+#chat-log .message-content,
+#chat-log .chat-message {
+  background: #0f0f12 !important;
+  color: #efe6d8 !important;
+}

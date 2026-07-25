@@ -1,0 +1,27 @@
+.hollows.sheet.item input[type="text"],
+.hollows.sheet.item input[type="number"],
+.hollows.sheet.item textarea,
+.hollows.sheet.item select {
+  color: #f8f3ea;
+  background: #1c1f26;
+  border: 1px solid #5a4f49;
+}
+
+.hollows.sheet.item select {
+  height: 28px;
+}
+
+.hollows.sheet.item select option {
+  background: #f2ede4;
+  color: #1b1a18;
+}
+
+.hollows.sheet.item .stat-label,
+.hollows.sheet.item h2 {
+  color: #f4c9b8;
+}
+
+.hollows.sheet.item .sheet-section {
+  background: #1b1a20;
+  border: 1px solid #4a4240;
+}

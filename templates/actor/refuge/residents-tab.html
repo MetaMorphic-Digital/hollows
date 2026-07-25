@@ -1,0 +1,41 @@
+<section class="sheet-section">
+  <h2>Residents</h2>
+  <div class="hollows-form-section">
+    <h3>Roles</h3>
+    {{#each npcRoleRows as |role|}}
+      <div class="hollows-form-row">
+        <div class="stat-label">{{role.label}}</div>
+        <select data-role-select="{{role.key}}">
+          <option value="">None</option>
+          {{#each role.candidates as |c|}}
+            <option value="{{c.id}}" {{#if (eq c.id role.current)}}selected{{/if}}>{{c.name}}</option>
+          {{/each}}
+        </select>
+      </div>
+    {{/each}}
+  </div>
+  <div class="hollows-form-row">
+    <div class="stat-label">Add NPC</div>
+    <select name="npcId">
+      {{#each availableNpcs as |npc|}}
+        <option value="{{npc.id}}">{{npc.name}}</option>
+      {{/each}}
+    </select>
+    <button type="button" class="stat-roll" data-resident-add>Add</button>
+  </div>
+  <div class="abilities-list">
+    {{#each residents as |r|}}
+      <div class="ability-card">
+        <div class="ability-row">
+          <div class="stat-label">{{r.name}}</div>
+          <button type="button" class="stat-roll danger" data-resident-remove="{{r.id}}">Remove</button>
+        </div>
+        <div class="ability-text">{{r.occupation}}</div>
+        <div class="muted">In Refuge: {{#if r.inRefuge}}Yes{{else}}No{{/if}}</div>
+      </div>
+    {{/each}}
+    {{#unless residents.length}}
+      <div class="muted">No NPC residents assigned yet.</div>
+    {{/unless}}
+  </div>
+</section>

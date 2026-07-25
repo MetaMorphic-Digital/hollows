@@ -1,0 +1,94 @@
+.hollows.sheet.actor.hunter {
+  font-family: "Georgia", "Garamond", "Palatino Linotype", serif;
+  --bg: #0f0f10;
+  --ink: #e7dfd3;
+  --muted: #a59a8b;
+  --accent: #b84a3a;
+  --accent-2: #6d7c8a;
+  --panel: #171618;
+  --panel-2: #1f1e21;
+  --border: #3b3430;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.hollows.sheet.actor.hunter .window-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.hollows.sheet.actor.hunter .window-content.hollows-sheet > .sheet-body {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.hollows.sheet.actor.hunter .header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  align-self: stretch;
+}
+
+.hollows.sheet.actor.hunter .header-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.hollows.sheet.actor.hunter .header-actions .stat-roll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  height: 30px;
+  padding: 6px 10px;
+  line-height: 1.2;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.hollows.sheet.actor.hunter .header-actions .attack-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  min-width: 74px;
+  max-width: 74px;
+  height: 40px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.hollows.sheet.actor.hunter .header-actions .begin-character-creation {
+  width: auto;
+  min-width: 240px;
+  max-width: none;
+  height: 44px;
+  padding: 12px 20px;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+
+.hollows.sheet.actor.hunter .hunter-action-stack,
+.hollows.sheet.actor.hunter .hunter-action-stack-row {
+  display: block;
+  width: 100%;
+}
+
+.hollows.sheet.actor.hunter .hunter-action-stack-row > .stat-roll {
+  display: flex;
+  width: 100%;
+  min-width: 100%;
+  justify-content: center;
+  box-sizing: border-box;
+}

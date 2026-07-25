@@ -1,0 +1,25 @@
+<section class="sheet-section">
+  <h2>Refuge Actions</h2>
+  <div class="abilities-list">
+    {{#each actionsCatalog as |a|}}
+      <div class="ability-card">
+        <div class="ability-row">
+          <div class="stat-label">
+            {{a.name}}
+            <span class="ability-duration-badge">{{a.category}}</span>
+            {{#if a.available}}
+              <span class="ability-duration-badge">Available</span>
+            {{else}}
+              <span class="ability-duration-badge">Locked</span>
+            {{/if}}
+          </div>
+          <button type="button" class="stat-roll" data-action-use="{{a.id}}" {{#unless a.available}}disabled{{/unless}}>Use</button>
+        </div>
+        <div class="ability-text">{{a.description}}</div>
+        {{#if a.requires.length}}
+          <div class="muted">Requires: {{a.requires}}</div>
+        {{/if}}
+      </div>
+    {{/each}}
+  </div>
+</section>

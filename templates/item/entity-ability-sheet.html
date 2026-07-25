@@ -1,0 +1,432 @@
+<form class="hollows-sheet hollows-entity-ability" autocomplete="off">
+  <header class="sheet-header eab-header">
+    <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Ability Name" />
+    <div class="subline">Entity Ability — {{lookup choices.kind system.kind}}</div>
+  </header>
+
+  <div class="rune-bar" aria-hidden="true"></div>
+
+  <section class="sheet-section">
+    <div class="form-group">
+      <label>Kind</label>
+      <div class="form-fields">
+        <select name="system.kind">{{selectOptions choices.kind selected=system.kind localize=false}}</select>
+      </div>
+    </div>
+  </section>
+
+  {{#if isActionKind}}
+  <nav class="sheet-tabs tabs eab-modes">
+    {{#each choices.builderMode as |label mode|}}
+    <a class="item {{#if (eq ../system.builderMode mode)}}active{{/if}}" data-action="setMode" data-mode="{{mode}}">{{label}}</a>
+    {{/each}}
+  </nav>
+
+  {{!-- ── Profile ─────────────────────────────────────────────── --}}
+  <section class="sheet-section profile-section">
+    <h3>Profile</h3>
+    {{#unless (eq system.kind "attack")}}
+    <div class="form-group">
+      <label>Action Type</label>
+      <div class="form-fields">
+        <select name="system.profile.actionType">{{selectOptions choices.actionType selected=system.profile.actionType localize=false}}</select>
+      </div>
+    </div>
+    {{/unless}}
+
+    {{#if (eq system.profile.actionType "attack")}}
+    <div class="form-group">
+      <label>Defence</label>
+      <div class="form-fields">
+        <select name="system.profile.defenceStat">{{selectOptions choices.stat selected=system.profile.defenceStat localize=false}}</select>
+        <select name="system.profile.basicDefenceMode">{{selectOptions choices.rollMode selected=system.profile.basicDefenceMode localize=false}}</select>
+      </div>
+    </div>
+    {{/if}}
+    {{#if (eq system.profile.actionType "test")}}
+    <div class="form-group">
+      <label>Test</label>
+      <div class="form-fields">
+        <select name="system.profile.testStat">{{selectOptions choices.stat selected=system.profile.testStat localize=false}}</select>
+        <select name="system.profile.basicRollMode">{{selectOptions choices.rollMode selected=system.profile.basicRollMode localize=false}}</select>
+      </div>
+    </div>
+    {{/if}}
+
+    {{#unless (eq system.profile.actionType "other")}}
+      {{#if (eq system.builderMode "manual")}}
+      <p class="notes">Manual mode — TN and damage are configured when the ability is used.</p>
+      {{else}}
+        <div class="form-group">
+          <label>TN</label>
+          <div class="form-fields">
+            <input type="number" name="system.profile.tn" value="{{system.profile.tn}}" />
+            {{#if (eq system.builderMode "advanced")}}<select name="system.profile.tnMode">{{selectOptions choices.tnMode selected=system.profile.tnMode localize=false}}</select>{{/if}}
+          </div>
+        </div>
+        {{#if (eq system.builderMode "advanced")}}{{#if (eq system.profile.tnMode "dynamic")}}
+        <div class="form-group sub">
+          <label>Source</label>
+          <div class="form-fields">
+            <select name="system.profile.tnDynamicType">{{selectOptions choices.tnDynamicType selected=system.profile.tnDynamicType localize=false}}</select>
+            {{#if (eq system.profile.tnDynamicType "set")}}<select name="system.profile.tnSetSource">{{selectOptions choices.tnSetSource selected=system.profile.tnSetSource localize=false}}</select>
+            {{else}}<select name="system.profile.tnDynamicSource">{{selectOptions choices.tnDynamicSource selected=system.profile.tnDynamicSource localize=false}}</select>{{/if}}
+          </div>
+        </div>
+        {{/if}}{{/if}}
+        {{#if (eq system.profile.actionType "attack")}}
+        <div class="form-group">
+          <label>Damage (R/W)</label>
+          <div class="form-fields">
+            <input type="number" class="dmg" name="system.profile.damage.resolve" value="{{system.profile.damage.resolve}}" />
+            <span class="dmg-sep">/</span>
+            <input type="number" class="dmg" name="system.profile.damage.wounds" value="{{system.profile.damage.wounds}}" />
+            {{#if (eq system.builderMode "advanced")}}<select name="system.profile.damageMode">{{selectOptions choices.damageMode selected=system.profile.damageMode localize=false}}</select>{{/if}}
+          </div>
+        </div>
+        {{#if (eq system.builderMode "advanced")}}{{#if (eq system.profile.damageMode "dynamic")}}
+        <div class="form-group sub">
+          <label>Source</label>
+          <div class="form-fields">
+            <select name="system.profile.damageDynamicMode">{{selectOptions choices.damageDynamicMode selected=system.profile.damageDynamicMode localize=false}}</select>
+            <select name="system.profile.damageDynamicSource">{{selectOptions choices.damageDynamicSource selected=system.profile.damageDynamicSource localize=false}}</select>
+          </div>
+        </div>
+        <div class="form-group sub">
+          <label>Reduce</label>
+          <div class="form-fields">
+            <label class="checkbox"><input type="checkbox" name="system.profile.damageDynamicReduce" {{#if system.profile.damageDynamicReduce}}checked{{/if}} /> Subtract</label>
+            <input type="number" name="system.profile.damageDynamicFloor" value="{{system.profile.damageDynamicFloor}}" title="Minimum per side when subtracting" />
+          </div>
+        </div>
+        {{/if}}{{/if}}
+        {{/if}}
+      {{/if}}
+
+      <div class="form-group">
+        <label>Targeting</label>
+        <div class="form-fields">
+          <select name="system.profile.targetMode">{{selectOptions targetModeChoices selected=system.profile.targetMode localize=false}}</select>
+        </div>
+      </div>
+      {{#if showProfileAdjacentTargeting}}
+      <div class="form-group sub">
+        <label>Adjacent</label>
+        <div class="form-fields">
+          <select name="system.profile.adjacentScope">{{selectOptions choices.targetAdjacentScope selected=system.profile.adjacentScope localize=false}}</select>
+          <select name="system.profile.adjacentCount">{{selectOptions choices.targetAdjacentCount selected=system.profile.adjacentCount localize=false}}</select>
+        </div>
+      </div>
+      {{/if}}
+      {{#unless (eq system.profile.targetMode "noTargets")}}
+      <div class="form-group stacked">
+        <label>Allowed Zones <span class="hint">(none = all)</span></label>
+        <div class="zone-grid">
+          {{#each profileZones as |z|}}
+          <label class="zone-chip {{#if (includes ../system.profile.allowedZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.profile.allowedZones" data-value="{{z}}" {{#if (includes ../system.profile.allowedZones z)}}checked{{/if}} />{{z}}</label>
+          {{/each}}
+        </div>
+      </div>
+      {{/unless}}
+    {{/unless}}
+
+    <div class="form-group stacked"><label>Description</label><textarea name="system.profile.effectText" rows="2">{{system.profile.effectText}}</textarea></div>
+    <div class="form-group stacked"><label>Text to chat</label><textarea name="system.profile.conditionText" rows="2">{{system.profile.conditionText}}</textarea></div>
+    {{#if (eq system.profile.actionType "other")}}<div class="form-group stacked"><label>Text</label><textarea name="system.profile.text" rows="3">{{system.profile.text}}</textarea></div>{{/if}}
+  </section>
+
+  {{#if (eq system.builderMode "advanced")}}
+  {{!-- ── Cost ────────────────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.cost.enabled" {{#if system.cost.enabled}}checked{{/if}} /> Cost</label></h3>
+    {{#if system.cost.enabled}}
+    <div class="form-group"><label>Type</label><div class="form-fields"><select name="system.cost.type">{{selectOptions choices.costType selected=system.cost.type localize=false}}</select><input type="number" name="system.cost.amount" value="{{system.cost.amount}}" /></div></div>
+    {{#if (eq system.cost.type "entityTerrain")}}<div class="form-group"><label>Terrain Tag</label><div class="form-fields"><select name="system.cost.terrainTag">{{selectOptions choices.terrainTag selected=system.cost.terrainTag localize=false}}</select></div></div>{{/if}}
+    {{/if}}
+  </section>
+
+  {{!-- ── Before Attack ───────────────────────────────────────── --}}
+  {{#if (eq system.kind "attack")}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.beforeAttack.enabled" {{#if system.beforeAttack.enabled}}checked{{/if}} /> Before Attack</label></h3>
+    {{#if system.beforeAttack.enabled}}
+    {{#each system.beforeAttack.groups as |group i|}}
+    {{> "systems/hollows/templates/item/parts/entity-after-attack-group.html" group=group i=i path="beforeAttack" choices=../choices applyIfChoices=../choices.beforeAttackIf zoneList=../zoneList}}
+    {{/each}}
+    <a class="group-add" data-action="addGroup" data-group-path="beforeAttack">+ Add Group</a>
+    {{/if}}
+  </section>
+  {{/if}}
+
+  {{!-- ── Threat Spend ────────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.threatSpend.enabled" {{#if system.threatSpend.enabled}}checked{{/if}} /> Threat Spend</label></h3>
+    {{#if system.threatSpend.enabled}}
+    <div class="form-group"><label>Affects TN</label><div class="form-fields"><input type="checkbox" name="system.threatSpend.affectsTN" {{#if system.threatSpend.affectsTN}}checked{{/if}} /></div></div>
+    {{#if (eq system.profile.actionType "attack")}}
+    <div class="form-group"><label>Modify Damage</label><div class="form-fields"><input type="checkbox" name="system.threatSpend.modifyDamage" {{#if system.threatSpend.modifyDamage}}checked{{/if}} /><input type="number" class="dmg" name="system.threatSpend.damage.resolve" value="{{system.threatSpend.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.threatSpend.damage.wounds" value="{{system.threatSpend.damage.wounds}}" /><span class="hint">R / W per threat</span></div></div>
+    {{/if}}
+    <div class="form-group stacked"><label>Threat Spend Text <span class="hint">(shown only when Threat is spent)</span></label><textarea name="system.threatSpend.specialText" rows="2">{{system.threatSpend.specialText}}</textarea></div>
+    {{/if}}
+  </section>
+
+  {{!-- ── possibleIf ──────────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.possibleIf.enabled" {{#if system.possibleIf.enabled}}checked{{/if}} /> Possible If</label></h3>
+    {{#if system.possibleIf.enabled}}
+    <div class="form-group"><label>Logic</label><div class="form-fields"><select name="system.possibleIf.logic">{{selectOptions choices.conditionLogic selected=system.possibleIf.logic localize=false}}</select></div></div>
+    {{#each system.possibleIf.conditions as |entry i|}}
+    <div class="form-group sub"><label>Condition {{i}}</label><div class="form-fields"><select name="system.possibleIf.conditions.{{i}}.condition">{{selectOptions @root.choices.condition selected=entry.condition localize=false}}</select><a class="group-remove" data-action="removeCondition" data-condition-path="system.possibleIf.conditions" data-index="{{i}}">✕</a></div></div>
+    {{/each}}
+    <a class="group-add" data-action="addCondition" data-condition-path="system.possibleIf.conditions">+ Add Condition</a>
+    {{/if}}
+  </section>
+
+  {{!-- ── modifyIf groups ─────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.modifyIf.enabled" {{#if system.modifyIf.enabled}}checked{{/if}} /> Modify If</label></h3>
+    {{#if system.modifyIf.enabled}}
+    {{#each system.modifyIf.groups as |group i|}}
+    <div class="group-card">
+      <div class="group-head"><span>Group {{i}}</span><a class="group-remove" data-action="removeGroup" data-group-path="modifyIf" data-index="{{i}}">✕</a></div>
+      <div class="form-group"><label>Logic</label><div class="form-fields"><select name="system.modifyIf.groups.{{i}}.logic">{{selectOptions ../choices.conditionLogic selected=group.logic localize=false}}</select></div></div>
+      {{#each group.conditions as |entry j|}}
+      <div class="form-group sub"><label>Condition {{j}}</label><div class="form-fields"><select name="system.modifyIf.groups.{{i}}.conditions.{{j}}.condition">{{selectOptions @root.choices.condition selected=entry.condition localize=false}}</select><a class="group-remove" data-action="removeCondition" data-condition-path="system.modifyIf.groups.{{i}}.conditions" data-index="{{j}}">✕</a></div></div>
+      {{/each}}
+      <a class="group-add" data-action="addCondition" data-condition-path="system.modifyIf.groups.{{i}}.conditions">+ Add Condition</a>
+      <div class="form-group"><label class="toggle"><input type="checkbox" name="system.modifyIf.groups.{{i}}.threshold.enabled" {{#if group.threshold.enabled}}checked{{/if}} /> Threshold Reached</label></div>
+      {{#if group.threshold.enabled}}
+      <div class="form-group sub"><label>When</label><div class="form-fields"><select name="system.modifyIf.groups.{{i}}.threshold.source">{{selectOptions @root.choices.thresholdSource selected=group.threshold.source localize=false}}</select><select name="system.modifyIf.groups.{{i}}.threshold.comparison">{{selectOptions @root.choices.thresholdComparison selected=group.threshold.comparison localize=false}}</select><input type="number" name="system.modifyIf.groups.{{i}}.threshold.value" value="{{group.threshold.value}}" /></div></div>
+      {{/if}}
+      <div class="form-group"><label>TN Delta</label><div class="form-fields"><input type="number" name="system.modifyIf.groups.{{i}}.tn" value="{{group.tn}}" /></div></div>
+      {{#if (eq @root.system.profile.actionType "attack")}}<div class="form-group"><label>Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.modifyIf.groups.{{i}}.damage.resolve" value="{{group.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.modifyIf.groups.{{i}}.damage.wounds" value="{{group.damage.wounds}}" /><span class="hint">(can be negative)</span></div></div>{{/if}}
+      <div class="form-group"><label>Self Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.modifyIf.groups.{{i}}.selfDamage.resolve" value="{{group.selfDamage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.modifyIf.groups.{{i}}.selfDamage.wounds" value="{{group.selfDamage.wounds}}" /></div></div>
+      <div class="form-group stacked"><label>Effect Text</label><textarea name="system.modifyIf.groups.{{i}}.effectText" rows="2">{{group.effectText}}</textarea></div>
+    </div>
+    {{/each}}
+    <a class="group-add" data-action="addGroup" data-group-path="modifyIf">+ Add Group</a>
+    {{/if}}
+  </section>
+
+  {{!-- ── Repeat ──────────────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.repeat.enabled" {{#if system.repeat.enabled}}checked{{/if}} /> Repeat</label></h3>
+    {{#if system.repeat.enabled}}
+    <div class="form-group"><label>When</label><div class="form-fields"><select name="system.repeat.repeatIf">{{selectOptions choices.outcomeWhen selected=system.repeat.repeatIf localize=false}}</select></div></div>
+    <div class="form-group"><label>TN Delta</label><div class="form-fields"><input type="number" name="system.repeat.modifyTN" value="{{system.repeat.modifyTN}}" /></div></div>
+    {{#if (eq system.profile.actionType "attack")}}<div class="form-group"><label>Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.repeat.damage.resolve" value="{{system.repeat.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.repeat.damage.wounds" value="{{system.repeat.damage.wounds}}" /><span class="hint">(can be negative)</span></div></div>{{/if}}
+    <div class="form-group"><label>Repeat Pays Cost</label><div class="form-fields"><input type="checkbox" name="system.repeat.hasCost" {{#if system.repeat.hasCost}}checked{{/if}} /></div></div>
+    {{/if}}
+  </section>
+
+  {{!-- ── After Attack groups ─────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.afterAttack.enabled" {{#if system.afterAttack.enabled}}checked{{/if}} /> After Attack</label></h3>
+    {{#if system.afterAttack.enabled}}
+    {{#each system.afterAttack.groups as |group i|}}
+    {{> "systems/hollows/templates/item/parts/entity-after-attack-group.html" group=group i=i path="afterAttack" choices=../choices applyIfChoices=../choices.applyIf zoneList=../zoneList}}
+    {{/each}}
+    <a class="group-add" data-action="addGroup" data-group-path="afterAttack">+ Add Group</a>
+    {{/if}}
+  </section>
+
+  {{!-- ── Follow-Up ───────────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.followUp.enabled" {{#if system.followUp.enabled}}checked{{/if}} /> Follow-Up</label></h3>
+    {{#if system.followUp.enabled}}
+    {{#each followUpGroups as |entry|}}
+    <div class="group-card">
+      <div class="group-head">
+        <strong>Follow-Up {{entry.displayIndex}}</strong>
+        <a class="group-remove" data-action="removeGroup" data-group-path="followUp" data-index="{{entry.index}}">✕</a>
+      </div>
+      {{#if entry.showTrigger}}
+      <div class="form-group"><label>Trigger</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.trigger">{{selectOptions ../choices.followUpTrigger selected=entry.group.trigger localize=false}}</select></div></div>
+      {{/if}}
+      <div class="form-group"><label>When</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.when">{{selectOptions ../choices.outcomeWhen selected=entry.group.when localize=false}}</select></div></div>
+      <div class="form-group"><label>Type</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.profile.actionType">{{selectOptions ../choices.actionType selected=entry.group.profile.actionType localize=false}}</select></div></div>
+      <div class="form-group"><label>Target Mode</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.targetMode">{{selectOptions entry.targetModeChoices selected=entry.group.targetMode localize=false}}</select></div></div>
+      {{#if (eq entry.group.profile.actionType "attack")}}
+      <div class="form-group"><label>Defence</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.profile.defenceStat">{{selectOptions ../choices.stat selected=entry.group.profile.defenceStat localize=false}}</select></div></div>
+      {{/if}}
+      {{#if (eq entry.group.profile.actionType "test")}}
+      <div class="form-group"><label>Test</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.profile.testStat">{{selectOptions ../choices.stat selected=entry.group.profile.testStat localize=false}}</select></div></div>
+      {{/if}}
+      {{#unless (eq entry.group.profile.actionType "other")}}
+      <div class="form-group"><label>TN</label><div class="form-fields"><input type="number" name="system.followUp.groups.{{entry.index}}.profile.tn" value="{{entry.group.profile.tn}}" /><select name="system.followUp.groups.{{entry.index}}.profile.tnMode">{{selectOptions ../choices.tnMode selected=entry.group.profile.tnMode localize=false}}</select></div></div>
+      {{#if (eq entry.group.profile.tnMode "dynamic")}}
+      <div class="form-group sub"><label>Source</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.profile.tnDynamicType">{{selectOptions ../choices.tnDynamicType selected=entry.group.profile.tnDynamicType localize=false}}</select>{{#if (eq entry.group.profile.tnDynamicType "set")}}<select name="system.followUp.groups.{{entry.index}}.profile.tnSetSource">{{selectOptions ../choices.tnSetSource selected=entry.group.profile.tnSetSource localize=false}}</select>{{else}}<select name="system.followUp.groups.{{entry.index}}.profile.tnDynamicSource">{{selectOptions ../choices.tnDynamicSource selected=entry.group.profile.tnDynamicSource localize=false}}</select>{{/if}}</div></div>
+      {{/if}}
+      <div class="form-group"><label>Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.followUp.groups.{{entry.index}}.profile.damage.resolve" value="{{entry.group.profile.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.followUp.groups.{{entry.index}}.profile.damage.wounds" value="{{entry.group.profile.damage.wounds}}" /><select name="system.followUp.groups.{{entry.index}}.profile.damageMode">{{selectOptions ../choices.damageMode selected=entry.group.profile.damageMode localize=false}}</select></div></div>
+      {{#if (eq entry.group.profile.damageMode "dynamic")}}
+      <div class="form-group sub"><label>Source</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.profile.damageDynamicMode">{{selectOptions ../choices.damageDynamicMode selected=entry.group.profile.damageDynamicMode localize=false}}</select><select name="system.followUp.groups.{{entry.index}}.profile.damageDynamicSource">{{selectOptions ../choices.damageDynamicSource selected=entry.group.profile.damageDynamicSource localize=false}}</select></div></div>
+      {{/if}}
+      {{/unless}}
+      {{#if entry.showTargetArea}}
+      <div class="form-group stacked">
+        <label>Target Area <span class="hint">(none = all zones)</span></label>
+        <div class="cond-grid">
+          {{#each ../choices.followUpTargetArea as |label key|}}
+          <label class="zone-chip {{#if (includes ../group.targetAreas key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.followUp.groups.{{../index}}.targetAreas" data-value="{{key}}" {{#if (includes ../group.targetAreas key)}}checked{{/if}} />{{label}}</label>
+          {{/each}}
+        </div>
+      </div>
+      {{#if entry.showAdjacentMode}}
+      <div class="form-group"><label>Adjacent</label><div class="form-fields"><select name="system.followUp.groups.{{entry.index}}.adjacentMode">{{selectOptions ../choices.followUpAdjacentMode selected=entry.group.adjacentMode localize=false}}</select></div></div>
+      {{/if}}
+      <div class="form-group"><label>Exclude Original</label><div class="form-fields"><input type="checkbox" name="system.followUp.groups.{{entry.index}}.excludeOriginal" {{#if entry.group.excludeOriginal}}checked{{/if}} /></div></div>
+      {{/if}}
+      <div class="form-group stacked"><label>Effect Text</label><textarea name="system.followUp.groups.{{entry.index}}.profile.effectText" rows="2">{{entry.group.profile.effectText}}</textarea></div>
+      {{#if entry.showAfterAttack}}
+      <div class="form-group"><label class="toggle"><input type="checkbox" name="system.followUp.groups.{{entry.index}}.afterAttack.enabled" {{#if entry.group.afterAttack.enabled}}checked{{/if}} /> After Attack</label></div>
+      {{#if entry.group.afterAttack.enabled}}
+      {{#each entry.group.afterAttack.groups as |afterGroup j|}}
+      {{> "systems/hollows/templates/item/parts/entity-after-attack-group.html" group=afterGroup i=j path=../afterAttackPath choices=../../choices applyIfChoices=../../choices.applyIf zoneList=../../zoneList}}
+      {{/each}}
+      <a class="group-add" data-action="addGroup" data-group-path="{{entry.afterAttackPath}}">+ Add After Attack Group</a>
+      {{/if}}
+      {{/if}}
+    </div>
+    {{/each}}
+    <a class="group-add" data-action="addGroup" data-group-path="followUp">+ Add Follow-Up</a>
+    {{/if}}
+  </section>
+
+  {{!-- ── Restore Resolve ─────────────────────────────────────── --}}
+  <section class="sheet-section">
+    <h3><label class="toggle"><input type="checkbox" name="system.restoreResolve.enabled" {{#if system.restoreResolve.enabled}}checked{{/if}} /> Restore Resolve</label></h3>
+    {{#if system.restoreResolve.enabled}}
+    <div class="form-group"><label>Mode</label><div class="form-fields"><select name="system.restoreResolve.mode">{{selectOptions choices.restoreMode selected=system.restoreResolve.mode localize=false}}</select></div></div>
+    {{#if (eq system.restoreResolve.mode "fixed")}}
+    <div class="form-group"><label>Amount</label><div class="form-fields"><input type="number" name="system.restoreResolve.fixed" value="{{system.restoreResolve.fixed}}" /></div></div>
+    {{else}}
+    <div class="form-group"><label>Source</label><div class="form-fields"><select name="system.restoreResolve.dynamicSource">{{selectOptions choices.restoreSource selected=system.restoreResolve.dynamicSource localize=false}}</select><input type="number" name="system.restoreResolve.dynamicNumber" value="{{system.restoreResolve.dynamicNumber}}" /></div></div>
+    {{#unless (eq system.restoreResolve.dynamicSource "entityTerrain")}}
+    <div class="form-group"><label>Zone Mode</label><div class="form-fields"><select name="system.restoreResolve.zoneMode">{{selectOptions choices.zoneMode selected=system.restoreResolve.zoneMode localize=false}}</select></div></div>
+    <div class="form-group stacked">
+      <label>Zones <span class="hint">(none = all)</span></label>
+      <div class="zone-grid">
+        {{#each zoneList as |z|}}
+        <label class="zone-chip {{#if (includes ../system.restoreResolve.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.restoreResolve.zones" data-value="{{z}}" {{#if (includes ../system.restoreResolve.zones z)}}checked{{/if}} />{{z}}</label>
+        {{/each}}
+      </div>
+    </div>
+    {{/unless}}
+    {{/if}}
+    {{/if}}
+  </section>
+  {{/if}}
+  {{/if}}
+
+  {{#if isSpecialKind}}
+  {{!-- ── Special / Doom / When-Broken ────────────────────────── --}}
+  <section class="sheet-section">
+    <h3>{{specialSectionTitle}}</h3>
+    {{#if (eq system.kind "doom")}}
+    <div class="form-group"><label>Doom Threshold</label><div class="form-fields"><input type="number" name="system.doom.threshold" value="{{system.doom.threshold}}" /></div></div>
+    {{/if}}
+    {{#if (eq system.kind "whenBroken")}}
+    <div class="form-group"><label>Triggers</label><div class="form-fields"><select name="system.whenBroken.mode">{{selectOptions choices.whenBrokenMode selected=system.whenBroken.mode localize=false}}</select></div></div>
+    <div class="form-group"><label>Terrain</label><div class="form-fields"><label class="checkbox"><input type="checkbox" name="system.whenBroken.returnHalfTerrain" {{#if system.whenBroken.returnHalfTerrain}}checked{{/if}} /> Return half the Entity's terrain to the pool</label></div></div>
+    {{/if}}
+
+    {{#if showSpecialRuntimeConfig}}
+    <div class="form-group"><label>Special Type</label><div class="form-fields"><select name="system.special.type">{{selectOptions choices.specialType selected=system.special.type localize=false}}</select></div></div>
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.special.colossal" {{#if system.special.colossal}}checked{{/if}} /> Colossal</label></div>
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.special.terrainShield" {{#if system.special.terrainShield}}checked{{/if}} /> Terrain Shield (destroy a tag instead of Wounds)</label></div>
+
+    {{#if (eq system.special.type "passiveModifier")}}
+    <div class="form-group"><label>Passive Type</label><div class="form-fields"><select name="system.special.passive.type">{{selectOptions choices.passiveType selected=system.special.passive.type localize=false}}</select></div></div>
+    <div class="form-group"><label>Condition</label><div class="form-fields"><select name="system.special.passive.condition">
+      <option value="always" {{#if (eq system.special.passive.condition "always")}}selected{{/if}}>Always</option>
+      {{#each passiveConditionGroups as |keys groupName|}}<optgroup label="{{groupName}}">{{#each keys as |key|}}<option value="{{key}}" {{#if (eq key @root.system.special.passive.condition)}}selected{{/if}}>{{lookup @root.choices.passiveCondition key}}</option>{{/each}}</optgroup>{{/each}}
+    </select></div></div>
+    {{#if (eq system.special.passive.condition "targetInZones")}}
+    <div class="form-group stacked"><label>Condition Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.passive.conditionZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.conditionZones" data-value="{{z}}" {{#if (includes ../system.special.passive.conditionZones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    {{/if}}
+    <div class="form-group"><label>Amount</label><div class="form-fields"><select name="system.special.passive.amountMode">{{selectOptions choices.damageMode selected=system.special.passive.amountMode localize=false}}</select></div></div>
+    {{#if (eq system.special.passive.amountMode "dynamic")}}
+    <div class="form-group sub"><label>Source</label><div class="form-fields"><select name="system.special.passive.amountSource">{{selectOptions choices.amountSource selected=system.special.passive.amountSource localize=false}}</select></div></div>
+    {{#unless (eq system.special.passive.amountSource "curseEntity")}}{{#unless (eq system.special.passive.amountSource "entityTerrain")}}
+    <div class="form-group sub"><label>Zones</label><div class="form-fields"><select name="system.special.passive.amountScope">{{selectOptions choices.zoneScope selected=system.special.passive.amountScope localize=false}}</select></div></div>
+    {{#if (eq system.special.passive.amountScope "select")}}
+    <div class="form-group stacked"><label>Select Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.passive.amountZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.amountZones" data-value="{{z}}" {{#if (includes ../system.special.passive.amountZones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    {{/if}}
+    {{/unless}}{{/unless}}
+    {{else}}
+    {{#if isDamagePassive}}
+    <div class="form-group sub"><label>R / W</label><div class="form-fields"><input type="number" class="dmg" name="system.special.passive.amount" value="{{system.special.passive.amount}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.special.passive.amountWounds" value="{{system.special.passive.amountWounds}}" /></div></div>
+    {{else}}
+    <div class="form-group sub"><label>Value</label><div class="form-fields"><input type="number" name="system.special.passive.amount" value="{{system.special.passive.amount}}" /></div></div>
+    {{/if}}
+    {{/if}}
+    {{#if isPassiveThreshold}}<div class="form-group"><label>Threshold</label><div class="form-fields"><input type="number" name="system.special.passive.curseThreshold" value="{{system.special.passive.curseThreshold}}" /></div></div>{{/if}}
+    {{#if isDefencePassive}}<div class="form-group"><label>Defence Scope</label><div class="form-fields"><select name="system.special.passive.defenceScope">{{selectOptions choices.defenceScope selected=system.special.passive.defenceScope localize=false}}</select></div></div>{{/if}}
+    {{/if}}
+    {{/if}}
+
+    {{#if showTriggeredEffectConfig}}
+    {{#if showSpecialTriggerGate}}
+    <div class="form-group"><label>Event</label><div class="form-fields"><select name="system.special.trigger.event">{{selectOptions choices.triggerEvent selected=system.special.trigger.event localize=false}}</select></div></div>
+    {{#if isThresholdEvent}}<div class="form-group"><label>Threshold</label><div class="form-fields"><input type="number" name="system.special.trigger.thresholdValue" value="{{system.special.trigger.thresholdValue}}" /></div></div>{{/if}}
+    {{/if}}
+    <div class="form-group"><label>Effect</label><div class="form-fields"><select name="system.special.trigger.effectType">{{selectOptions choices.effectType selected=system.special.trigger.effectType localize=false}}</select></div></div>
+    <div class="form-group"><label>Targets</label><div class="form-fields"><select name="system.special.trigger.targetMode">{{selectOptions choices.triggerTargetMode selected=system.special.trigger.targetMode localize=false}}</select></div></div>
+    {{#if showSpecialTriggerZones}}
+    <div class="form-group stacked"><label>Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.trigger.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.trigger.zones" data-value="{{z}}" {{#if (includes ../system.special.trigger.zones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    {{/if}}
+    {{#if (eq system.special.trigger.effectType "afterEffects")}}
+    <div class="form-group stacked"><label>After Effects</label></div>
+    {{#each system.special.trigger.afterAttack.groups as |group i|}}
+    {{> "systems/hollows/templates/item/parts/entity-after-attack-group.html" group=group i=i path="special.trigger.afterAttack" choices=../choices applyIfChoices=../choices.applyIf zoneList=../zoneList}}
+    {{/each}}
+    <a class="group-add" data-action="addGroup" data-group-path="special.trigger.afterAttack">+ Add Group</a>
+    {{/if}}
+    {{#if (eq system.special.trigger.effectType "triggerAbility")}}
+    <div class="form-group"><label>Ability Source</label><div class="form-fields"><select name="system.special.trigger.abilitySource">{{selectOptions choices.abilitySource selected=system.special.trigger.abilitySource localize=false}}</select></div></div>
+    {{#if (eq system.special.trigger.abilitySource "existing")}}
+    <div class="form-group"><label>Ability</label><div class="form-fields"><select name="system.special.trigger.abilityId">{{selectOptions triggeredAbilityChoices selected=system.special.trigger.abilityId localize=false}}</select></div></div>
+    {{else}}
+    <div class="form-group"><label>Custom</label><div class="form-fields"><select name="system.special.trigger.abilityKind">{{selectOptions choices.abilityKind selected=system.special.trigger.abilityKind localize=false}}</select><input type="text" name="system.special.trigger.abilityName" value="{{system.special.trigger.abilityName}}" placeholder="Name" /></div></div>
+    <div class="form-group sub"><label>Defence</label><div class="form-fields"><select name="system.special.trigger.profile.defenceStat">{{selectOptions choices.stat selected=system.special.trigger.profile.defenceStat localize=false}}</select><select name="system.special.trigger.profile.basicDefenceMode">{{selectOptions choices.rollMode selected=system.special.trigger.profile.basicDefenceMode localize=false}}</select></div></div>
+    <div class="form-group sub"><label>TN <span class="hint">(target number)</span></label><div class="form-fields"><input type="number" class="dmg" name="system.special.trigger.profile.tn" value="{{system.special.trigger.profile.tn}}" /></div></div>
+    <div class="form-group sub"><label>Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.special.trigger.profile.damage.resolve" value="{{system.special.trigger.profile.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.special.trigger.profile.damage.wounds" value="{{system.special.trigger.profile.damage.wounds}}" /></div></div>
+    {{/if}}
+    {{/if}}
+    {{/if}}
+
+    {{!-- ── Use Action ──────────────────────────────────────────── --}}
+    {{#if showSpecialRuntimeConfig}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.special.use.enabled" {{#if system.special.use.enabled}}checked{{/if}} /> Use Action Available</label></div>
+    {{#if system.special.use.enabled}}
+    <div class="form-group"><label>Use Mode</label><div class="form-fields"><select name="system.special.use.mode">{{selectOptions choices.useMode selected=system.special.use.mode localize=false}}</select></div></div>
+    {{#if (eq system.special.use.mode "transferCurse")}}
+    <div class="form-group sub"><label>Transfer</label><div class="form-fields"><select name="system.special.use.transferFrom">{{selectOptions choices.transferEnd selected=system.special.use.transferFrom localize=false}}</select><span class="dmg-sep">&rarr;</span><select name="system.special.use.transferTo">{{selectOptions choices.transferEnd selected=system.special.use.transferTo localize=false}}</select></div></div>
+    {{/if}}
+    <div class="form-group"><label>Target</label><div class="form-fields"><select name="system.special.use.target">{{selectOptions choices.useTarget selected=system.special.use.target localize=false}}</select></div></div>
+    <div class="form-group"><label>Scope</label><div class="form-fields"><select name="system.special.use.scope">{{selectOptions choices.useScope selected=system.special.use.scope localize=false}}</select></div></div>
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.special.use.test.enabled" {{#if system.special.use.test.enabled}}checked{{/if}} /> Requires Test</label></div>
+    {{#if system.special.use.test.enabled}}
+    <div class="form-group sub"><label>Test</label><div class="form-fields"><select name="system.special.use.test.stat">{{selectOptions choices.stat selected=system.special.use.test.stat localize=false}}</select><input type="number" class="dmg" name="system.special.use.test.tn" value="{{system.special.use.test.tn}}" placeholder="TN" /></div></div>
+    {{/if}}
+    <div class="form-group sub"><label>On Success</label><div class="form-fields"><select name="system.special.use.onSuccess">{{selectOptions choices.useOutcome selected=system.special.use.onSuccess localize=false}}</select></div></div>
+    <div class="form-group sub"><label>Success Amount</label><div class="form-fields"><select name="system.special.use.amountSuccessMode">{{selectOptions choices.damageMode selected=system.special.use.amountSuccessMode localize=false}}</select>{{#if (eq system.special.use.amountSuccessMode "dynamic")}}<select name="system.special.use.amountSuccessSource">{{selectOptions choices.weaponDamageSource selected=system.special.use.amountSuccessSource localize=false}}</select>{{else}}<input type="number" class="dmg" name="system.special.use.amountSuccess" value="{{system.special.use.amountSuccess}}" />{{/if}}</div></div>
+    <div class="form-group sub"><label>Success Dmg (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.special.use.damageSuccess.resolve" value="{{system.special.use.damageSuccess.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.special.use.damageSuccess.wounds" value="{{system.special.use.damageSuccess.wounds}}" /></div></div>
+    {{#if system.special.use.test.enabled}}
+    <div class="form-group sub"><label>On Failure</label><div class="form-fields"><select name="system.special.use.onFailure">{{selectOptions choices.useOutcome selected=system.special.use.onFailure localize=false}}</select></div></div>
+    <div class="form-group sub"><label>Failure Amount</label><div class="form-fields"><select name="system.special.use.amountFailureMode">{{selectOptions choices.damageMode selected=system.special.use.amountFailureMode localize=false}}</select>{{#if (eq system.special.use.amountFailureMode "dynamic")}}<select name="system.special.use.amountFailureSource">{{selectOptions choices.weaponDamageSource selected=system.special.use.amountFailureSource localize=false}}</select>{{else}}<input type="number" class="dmg" name="system.special.use.amountFailure" value="{{system.special.use.amountFailure}}" />{{/if}}</div></div>
+    <div class="form-group sub"><label>Failure Dmg (R/W)</label><div class="form-fields"><input type="number" class="dmg" name="system.special.use.damageFailure.resolve" value="{{system.special.use.damageFailure.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.special.use.damageFailure.wounds" value="{{system.special.use.damageFailure.wounds}}" /></div></div>
+    {{/if}}
+    <div class="form-group stacked"><label>Apply On Manoeuvre</label><div class="cond-grid">{{#each choices.useManoeuvre as |label key|}}<label class="zone-chip {{#if (includes ../system.special.use.applyOnManoeuvre key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.use.applyOnManoeuvre" data-value="{{key}}" {{#if (includes ../system.special.use.applyOnManoeuvre key)}}checked{{/if}} />{{label}}</label>{{/each}}</div></div>
+    {{/if}}
+    {{/if}}
+
+    <div class="form-group stacked"><label>Text</label><textarea name="system.profile.text" rows="3">{{system.profile.text}}</textarea></div>
+  </section>
+  {{/if}}
+
+  {{#unless isActionKind}}{{#unless isSpecialKind}}
+  <section class="sheet-section notes-section"><p class="notes">Select a Kind to configure this ability.</p></section>
+  {{/unless}}{{/unless}}
+</form>

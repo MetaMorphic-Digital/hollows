@@ -1,0 +1,216 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Echo Name" />
+      <div class="subline">Echo</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Details</h2>
+    <div class="form-group">
+      <label>Type</label>
+      <div class="form-fields">
+        <select name="system.echoType">{{selectOptions echoTypeChoices selected=system.echoType localize=false}}</select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <div class="form-fields">
+        <select name="system.category">{{selectOptions categoryChoices selected=system.category localize=false}}</select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Subtype</label>
+      <div class="form-fields">
+        <input type="text" name="system.subtype" value="{{system.subtype}}" />
+      </div>
+    </div>
+    {{#if isMalignancyEcho}}
+    <div class="form-group">
+      <label>Malignancy</label>
+      <div class="form-fields">
+        <select name="system.malignancy">
+          <option value="">None</option>
+          {{selectOptions malignancyChoices selected=system.malignancy localize=false}}
+        </select>
+      </div>
+    </div>
+    {{/if}}
+    {{#if isWeaponEcho}}
+    {{#if hasHunterParent}}
+    <div class="form-group">
+      <label>Attached Weapon</label>
+      <div class="form-fields">
+        <select name="system.sourceWeaponId">
+          <option value="">Any matching weapon type</option>
+          {{selectOptions weaponChoices selected=system.sourceWeaponId valueAttr="value" labelAttr="label" localize=false}}
+        </select>
+      </div>
+    </div>
+    {{/if}}
+    {{#unless system.sourceWeaponId}}
+    <div class="form-group">
+      <label>Weapon Type</label>
+      <div class="form-fields">
+        <select name="system.weaponType">
+          <option value="">Any</option>
+          {{selectOptions weaponTypeChoices selected=system.weaponType localize=false}}
+        </select>
+      </div>
+    </div>
+    {{/unless}}
+    {{/if}}
+    <div class="form-group">
+      <label>State</label>
+      <div class="form-fields">
+        <label class="checkbox"><input type="checkbox" name="system.suppressed" {{#if system.suppressed}}checked{{/if}} /> Suppressed</label>
+        <label class="checkbox"><input type="checkbox" name="system.onePerHollow" {{#if system.onePerHollow}}checked{{/if}} /> One per Hollow</label>
+        <label class="checkbox"><input type="checkbox" name="system.usedThisHollow" {{#if system.usedThisHollow}}checked{{/if}} /> Used this Hollow</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Passive Bonuses</h2>
+    <div class="form-group stacked">
+      <label>Stat Modifiers</label>
+      <div class="form-fields">
+        <span class="hint">Strong</span><input type="number" class="dmg" name="system.modifiers.strong" value="{{system.modifiers.strong}}" />
+        <span class="hint">Hard</span><input type="number" class="dmg" name="system.modifiers.hard" value="{{system.modifiers.hard}}" />
+        <span class="hint">Quick</span><input type="number" class="dmg" name="system.modifiers.quick" value="{{system.modifiers.quick}}" />
+        <span class="hint">Sharp</span><input type="number" class="dmg" name="system.modifiers.sharp" value="{{system.modifiers.sharp}}" />
+        <span class="hint">Wise</span><input type="number" class="dmg" name="system.modifiers.wise" value="{{system.modifiers.wise}}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Damage Bonus</label>
+      <div class="form-fields">
+        <input type="number" class="dmg" name="system.damageBonus.resolve" value="{{system.damageBonus.resolve}}" />
+        <span class="dmg-sep">/</span>
+        <input type="number" class="dmg" name="system.damageBonus.wounds" value="{{system.damageBonus.wounds}}" />
+        <span class="hint">Resolve / Wounds</span>
+      </div>
+    </div>
+  </section>
+
+  {{#if isSeedEcho}}
+  <section class="sheet-section">
+    <h2>On Acquire</h2>
+    <div class="form-group">
+      <label>Creates</label>
+      <div class="form-fields">
+        <label class="checkbox"><input type="checkbox" name="system.onAcquire.createsThrall" {{#if system.onAcquire.createsThrall}}checked{{/if}} /> Thrall</label>
+        <label class="checkbox"><input type="checkbox" name="system.onAcquire.createsHazard" {{#if system.onAcquire.createsHazard}}checked{{/if}} /> Hazard</label>
+        <label class="checkbox"><input type="checkbox" name="system.onAcquire.enhancesExplorationRoll" {{#if system.onAcquire.enhancesExplorationRoll}}checked{{/if}} /> Exploration TN</label>
+      </div>
+    </div>
+    {{#if system.onAcquire.enhancesExplorationRoll}}
+    <div class="form-group">
+      <label>Exploration TN</label>
+      <div class="form-fields">
+        <input type="number" class="dmg" name="system.onAcquire.explorationTNMod" value="{{system.onAcquire.explorationTNMod}}" />
+        <span class="hint">first</span>
+        <input type="number" class="dmg" name="system.onAcquire.explorationRepeatTNMod" value="{{system.onAcquire.explorationRepeatTNMod}}" />
+        <span class="hint">repeat</span>
+      </div>
+    </div>
+    {{/if}}
+    {{#if system.onAcquire.createsHazard}}
+    <div class="form-group">
+      <label>Hazard</label>
+      <div class="form-fields">
+        <input type="number" class="dmg" name="system.onAcquire.hazard.tn" value="{{system.onAcquire.hazard.tn}}" />
+        <span class="hint">TN</span>
+        <input type="number" class="dmg" name="system.onAcquire.hazard.resolve" value="{{system.onAcquire.hazard.resolve}}" />
+        <span class="dmg-sep">/</span>
+        <input type="number" class="dmg" name="system.onAcquire.hazard.wounds" value="{{system.onAcquire.hazard.wounds}}" />
+        <span class="hint">damage</span>
+      </div>
+    </div>
+    {{/if}}
+    {{#if system.onAcquire.createsThrall}}
+    <div class="form-group">
+      <label>Thrall</label>
+      <div class="form-fields">
+        <input type="number" class="dmg" name="system.onAcquire.thrall.tn" value="{{system.onAcquire.thrall.tn}}" />
+        <span class="hint">TN</span>
+        <input type="number" class="dmg" name="system.onAcquire.thrall.damageResolve" value="{{system.onAcquire.thrall.damageResolve}}" />
+        <span class="dmg-sep">/</span>
+        <input type="number" class="dmg" name="system.onAcquire.thrall.damageWounds" value="{{system.onAcquire.thrall.damageWounds}}" />
+        <span class="hint">damage</span>
+        <input type="number" class="dmg" name="system.onAcquire.thrall.healthResolve" value="{{system.onAcquire.thrall.healthResolve}}" />
+        <span class="dmg-sep">/</span>
+        <input type="number" class="dmg" name="system.onAcquire.thrall.healthWounds" value="{{system.onAcquire.thrall.healthWounds}}" />
+        <span class="hint">health</span>
+      </div>
+    </div>
+    {{/if}}
+  </section>
+  {{/if}}
+
+  {{#if isWeaponEcho}}
+  <section class="sheet-section">
+    <h2>On Acquire</h2>
+    <div class="form-group">
+      <label>Grants</label>
+      <div class="form-fields">
+        <label class="checkbox"><input type="checkbox" name="system.onAcquire.grantTier3Ability" {{#if system.onAcquire.grantTier3Ability}}checked{{/if}} /> Tier 3 Ability</label>
+      </div>
+    </div>
+  </section>
+  {{/if}}
+
+  <section class="sheet-section">
+    <h2>Replace Dying State</h2>
+    <div class="form-group">
+      <label>Enabled</label>
+      <div class="form-fields">
+        <input type="checkbox" name="system.replaceDyingState.enabled" {{#if system.replaceDyingState.enabled}}checked{{/if}} />
+      </div>
+    </div>
+    {{#if system.replaceDyingState.enabled}}
+    <div class="form-group">
+      <label>Outcome</label>
+      <div class="form-fields">
+        <select name="system.replaceDyingState.outcome">{{selectOptions replaceDyingOutcomeChoices selected=system.replaceDyingState.outcome localize=false}}</select>
+        <label class="checkbox"><input type="checkbox" name="system.replaceDyingState.oncePerCombat" {{#if system.replaceDyingState.oncePerCombat}}checked{{/if}} /> Once per combat</label>
+      </div>
+    </div>
+    {{#if (eq system.replaceDyingState.outcome "preventDeath")}}
+    <div class="form-group">
+      <label>Restore</label>
+      <div class="form-fields">
+        <input type="number" class="dmg" name="system.replaceDyingState.resolve" value="{{system.replaceDyingState.resolve}}" />
+        <span class="dmg-sep">/</span>
+        <input type="number" class="dmg" name="system.replaceDyingState.wounds" value="{{system.replaceDyingState.wounds}}" />
+        <span class="hint">Resolve / Wounds</span>
+      </div>
+    </div>
+    {{/if}}
+
+    <h3>Triggered Effects</h3>
+    {{#each system.replaceDyingState.groups as |group i|}}
+      {{> "systems/hollows/templates/item/parts/effect-group.html" group=group i=i groupsPath="replaceDyingState.groups"
+          choices=../choices zoneList=../zoneList conditionChoices=../conditionChoices
+          entityChoices=../entityChoices entityAbilityMap=../entityAbilityMap}}
+    {{/each}}
+    <button type="button" class="stat-roll" data-action="addGroup" data-groups-path="replaceDyingState.groups">+ Add effect group</button>
+    {{/if}}
+  </section>
+
+  <section class="sheet-section">
+    <h2>Play Text</h2>
+    <div class="form-group stacked">
+      <label>Description</label>
+      <textarea name="system.text" rows="4">{{system.text}}</textarea>
+    </div>
+    <div class="form-group stacked">
+      <label>GM Notes</label>
+      <textarea name="system.gmText" rows="3">{{system.gmText}}</textarea>
+    </div>
+  </section>
+</form>

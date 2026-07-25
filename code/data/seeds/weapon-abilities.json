@@ -1,0 +1,866 @@
+[
+    {
+        "_id": "01dcfe1c24276137",
+        "name": "Bulwark",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Armour",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "armour.t1.bulwark",
+            "text": "Everyone cowers while you alone weather the storm. While you are Ready, allies in your area restore +1 Resolve when they Guard. Expend Ready to grant an immediate Guard manoeuvre to an ally in your area."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Armour/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "8eb18f67118e982f",
+        "name": "Control",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Armour",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "armour.t1.control",
+            "text": "You unravel the chaos of combat into reason. While you are Ready, when your turn ends, you may Shift 1 Threat in your or an adjacent area. During your turn, you may expend Ready to grant an ally in your area an immediate Reload, Take Cover or Move manoeuvre."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Armour/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "ed4dd93415a6936f",
+        "name": "Martyr",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Armour",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "armour.t1.martyr",
+            "text": "Your body bears a litany of scars. When an ally in your area would suffer Wound damage, you may expend Ready as an immediate action; they take no damage, and you take the inflicted Wound damage -1 instead."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Armour/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "98de7e988800152e",
+        "name": "Masochist",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Armour",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "armour.t1.masochist",
+            "text": "Violence makes the heart grow stronger. When an Entity targets you with any attack, you may expend Ready as an immediate action to heal 1 Wound."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Armour/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "726a6af5f75c22ad",
+        "name": "Resolute",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Armour",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "armour.t1.resolute",
+            "text": "Your anger is yours and yours alone; use it. Once per round, when you miss with an attack, you may become Ready as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Armour/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "d742d91b5af083b3",
+        "name": "Stoic",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Armour",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "armour.t1.stoic",
+            "text": "You can endure anything. While you are Ready, when your turn starts, restore 1 Resolve."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Armour/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "a3bbc38d91941132",
+        "name": "Brand",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Book",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "book.t1.brand",
+            "text": "Carve your dominion into its flesh. When you inflict damage on the Entity with a Book attack, one Hunter in your area or an adjacent area may Focus as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Book/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "3207e5f60d61eae7",
+        "name": "Leash",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Book",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "book.t1.leash",
+            "text": "Down, wretch. While you are in Close, when the Entity Repositions an ally or uses an Interrupt ability, it suffers 1 Resolve damage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Book/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "307712ba4c12057f",
+        "name": "Rebuke",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Book",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "book.t1.rebuke",
+            "text": "Chastise it for daring to stand against you. When you inflict damage with a Book attack, you may activate this ability. If you inflict Resolve damage, remove 2 Threat from your or an adjacent area. If you inflict Wound damage, remove 4 Threat from your or an adjacent area."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Book/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "ef387ef4145dab55",
+        "name": "Remake",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Book",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "book.t1.remake",
+            "text": "Speak their bones back into their ordained form. Spend 1 Wound and a manoeuvre to activate this ability. Test Wise; on any success, an ally in your area heals 3 Wounds. On any failure, an ally in your area heals 1 Wound. If this action is performed in Support, roll with advantage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Book/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "aaf53ffa58f9688d",
+        "name": "Ward",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Book",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "book.t1.ward",
+            "text": "Protective hexes shield you from the storm. While you hold a Sheltered terrain tag, it reduces damage suffered by 2. As an immediate action on your turn, you may spend 1 Wound to apply the effects of this ability to an ally in your area until the end of their next turn. If you do this, you no longer receive the benefit yourself."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Book/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "f06e701abc6ef2a2",
+        "name": "Witness",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Book",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "book.t1.witness",
+            "text": "Watch closely ? you've exposed a weakness. Once per round, when you miss with an attack, you may Focus as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Book/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "7e7c582e7bb93103",
+        "name": "Anointed",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Knife",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "knife.t1.anointed",
+            "text": "Daub your body in the blood of the beast. While the Entity is Bleeding and you are in Close, when your turn ends, restore 2 Resolve."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Knife/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "583573dcee09cfa0",
+        "name": "Backstab",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Knife",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "knife.t1.backstab",
+            "text": "They left themselves open; it's more their fault than yours. While you are in Rear, inflict +1/+1 damage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Knife/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "676d0b88563ede38",
+        "name": "Dodge",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Knife",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "knife.t1.dodge",
+            "text": "They're going to wish they'd killed you sooner. Once per round, when an Entity attacks you, you may spend 1 Resolve to defend with Quick instead of any other stat. If you roll under your Quick on this defence roll, you may Move to any adjacent area as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Knife/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "26ff6d207d2b636f",
+        "name": "Drink Deep",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Knife",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "knife.t1.drink-deep",
+            "text": "Take your fill and bleed the bastard dry. While the Entity is Bleeding, when its turn starts, instead of inflicting damage and tossing the token, you may opt to remove it. If you do so, all Hunters in your area may Focus as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Knife/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "9e134c38b2ce66df",
+        "name": "Scramble",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Knife",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "knife.t1.scramble",
+            "text": "Nothing can stop you from getting where you need to be. Once per round, when you miss with an attack, you may Move as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Knife/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "806895fce583f907",
+        "name": "Whisper-Quick",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Knife",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "knife.t1.whisper-quick",
+            "text": "Kill them before they can hurt you. As an immediate action, spend 1 Resolve to make your next attack with Quick instead of any other stat. If this attack inflicts Wound damage, restore 2 Resolve."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Knife/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "15930be2c0185556",
+        "name": "Brandish",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Pistol",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "pistol.t1.brandish",
+            "text": "The monster can wait; you've got things to do. Instead of your attack action each turn, you may make two manoeuvres (allowing you to make three manoeuvres in total on your turn)."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Pistol/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "e6f455a81d0ada0a",
+        "name": "Dive Shot",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Pistol",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "pistol.t1.dive-shot",
+            "text": "Serves you right for showing off; at least you landed somewhere safe. Once per round, when you miss with an attack, you may claim a terrain tag."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Pistol/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "5ccd1b9610d71016",
+        "name": "Duck and Cover",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Pistol",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "pistol.t1.duck-and-cover",
+            "text": "Get your head down! Once per round, when you inflict Wound damage, one Hunter in your area may Take Cover as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Pistol/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "63cd1103b1dd31f0",
+        "name": "Make It Count",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Pistol",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "pistol.t1.make-it-count",
+            "text": "Hit it where it hurts. When you inflict Resolve damage with an attack, you may spend Focus to inflict 1 Wound damage on the Entity."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Pistol/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "479ab64e2ce3d740",
+        "name": "Momentum",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Pistol",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "pistol.t1.momentum",
+            "text": "Feels good, doesn't it? Once per round, when you inflict Wound damage, restore 2 Resolve."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Pistol/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "3d453be5b4812289",
+        "name": "Skirmisher",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Pistol",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "pistol.t1.skirmisher",
+            "text": "Line up the perfect shot. When you Move to a Close area, gain +2 Quick until the start of your next turn. When you Move to a Ranged area, gain +2 Sharp until the start of your next turn."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Pistol/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "b3ef18c1348a34fe",
+        "name": "Aim For the Head",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Rifle",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "rifle.t1.aim-for-the-head",
+            "text": "One shot is all you need. When you spend Focus as part of an attack, you may activate this ability. The attack gains +1/+1 for each Focus spent, but you do not roll with advantage as you normally would."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Rifle/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "3e64e85232067420",
+        "name": "Drill",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Rifle",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "rifle.t1.drill",
+            "text": "Do. It. Again. Once per round, when you miss with an attack, you may Reload as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Rifle/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "9c7fef0df2327749",
+        "name": "Forewarned",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Rifle",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "rifle.t1.forewarned",
+            "text": "Avoiding pain and suffering is simply a matter of not standing in the way of an enemy's attacks. When you would suffer or spend Resolve or Wound damage, you may immediately spend Focus up to the amount you currently hold. Reduce the damage suffered by the amount of Focus spent."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Rifle/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "a83f61a46bb39029",
+        "name": "Pristine",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Rifle",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "rifle.t1.pristine",
+            "text": "Don't let them touch you. While you have your maximum number of Wounds or higher, +1 to all stats."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Rifle/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "6bd834567c036541",
+        "name": "Satisfaction",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Rifle",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "rifle.t1.satisfaction",
+            "text": "Nothing like spilt blood to clear the mind. When you inflict Wound damage, gain 1 Focus."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Rifle/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "9eeeaa7d6f758c4c",
+        "name": "Walk In Like You Own the Place",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Rifle",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "rifle.t1.walk-in-like-you-own-the-place",
+            "text": "The decor isn't up to much, but at least it's sturdy. As an immediate action on your turn, you may spend Focus to claim a terrain tag."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Rifle/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "c4be07192a3c89a9",
+        "name": "Frantic",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Shotgun",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "shotgun.t1.frantic",
+            "text": "Kill it! Kill it now! The first time each turn you miss with an attack, you suffer 1 Resolve damage and inflict 2 Resolve damage on the Entity."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Shotgun/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "1f615e987ebac951",
+        "name": "Hungry",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Shotgun",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "shotgun.t1.hungry",
+            "text": "More! MORE! While your Shotgun is Empty, when your turn ends, you must spend either 1 Resolve or 1 Wound to make an immediate Reload action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Shotgun/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "250963b55340da5f",
+        "name": "Kicking and Screaming",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Shotgun",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "shotgun.t1.kicking-and-screaming",
+            "text": "Never miss a chance to hurt something. While you are in Close, when you Reload the Shotgun, you may make an immediate 1/1 attack with Hard before flipping the Shotgun to Loaded. This attack is treated as an untyped attack, as though it is made with no Weapon, and is not treated as a Shotgun attack."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Shotgun/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "b98cbe82f6df1fc2",
+        "name": "Knockback",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Shotgun",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "shotgun.t1.knockback",
+            "text": "Send it stumbling. When you inflict Resolve damage with the Shotgun, you may Reposition one Hunter in Close or remove 1 Threat from your area."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Shotgun/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "e853956b38a08711",
+        "name": "Seeing Red",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Shotgun",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "shotgun.t1.seeing-red",
+            "text": "Time to die. While you are Broken, you inflict +1/+1 damage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Shotgun/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "b9293aabea5e1283",
+        "name": "Solid Shot",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Shotgun",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "shotgun.t1.solid-shot",
+            "text": "Thumb-sized slugs that tear and tumble. When you attack with the Shotgun, inflict +0/+1 damage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Shotgun/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "a4cc1753173cea85",
+        "name": "Back-To-Back",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Spear",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "spear.t1.back-to-back",
+            "text": "There's more of us than there are of them. When your turn ends, restore Resolve equal to the number of allies in your area, and every ally in your area restores 1 Resolve."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Spear/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "2b2d9c417b299d4e",
+        "name": "Bristle",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Spear",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "spear.t1.bristle",
+            "text": "You've given it something to think about. Once per round, when you miss with an attack, you may remove 1 Threat from your area or an adjacent area as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Spear/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "30a8d7069444bab4",
+        "name": "Decoy",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Spear",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "spear.t1.decoy",
+            "text": "A sacrifice worth making. When an ally makes a ranged attack through your area, that attack gains +1/+1."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Spear/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "48ee8f179418fcc6",
+        "name": "Goad",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Spear",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "spear.t1.goad",
+            "text": "The stupid creature is two steps behind you. When you Guard, you may also place 1 Threat on your area or an adjacent area, or Shift 1 Threat in your area or an adjacent area."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Spear/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "a9c5dc97d81619c8",
+        "name": "Pierce",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Spear",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "spear.t1.pierce",
+            "text": "Gouge a hole in its guts. While you are in Flank, inflict +0/+1 damage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Spear/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "828a70dcc88885e3",
+        "name": "Trap",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Spear",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "spear.t1.trap",
+            "text": "Just try and take me down. While you are in a Close area with 3 or more Threat on it, make attack rolls with advantage."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Spear/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "0be0c09caf5cb5f2",
+        "name": "Charge",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Sword",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "sword.t1.charge",
+            "text": "Lead from the front. When you Move to a Close area, inflict 1 Resolve damage on the Entity."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Sword/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "066c581d8e86a548",
+        "name": "Exemplar",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Sword",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "sword.t1.exemplar",
+            "text": "A true warrior's mind is sharpened by danger. While there is Threat in your area, once per round during your turn, you may spend 1 Resolve to Focus as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Sword/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "d2fb06faf74fb131",
+        "name": "Got Your Back",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Sword",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "sword.t1.got-your-back",
+            "text": "Gather them around you. While you are in an area with at least one ally, inflict +1/+0 damage with your attacks. While there is Threat in your area, allies in that area also inflict +1/+0 damage with their attacks."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Sword/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "03027fa48dcd028d",
+        "name": "Misdirection",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Sword",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "sword.t1.misdirection",
+            "text": "Any fool could see this was part of your plan all along. Once per round, when you miss with an attack, you may Shift 2 Threat into or out of your area as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Sword/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "219fa5a30876ffc3",
+        "name": "Rally",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Sword",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "sword.t1.rally",
+            "text": "Guide them to victory. When you Guard, an ally in your area may Focus as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Sword/Tier 1"
+            }
+        }
+    },
+    {
+        "_id": "82fccc08ceaa8e85",
+        "name": "War of Attrition",
+        "type": "weapon-ability",
+        "img": "icons/svg/book.svg",
+        "system": {
+            "weaponType": "Sword",
+            "tier": 1,
+            "durationType": "permanent",
+            "key": "sword.t1.war-of-attrition",
+            "text": "Draw strength from adversity. Once per round, when Threat is spent from your area to trigger or enhance an Entity action, you may Guard as an immediate action."
+        },
+        "flags": {
+            "hollows": {
+                "folderHint": "Sword/Tier 1"
+            }
+        }
+    }
+]

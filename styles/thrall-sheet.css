@@ -1,0 +1,13 @@
+.hollows-thrall input[type="text"],
+.hollows-thrall input[type="number"],
+.hollows-thrall textarea,
+.hollows-thrall select {
+  background: #14151a;
+  color: #f6f1e8;
+  border: 1px solid var(--border);
+}
+
+.hollows-thrall select option {
+  background: #14151a;
+  color: #f6f1e8;
+}

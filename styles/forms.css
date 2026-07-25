@@ -1,0 +1,146 @@
+.hollows-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hollows-form-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.weapon-capacity {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  gap: 6px;
+  align-items: center;
+}
+
+.hollows-form-section {
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.hollows-form-section h3 {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f4c9b8;
+}
+
+.hollows-form-section input[type="text"],
+.hollows-form-section input[type="number"],
+.hollows-form-section select,
+.hollows-form-section textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #14151a;
+  color: #f6f1e8;
+  padding: 6px;
+}
+
+.hollows-form-section textarea {
+  resize: vertical;
+}
+
+.hollows-sheet .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.hollows-sheet .checkbox-group .checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: #efe6d8;
+  font-weight: 700;
+}
+
+.mod-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mod-row {
+  display: grid;
+  grid-template-columns: 1fr 80px;
+  gap: 8px;
+  align-items: center;
+}
+
+.hollows-form-value {
+  padding: 6px 8px;
+  border: 1px dashed #3f3733;
+  background: #0f1014;
+  color: #f6f1e8;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  cursor: default;
+}
+
+.hollows-form-value.multiline {
+  white-space: pre-wrap;
+  min-height: 40px;
+}
+
+.equipment-used {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #caa48f;
+  border: 1px dashed #4b3e37;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.stat-marks {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.stat-mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #5b4b44;
+  background: #1a1b20;
+}
+
+.stat-mark.filled {
+  background: #e0c7a1;
+  border-color: #b89252;
+  box-shadow: 0 0 6px rgba(224, 199, 161, 0.35);
+}
+
+.hollows-longtext {
+  max-height: 180px;
+  overflow: auto;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 10, 0.35);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.stat-assign-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stat-assign-grid label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}

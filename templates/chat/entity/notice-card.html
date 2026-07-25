@@ -1,0 +1,14 @@
+<div class="hollows-chat hollows-entity-attack">
+  {{#if titleHtml}}
+    <div class="attack-title">{{{titleHtml}}}</div>
+  {{/if}}
+  {{#if text}}
+    <div>{{text}}</div>
+  {{else}}
+    {{#if bodyHtml}}
+      {{{bodyHtml}}}
+    {{else}}
+      <div class="muted">{{emptyText}}</div>
+    {{/if}}
+  {{/if}}
+</div>

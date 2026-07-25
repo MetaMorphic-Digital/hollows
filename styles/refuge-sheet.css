@@ -1,0 +1,37 @@
+.hollows.sheet.actor.refuge .sheet-header,
+.hollows.sheet.actor.refuge .sheet-tabs[data-group='refugeTabs'] {
+  flex: 0 0 auto;
+}
+
+.refuge-content {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.refuge-tabs-content > .tab {
+  display: none;
+  position: static;
+  margin: 0;
+}
+
+.refuge-tabs-content > .tab.active {
+  display: block;
+}
+
+.hollows.sheet.actor.refuge .window-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.hollows.sheet.actor.refuge .window-content > form.hollows-sheet {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}

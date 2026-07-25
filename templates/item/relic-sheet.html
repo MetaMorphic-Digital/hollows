@@ -1,0 +1,78 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Relic Name" />
+      <div class="subline">{{#if system.upgraded}}Cypher{{else}}Relic{{/if}}</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Play text</h2>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row"><div class="stat-label">Description</div><textarea name="system.text" rows="4">{{system.text}}</textarea></div>
+      <div class="hollows-form-row"><div class="stat-label">GM Notes</div><textarea name="system.gmText" rows="3">{{system.gmText}}</textarea></div>
+      <div class="hollows-form-row"><div class="stat-label">Combat Reminder</div><input type="text" name="system.combatReminder" value="{{system.combatReminder}}" /></div>
+      <div class="hollows-form-row"><div class="stat-label">Narrative Setup</div><textarea name="system.narrativeSetup" rows="2">{{system.narrativeSetup}}</textarea></div>
+      <div class="hollows-form-row"><div class="stat-label">Uses</div><select name="system.uses">{{#each choices.uses as |label key|}}<option value="{{key}}" {{#if (eq ../system.uses key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <div class="hollows-form-row"><div class="stat-label">Delete when Used</div><input type="checkbox" name="system.deleteWhenUsed" {{#if system.deleteWhenUsed}}checked{{/if}} /></div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Effects</h2>
+    {{#each system.groups as |group i|}}
+      {{> "systems/hollows/templates/item/parts/effect-group.html" group=group i=i groupsPath="groups"
+          choices=../choices zoneList=../zoneList conditionChoices=../conditionChoices
+          entityChoices=../entityChoices entityAbilityMap=../entityAbilityMap}}
+    {{/each}}
+    <button type="button" class="stat-roll" data-action="addGroup" data-groups-path="groups">+ Add effect group</button>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Cypher Upgrade</h2>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row"><div class="stat-label">Could be upgraded to Cypher?</div><input type="checkbox" name="system.cypherUpgradable" {{#if system.cypherUpgradable}}checked{{/if}} /></div>
+      {{#if system.cypherUpgradable}}
+        {{#if system.upgraded}}<div class="hollows-form-row"><div class="stat-label">Status</div><div class="hollows-form-value"><strong>Upgraded to Cypher.</strong></div></div>{{/if}}
+        <div class="hollows-form-row"><div class="stat-label">Upgrade Trigger</div>
+          <select name="system.cypherTrigger">
+            <option value="rumourRevealed" {{#if (eq system.cypherTrigger "rumourRevealed")}}selected{{/if}}>When a Rumour is Revealed</option>
+            <option value="thrallDefeated" {{#if (eq system.cypherTrigger "thrallDefeated")}}selected{{/if}}>When a Thrall is Defeated</option>
+            <option value="hazardPassed" {{#if (eq system.cypherTrigger "hazardPassed")}}selected{{/if}}>When a Hazard is Passed</option>
+            <option value="entityDefeated" {{#if (eq system.cypherTrigger "entityDefeated")}}selected{{/if}}>When an Entity is Defeated</option>
+          </select>
+        </div>
+        <div class="hollows-form-row"><div class="stat-label">{{cypherTargetLabel}}</div>
+          <select name="system.cypherTriggerTargetId"><option value="">Select {{cypherTargetLabel}}</option>{{#each cypherTargetChoices as |choice|}}<option value="{{choice.id}}" {{#if (eq ../system.cypherTriggerTargetId choice.id)}}selected{{/if}}>{{choice.name}}</option>{{/each}}</select>
+        </div>
+        <div class="hollows-form-row"><div class="stat-label">Cypher Name</div><input type="text" name="system.cypherName" value="{{system.cypherName}}" placeholder="Name after upgrade" /></div>
+      {{/if}}
+    </div>
+  </section>
+
+  {{#if system.cypherUpgradable}}
+    <section class="sheet-section">
+      <h2>Cypher — play text</h2>
+      <div class="hollows-form-grid">
+        <div class="hollows-form-row"><div class="stat-label">Description</div><textarea name="system.cypher.text" rows="4">{{system.cypher.text}}</textarea></div>
+        <div class="hollows-form-row"><div class="stat-label">GM Notes</div><textarea name="system.cypher.gmText" rows="3">{{system.cypher.gmText}}</textarea></div>
+        <div class="hollows-form-row"><div class="stat-label">Combat Reminder</div><input type="text" name="system.cypher.combatReminder" value="{{system.cypher.combatReminder}}" /></div>
+        <div class="hollows-form-row"><div class="stat-label">Narrative Setup</div><textarea name="system.cypher.narrativeSetup" rows="2">{{system.cypher.narrativeSetup}}</textarea></div>
+        <div class="hollows-form-row"><div class="stat-label">Uses</div><select name="system.cypher.uses">{{#each choices.uses as |label key|}}<option value="{{key}}" {{#if (eq ../system.cypher.uses key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      </div>
+    </section>
+
+    <section class="sheet-section">
+      <h2>Cypher — effects</h2>
+      {{#each system.cypher.groups as |group i|}}
+        {{> "systems/hollows/templates/item/parts/effect-group.html" group=group i=i groupsPath="cypher.groups"
+            choices=../choices zoneList=../zoneList conditionChoices=../conditionChoices
+            entityChoices=../entityChoices entityAbilityMap=../entityAbilityMap}}
+      {{/each}}
+      <button type="button" class="stat-roll" data-action="addGroup" data-groups-path="cypher.groups">+ Add cypher effect group</button>
+    </section>
+  {{/if}}
+</form>

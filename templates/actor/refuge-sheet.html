@@ -1,0 +1,29 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Refuge Name" />
+      <div class="subline">Hollows Refuge</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <div class="ability-row">
+      <button type="button" class="stat-roll" data-enter-refuge>Enter Refuge (1 Bone, +3 Doom)</button>
+    </div>
+  </section>
+
+  <nav class="sheet-tabs tabs" data-group="refugeTabs">
+    {{#each tabs as |t|}}
+      <a class="item" data-tab="{{t.id}}">{{t.label}}</a>
+    {{/each}}
+  </nav>
+
+  <section class="refuge-tabs-content refuge-content">
+    {{#each tabs as |t|}}
+      <div class="tab" data-tab="{{t.id}}" data-group="refugeTabs">{{{t.html}}}</div>
+    {{/each}}
+  </section>
+</form>

@@ -1,0 +1,300 @@
+/* Entity ability builder */
+.hollows.sheet.item.builder {
+  --ink: #f8f3ea;
+  --muted: #b8ad9c;
+  --accent: #b84a3a;
+  --panel: #1c1f26;
+  --panel-2: #1b1a20;
+  --border: #5a4f49;
+}
+
+.hollows.sheet.item.builder .eab-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hollows.sheet.item.builder .eab-header .name {
+  font-size: 20px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  padding: 2px 0;
+}
+
+.hollows.sheet.item.builder .subline {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hollows.sheet.item.builder .form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px 0;
+}
+
+.hollows.sheet.item.builder .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.hollows.sheet.item.builder .form-group > label {
+  flex: 0 0 130px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hollows.sheet.item.builder .form-group .form-fields {
+  flex: 1 1 auto;
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hollows.sheet.item.builder label,
+.hollows.sheet.item.builder input,
+.hollows.sheet.item.builder select,
+.hollows.sheet.item.builder textarea {
+  margin: 0 !important;
+}
+
+.hollows.sheet.item.builder input:not([type="checkbox"]),
+.hollows.sheet.item.builder select {
+  height: 28px;
+  box-sizing: border-box;
+}
+
+.hollows.sheet.item.builder .form-group.sub {
+  margin-left: 130px;
+}
+
+.hollows.sheet.item.builder .form-group.sub > label {
+  flex: 0 0 80px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.hollows.sheet.item.builder .form-group.stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+}
+
+.hollows.sheet.item.builder .form-group.stacked > label {
+  flex: none;
+}
+
+.hollows.sheet.item.builder .form-fields select,
+.hollows.sheet.item.builder .form-fields input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hollows.sheet.item.builder input[type="number"] {
+  max-width: 72px;
+}
+
+.hollows.sheet.item.builder input[type="number"].dmg {
+  max-width: 3.4em;
+  text-align: center;
+  padding: 0 2px;
+}
+
+.hollows.sheet.item.builder .dmg-sep {
+  align-self: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hollows.sheet.item.builder .toggle,
+.hollows.sheet.item.builder .zone-chip {
+  white-space: nowrap;
+}
+
+.hollows.sheet.item.builder .profile-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 16px;
+  align-items: start;
+}
+
+.hollows.sheet.item.builder .profile-section h3,
+.hollows.sheet.item.builder .profile-section .notes {
+  grid-column: 1 / -1;
+}
+
+.hollows.sheet.item.builder .profile-section .form-group:not(.stacked) > label {
+  flex: 0 0 92px;
+}
+
+.hollows.sheet.item.builder .profile-section .form-group {
+  margin: 0;
+}
+
+.hollows.sheet.item.builder .profile-section .form-group.sub {
+  grid-column: 1 / -1;
+  margin-left: 92px;
+}
+
+.hollows.sheet.item.builder .profile-section .form-group.stacked {
+  grid-column: 1 / -1;
+  gap: 2px;
+}
+
+.hollows.sheet.item.builder .profile-section .zone-grid {
+  margin: 2px 0;
+}
+
+.hollows.sheet.item.builder textarea {
+  resize: vertical;
+}
+
+.hollows.sheet.item.builder .zone-grid,
+.hollows.sheet.item.builder .cond-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0 0 6px 0;
+}
+
+.hollows.sheet.item.builder .zone-chip,
+.hollows.sheet.item.builder .toggle-row .toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hollows.sheet.item.builder .zone-chip.on {
+  color: #f4c9b8;
+}
+
+.hollows.sheet.item.builder .zone-chip input {
+  flex: none;
+}
+
+.hollows.sheet.item.builder .sheet-section {
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  box-shadow: none;
+  padding: 10px 2px 0 2px;
+}
+
+.hollows.sheet.item.builder .sheet-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.hollows.sheet.item.builder h3 {
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #f4c9b8;
+}
+
+.hollows.sheet.item.builder .notes {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.hollows.sheet.item.builder .hint {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.hollows.sheet.item.builder input[type="checkbox"] {
+  flex: none;
+  width: auto;
+  min-width: 0;
+}
+
+.hollows.sheet.item.builder h3 .toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.hollows.sheet.item.builder .toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 8px 0;
+}
+
+.hollows.sheet.item.builder .num-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 12px;
+  margin: 0 0 8px 0;
+}
+
+.hollows.sheet.item.builder .num-grid label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.hollows.sheet.item.builder .num-grid input {
+  max-width: 64px;
+}
+
+.hollows.sheet.item.builder .group-card {
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.22);
+  padding: 10px;
+  margin: 0 0 10px 0;
+}
+
+.hollows.sheet.item.builder .group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #f4c9b8;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hollows.sheet.item.builder .group-remove {
+  cursor: pointer;
+  color: var(--accent);
+  padding: 0 6px;
+  font-weight: 700;
+}
+
+.hollows.sheet.item.builder .group-add {
+  display: inline-block;
+  cursor: pointer;
+  color: #f4c9b8;
+  border: 1px dashed var(--border);
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.hollows.sheet.item.builder .group-add:hover,
+.hollows.sheet.item.builder .group-remove:hover {
+  color: #fff;
+  border-color: var(--accent);
+}

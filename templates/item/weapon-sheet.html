@@ -1,0 +1,237 @@
+<form class="hollows-sheet weapon-bg" autocomplete="off" style="--weapon-bg: url('{{item.img}}')">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Weapon Name" />
+      <div class="subline">Weapon Item</div>
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Selected Form</h2>
+    <div class="hollows-form-row">
+      <div class="stat-label">Form</div>
+      <select name="system.selectedForm">
+        <option value="">-</option>
+        {{#each formsForDisplay as |form|}}
+          <option value="{{form.name}}" {{#if (eq ../system.selectedForm form.name)}}selected{{/if}}>{{form.name}}</option>
+        {{/each}}
+        <option value="Custom" {{#if (eq system.selectedForm "Custom")}}selected{{/if}}>Custom</option>
+      </select>
+    </div>
+    <div class="hollows-form-section">
+      <h3>Form Abilities</h3>
+      {{#if (eq system.selectedForm "Custom")}}
+        <div class="hollows-form-row">
+          <div class="stat-label">Name</div>
+          <input type="text" name="system.customForm.name" value="{{system.customForm.name}}" />
+        </div>
+        <div class="hollows-form-section">
+          <h3>Text</h3>
+          <textarea name="system.customForm.text" rows="3">{{system.customForm.text}}</textarea>
+        </div>
+        <div class="hollows-form-row">
+          <div class="stat-label">Damage (Resolve / Wounds)</div>
+          <div class="weapon-capacity">
+            <input type="number" name="system.customForm.damage.resolve" value="{{system.customForm.damage.resolve}}" />
+            <span class="slash">/</span>
+            <input type="number" name="system.customForm.damage.wounds" value="{{system.customForm.damage.wounds}}" />
+          </div>
+        </div>
+        <div class="hollows-form-row">
+          <div class="stat-label">Capacity</div>
+          <div class="weapon-capacity">
+            <input type="number" name="system.capacity.value" value="{{system.capacity.value}}" />
+            <span class="slash">/</span>
+            <input type="number" name="system.customForm.capacity.max" value="{{system.customForm.capacity.max}}" />
+          </div>
+        </div>
+      {{else}}
+        {{#if system.selectedForm}}
+          {{#each formsForDisplay as |form|}}
+            {{#if (eq ../system.selectedForm form.name)}}
+              <div class="hollows-form-value multiline">{{form.text}}</div>
+              {{#if form.damage}}
+                <div class="hollows-form-value">Damage: {{form.damage.resolve}} / {{form.damage.wounds}}</div>
+              {{/if}}
+              {{#if (gt form.capacity.max 0)}}
+                <div class="hollows-form-value">Capacity: {{form.capacity.value}} / {{form.capacity.max}}</div>
+              {{/if}}
+              {{#if (eq ../system.selectedForm "Silk")}}
+                <div class="hollows-form-row">
+                  <div class="stat-label">Silk Attack</div>
+                  <select name="system.formAttackChoice">
+                    <option value="Quick" {{#if (eq ../system.formAttackChoice "Quick")}}selected{{/if}}>Quick from Close</option>
+                    <option value="Sharp" {{#if (eq ../system.formAttackChoice "Sharp")}}selected{{/if}}>Sharp from Close</option>
+                  </select>
+                </div>
+              {{/if}}
+            {{/if}}
+          {{/each}}
+        {{else}}
+          <div class="muted">Select a form to see its abilities.</div>
+        {{/if}}
+      {{/if}}
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Modifiers</h2>
+    {{#if modifierChoicesForDisplay.length}}
+      <div class="hollows-form-row">
+        <div class="stat-label">Modifier Choice</div>
+        <select name="system.modifierChoice">
+          <option value="">-</option>
+          {{#each modifierChoicesForDisplay as |opt|}}
+            <option value="{{opt.id}}" {{#if (eq ../system.modifierChoice opt.id)}}selected{{/if}}>{{opt.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    {{else}}
+      <div class="muted">No modifier choices configured for this weapon.</div>
+    {{/if}}
+  </section>
+
+  {{#if (eq item.name "Shotgun")}}
+  <section class="sheet-section">
+    <h2>Loaded</h2>
+    <div class="hollows-form-row">
+      <div class="stat-label">State</div>
+      <select name="system.loaded" data-dtype="Boolean">
+        <option value="true" {{#if system.loaded}}selected{{/if}}>Loaded</option>
+        <option value="false" {{#unless system.loaded}}selected{{/unless}}>Empty</option>
+      </select>
+    </div>
+  </section>
+  {{/if}}
+
+  <section class="sheet-section">
+    <h2>Health Bonus</h2>
+    {{#if (eq item.name "Armour")}}
+      <div class="hollows-form-value">Resolve +2, Wounds +5</div>
+    {{else}}
+      <div class="mod-grid">
+        <div class="mod-row">
+          <div class="stat-label">Resolve</div>
+          <input type="number" name="system.health_bonus.resolve" value="{{system.health_bonus.resolve}}" {{#unless (eq system.selectedForm "Custom")}}disabled{{/unless}} />
+        </div>
+        <div class="mod-row">
+          <div class="stat-label">Wounds</div>
+          <input type="number" name="system.health_bonus.wounds" value="{{system.health_bonus.wounds}}" {{#unless (eq system.selectedForm "Custom")}}disabled{{/unless}} />
+        </div>
+      </div>
+    {{/if}}
+  </section>
+
+  <section class="sheet-section">
+    <h2>Core Ability</h2>
+    <textarea name="system.coreAbility" rows="4">{{system.coreAbility}}</textarea>
+  </section>
+
+  <section class="sheet-section ability-drop-zone">
+    <h2>Assigned Abilities</h2>
+    <div class="muted">Drag a Weapon Ability item here to assign it to this weapon.</div>
+    <div class="abilities-list">
+      {{#each assignedAbilities as |ability|}}
+        <div class="ability-card">
+          <div class="ability-row">
+            <div class="stat-label">
+              {{ability.name}}
+              <span class="ability-duration-badge">{{#if (eq ability.system.durationType "temporary")}}Temporary{{else}}Permanent{{/if}}</span>
+            </div>
+            <button type="button" class="stat-roll danger" data-action="unbindAbility" data-ability-id="{{ability.id}}">Unbind</button>
+            <button type="button" class="stat-roll danger" data-action="deleteAbility" data-ability-id="{{ability.id}}">Remove</button>
+          </div>
+          <div class="ability-text">{{ability.system.text}}</div>
+        </div>
+      {{/each}}
+      {{#unless assignedAbilities.length}}
+        <div class="muted">No abilities assigned yet.</div>
+      {{/unless}}
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Base Traits</h2>
+    <div class="hollows-form-section">
+      <h3>Outlook</h3>
+      {{#if (eq system.selectedForm "Custom")}}
+        <textarea name="system.outlook" rows="3">{{system.outlook}}</textarea>
+      {{else}}
+        <div class="hollows-form-value multiline">{{system.outlook}}</div>
+      {{/if}}
+    </div>
+    <div class="hollows-form-section">
+      <h3>Lies</h3>
+      {{#if (eq system.selectedForm "Custom")}}
+        <textarea name="system.lies" rows="3">{{system.lies}}</textarea>
+      {{else}}
+        <div class="hollows-form-value multiline">{{system.lies}}</div>
+      {{/if}}
+    </div>
+    <div class="hollows-form-section">
+      <h3>Fears</h3>
+      {{#if (eq system.selectedForm "Custom")}}
+        <textarea name="system.fears" rows="3">{{system.fears}}</textarea>
+      {{else}}
+        <div class="hollows-form-value multiline">{{system.fears}}</div>
+      {{/if}}
+    </div>
+    <div class="hollows-form-section">
+      <h3>Attack Profiles</h3>
+      {{#if (eq system.selectedForm "Custom")}}
+        <div class="attack-profiles">
+          {{#each customAttackProfilesForDisplay as |atk i|}}
+            <div class="hollows-form-grid attack-profile-editor-row">
+              <div class="hollows-form-row">
+                <div class="stat-label">Range</div>
+                <select name="system.customForm.attackProfiles.{{i}}.range">
+                  {{#each ../attackProfileRangeChoices as |choice|}}
+                    <option value="{{choice.value}}" {{#if (eq atk.range choice.value)}}selected{{/if}}>{{choice.label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="hollows-form-row">
+                <div class="stat-label">Stat</div>
+                <select name="system.customForm.attackProfiles.{{i}}.stat">
+                  {{#each ../attackProfileStatChoices as |choice|}}
+                    <option value="{{choice.value}}" {{#if (eq atk.stat choice.value)}}selected{{/if}}>{{choice.label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="hollows-form-row">
+                <div class="stat-label">Defence</div>
+                <select name="system.customForm.attackProfiles.{{i}}.defence">
+                  {{#each ../attackProfileDefenceChoices as |choice|}}
+                    <option value="{{choice.value}}" {{#if (eq atk.defence choice.value)}}selected{{/if}}>{{choice.label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="hollows-form-row">
+                <button type="button" class="stat-roll danger" data-action="removeCustomAttackProfile" data-index="{{i}}">Remove</button>
+              </div>
+            </div>
+          {{/each}}
+          {{#unless customAttackProfilesForDisplay.length}}
+            <div class="muted">No attack profiles set yet.</div>
+          {{/unless}}
+        </div>
+        <button type="button" class="stat-roll" data-action="addCustomAttackProfile">Add Attack Profile</button>
+      {{else}}
+        {{#if attackProfilesForDisplay.length}}
+          <div class="attack-profiles">
+            {{#each attackProfilesForDisplay as |atk|}}
+              <div class="hollows-form-value">
+                {{atk.range}} / {{atk.stat}} vs {{atk.defence}}
+                {{#if atk.form}} - Form: {{atk.form}}{{/if}}
+                {{#if atk.condition}} - {{atk.condition}}{{/if}}
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="muted">No attack profiles set yet.</div>
+        {{/if}}
+      {{/if}}
+    </div>
+  </section>
+
+</form>

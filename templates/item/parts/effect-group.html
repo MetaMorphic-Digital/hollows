@@ -1,0 +1,188 @@
+{{!--
+  One effect group of the relic/rumour/cypher builder. Invoke from a
+  {{#each …groups as |group i|}} loop:
+    {{> ".../effect-group.html" group=group i=i groupsPath="groups"
+        choices=../choices zoneList=../zoneList conditionChoices=../conditionChoices
+        entityChoices=../entityChoices entityAbilityMap=../entityAbilityMap}}
+  Field names are system.{{groupsPath}}.{{i}}.<path>. `group.target.side` drives
+  which clauses/properties render — hunter and entity sets are never mixed.
+--}}
+<div class="group-card">
+  <div class="group-head">
+    <label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.enabled" {{#if group.enabled}}checked{{/if}} /> Group {{i}}</label>
+    <input type="text" name="system.{{groupsPath}}.{{i}}.label" value="{{group.label}}" placeholder="label (optional)" />
+    <a class="group-remove" data-action="removeGroup" data-groups-path="{{groupsPath}}" data-index="{{i}}">✕</a>
+  </div>
+
+  <div class="form-group"><label>Trigger</label><div class="form-fields">
+    <select name="system.{{groupsPath}}.{{i}}.trigger">{{#each choices.trigger as |label key|}}<option value="{{key}}" {{#if (eq ../group.trigger key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+  </div></div>
+
+  <div class="form-group"><label>Gate</label><div class="form-fields">
+    <select name="system.{{groupsPath}}.{{i}}.gate.source">{{#each choices.gateSource as |label key|}}<option value="{{key}}" {{#if (eq ../group.gate.source key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+    {{#unless (eq group.gate.source "none")}}
+      <select name="system.{{groupsPath}}.{{i}}.gate.comparison">{{#each choices.gateComparison as |label key|}}<option value="{{key}}" {{#if (eq ../group.gate.comparison key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      <input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.gate.value" value="{{group.gate.value}}" />
+    {{/unless}}
+  </div></div>
+
+  <div class="form-group"><label>Target</label><div class="form-fields">
+    <select name="system.{{groupsPath}}.{{i}}.target.side">{{#each choices.targetSide as |label key|}}<option value="{{key}}" {{#if (eq ../group.target.side key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+    {{#if (eq group.target.side "entity")}}
+      <select name="system.{{groupsPath}}.{{i}}.target.entityScope">{{#each choices.entityScope as |label key|}}<option value="{{key}}" {{#if (eq ../group.target.entityScope key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+      {{#if (eq group.target.entityScope "specific")}}
+        <select name="system.{{groupsPath}}.{{i}}.target.entityId"><option value="">Select Entity</option>{{#each entityChoices as |entity|}}<option value="{{entity.id}}" {{#if (eq ../group.target.entityId entity.id)}}selected{{/if}}>{{entity.name}}</option>{{/each}}</select>
+      {{/if}}
+    {{/if}}
+    {{#if (eq group.target.side "hunter")}}
+      <select name="system.{{groupsPath}}.{{i}}.target.hunterScope">{{#each choices.hunterScope as |label key|}}<option value="{{key}}" {{#if (eq ../group.target.hunterScope key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+    {{/if}}
+    {{#if (eq group.target.side "zone")}}
+      <select name="system.{{groupsPath}}.{{i}}.target.zoneMode">{{#each choices.zoneMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.target.zoneMode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+    {{/if}}
+  </div></div>
+
+  {{#if (or (eq group.target.hunterScope "chosenZone") (and (eq group.target.side "zone") (eq group.target.zoneMode "selected")))}}
+    <div class="form-group stacked"><label>Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../group.target.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.target.zones" data-value="{{z}}" {{#if (includes ../group.target.zones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+  {{/if}}
+  {{#if (and (eq group.target.side "zone") (eq group.target.zoneMode "adjacent"))}}
+    <div class="form-group stacked"><label>Adjacency</label><div class="toggle-row">
+      <label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.target.adjClose" {{#if group.target.adjClose}}checked{{/if}} /> Adjacent Close</label>
+      <label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.target.adjRanged" {{#if group.target.adjRanged}}checked{{/if}} /> Adjacent Ranged</label>
+      <label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.target.adjSelect" {{#if group.target.adjSelect}}checked{{/if}} /> Select Adjacent</label>
+      <label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.target.adjBearer" {{#if group.target.adjBearer}}checked{{/if}} /> Bearer's Zone</label>
+    </div></div>
+  {{/if}}
+
+  {{!-- ── Entity-side clauses ─────────────────────────────────────────── --}}
+  {{#if (eq group.target.side "entity")}}
+    {{#if (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.characteristic.enabled" {{#if group.characteristic.enabled}}checked{{/if}} /> Modify property</label></div>
+    {{#if group.characteristic.enabled}}
+      <div class="form-group sub stacked"><label>Properties</label><div class="cond-grid">{{#each choices.entityProperty as |label key|}}<label class="zone-chip {{#if (includes ../group.characteristic.properties key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.characteristic.properties" data-value="{{key}}" {{#if (includes ../group.characteristic.properties key)}}checked{{/if}} />{{label}}</label>{{/each}}</div></div>
+      <div class="form-group sub"><label>Modify by</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.characteristic.value" value="{{group.characteristic.value}}" /></div></div>
+    {{/if}}
+    {{/if}}
+
+    {{#unless (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.resource.enabled" {{#if group.resource.enabled}}checked{{/if}} /> Resolve / Wounds</label></div>
+    {{#if group.resource.enabled}}
+      <div class="form-group sub"><label>R / W (− = damage)</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.resource.resolve" value="{{group.resource.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.resource.wounds" value="{{group.resource.wounds}}" /></div></div>
+    {{/if}}
+
+    {{#if (eq group.trigger "onUse")}}
+      <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.attack.enabled" {{#if group.attack.enabled}}checked{{/if}} /> Attack</label></div>
+      {{#if group.attack.enabled}}
+        <div class="form-group sub"><label>Damage R / W</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.attack.amount.resolve" value="{{group.attack.amount.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.attack.amount.wounds" value="{{group.attack.amount.wounds}}" /></div></div>
+        <div class="form-group sub"><label>Stat vs Defence</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.attack.attackStat">{{#each choices.stat as |label key|}}<option value="{{key}}" {{#if (eq ../group.attack.attackStat key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><select name="system.{{groupsPath}}.{{i}}.attack.defence">{{#each choices.attackDefence as |label key|}}<option value="{{key}}" {{#if (eq ../group.attack.defence key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><label class="checkbox"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.attack.advantage" {{#if group.attack.advantage}}checked{{/if}} /> Advantage</label></div></div>
+      {{/if}}
+    {{/if}}
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.curse.enabled" {{#if group.curse.enabled}}checked{{/if}} /> Curse</label></div>
+    {{#if group.curse.enabled}}
+      <div class="form-group sub"><label>Curse</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.curse.mode">{{#each choices.curseMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.curse.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.curse.amount" value="{{group.curse.amount}}" /></div></div>
+    {{/if}}
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.terrain.enabled" {{#if group.terrain.enabled}}checked{{/if}} /> Terrain (entity pool)</label></div>
+    {{#if group.terrain.enabled}}
+      <div class="form-group sub"><label>Tag / count</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.terrain.mode">{{#each choices.terrainMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.terrain.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.terrain.amount" value="{{group.terrain.amount}}" /></div></div>
+      <div class="form-group sub stacked"><label>Tags</label><div class="cond-grid">{{#each choices.entityTerrainTag as |label key|}}<label class="zone-chip {{#if (includes ../group.terrain.tags key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.terrain.tags" data-value="{{key}}" {{#if (includes ../group.terrain.tags key)}}checked{{/if}} />{{label}}</label>{{/each}}</div></div>
+    {{/if}}
+    {{/unless}}
+
+    {{!-- Ability disable/modify is passive only — shown only for passiveWhileHeld groups. --}}
+    {{#if (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.ability.enabled" {{#if group.ability.enabled}}checked{{/if}} /> Modify ability</label></div>
+    {{#if group.ability.enabled}}
+      <div class="form-group sub"><label>Entity</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.ability.entityId"><option value="">Select Entity</option>{{#each entityChoices as |entity|}}<option value="{{entity.id}}" {{#if (eq ../group.ability.entityId entity.id)}}selected{{/if}}>{{entity.name}}</option>{{/each}}</select></div></div>
+      <div class="form-group sub"><label>Ability</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.ability.abilityKey"><option value="">Select Ability</option>{{#each (lookup entityAbilityMap group.ability.entityId) as |ab|}}<option value="{{ab.id}}" {{#if (eq ../group.ability.abilityKey ab.id)}}selected{{/if}}>{{ab.name}}</option>{{/each}}</select></div></div>
+      <div class="form-group sub"><label>Mode</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.ability.mode">{{#each choices.abilityMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.ability.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div></div>
+      {{#if (eq group.ability.mode "modify")}}
+        <div class="form-group sub"><label>TN delta</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.ability.tnDelta" value="{{group.ability.tnDelta}}" /></div></div>
+        <div class="form-group sub"><label>Damage delta R / W</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.ability.damageResolve" value="{{group.ability.damageResolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.ability.damageWounds" value="{{group.ability.damageWounds}}" /></div></div>
+      {{/if}}
+    {{/if}}
+    {{/if}}
+  {{/if}}
+
+  {{!-- ── Hunter-side clauses ─────────────────────────────────────────── --}}
+  {{#if (eq group.target.side "hunter")}}
+    {{#if (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.characteristic.enabled" {{#if group.characteristic.enabled}}checked{{/if}} /> Modify stat</label></div>
+    {{#if group.characteristic.enabled}}
+      <div class="form-group sub stacked"><label>Stats</label><div class="cond-grid">{{#each choices.hunterProperty as |label key|}}<label class="zone-chip {{#if (includes ../group.characteristic.properties key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.characteristic.properties" data-value="{{key}}" {{#if (includes ../group.characteristic.properties key)}}checked{{/if}} />{{label}}</label>{{/each}}</div></div>
+      <div class="form-group sub"><label>Modify by</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.characteristic.value" value="{{group.characteristic.value}}" /></div></div>
+    {{/if}}
+    {{/if}}
+
+    {{#unless (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.resource.enabled" {{#if group.resource.enabled}}checked{{/if}} /> Resolve / Wounds / Focus</label></div>
+    {{#if group.resource.enabled}}
+      <div class="form-group sub"><label>R / W / F</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.resource.resolve" value="{{group.resource.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.resource.wounds" value="{{group.resource.wounds}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.resource.focus" value="{{group.resource.focus}}" /><label class="checkbox"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.resource.allowTemporary" {{#if group.resource.allowTemporary}}checked{{/if}} /> Temporary</label></div></div>
+    {{/if}}
+
+    {{#if (eq group.trigger "onUse")}}
+      <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.attack.enabled" {{#if group.attack.enabled}}checked{{/if}} /> Attack</label></div>
+      {{#if group.attack.enabled}}
+        <div class="form-group sub"><label>Damage R / W</label><div class="form-fields"><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.attack.amount.resolve" value="{{group.attack.amount.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.attack.amount.wounds" value="{{group.attack.amount.wounds}}" /></div></div>
+        <div class="form-group sub"><label>Stat vs Defence</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.attack.attackStat">{{#each choices.stat as |label key|}}<option value="{{key}}" {{#if (eq ../group.attack.attackStat key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><select name="system.{{groupsPath}}.{{i}}.attack.defence">{{#each choices.attackDefence as |label key|}}<option value="{{key}}" {{#if (eq ../group.attack.defence key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><label class="checkbox"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.attack.advantage" {{#if group.attack.advantage}}checked{{/if}} /> Advantage</label></div></div>
+      {{/if}}
+    {{/if}}
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.terrain.enabled" {{#if group.terrain.enabled}}checked{{/if}} /> Terrain tag</label></div>
+    {{#if group.terrain.enabled}}
+      <div class="form-group sub"><label>Mode</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.terrain.mode">{{#each choices.terrainMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.terrain.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div></div>
+      <div class="form-group sub stacked"><label>Tags</label><div class="cond-grid">{{#each choices.hunterTerrainTag as |label key|}}<label class="zone-chip {{#if (includes ../group.terrain.tags key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.terrain.tags" data-value="{{key}}" {{#if (includes ../group.terrain.tags key)}}checked{{/if}} />{{label}}</label>{{/each}}</div></div>
+    {{/if}}
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.condition.enabled" {{#if group.condition.enabled}}checked{{/if}} /> Condition</label></div>
+    {{#if group.condition.enabled}}
+      <div class="form-group sub"><label>Mode</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.condition.mode">{{#each choices.conditionMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.condition.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div></div>
+      <div class="form-group sub stacked"><label>Conditions</label><div class="cond-grid">{{#each conditionChoices as |cond|}}<label class="zone-chip {{#if (includes ../group.condition.conditions cond.key)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.condition.conditions" data-value="{{cond.key}}" {{#if (includes ../group.condition.conditions cond.key)}}checked{{/if}} />{{cond.label}}</label>{{/each}}</div></div>
+    {{/if}}
+    {{/unless}}
+
+    {{#if (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.incomingDamage.enabled" {{#if group.incomingDamage.enabled}}checked{{/if}} /> Incoming-damage modifier</label></div>
+    {{#if group.incomingDamage.enabled}}
+      <div class="form-group sub"><label>Source / R-W delta</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.incomingDamage.source">{{#each choices.incomingSource as |label key|}}<option value="{{key}}" {{#if (eq ../group.incomingDamage.source key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.incomingDamage.delta.resolve" value="{{group.incomingDamage.delta.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.incomingDamage.delta.wounds" value="{{group.incomingDamage.delta.wounds}}" /><span class="hint">(− = mitigate)</span></div></div>
+    {{/if}}
+    {{/if}}
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.reaction.enabled" {{#if group.reaction.enabled}}checked{{/if}} /> Reaction / grant</label></div>
+    {{#if group.reaction.enabled}}
+      <div class="form-group sub"><label>Kind</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.reaction.kind">
+        <option value="none" {{#if (eq group.reaction.kind "none")}}selected{{/if}}>None</option>
+        {{#if (eq group.trigger "passiveWhileHeld")}}
+          <option value="cancelAction" {{#if (eq group.reaction.kind "cancelAction")}}selected{{/if}}>Cancel Entity Action</option>
+        {{else}}
+          {{#if (eq group.trigger "onDeath")}}
+            <option value="deathSave" {{#if (eq group.reaction.kind "deathSave")}}selected{{/if}}>Prevent Death</option>
+          {{else}}
+            <option value="grantReaction" {{#if (eq group.reaction.kind "grantReaction")}}selected{{/if}}>Grant Reaction</option>
+            <option value="grantManoeuvre" {{#if (eq group.reaction.kind "grantManoeuvre")}}selected{{/if}}>Grant Manoeuvre</option>
+            <option value="immediateMove" {{#if (eq group.reaction.kind "immediateMove")}}selected{{/if}}>Immediate Move (chat reminder)</option>
+          {{/if}}
+        {{/if}}
+      </select></div></div>
+      {{#if (eq group.reaction.kind "grantReaction")}}<div class="form-group sub"><label>Reaction</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.reaction.reactionKey">{{#each choices.grantableReaction as |label key|}}<option value="{{key}}" {{#if (eq ../group.reaction.reactionKey key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div></div>{{/if}}
+    {{/if}}
+  {{/if}}
+
+  {{!-- ── Zone-side clauses ───────────────────────────────────────────── --}}
+  {{#if (eq group.target.side "zone")}}
+    {{#unless (eq group.trigger "passiveWhileHeld")}}
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.threat.enabled" {{#if group.threat.enabled}}checked{{/if}} /> Threat</label></div>
+    {{#if group.threat.enabled}}
+      <div class="form-group sub"><label>Mode / amount</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.threat.mode">{{#each choices.threatMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.threat.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.threat.amount" value="{{group.threat.amount}}" /></div></div>
+    {{/if}}
+
+    <div class="form-group"><label class="toggle"><input type="checkbox" name="system.{{groupsPath}}.{{i}}.curse.enabled" {{#if group.curse.enabled}}checked{{/if}} /> Curse</label></div>
+    {{#if group.curse.enabled}}
+      <div class="form-group sub"><label>Curse</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.curse.mode">{{#each choices.curseMode as |label key|}}<option value="{{key}}" {{#if (eq ../group.curse.mode key)}}selected{{/if}}>{{label}}</option>{{/each}}</select><input type="number" class="dmg" name="system.{{groupsPath}}.{{i}}.curse.amount" value="{{group.curse.amount}}" /></div></div>
+    {{/if}}
+    {{/unless}}
+  {{/if}}
+
+  <div class="form-group stacked"><label>Other text (chat fallback)</label><textarea name="system.{{groupsPath}}.{{i}}.otherText" rows="2">{{group.otherText}}</textarea></div>
+</div>

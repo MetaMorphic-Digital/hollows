@@ -1,0 +1,66 @@
+<form class="hollows-sheet hollows-thrall" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Thrall Name" />
+      <div class="subline">Hollows Thrall</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Health</h2>
+    <div class="health-grid">
+      <div class="health-row">
+        <div class="health-label">Resolve</div>
+        <input type="number" name="system.health.resolve.value" value="{{system.health.resolve.value}}" />
+        <span class="slash">/</span>
+        <input type="number" name="system.health.resolve.max" value="{{system.health.resolve.max}}" />
+      </div>
+      <div class="health-row">
+        <div class="health-label">Wounds</div>
+        <input type="number" name="system.health.wounds.value" value="{{system.health.wounds.value}}" />
+        <span class="slash">/</span>
+        <input type="number" name="system.health.wounds.max" value="{{system.health.wounds.max}}" />
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Attack</h2>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row">
+        <div class="stat-label">Defence Stat</div>
+        <select name="system.stat">
+          <option value="strong" {{#if (eq system.stat "strong")}}selected{{/if}}>Strong</option>
+          <option value="hard" {{#if (eq system.stat "hard")}}selected{{/if}}>Hard</option>
+          <option value="quick" {{#if (eq system.stat "quick")}}selected{{/if}}>Quick</option>
+          <option value="sharp" {{#if (eq system.stat "sharp")}}selected{{/if}}>Sharp</option>
+          <option value="wise" {{#if (eq system.stat "wise")}}selected{{/if}}>Wise</option>
+        </select>
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">TN</div>
+        <input type="number" name="system.tn" value="{{system.tn}}" />
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Damage (R / W)</div>
+        <div class="weapon-capacity">
+          <input type="number" name="system.damage.resolve" value="{{system.damage.resolve}}" />
+          <span class="slash">/</span>
+          <input type="number" name="system.damage.wounds" value="{{system.damage.wounds}}" />
+        </div>
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Attack</div>
+        <button type="button" class="stat-roll" data-action="thrallAttack">Attack Target</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Notes</h2>
+    <textarea name="system.notes" rows="8">{{system.notes}}</textarea>
+  </section>
+</form>

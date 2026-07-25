@@ -1,0 +1,26 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Equipment Name" />
+      <div class="subline">Hollows Equipment</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Details</h2>
+    <div class="hollows-form-row">
+      <div class="stat-label">Category</div>
+      <select name="system.category">
+        <option value="exploration" {{#if (eq system.category "exploration")}}selected{{/if}}>Exploration</option>
+        <option value="battle" {{#if (eq system.category "battle")}}selected{{/if}}>Battle</option>
+      </select>
+    </div>
+    <div class="hollows-form-section">
+      <h3>Description</h3>
+      <textarea name="system.text" rows="10">{{system.text}}</textarea>
+    </div>
+  </section>
+</form>

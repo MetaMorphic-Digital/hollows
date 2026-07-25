@@ -1,0 +1,30 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="NPC Name" />
+      <div class="subline">Hollows NPC</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Refuge</h2>
+    <div class="hollows-form-row">
+      <div class="stat-label">Occupation</div>
+      <input type="text" name="system.refugeOccupation" value="{{system.refugeOccupation}}" />
+    </div>
+    <div class="hollows-form-row">
+      <label class="checkbox">
+        <input type="checkbox" name="system.inRefuge" {{#if system.inRefuge}}checked{{/if}} />
+        In Refuge
+      </label>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Description</h2>
+    <textarea name="system.description" rows="10">{{system.description}}</textarea>
+  </section>
+</form>
