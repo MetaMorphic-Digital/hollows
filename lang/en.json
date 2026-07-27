@@ -8,6 +8,10 @@
       "changeBracket": "Change Bracket",
       "makeActive": "Make Active",
       "toggleActiveState": "Toggle Active State"
+    },
+    "PACKS": {
+      "WEAPONS": "Hollows - Weapons",
+      "WEAPON_ABILITIES": "Hollows - Weapon Abilities"
     }
   }
 }

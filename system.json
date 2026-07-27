@@ -21,17 +21,13 @@
   "packs": [
     {
       "name": "weapons",
-      "label": "Hollows - Weapons",
-      "path": "packs/weapons",
-      "type": "Item",
-      "system": "hollows"
+      "label": "HOLLOWS.PACKS.WEAPONS",
+      "type": "Item"
     },
     {
       "name": "weapon-abilities",
-      "label": "Hollows - Weapon Abilities",
-      "path": "packs/weapon-abilities.db",
-      "type": "Item",
-      "system": "hollows"
+      "label": "HOLLOWS.PACKS.WEAPON_ABILIIES",
+      "type": "Item"
     }
   ],
   "packFolders": [
