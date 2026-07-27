@@ -3,7 +3,7 @@ import postcss from "rollup-plugin-postcss";
 import postcssImport from "postcss-import";
 import postcssValueParser from "postcss-value-parser";
 import resolve from "@rollup/plugin-node-resolve";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 
 const filepath = "_variables.yml";
 if (!fs.existsSync(filepath)) {

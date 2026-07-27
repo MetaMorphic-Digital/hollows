@@ -1,4 +1,5 @@
 packs/
 node_modules/
 foundry/
+public/
 _environment.yml
