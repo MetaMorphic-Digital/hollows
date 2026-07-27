@@ -13,5 +13,16 @@
       "WEAPONS": "Hollows - Weapons",
       "WEAPON_ABILITIES": "Hollows - Weapon Abilities"
     }
+  },
+  "TYPES": {
+    "Actor": {
+      "entity": "Entity",
+      "hazard": "Hazard",
+      "hollow": "Hollow",
+      "hunter": "Hunter",
+      "npc": "NPC",
+      "refuge": "Refuge",
+      "thrall": "Thrall"
+    }
   }
 }

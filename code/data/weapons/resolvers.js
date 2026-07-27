@@ -3,7 +3,7 @@ import {
   getRegisteredWeaponForm,
   getRegisteredWeaponFormMechanics,
   getRegisteredWeaponForms,
-  getWeaponDefinition
+  getWeaponDefinition,
 } from "./registry.js";
 
 const EMPTY_DAMAGE = Object.freeze({ resolve: 0, wounds: 0 });
@@ -28,7 +28,7 @@ function statBlock(source = {}) {
     hard: asNumber(source.hard),
     quick: asNumber(source.quick),
     sharp: asNumber(source.sharp),
-    wise: asNumber(source.wise)
+    wise: asNumber(source.wise),
   };
 }
 
@@ -53,19 +53,19 @@ function normalizeLegacyForm(weapon, form) {
     text: String(form.text || ""),
     damage: {
       resolve: asNumber(form.damage?.resolve),
-      wounds: asNumber(form.damage?.wounds)
+      wounds: asNumber(form.damage?.wounds),
     },
     capacity: {
       value: asNumber(form.capacity?.value),
-      max: asNumber(form.capacity?.max)
+      max: asNumber(form.capacity?.max),
     },
     healthBonus: {
       resolve: asNumber(form.healthBonus?.resolve),
-      wounds: asNumber(form.healthBonus?.wounds)
+      wounds: asNumber(form.healthBonus?.wounds),
     },
     modifiers: statBlock(form.modifiers || EMPTY_MODIFIERS),
     modifierChoices: Array.isArray(form.modifierChoices) ? clone(form.modifierChoices) : [],
-    attackProfiles: Array.isArray(form.attackProfiles) ? clone(form.attackProfiles) : []
+    attackProfiles: Array.isArray(form.attackProfiles) ? clone(form.attackProfiles) : [],
   };
 }
 
@@ -117,7 +117,7 @@ export function getSelectedWeaponForm(weapon) {
       name: weapon?.system?.customForm?.name || "Custom",
       key: "Custom",
       healthBonus: weapon?.system?.health_bonus || EMPTY_HEALTH,
-      modifierChoices: weapon?.system?.modifierChoices || []
+      modifierChoices: weapon?.system?.modifierChoices || [],
     });
   }
   return getRegisteredWeaponForm(getWeaponType(weapon), selected) || getLegacySelectedForm(weapon, selected);
@@ -134,7 +134,7 @@ export function getEffectiveWeaponDamage(weapon) {
   const source = form?.damage || EMPTY_DAMAGE;
   return {
     resolve: asNumber(source.resolve),
-    wounds: asNumber(source.wounds)
+    wounds: asNumber(source.wounds),
   };
 }
 
@@ -143,16 +143,7 @@ export function getEffectiveWeaponCapacity(weapon) {
   const source = form?.capacity || weapon?.system?.capacity || EMPTY_CAPACITY;
   return {
     value: resolveCurrentCapacityValue(weapon, source),
-    max: asNumber(source.max)
-  };
-}
-
-export function getEffectiveWeaponHealthBonus(weapon) {
-  const form = getSelectedWeaponForm(weapon);
-  const source = form?.healthBonus || weapon?.system?.health_bonus || EMPTY_HEALTH;
-  return {
-    resolve: asNumber(source.resolve),
-    wounds: asNumber(source.wounds)
+    max: asNumber(source.max),
   };
 }
 
@@ -184,6 +175,6 @@ export function getEffectiveWeaponModifiers(weapon) {
     hard: formMods.hard + choiceMods.hard,
     quick: formMods.quick + choiceMods.quick,
     sharp: formMods.sharp + choiceMods.sharp,
-    wise: formMods.wise + choiceMods.wise
+    wise: formMods.wise + choiceMods.wise,
   };
 }

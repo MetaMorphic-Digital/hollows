@@ -37,20 +37,23 @@ Hooks.once("init", () => {
 function registerSubtypes() {
   // FIXME: clean this up
   const {
-    EchoDataModel, NpcDataModel, RelicDataModel, EntityDataModel, HazardDataModel,
-    HollowDataModel, HunterDataModel, RefugeDataModel, RumourDataModel,
-    ThrallDataModel, WeaponDataModel, EquipmentDataModel, EntityAbilityDataModel,
-    WeaponAbilityDataModel, EntityEnhancementDataModel,
+    EchoDataModel,
+    EntityAbilityDataModel,
+    EntityEnhancementDataModel,
+    EquipmentDataModel,
+    RelicDataModel,
+    RumourDataModel,
+    WeaponAbilityDataModel,
   } = data;
 
   Object.assign(CONFIG.Actor.dataModels, {
-    entity: EntityDataModel,
-    hazard: HazardDataModel,
-    hollow: HollowDataModel,
-    hunter: HunterDataModel,
-    npc: NpcDataModel,
-    refuge: RefugeDataModel,
-    thrall: ThrallDataModel,
+    entity: data.actors.EntityData,
+    hazard: data.actors.HazardData,
+    hollow: data.actors.HollowData,
+    hunter: data.actors.HunterData,
+    npc: data.actors.NpcData,
+    refuge: data.actors.RefugeData,
+    thrall: data.actors.ThrallData,
   });
 
   Object.assign(CONFIG.Item.dataModels, {
@@ -61,7 +64,7 @@ function registerSubtypes() {
     equipment: EquipmentDataModel,
     relic: RelicDataModel,
     rumour: RumourDataModel,
-    weapon: WeaponDataModel,
+    weapon: data.items.WeaponData,
   });
 
 }

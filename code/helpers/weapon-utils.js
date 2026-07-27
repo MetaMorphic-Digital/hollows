@@ -1,6 +1,4 @@
 import { WEAPON_TYPE_ORDER } from "../data/_module.mjs";
-import { getAdjacentZones } from "../canvas/zone.js";
-import { addThreatToZone, addThreatToZoneSafe } from "../canvas/overlays.js";
 import { resolveSuggestedRollMode } from "../dice/_module.mjs";
 import { getEffectiveWeaponCapacity } from "../data/weapons/index.js";
 import { hasCondition, addCondition, removeCondition } from "../documents/actor/conditions.js";
@@ -134,8 +132,8 @@ export async function chooseHunterWeapon(actor, title = "Choose Weapon") {
     rejectClose: false,
     buttons: [
       { action: "choose", label: "Choose", default: true, callback: (_e, _b, dialog) => String(dialog.element.querySelector("[name=weaponId]")?.value || "") },
-      { action: "cancel", label: "Cancel", callback: () => null }
-    ]
+      { action: "cancel", label: "Cancel", callback: () => null },
+    ],
   }) ?? "";
   return weapons.find(w => w.id === id) || null;
 }
@@ -186,7 +184,7 @@ export async function ensureWeaponAbilityCompendiumFolders(packArg = null) {
         name,
         type: "Item",
         folder: parentId || null,
-        sorting: "m"
+        sorting: "m",
       }, { pack: collection });
     } catch (err) {
       console.warn(`Hollows | Failed to create compendium folder "${name}"`, err);
@@ -298,7 +296,7 @@ export function bindSuggestedRollMode(root, {
   fallback = "normal",
   getAdvantages = () => [],
   getDisadvantages = () => [],
-  watch = []
+  watch = [],
 } = {}) {
   const select = root.querySelector(`[name="${selectName}"]`);
   if (!select) return () => {};
@@ -306,7 +304,7 @@ export function bindSuggestedRollMode(root, {
     const nextMode = resolveSuggestedRollMode({
       advantages: getAdvantages(root),
       disadvantages: getDisadvantages(root),
-      fallback
+      fallback,
     });
     select.value = nextMode;
   };
@@ -316,7 +314,6 @@ export function bindSuggestedRollMode(root, {
   update();
   return update;
 }
-
 
 // Attack damage changes are aggregated over AttackDamageChange mechanic
 // classes by helpers/weapon-abilities.

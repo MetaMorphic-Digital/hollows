@@ -7,7 +7,6 @@ import {
   getEffectiveWeaponAttackProfiles,
   getEffectiveWeaponCapacity,
   getEffectiveWeaponDamage,
-  getEffectiveWeaponHealthBonus,
   getEffectiveWeaponModifierChoices,
   getWeaponPackDocs,
 } from "../../../data/weapons/index.js";
@@ -105,7 +104,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     data.formsForDisplay = getAvailableWeaponForms(this.item);
     data.effectiveDamage = getEffectiveWeaponDamage(this.item);
     data.effectiveCapacity = getEffectiveWeaponCapacity(this.item);
-    data.effectiveHealthBonus = getEffectiveWeaponHealthBonus(this.item);
+    data.effectiveHealthBonus = this.item.system.getEffectiveWeaponHealthBonus();
     data.system.capacity = {
       value: Number(this.item.system?.capacity?.value ?? data.effectiveCapacity.value ?? 0),
       max: Number(data.effectiveCapacity.max ?? 0),
