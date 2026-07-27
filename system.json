@@ -1,10 +1,10 @@
 {
   "id": "hollows",
-  "title": "Hollows RPG (by Grighoul)",
-  "description": "Tactical combat and brisk gameplay in a dying world. D20 Blackjack engine.",
-  "version": "0.3.0",
+  "title": "Hollows",
+  "description": "<p>Foundry VTT implementation of the Hollows tabletop roleplaying game system by Rowan, Rook & Decard.",
+  "version": "1.0.0",
   "compatibility": {
-    "minimum": "14",
+    "minimum": "14.365",
     "verified": "14"
   },
   "authors": [
@@ -44,6 +44,13 @@
       ]
     }
   ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
   "documentTypes": {
     "Actor": {
       "hunter": {},
@@ -65,7 +72,22 @@
       "rumour": {}
     }
   },
-  "url": "https://github.com/grighoul/fvtt-hollows",
-  "manifest": "https://raw.githubusercontent.com/grighoul/fvtt-hollows/main/system.json",
-  "download": ""
+  "url": "https://github.com/MetaMorphic-Digital/hollows",
+  "manifest": "https://github.com/MetaMorphic-Digital/hollows/releases/latest/download/system.json",
+  "download": "",
+  "bugs": "https://github.com/MetaMorphic-Digital/hollows/issues",
+  "flags": {
+    "hotReload": {
+      "extensions": [
+        "css",
+        "hbs",
+        "json"
+      ],
+      "paths": [
+        "lang",
+        "styles",
+        "templates"
+      ]
+    }
+  }
 }
