@@ -1,31 +1,6 @@
 import { entityAbilityFields } from "./entity/action-schema.js";
 import { effectGroupsField } from "./relic/effect-schema.js";
 
-function entityEnhancementBuilderFields() {
-  const fields = foundry.data.fields;
-  return {
-    enabled: new fields.BooleanField({ initial: true }),
-    configure: new fields.ObjectField({ initial: {} }),
-    statModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
-    actionModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
-    generatedAbility: new fields.ObjectField({ initial: {} }),
-    triggers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
-  };
-}
-
-export class WeaponAbilityDataModel extends foundry.abstract.TypeDataModel {
-  static defineSchema() {
-    const fields = foundry.data.fields;
-    return {
-      weaponType: new fields.StringField({ initial: "" }),
-      tier: new fields.NumberField({ initial: 1, integer: true }),
-      durationType: new fields.StringField({ initial: "permanent" }),
-      boundWeaponId: new fields.StringField({ initial: "" }),
-      text: new fields.StringField({ initial: "" }),
-    };
-  }
-}
-
 // Shared effect-builder schema used by Rumour, Relic and the nested Cypher
 // block. Relics/Cyphers opt into `uses`; Rumours are used from the Hollow sheet
 // and do not carry their own spent-state.
@@ -40,16 +15,6 @@ function effectBuilderFields({ uses = false } = {}) {
   };
   if (uses) schema.uses = new fields.StringField({ initial: "oneOff" });
   return schema;
-}
-
-export class EquipmentDataModel extends foundry.abstract.TypeDataModel {
-  static defineSchema() {
-    const fields = foundry.data.fields;
-    return {
-      category: new fields.StringField({ initial: "exploration" }),
-      text: new fields.StringField({ initial: "" }),
-    };
-  }
 }
 
 export class RelicDataModel extends foundry.abstract.TypeDataModel {
@@ -134,17 +99,6 @@ export class EchoDataModel extends foundry.abstract.TypeDataModel {
 export class EntityAbilityDataModel extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return entityAbilityFields();
-  }
-}
-
-export class EntityEnhancementDataModel extends foundry.abstract.TypeDataModel {
-  static defineSchema() {
-    const fields = foundry.data.fields;
-    return {
-      category: new fields.StringField({ initial: "default" }),
-      text: new fields.StringField({ initial: "" }),
-      builder: new fields.SchemaField(entityEnhancementBuilderFields()),
-    };
   }
 }
 

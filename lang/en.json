@@ -23,6 +23,16 @@
       "npc": "NPC",
       "refuge": "Refuge",
       "thrall": "Thrall"
+    },
+    "Item": {
+      "echo": "Echo",
+      "entityAbility": "Entity Ability",
+      "entityEnhancement": "Entity Enhancement",
+      "equipment": "Equipment",
+      "relic": "Relic",
+      "rumour": "Rumour",
+      "weapon": "Weapon",
+      "weaponAbility": "Weapon Ability"
     }
   }
 }

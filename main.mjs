@@ -39,11 +39,8 @@ function registerSubtypes() {
   const {
     EchoDataModel,
     EntityAbilityDataModel,
-    EntityEnhancementDataModel,
-    EquipmentDataModel,
     RelicDataModel,
     RumourDataModel,
-    WeaponAbilityDataModel,
   } = data;
 
   Object.assign(CONFIG.Actor.dataModels, {
@@ -58,10 +55,10 @@ function registerSubtypes() {
 
   Object.assign(CONFIG.Item.dataModels, {
     "entity-ability": EntityAbilityDataModel,
-    "entity-enhancement": EntityEnhancementDataModel,
-    "weapon-ability": WeaponAbilityDataModel,
+    "entity-enhancement": data.items.EntityEnhancementData,
+    "weapon-ability": data.items.WeaponAbilityData,
     echo: EchoDataModel,
-    equipment: EquipmentDataModel,
+    equipment: data.items.EquipmentData,
     relic: RelicDataModel,
     rumour: RumourDataModel,
     weapon: data.items.WeaponData,

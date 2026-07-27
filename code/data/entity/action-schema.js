@@ -13,7 +13,7 @@ const damageField = () => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     resolve: new fields.NumberField({ initial: 0 }),
-    wounds: new fields.NumberField({ initial: 0 })
+    wounds: new fields.NumberField({ initial: 0 }),
   });
 };
 
@@ -29,7 +29,7 @@ const conditionListField = (choices, initial = []) => {
   const fields = foundry.data.fields;
   const list = (Array.isArray(initial) ? initial : [initial]).filter((condition) => String(condition || ""));
   return new fields.ArrayField(new fields.SchemaField({
-    condition: new fields.StringField({ initial: list[0] || "", choices })
+    condition: new fields.StringField({ initial: list[0] || "", choices }),
   }), { initial: list.map((condition) => ({ condition })) });
 };
 
@@ -88,7 +88,7 @@ export const ENTITY_ACTION_CHOICES = {
   triggerTargetMode: { entity: "Entity", eventTarget: "Event Target", eventZone: "Event Target Zone", allInEventZone: "All Hunters In Event Zone", allInSelectedZones: "All Hunters In Selected Zones", single: "Single", multiZone: "Select Zones" },
   abilitySource: { existing: "Existing", custom: "Custom" },
   abilityKind: { attack: "Attack", interrupt: "Interrupt" },
-  whenBrokenMode: { first: "First Time Only", every: "Every Time" }
+  whenBrokenMode: { first: "First Time Only", every: "Every Time" },
 };
 
 const profileField = () => {
@@ -119,7 +119,7 @@ const profileField = () => {
     allowedZones: zonesField(),
     conditionText: new fields.StringField({ initial: "" }),
     effectText: new fields.StringField({ initial: "" }),
-    text: new fields.StringField({ initial: "" })
+    text: new fields.StringField({ initial: "" }),
   });
 };
 
@@ -129,7 +129,7 @@ const costField = () => {
     enabled: new fields.BooleanField({ initial: false }),
     type: new fields.StringField({ initial: "threat", choices: ENTITY_ACTION_CHOICES.costType }),
     amount: new fields.NumberField({ initial: 0 }),
-    terrainTag: new fields.StringField({ initial: "any", choices: ENTITY_ACTION_CHOICES.terrainTag })
+    terrainTag: new fields.StringField({ initial: "any", choices: ENTITY_ACTION_CHOICES.terrainTag }),
   });
 };
 
@@ -140,7 +140,7 @@ const threatSpendField = () => {
     affectsTN: new fields.BooleanField({ initial: true }),
     modifyDamage: new fields.BooleanField({ initial: false }),
     damage: damageField(),
-    specialText: new fields.StringField({ initial: "" })
+    specialText: new fields.StringField({ initial: "" }),
   });
 };
 
@@ -149,7 +149,7 @@ export const PASSIVE_CONDITION_GROUPS = {
   Curse: ["entityHasCurse", "entityNoCurse", "entityCurseThreshold", "targetHasCurse", "targetNoCurse", "targetCurseThreshold"],
   Terrain: ["entityHasTerrain", "entityNoTerrain", "entityTerrainThreshold", "targetHasTerrain", "targetNoTerrain"],
   Threat: ["zoneHasThreat", "zoneNoThreat", "zoneThreatThreshold"],
-  Location: ["targetInZones", "targetAlone", "targetNotAlone"]
+  Location: ["targetInZones", "targetAlone", "targetNotAlone"],
 };
 
 const possibleIfField = () => {
@@ -157,7 +157,7 @@ const possibleIfField = () => {
   return new fields.SchemaField({
     enabled: new fields.BooleanField({ initial: false }),
     logic: new fields.StringField({ initial: "and", choices: ENTITY_ACTION_CHOICES.conditionLogic }),
-    conditions: conditionListField(ENTITY_ACTION_CHOICES.condition, ["targetHasTerrain"])
+    conditions: conditionListField(ENTITY_ACTION_CHOICES.condition, ["targetHasTerrain"]),
   });
 };
 
@@ -167,7 +167,7 @@ const thresholdField = () => {
     enabled: new fields.BooleanField({ initial: false }),
     source: new fields.StringField({ initial: "entityResolve", choices: ENTITY_ACTION_CHOICES.thresholdSource }),
     comparison: new fields.StringField({ initial: "lowerEqual", choices: ENTITY_ACTION_CHOICES.thresholdComparison }),
-    value: new fields.NumberField({ initial: 0 })
+    value: new fields.NumberField({ initial: 0 }),
   });
 };
 
@@ -180,7 +180,7 @@ const modifyGroupField = () => {
     tn: new fields.NumberField({ initial: 0 }),
     damage: damageField(),
     selfDamage: damageField(),
-    effectText: new fields.StringField({ initial: "" })
+    effectText: new fields.StringField({ initial: "" }),
   });
 };
 
@@ -188,7 +188,7 @@ const modifyIfField = () => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     enabled: new fields.BooleanField({ initial: false }),
-    groups: new fields.ArrayField(modifyGroupField(), { initial: [fieldDefaults(modifyGroupField())] })
+    groups: new fields.ArrayField(modifyGroupField(), { initial: [fieldDefaults(modifyGroupField())] }),
   });
 };
 
@@ -200,7 +200,7 @@ const repeatField = () => {
     modifyTN: new fields.NumberField({ initial: 0 }),
     damage: damageField(),
     hasCost: new fields.BooleanField({ initial: false }),
-    repeatCount: new fields.NumberField({ initial: 0 })
+    repeatCount: new fields.NumberField({ initial: 0 }),
   });
 };
 
@@ -217,10 +217,10 @@ const specialConditionField = () => {
     disadvTests: new fields.BooleanField({ initial: false }),
     statMod: new fields.SchemaField({
       stat: new fields.StringField({ initial: "hard", choices: ENTITY_ACTION_CHOICES.stat }),
-      amount: new fields.NumberField({ initial: 0 })
+      amount: new fields.NumberField({ initial: 0 }),
     }),
     tnMod: new fields.NumberField({ initial: 0 }),
-    damageTaken: damageField()
+    damageTaken: damageField(),
   });
 };
 
@@ -231,7 +231,7 @@ const shiftField = () => {
     resource: new fields.StringField({ initial: "threat", choices: ENTITY_ACTION_CHOICES.shiftResource }),
     direction: new fields.StringField({ initial: "towardEntity", choices: ENTITY_ACTION_CHOICES.shiftDirection }),
     amount: new fields.NumberField({ initial: 0 }),
-    zone: new fields.StringField({ initial: "" })
+    zone: new fields.StringField({ initial: "" }),
   });
 };
 
@@ -255,7 +255,7 @@ const effectPayloadFields = () => {
     transferTerrainToEntity: new fields.BooleanField({ initial: false }),
     shift: shiftField(),
     otherText: new fields.StringField({ initial: "" }),
-    specialCondition: specialConditionField()
+    specialCondition: specialConditionField(),
   };
 };
 
@@ -264,7 +264,7 @@ const beforeAttackGroupField = () => {
   return new fields.SchemaField({
     applyIfLogic: new fields.StringField({ initial: "and", choices: ENTITY_ACTION_CHOICES.conditionLogic }),
     applyIfConditions: conditionListField(ENTITY_ACTION_CHOICES.beforeAttackIf, ["always"]),
-    ...effectPayloadFields()
+    ...effectPayloadFields(),
   });
 };
 
@@ -272,7 +272,7 @@ const beforeAttackField = () => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     enabled: new fields.BooleanField({ initial: false }),
-    groups: new fields.ArrayField(beforeAttackGroupField(), { initial: [fieldDefaults(beforeAttackGroupField())] })
+    groups: new fields.ArrayField(beforeAttackGroupField(), { initial: [fieldDefaults(beforeAttackGroupField())] }),
   });
 };
 
@@ -284,7 +284,7 @@ const afterAttackGroupField = (applyIf = "anyDamageDealt") => {
     // on afterAttackField toggles the whole After-Attack feature.
     applyIfLogic: new fields.StringField({ initial: "and", choices: ENTITY_ACTION_CHOICES.conditionLogic }),
     applyIfConditions: conditionListField(ENTITY_ACTION_CHOICES.applyIf, [applyIf]),
-    ...effectPayloadFields()
+    ...effectPayloadFields(),
   });
 };
 
@@ -292,7 +292,7 @@ const afterAttackField = (applyIf = "anyDamageDealt", enabled = false) => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     enabled: new fields.BooleanField({ initial: enabled }),
-    groups: new fields.ArrayField(afterAttackGroupField(applyIf), { initial: [fieldDefaults(afterAttackGroupField(applyIf))] })
+    groups: new fields.ArrayField(afterAttackGroupField(applyIf), { initial: [fieldDefaults(afterAttackGroupField(applyIf))] }),
   });
 };
 
@@ -311,7 +311,7 @@ const followUpGroupField = () => {
     adjacentMode: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.followUpAdjacentMode }),
     excludeOriginal: new fields.BooleanField({ initial: true }),
     damageBonus: damageField(),
-    afterAttack: afterAttackField()
+    afterAttack: afterAttackField(),
   });
 };
 
@@ -319,7 +319,7 @@ const followUpField = () => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     enabled: new fields.BooleanField({ initial: false }),
-    groups: new fields.ArrayField(followUpGroupField(), { initial: [] })
+    groups: new fields.ArrayField(followUpGroupField(), { initial: [] }),
   });
 };
 
@@ -332,7 +332,7 @@ const restoreResolveField = () => {
     dynamicSource: new fields.StringField({ initial: "curseZones", choices: ENTITY_ACTION_CHOICES.restoreSource }),
     dynamicNumber: new fields.NumberField({ initial: 0 }),
     zoneMode: new fields.StringField({ initial: "single", choices: ENTITY_ACTION_CHOICES.zoneMode }),
-    zones: zonesField()
+    zones: zonesField(),
   });
 };
 
@@ -346,7 +346,7 @@ const useField = () => {
     test: new fields.SchemaField({
       enabled: new fields.BooleanField({ initial: false }),
       stat: new fields.StringField({ initial: "hard", choices: ENTITY_ACTION_CHOICES.stat }),
-      tn: new fields.NumberField({ initial: 0 })
+      tn: new fields.NumberField({ initial: 0 }),
     }),
     onSuccess: new fields.StringField({ initial: "removeAll", choices: ENTITY_ACTION_CHOICES.useOutcome }),
     onFailure: new fields.StringField({ initial: "removeNothing", choices: ENTITY_ACTION_CHOICES.useOutcome }),
@@ -360,7 +360,7 @@ const useField = () => {
     damageFailure: damageField(),
     transferFrom: new fields.StringField({ initial: "zone", choices: ENTITY_ACTION_CHOICES.transferEnd }),
     transferTo: new fields.StringField({ initial: "hunter", choices: ENTITY_ACTION_CHOICES.transferEnd }),
-    applyOnManoeuvre: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: ["use"] })
+    applyOnManoeuvre: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: ["use"] }),
   });
 };
 
@@ -379,7 +379,7 @@ const specialField = () => {
       amountZones: zonesField(),
       curseThreshold: new fields.NumberField({ initial: 3 }),
       conditionZones: zonesField(),
-      defenceScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.defenceScope })
+      defenceScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.defenceScope }),
     }),
     trigger: new fields.SchemaField({
       event: new fields.StringField({ initial: "entityStart", choices: ENTITY_ACTION_CHOICES.triggerEvent }),
@@ -392,11 +392,11 @@ const specialField = () => {
       abilityKind: new fields.StringField({ initial: "attack", choices: ENTITY_ACTION_CHOICES.abilityKind }),
       abilityName: new fields.StringField({ initial: "" }),
       profile: profileField(),
-      afterAttack: afterAttackField("always", true)
+      afterAttack: afterAttackField("always", true),
     }),
     use: useField(),
     colossal: new fields.BooleanField({ initial: false }),
-    terrainShield: new fields.BooleanField({ initial: false })
+    terrainShield: new fields.BooleanField({ initial: false }),
   });
 };
 
@@ -428,7 +428,7 @@ export function entityAbilityFields() {
     restoreResolve: restoreResolveField(),
     special: specialField(),
     doom: doomField(),
-    whenBroken: whenBrokenField()
+    whenBroken: whenBrokenField(),
   };
 }
 
@@ -459,7 +459,7 @@ export function createRepeatConfig(source = {}, repeatCount = 0) {
   return {
     ...base,
     repeatIf: normalizeAfterAttackApplyIf(base.repeatIf, "successAny"),
-    repeatCount: Math.max(0, Number(repeatCount ?? 0) || 0)
+    repeatCount: Math.max(0, Number(repeatCount ?? 0) || 0),
   };
 }
 
@@ -482,8 +482,8 @@ export function createFollowUpGroupConfig(source = {}, damageBonus = { resolve: 
     when: normalizeAfterAttackApplyIf(source?.when, "successAny"),
     damageBonus: {
       resolve: Number(damageBonus?.resolve ?? 0) || 0,
-      wounds: Number(damageBonus?.wounds ?? 0) || 0
-    }
+      wounds: Number(damageBonus?.wounds ?? 0) || 0,
+    },
   };
 }
 
@@ -491,7 +491,7 @@ export function createFollowUpConfig(source = {}, damageBonus = { resolve: 0, wo
   const groups = Array.isArray(source?.groups) ? source.groups : [];
   return {
     enabled: !!source?.enabled && groups.length > 0,
-    groups: groups.map((group) => createFollowUpGroupConfig(group, damageBonus))
+    groups: groups.map((group) => createFollowUpGroupConfig(group, damageBonus)),
   };
 }
 
@@ -507,7 +507,7 @@ export function createDefaultEntityAttack() {
     beforeAttack: fieldDefaults(beforeAttackField()),
     repeat: fieldDefaults(repeatField()),
     afterAttack: fieldDefaults(afterAttackField()),
-    followUp: fieldDefaults(followUpField())
+    followUp: fieldDefaults(followUpField()),
   };
 }
 
@@ -518,7 +518,7 @@ export function createDefaultEntityInterrupt() {
     cost: { ...fieldDefaults(costField()), enabled: true, type: "threat", amount: 1 },
     possibleIf: fieldDefaults(possibleIfField()),
     modifyIf: fieldDefaults(modifyIfField()),
-    afterAttack: fieldDefaults(afterAttackField())
+    afterAttack: fieldDefaults(afterAttackField()),
   };
 }
 
@@ -530,7 +530,7 @@ function createDefaultEntityManoeuvre() {
     possibleIf: fieldDefaults(possibleIfField()),
     modifyIf: fieldDefaults(modifyIfField()),
     afterAttack: fieldDefaults(afterAttackField()),
-    restoreResolve: fieldDefaults(restoreResolveField())
+    restoreResolve: fieldDefaults(restoreResolveField()),
   };
 }
 
@@ -540,7 +540,7 @@ function createDefaultEntitySpecial(kind = "special") {
     profile: createEntityActionProfile({ actionType: "other", targetMode: "noTargets" }),
     special: fieldDefaults(specialField()),
     doom: fieldDefaults(doomField()),
-    whenBroken: fieldDefaults(whenBrokenField())
+    whenBroken: fieldDefaults(whenBrokenField()),
   };
 }
 
