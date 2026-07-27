@@ -1,0 +1,19 @@
+# Package type 'module' or 'system'
+PACKAGE_TYPE: 'system'
+
+# Package id
+PACKAGE_ID: "hollows"
+
+# Package Title
+PACKAGE_TITLE: "Hollows"
+
+# For packing and unpacking compendiums.
+PACKS:
+  # Where compiled packs should be located (relative to the repository root).
+  DESTINATION: 'packs'
+
+  # Where source files are located (relative to the repository root).
+  SOURCE: 'src'
+
+  # To reduce diffs when unpacking, the user id replacing '_stats.lastModifiedBy'. If omitted or falsy, no replacement performed.
+  USER_ID: 'hollowsBuilder00'

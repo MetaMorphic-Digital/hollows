@@ -5,12 +5,8 @@ import {
   onDeleteCombat,
   onPreUpdateCombat,
   onUpdateCombat,
-  onUpdateCombatant
+  onUpdateCombatant,
 } from "./combat-turn-hooks.js";
-import {
-  onGetCombatTrackerEntryContext,
-  onRenderCombatTracker
-} from "../applications/sidebar/combat-tracker.js";
 
 export function registerCombatRuntimeHooks() {
   Hooks.on("updateCombat", onCombatInitializeUpdate);
@@ -20,9 +16,4 @@ export function registerCombatRuntimeHooks() {
   Hooks.on("combatStart", onCombatStart);
   Hooks.on("deleteCombat", onDeleteCombat);
   Hooks.on("updateCombatant", onUpdateCombatant);
-}
-
-export function registerCombatUiHooks() {
-  Hooks.on("renderCombatTracker", onRenderCombatTracker);
-  Hooks.on("getCombatTrackerEntryContext", onGetCombatTrackerEntryContext);
 }

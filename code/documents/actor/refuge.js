@@ -9,7 +9,7 @@ import {
   getRecoverOptions,
   getRecoverAmounts
 } from "../../data/refuge/index.js";
-import { pickOne, resolveActionHunter } from "../../applications/apps/selection-dialogs.js";
+import { pickOne, resolveActionHunter } from "../../applications/apps/selection-dialogs.mjs";
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { adjustHunterResource } from "./resources.js";
 

@@ -13,7 +13,7 @@
     }
   ],
   "esmodules": [
-    "code/main.js"
+    "main.mjs"
   ],
   "styles": [
     "styles/hollows.css"

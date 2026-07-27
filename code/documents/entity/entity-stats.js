@@ -17,7 +17,7 @@ const STAT_ALIASES = {
   resolvemax: "resolveMax",
   wounds: "woundsMax",
   woundsmax: "woundsMax",
-  defendtn: "defendTN"
+  defendtn: "defendTN",
 };
 
 export function normalizeEntityStatKey(stat) {
@@ -168,7 +168,7 @@ function getEntitySpecialPassiveStatDelta(entityActor, stat, context = {}) {
         threatCap: "modifyThreatCap",
         threatPerRound: "modifyThreatPerRound",
         resolveMax: "modifyMaxResolve",
-        woundsMax: "modifyMaxWounds"
+        woundsMax: "modifyMaxWounds",
       }[key] || "";
       if (passiveType !== expectedType) continue;
     }
@@ -184,7 +184,7 @@ export function getEntitySelfStatDelta(entityActor, stat, context = {}) {
   const state = {
     ...context,
     stat: key,
-    hunterCount: context.hunterCount ?? getActiveSceneHunterCount()
+    hunterCount: context.hunterCount ?? getActiveSceneHunterCount(),
   };
   let total = 0;
   for (const modifier of MECHANIC_BUCKETS.entitySelfStatModifier || []) {

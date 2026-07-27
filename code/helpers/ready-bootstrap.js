@@ -2,9 +2,8 @@ import { ensureWeaponAbilityCompendiumFolders, isShotgunWeapon, syncHunterLoaded
 import { removeCoreDeadCondition } from "../documents/actor/conditions.js";
 import {
   ensureWeaponAbilitiesSeeded,
-  ensureWeaponsSeeded
+  ensureWeaponsSeeded,
 } from "./compendium-seeding.js";
-import { registerHollowsSheets } from "../applications/sheets/registry.js";
 import { getHollowsWeaponIndex, setHollowsWeaponIndex } from "./runtime-state.js";
 import { getWeaponPackDocs } from "../data/weapons/index.js";
 
@@ -184,12 +183,6 @@ async function normalizeActorDefaultsForWorld() {
 }
 
 export async function runHollowsReady() {
-  try {
-    await registerHollowsSheets();
-  } catch (err) {
-    console.warn("Hollows | Failed to re-register sheets", err);
-  }
-
   await normalizeHollowsSheetFlags();
   await ensureWeaponsSeeded();
   await ensureWeaponAbilitiesSeeded();

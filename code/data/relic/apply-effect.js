@@ -9,7 +9,7 @@ import {
   getThreatInZone,
   getZoneCurseValue
 } from "../../canvas/zone.js";
-import { confirmDialog, pickMany, pickOne } from "../../applications/apps/selection-dialogs.js";
+import { confirmDialog, pickMany, pickOne } from "../../applications/apps/selection-dialogs.mjs";
 import { dispatchToGM } from "../../helpers/queries.js";
 import { activeRelicEffect } from "../../documents/item/relic-cypher.js";
 

@@ -1,19 +1,16 @@
 const actorDataModelHooks = {
   getEffectiveEntityStat: (actor, stat) => {
     const system = actor?._source?.system || actor?.system || {};
-    if (stat === "close" || stat === "ranged" || stat === "wyrd") return Math.max(0, Number(system?.defences?.[stat] ?? 0) || 0);
+    if ((stat === "close") || (stat === "ranged") || (stat === "wyrd")) return Math.max(0, Number(system?.defences?.[stat] ?? 0) || 0);
     if (stat === "threatCap") return Math.max(0, Number(system?.threat?.max ?? 0) || 0);
     if (stat === "threatPerRound") return Math.max(0, Number(system?.threat?.perRound ?? 0) || 0);
     if (stat === "resolveMax") return Math.max(0, Number(system?.health?.resolve?.max ?? 0) || 0);
     if (stat === "woundsMax") return Math.max(0, Number(system?.health?.wounds?.max ?? 0) || 0);
     return Math.max(0, Number(system?.[stat] ?? 0) || 0);
-  }
+  },
 };
 
-import {
-  getEffectiveWeaponHealthBonus,
-  getEffectiveWeaponModifiers
-} from "./weapons/index.js";
+import { getEffectiveWeaponHealthBonus, getEffectiveWeaponModifiers } from "./weapons/index.js";
 
 export function registerActorDataModelHooks(hooks = {}) {
   if (typeof hooks.getEffectiveEntityStat === "function") {
@@ -30,14 +27,14 @@ export class HunterDataModel extends foundry.abstract.TypeDataModel {
         hard: new fields.NumberField({ initial: 1, integer: true }),
         quick: new fields.NumberField({ initial: 1, integer: true }),
         sharp: new fields.NumberField({ initial: 1, integer: true }),
-        wise: new fields.NumberField({ initial: 1, integer: true })
+        wise: new fields.NumberField({ initial: 1, integer: true }),
       }),
       statsMarks: new fields.SchemaField({
         strong: new fields.NumberField({ initial: 0, integer: true }),
         hard: new fields.NumberField({ initial: 0, integer: true }),
         quick: new fields.NumberField({ initial: 0, integer: true }),
         sharp: new fields.NumberField({ initial: 0, integer: true }),
-        wise: new fields.NumberField({ initial: 0, integer: true })
+        wise: new fields.NumberField({ initial: 0, integer: true }),
       }),
       identity: new fields.SchemaField({
         faction: new fields.StringField({ initial: "" }),
@@ -45,37 +42,37 @@ export class HunterDataModel extends foundry.abstract.TypeDataModel {
         origin: new fields.StringField({ initial: "" }),
         originText: new fields.StringField({ initial: "" }),
         seed: new fields.StringField({ initial: "" }),
-        seedText: new fields.StringField({ initial: "" })
+        seedText: new fields.StringField({ initial: "" }),
       }),
       equipment: new fields.SchemaField({
         relic: new fields.SchemaField({
-          used: new fields.BooleanField({ initial: false })
-        })
+          used: new fields.BooleanField({ initial: false }),
+        }),
       }),
       bio: new fields.SchemaField({
         appearance: new fields.StringField({ initial: "" }),
-        notes: new fields.StringField({ initial: "" })
+        notes: new fields.StringField({ initial: "" }),
       }),
       health: new fields.SchemaField({
         resolve: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
-          max: new fields.NumberField({ initial: 0 })
+          max: new fields.NumberField({ initial: 0 }),
         }),
         wounds: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
-          max: new fields.NumberField({ initial: 0 })
-        })
+          max: new fields.NumberField({ initial: 0 }),
+        }),
       }),
       corruption: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 0 })
+        value: new fields.NumberField({ initial: 0 }),
       }),
       malignancy: new fields.StringField({ initial: "" }),
       focus: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 0, integer: true })
+        value: new fields.NumberField({ initial: 0, integer: true }),
       }),
       curse: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 0, integer: true })
-      })
+        value: new fields.NumberField({ initial: 0, integer: true }),
+      }),
     };
   }
 
@@ -122,7 +119,7 @@ export function getDefaultHunterTokenConfig() {
     displayBars: dm.ALWAYS,
     actorLink: true,
     bar1: { attribute: "health.wounds" },
-    bar2: { attribute: "health.resolve" }
+    bar2: { attribute: "health.resolve" },
   };
 }
 
@@ -175,21 +172,21 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
       defences: new fields.SchemaField({
         close: new fields.NumberField({ initial: 10, integer: true }),
         ranged: new fields.NumberField({ initial: 10, integer: true }),
-        wyrd: new fields.NumberField({ initial: 10, integer: true })
+        wyrd: new fields.NumberField({ initial: 10, integer: true }),
       }),
       health: new fields.SchemaField({
         resolve: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
-          max: new fields.NumberField({ initial: 0 })
+          max: new fields.NumberField({ initial: 0 }),
         }),
         wounds: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
-          max: new fields.NumberField({ initial: 0 })
-        })
+          max: new fields.NumberField({ initial: 0 }),
+        }),
       }),
       threat: new fields.SchemaField({
         perRound: new fields.NumberField({ initial: 0 }),
-        max: new fields.NumberField({ initial: 0 })
+        max: new fields.NumberField({ initial: 0 }),
       }),
       curse: new fields.SchemaField({
         enabled: new fields.BooleanField({ initial: false }),
@@ -197,24 +194,24 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
         targets: new fields.SchemaField({
           hunter: new fields.BooleanField({ initial: false }),
           entity: new fields.BooleanField({ initial: false }),
-          zone: new fields.BooleanField({ initial: false })
-        })
+          zone: new fields.BooleanField({ initial: false }),
+        }),
       }),
       terrainPool: new fields.SchemaField({
         elevated: new fields.NumberField({ initial: 3 }),
-        sheltered: new fields.NumberField({ initial: 3 })
+        sheltered: new fields.NumberField({ initial: 3 }),
       }),
       terrainEngineEnabled: new fields.BooleanField({ initial: false }),
       terrain: new fields.SchemaField({
         elevated: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        sheltered: new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        sheltered: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       }),
       abilities: new fields.ArrayField(
         new fields.SchemaField({
           name: new fields.StringField({ initial: "Ability" }),
-          text: new fields.StringField({ initial: "" })
+          text: new fields.StringField({ initial: "" }),
         }),
-        { initial: [] }
+        { initial: [] },
       ),
       attacks: new fields.ArrayField(
         new fields.SchemaField({
@@ -223,12 +220,12 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
           tn: new fields.NumberField({ initial: 0 }),
           damage: new fields.SchemaField({
             resolve: new fields.NumberField({ initial: 0 }),
-            wounds: new fields.NumberField({ initial: 0 })
+            wounds: new fields.NumberField({ initial: 0 }),
           }),
           targetMode: new fields.StringField({ initial: "single" }),
           allowedZones: new fields.ArrayField(
             new fields.StringField({ initial: "" }),
-            { initial: [] }
+            { initial: [] },
           ),
           conditionText: new fields.StringField({ initial: "" }),
           followUpEnabled: new fields.BooleanField({ initial: false }),
@@ -236,7 +233,7 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
           followUpTargets: new fields.StringField({ initial: "" }),
           followUpDamage: new fields.SchemaField({
             resolve: new fields.NumberField({ initial: 0 }),
-            wounds: new fields.NumberField({ initial: 0 })
+            wounds: new fields.NumberField({ initial: 0 }),
           }),
           followUpDefenceStat: new fields.StringField({ initial: "" }),
           followUpTN: new fields.NumberField({ initial: 0 }),
@@ -245,11 +242,11 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
           followUpZoneCount: new fields.StringField({ initial: "all" }),
           followUpAllowedZones: new fields.ArrayField(
             new fields.StringField({ initial: "" }),
-            { initial: [] }
+            { initial: [] },
           ),
-          followUpExcludeOriginal: new fields.BooleanField({ initial: true })
+          followUpExcludeOriginal: new fields.BooleanField({ initial: true }),
         }),
-        { initial: [] }
+        { initial: [] },
       ),
       interrupts: new fields.ArrayField(
         new fields.SchemaField({
@@ -258,7 +255,7 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
           targetMode: new fields.StringField({ initial: "single" }),
           allowedZones: new fields.ArrayField(
             new fields.StringField({ initial: "" }),
-            { initial: [] }
+            { initial: [] },
           ),
           actionType: new fields.StringField({ initial: "attack" }),
           defenceStat: new fields.StringField({ initial: "hard" }),
@@ -266,13 +263,13 @@ export class EntityDataModel extends foundry.abstract.TypeDataModel {
           tn: new fields.NumberField({ initial: 0 }),
           damage: new fields.SchemaField({
             resolve: new fields.NumberField({ initial: 0 }),
-            wounds: new fields.NumberField({ initial: 0 })
+            wounds: new fields.NumberField({ initial: 0 }),
           }),
           conditionText: new fields.StringField({ initial: "" }),
-          effectText: new fields.StringField({ initial: "" })
+          effectText: new fields.StringField({ initial: "" }),
         }),
-        { initial: [] }
-      )
+        { initial: [] },
+      ),
     };
   }
 
@@ -295,7 +292,7 @@ export class NpcDataModel extends foundry.abstract.TypeDataModel {
     return {
       description: new fields.StringField({ initial: "" }),
       refugeOccupation: new fields.StringField({ initial: "" }),
-      inRefuge: new fields.BooleanField({ initial: false })
+      inRefuge: new fields.BooleanField({ initial: false }),
     };
   }
 }
@@ -308,19 +305,19 @@ export class ThrallDataModel extends foundry.abstract.TypeDataModel {
       tn: new fields.NumberField({ initial: 10 }),
       damage: new fields.SchemaField({
         resolve: new fields.NumberField({ initial: 0 }),
-        wounds: new fields.NumberField({ initial: 0 })
+        wounds: new fields.NumberField({ initial: 0 }),
       }),
       health: new fields.SchemaField({
         resolve: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
-          max: new fields.NumberField({ initial: 0 })
+          max: new fields.NumberField({ initial: 0 }),
         }),
         wounds: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
-          max: new fields.NumberField({ initial: 0 })
-        })
+          max: new fields.NumberField({ initial: 0 }),
+        }),
       }),
-      notes: new fields.StringField({ initial: "" })
+      notes: new fields.StringField({ initial: "" }),
     };
   }
 }
@@ -336,7 +333,7 @@ export class HazardDataModel extends foundry.abstract.TypeDataModel {
       damageSuccessResolve: new fields.NumberField({ initial: 0 }),
       damageFailureWounds: new fields.NumberField({ initial: 0 }),
       doomOnFailure: new fields.NumberField({ initial: 0 }),
-      notes: new fields.StringField({ initial: "" })
+      notes: new fields.StringField({ initial: "" }),
     };
   }
 }
@@ -349,7 +346,7 @@ export class HollowDataModel extends foundry.abstract.TypeDataModel {
       notes: new fields.StringField({ initial: "" }),
       performerActorId: new fields.StringField({ initial: "" }),
       performerName: new fields.StringField({ initial: "" }),
-      performerImg: new fields.StringField({ initial: "" })
+      performerImg: new fields.StringField({ initial: "" }),
     });
     const sceneSchema = new fields.SchemaField({
       sceneId: new fields.StringField({ initial: "" }),
@@ -361,7 +358,7 @@ export class HollowDataModel extends foundry.abstract.TypeDataModel {
       entityIds: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       thrallIds: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       rumourIds: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
-      relicIds: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] })
+      relicIds: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
     });
     const publicLinkSchema = () => new fields.SchemaField({
       ref: new fields.StringField({ initial: "" }),
@@ -369,7 +366,7 @@ export class HollowDataModel extends foundry.abstract.TypeDataModel {
       uuid: new fields.StringField({ initial: "" }),
       name: new fields.StringField({ initial: "" }),
       img: new fields.StringField({ initial: "" }),
-      system: new fields.ObjectField({ initial: {} })
+      system: new fields.ObjectField({ initial: {} }),
     });
     return {
       status: new fields.StringField({ initial: "active" }),
@@ -380,7 +377,7 @@ export class HollowDataModel extends foundry.abstract.TypeDataModel {
       doom: new fields.SchemaField({
         current: new fields.NumberField({ initial: 0, integer: true }),
         cap: new fields.NumberField({ initial: 25, integer: true }),
-        show: new fields.BooleanField({ initial: false })
+        show: new fields.BooleanField({ initial: false }),
       }),
       incursion: new fields.SchemaField({
         omensText: new fields.StringField({ initial: "" }),
@@ -389,8 +386,8 @@ export class HollowDataModel extends foundry.abstract.TypeDataModel {
           gather: stepSchema(),
           resonate: stepSchema(),
           commune: stepSchema(),
-          rend: stepSchema()
-        })
+          rend: stepSchema(),
+        }),
       }),
       scenes: new fields.ArrayField(sceneSchema, { initial: [] }),
       trackedHazards: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
@@ -403,8 +400,8 @@ export class HollowDataModel extends foundry.abstract.TypeDataModel {
         thralls: new fields.ArrayField(publicLinkSchema(), { initial: [] }),
         entities: new fields.ArrayField(publicLinkSchema(), { initial: [] }),
         rumours: new fields.ArrayField(publicLinkSchema(), { initial: [] }),
-        relics: new fields.ArrayField(publicLinkSchema(), { initial: [] })
-      })
+        relics: new fields.ArrayField(publicLinkSchema(), { initial: [] }),
+      }),
     };
   }
 }
@@ -415,23 +412,23 @@ export class RefugeDataModel extends foundry.abstract.TypeDataModel {
     return {
       resources: new fields.SchemaField({
         bone: new fields.NumberField({ initial: 0, integer: true }),
-        hearts: new fields.NumberField({ initial: 0, integer: true })
+        hearts: new fields.NumberField({ initial: 0, integer: true }),
       }),
       npcRoles: new fields.SchemaField({
         keeper: new fields.StringField({ initial: "" }),
         doctor: new fields.StringField({ initial: "" }),
         apprentice: new fields.StringField({ initial: "" }),
         smith: new fields.StringField({ initial: "" }),
-        magus: new fields.StringField({ initial: "" })
+        magus: new fields.StringField({ initial: "" }),
       }),
       upgrades: new fields.ObjectField({ initial: {} }),
       residents: new fields.ArrayField(
         new fields.StringField({ initial: "" }),
-        { initial: [] }
+        { initial: [] },
       ),
       unlockedExploration: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       unlockedBattle: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
-      notes: new fields.StringField({ initial: "" })
+      notes: new fields.StringField({ initial: "" }),
     };
   }
 }

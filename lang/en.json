@@ -1,1 +1,13 @@
-{}
+{
+  "HOLLOWS": {
+    "COMBAT": {
+      "after": "After",
+      "apply": "Apply",
+      "before": "Before",
+      "bracket": "Bracket",
+      "changeBracket": "Change Bracket",
+      "makeActive": "Make Active",
+      "toggleActiveState": "Toggle Active State"
+    }
+  }
+}

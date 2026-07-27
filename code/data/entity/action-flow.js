@@ -1,4 +1,4 @@
-import { chooseOneTarget, chooseOneZone, promptForZoneSelection } from "../../applications/apps/selection-dialogs.js";
+import { chooseOneTarget, chooseOneZone, promptForZoneSelection } from "../../applications/apps/selection-dialogs.mjs";
 import { filterZonesByGroup, getAdjacentZones, getTokenZone, getZoneCurseValue, getZoneList, getActiveEntityActor, sceneHunterTokens } from "../../canvas/zone.js";
 import { matchesEntityAttackConditions } from "./action-rules.js";
 import { applyInterceptors } from "../../helpers/extensions.js";

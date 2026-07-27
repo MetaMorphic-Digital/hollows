@@ -1,12 +1,11 @@
 import {
   addSceneCombatantsToCombat,
   applyAdvanceTurnGM,
-  applyHollowsCombatTrackerEntryContext,
   applyPassInitiativeGM,
   createSetupRollMessage,
   getCombatantBracket,
   getCombatantsInBracket,
-  promptSceneCombatantAdditions
+  promptSceneCombatantAdditions,
 } from "../../helpers/combat-runtime.js";
 import { dispatchToGM } from "../../helpers/queries.js";
 import { getActiveEntityActor } from "../../canvas/zone.js";
@@ -16,10 +15,9 @@ import {
   ensureFirstPickDialog,
   finishEntityTurnAndBeginFirstPick,
   openFirstPickDialog,
-  shouldCurrentUserHandleFirstPick
+  shouldCurrentUserHandleFirstPick,
 } from "../../helpers/combat-first-pick.js";
 import { processEndOfTurn } from "../../helpers/combat-lifecycle.js";
-
 
 function makeEl(htmlStr) {
   const div = document.createElement("div");
@@ -27,7 +25,11 @@ function makeEl(htmlStr) {
   return div.firstElementChild;
 }
 
-export function onRenderCombatTracker(app, html) {
+/**
+ * On-render method.
+ * FIXME: move into combat tracker class.
+ */
+function onRenderCombatTracker(app, html) {
   const el = html;
   const combat = game.combat;
   const awaitingFirstPick = combat?.getFlag("hollows", "awaitingFirstPick") || null;
@@ -49,7 +51,7 @@ export function onRenderCombatTracker(app, html) {
       if (isEndCombat || isHollows) return;
       e.remove();
     });
-    controls.querySelectorAll('[data-control="endTurn"],[data-control*="endTurn"],[data-control*="nextTurn"],[data-control*="previousTurn"],.combat-control.endturn,.combat-control.endTurn,.combat-control.end-turn,.combat-control.roll').forEach(e => e.remove());
+    controls.querySelectorAll("[data-control=\"endTurn\"],[data-control*=\"endTurn\"],[data-control*=\"nextTurn\"],[data-control*=\"previousTurn\"],.combat-control.endturn,.combat-control.endTurn,.combat-control.end-turn,.combat-control.roll").forEach(e => e.remove());
   }
   el.querySelectorAll("[data-control]").forEach(e => {
     const control = e.dataset.control || "";
@@ -77,7 +79,7 @@ export function onRenderCombatTracker(app, html) {
     const started = combat && (combat.started || (combat.round ?? 0) > 0);
     if (game.user?.isGM) {
       controls.querySelectorAll(".hollows-end-combat").forEach(e => e.remove());
-      const endBtn = makeEl(`<button type="button" class="hollows-end-combat"><i class="fas fa-flag-checkered"></i> End Encounter</button>`);
+      const endBtn = makeEl("<button type=\"button\" class=\"hollows-end-combat\"><i class=\"fas fa-flag-checkered\"></i> End Encounter</button>");
       endBtn.addEventListener("click", async (event) => {
         event.preventDefault();
         if (!game.combat) return;
@@ -85,7 +87,7 @@ export function onRenderCombatTracker(app, html) {
       });
       controls.append(endBtn);
       controls.querySelectorAll(".hollows-add-combatant").forEach(e => e.remove());
-      const addCombatantBtn = makeEl(`<button type="button" class="hollows-add-combatant"><i class="fas fa-user-plus"></i> Add Combatant</button>`);
+      const addCombatantBtn = makeEl("<button type=\"button\" class=\"hollows-add-combatant\"><i class=\"fas fa-user-plus\"></i> Add Combatant</button>");
       addCombatantBtn.addEventListener("click", async (event) => {
         event.preventDefault();
         const combat = game.combat;
@@ -112,7 +114,7 @@ export function onRenderCombatTracker(app, html) {
       if (started) {
         controls.querySelectorAll(".hollows-setup-init").forEach(e => e.remove());
       } else if (!controls.querySelector(".hollows-setup-init")) {
-        const btn = makeEl(`<button type="button" class="hollows-setup-init"><i class="fas fa-dice-d20"></i> Setup Rolls</button>`);
+        const btn = makeEl("<button type=\"button\" class=\"hollows-setup-init\"><i class=\"fas fa-dice-d20\"></i> Setup Rolls</button>");
         btn.addEventListener("click", async (event) => {
           event.preventDefault();
           const combat = game.combat;
@@ -154,7 +156,7 @@ export function onRenderCombatTracker(app, html) {
       combatant.actor?.testUserPermission(game.user, "OWNER");
     const canPass = !!combatant && (game.user?.isGM || isHunterOwner);
     if (canPass) {
-      const passBtn = makeEl(`<button type="button" class="hollows-pass-init"><i class="fas fa-share"></i> End Turn / Pass Initiative</button>`);
+      const passBtn = makeEl("<button type=\"button\" class=\"hollows-pass-init\"><i class=\"fas fa-share\"></i> End Turn / Pass Initiative</button>");
       passBtn.addEventListener("click", async () => {
         const combat = game.combat;
         if (!combat?.started) {
@@ -193,7 +195,7 @@ export function onRenderCombatTracker(app, html) {
               combatId: combat.id,
               fromCombatantId: current.id,
               toCombatantId: targetId,
-              userId: game.user?.id
+              userId: game.user?.id,
             });
           }
           return;
@@ -237,7 +239,7 @@ export function onRenderCombatTracker(app, html) {
                   combatId: combat.id,
                   fromCombatantId: current.id,
                   mode: "after-to-entity",
-                  userId: game.user?.id
+                  userId: game.user?.id,
                 });
                 return;
               }
@@ -246,13 +248,13 @@ export function onRenderCombatTracker(app, html) {
                   combatId: combat.id,
                   fromCombatantId: current.id,
                   mode: "after-to-before",
-                  userId: game.user?.id
+                  userId: game.user?.id,
                 });
                 return;
               }
               await openFirstPickDialog(combat, "before", "", {
                 prevCombatantId: current.id,
-                reason: "round-start"
+                reason: "round-start",
               });
               return;
             }
@@ -260,7 +262,7 @@ export function onRenderCombatTracker(app, html) {
               combatId: combat.id,
               fromCombatantId: current.id,
               mode,
-              userId: game.user?.id
+              userId: game.user?.id,
             });
           }
           return;
@@ -289,13 +291,13 @@ export function onRenderCombatTracker(app, html) {
                   combatId: combat.id,
                   fromCombatantId: current.id,
                   toCombatantId: id,
-                  userId: game.user?.id
+                  userId: game.user?.id,
                 });
               }
-            }},
-            { action: "skip", label: "Skip", callback: () => null }
+            } },
+            { action: "skip", label: "Skip", callback: () => null },
           ],
-          rejectClose: false
+          rejectClose: false,
         });
       });
       controls.append(passBtn);
@@ -323,6 +325,126 @@ export function onRenderCombatTracker(app, html) {
   });
 }
 
-export function onGetCombatTrackerEntryContext(_html, options) {
-  applyHollowsCombatTrackerEntryContext(options);
+export default class HollowsCombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
+  /** @inheritdoc */
+  _getEntryContextOptions() {
+    const options = super._getEntryContextOptions();
+
+    const getEntry = target => this.viewed.combatants.get(target.dataset.combatantId);
+    const isHunter = target => getEntry(target).actor?.type === "hunter";
+
+    for (const option of options) {
+      // No need for fallbacks; the relevant methods all have this defined.
+      const fn = option.visible;
+
+      // Change visibility to only apply to Hunters.
+      switch (option.label) {
+        case "COMBATANT.ACTIONS.Clear":
+        case "COMBATANT.ACTIONS.Reroll":
+        case "COMBATANT.ACTIONS.ClearMovementHistory":
+          option.visible = target => (fn(target) && isHunter(target));
+          break;
+      }
+    }
+
+    options.push(
+      {
+        label: "HOLLOWS.COMBAT.toggleActiveState",
+        icon: "fa-solid fa-toggle-on",
+        visible: target => isHunter(target) && game.user.isGM,
+        onClick: (event, target) => {
+          const combatant = getEntry(target);
+          combatant.setFlag(hollows.id, "acted", !combatant.getFlag(hollows.id, "acted"));
+        },
+      },
+      {
+        label: "HOLLOWS.COMBAT.changeBracket",
+        icon: "fa-solid fa-arrows-up-down",
+        visible: target => isHunter(target) && game.user.isGM,
+        onClick: (event, target) => {
+          const combatant = getEntry(target);
+          this.#promptCombatantBracketChange(combatant);
+        },
+      },
+      {
+        label: "HOLLOWS.COMBAT.makeActive",
+        icon: "fa-solid fa-bolt",
+        visible: target => {
+          const c = getEntry(target);
+          return ["hunter", "entity"].includes(c.actor?.type) && game.user.isGM && this.viewed.started;
+        },
+        onClick: (event, target) => {
+          const combatant = getEntry(target);
+          const turn = this.viewed.turns.findIndex(entry => entry.id === combatant.id);
+          if (turn < 0) return;
+          this.viewed.update({ turn }, { hollowsPassInitiative: true, hollowsManualMakeActive: true });
+        },
+      },
+    );
+
+    return options;
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Prompt for combatant bracket change.
+   * @param {foundry.documents.Combatant} combatant
+   * @returns {Promise<foundry.documents.Combatant|null>}
+   */
+  async #promptCombatantBracketChange(combatant) {
+    const current = combatant.getFlag(hollows.id, "setup.bracket") || "before";
+    if (combatant.actor?.type !== "hunter") return null;
+
+    const select = foundry.applications.fields.createFormGroup({
+      label: _loc("HOLLOWS.COMBAT.bracket"),
+      input: foundry.applications.fields.createSelectInput({
+        value: current,
+        blank: false,
+        name: "bracket",
+        options: [
+          { value: "before", label: _loc("HOLLOWS.COMBAT.before") },
+          { value: "after", label: _loc("HOLLOWS.COMBAT.after") },
+        ],
+      }),
+    });
+
+    const result = await foundry.applications.api.Dialog.input({
+      window: { title: `${_loc("HOLLOWS.COMBAT.changeBracket")}: ${combatant.name}` },
+      content: select.outerHTML,
+      ok: { label: _loc("HOLLOWS.COMBAT.apply") },
+    });
+
+    if (!result) return null;
+    return this.setCombatantBracket(combatant, result.bracket);
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Set combatant to new bracket.
+   * @param {foundry.documents.Combatant} combatant
+   * @param {"after"|"before"} bracket
+   * @returns {Promise<foundry.documents.Combatant|null>}
+   */
+  async setCombatantBracket(combatant, bracket) {
+    if (combatant.actor?.type !== "hunter") return null;
+    if (!["after", "before"].includes(bracket)) return null;
+
+    const setup = foundry.utils.deepClone(combatant.getFlag(hollows.id, "setup") ?? {});
+    setup.bracket = bracket;
+    const init = (bracket === "before") ? 2 : 0;
+    await combatant.update({
+      initiative: init,
+      flags: { [hollows.id]: { setup } },
+    });
+    return combatant;
+  }
+
+  /* -------------------------------------------------- */
+
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+    onRenderCombatTracker(this, this.element);
+  }
 }

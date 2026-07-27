@@ -1,1 +1,4 @@
 packs/
+node_modules/
+foundry/
+_environment.yml

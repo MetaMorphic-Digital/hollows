@@ -12,7 +12,7 @@ export const BOOK_SACRED_GUARD = new Reaction("book.form.sacred.guard", {
     const actor = actorId ? game.actors.get(String(actorId)) : null;
     if (!actor || actor.type !== "hunter") return null;
     if (!actor.testUserPermission(game.user, "OWNER")) return null;
-    const { chooseOneTarget } = await import("../../../../applications/apps/selection-dialogs.js");
+    const { chooseOneTarget } = await import("../../../../applications/apps/selection-dialogs.mjs");
     const { getActiveSceneHunters, getActorTokenOnScene } = await import("../../../../canvas/zone.js");
     const { hasCondition } = await import("../../../../documents/actor/conditions.js");
     const { adjustHunterResource } = await import("../../../../documents/actor/resources.js");

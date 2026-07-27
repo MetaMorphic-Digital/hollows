@@ -1,1 +1,1 @@
-export * from "./combat-tracker.js";
+export { default as HollowsCombatTracker } from "./combat-tracker.js";

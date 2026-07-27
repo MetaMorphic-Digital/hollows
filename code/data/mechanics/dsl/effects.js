@@ -44,7 +44,7 @@
 
 import { addCondition, removeCondition } from "../../../documents/actor/conditions.js";
 import { getActiveEntityActor, getActorZone, getAdjacentZones, getHuntersInZone, getThreatInZone, isCloseZone, isRangedZone } from "../../../canvas/zone.js";
-import { pickOne } from "../../../applications/apps/selection-dialogs.js";
+import { pickOne } from "../../../applications/apps/selection-dialogs.mjs";
 import { HOLLOWS_CONDITIONS } from "../../system-constants.js";
 import { getEffectiveWeaponCapacity } from "../../weapons/index.js";
 import { adjustHunterResource, adjustEntityResource, getFocusCount, spendResolve } from "../../../documents/actor/resources.js";
@@ -549,7 +549,7 @@ async function applyOne(eff, ctx) {
       }
       return;
     }
-    
+
     default:
       console.warn(`Hollows | Unknown effect type: ${eff?.type}`);
   }

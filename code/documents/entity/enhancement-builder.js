@@ -8,7 +8,7 @@ import {
   isCloseZone,
   isRangedZone
 } from "../../canvas/zone.js";
-import { pickOne, promptForm } from "../../applications/apps/selection-dialogs.js";
+import { pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
 import { createDefaultEntityInterrupt } from "../../data/entity/action-schema.js";
 import { performEntityAttack } from "../../data/entity/actions/entity-attack.js";
 import { triggerEntityInterrupt } from "../../data/entity/actions/entity-interrupt.js";

@@ -28,7 +28,7 @@ import {
   getFocusCount,
   setFocusCount
 } from "../actor/resources.js";
-import { pickOne } from "../../applications/apps/selection-dialogs.js";
+import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
 
 /**
  * Entity attack after-effects.

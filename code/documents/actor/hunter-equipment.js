@@ -1,4 +1,4 @@
-import { confirmDialog } from "../../applications/apps/selection-dialogs.js";
+import { confirmDialog } from "../../applications/apps/selection-dialogs.mjs";
 import { getContentPacks } from "../../helpers/extensions.js";
 
 // ─── Equipment Packs ──────────────────────────────────────────────────────────

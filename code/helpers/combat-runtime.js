@@ -7,7 +7,7 @@ export function getCombatTurnKey(combat) {
     combatId: combat.id,
     round: Number(combat.round ?? 0),
     turn: Number(combat.turn ?? 0),
-    combatantId: String(combat.combatant?.id || "")
+    combatantId: String(combat.combatant?.id || ""),
   };
 }
 
@@ -47,14 +47,14 @@ export function setupOutcomeData(outcomeLabel) {
   return {
     canActBefore: isSuccess,
     freeDeployGranted: isSuperior,
-    extraManeuver: isCritical
+    extraManeuver: isCritical,
   };
 }
 
 export function setupResultHtml(data) {
   const perks = [
     data.freeDeployGranted ? "Free Deploy" : null,
-    data.extraManeuver ? "Extra Manoeuvre (first turn)" : null
+    data.extraManeuver ? "Extra Manoeuvre (first turn)" : null,
   ].filter(Boolean);
   const perkText = perks.length ? `<div>Perks: ${perks.join(", ")}</div>` : "";
   const buttons = data.choiceButtons || "";
@@ -70,7 +70,7 @@ export function setupResultHtml(data) {
     footerHtml: `
       ${perkText}
       ${buttons}
-    `
+    `,
   }).replace("hollows-roll", "hollows-roll hollows-setup-card");
 }
 
@@ -112,10 +112,10 @@ export async function createSetupRollMessage(combatant, tn) {
         setupRoll: {
           combatantId: combatant.id,
           actorId: actor.id,
-          tn
-        }
-      }
-    }
+          tn,
+        },
+      },
+    },
   });
 }
 
@@ -136,133 +136,12 @@ export function getCombatantsInBracket(combat, bracket) {
   });
 }
 
-export async function setCombatantBracket(combatant, bracket) {
-  if (!combatant?.combat || combatant.actor?.type !== "hunter") return false;
-  const normalized = String(bracket || "").trim().toLowerCase();
-  if (!["before", "after"].includes(normalized)) return false;
-  const setup = foundry.utils.deepClone(combatant.getFlag("hollows", "setup") || {});
-  setup.bracket = normalized;
-  const initiative = normalized === "before" ? 2 : 0;
-  await combatant.update({ initiative });
-  await combatant.setFlag("hollows", "setup", setup);
-  return true;
-}
-
-export async function promptCombatantBracketChange(combatant) {
-  if (!combatant?.combat || combatant.actor?.type !== "hunter") return false;
-  const current = getCombatantBracket(combatant) || "before";
-  const content = `
-    <form class="hollows-roll-dialog">
-      <div class="form-group">
-        <label>Bracket</label>
-        <select name="bracket">
-          <option value="before" ${current === "before" ? "selected" : ""}>Before</option>
-          <option value="after" ${current === "after" ? "selected" : ""}>After</option>
-        </select>
-      </div>
-    </form>
-  `;
-  return await foundry.applications.api.DialogV2.wait({
-    window: { title: `Change Bracket: ${combatant.name || "Hunter"}` },
-    content,
-    buttons: [
-      { action: "apply", label: "Apply", default: true, callback: async (_e, _b, dialog) => {
-        const bracket = String(dialog.element.querySelector("[name=bracket]")?.value || current);
-        await setCombatantBracket(combatant, bracket);
-        return true;
-      }},
-      { action: "cancel", label: "Cancel", callback: () => null }
-    ],
-    rejectClose: false
-  }) ?? false;
-}
-
-export function getCombatantFromTrackerElement(li) {
-  const combatantId = String(li?.dataset?.combatantId || "");
-  return game.combat?.combatants?.get(combatantId) || null;
-}
-
-export function applyHollowsCombatTrackerEntryContext(options) {
-  if (!Array.isArray(options)) return options;
-  if (options.some((entry) => entry?.name === "Toggle Active State")) return options;
-
-  const isHunterEntry = (li) => {
-    const combatant = getCombatantFromTrackerElement(li);
-    return combatant?.actor?.type === "hunter";
-  };
-
-  const canManageHunterEntry = (li) => {
-    const combatant = getCombatantFromTrackerElement(li);
-    if (!combatant || combatant.actor?.type !== "hunter") return false;
-    return !!game.user?.isGM;
-  };
-
-  const canMakeActiveEntry = (li) => {
-    const combatant = getCombatantFromTrackerElement(li);
-    if (!combatant || !["hunter", "entity"].includes(String(combatant.actor?.type || ""))) return false;
-    return !!game.user?.isGM && !!game.combat?.started;
-  };
-
-  for (let i = options.length - 1; i >= 0; i -= 1) {
-    const name = String(options[i]?.name || "");
-    if (name.includes("CombatantClear") || name.includes("CombatantReroll") || name === "Clear Initiative" || name === "Re-roll Initiative" || name === "Reroll Initiative") {
-      const existingCondition = options[i].condition;
-      options[i].condition = (li) => {
-        if (isHunterEntry(li)) return false;
-        return typeof existingCondition === "function" ? existingCondition(li) : true;
-      };
-    }
-  }
-
-  options.push(
-    {
-      name: "Toggle Active State",
-      icon: '<i class="fas fa-toggle-on"></i>',
-      condition: canManageHunterEntry,
-      callback: async (li) => {
-        const combatant = getCombatantFromTrackerElement(li);
-        if (!combatant) return;
-        const acted = !!combatant.getFlag("hollows", "acted");
-        await combatant.setFlag("hollows", "acted", !acted);
-        ui.combat?.render();
-      }
-    },
-    {
-      name: "Change Bracket",
-      icon: '<i class="fas fa-arrows-up-down"></i>',
-      condition: canManageHunterEntry,
-      callback: async (li) => {
-        const combatant = getCombatantFromTrackerElement(li);
-        if (!combatant) return;
-        await promptCombatantBracketChange(combatant);
-        ui.combat?.render();
-      }
-    },
-    {
-      name: "Make Active",
-      icon: '<i class="fas fa-bolt"></i>',
-      condition: canMakeActiveEntry,
-      callback: async (li) => {
-        const combatant = getCombatantFromTrackerElement(li);
-        const combat = game.combat;
-        if (!combatant || !combat) return;
-        const turn = combat.turns.findIndex((entry) => entry.id === combatant.id);
-        if (turn < 0) return;
-        await combat.update({ turn }, { hollowsPassInitiative: true, hollowsManualMakeActive: true });
-        ui.combat?.render();
-      }
-    }
-  );
-
-  return options;
-}
-
 export function getSceneCombatantAddChoices(combat, scene = canvas?.scene) {
   if (!combat || !scene) return [];
   const existingTokenIds = new Set(
     combat.combatants
       .map((combatant) => String(combatant.tokenId || combatant.token?.id || ""))
-      .filter(Boolean)
+      .filter(Boolean),
   );
   return (scene.tokens?.contents || [])
     .filter((tokenDoc) => tokenDoc?.actor)
@@ -272,7 +151,7 @@ export function getSceneCombatantAddChoices(combat, scene = canvas?.scene) {
       tokenId: String(tokenDoc.id || ""),
       actorId: String(tokenDoc.actor?.id || ""),
       actorType: String(tokenDoc.actor?.type || ""),
-      name: String(tokenDoc.name || tokenDoc.actor?.name || "Combatant")
+      name: String(tokenDoc.name || tokenDoc.actor?.name || "Combatant"),
     }))
     .sort((a, b) => {
       if (a.actorType !== b.actorType) return a.actorType === "entity" ? -1 : 1;
@@ -301,8 +180,8 @@ export async function promptSceneCombatantAdditions(combat, scene = canvas?.scen
         </label>
       `
       : started
-        ? `<span class="hollows-add-combatant-note">Initiative 1</span>`
-        : `<span class="hollows-add-combatant-note">Setup later</span>`;
+        ? "<span class=\"hollows-add-combatant-note\">Initiative 1</span>"
+        : "<span class=\"hollows-add-combatant-note\">Setup later</span>";
     return `
       <label class="hollows-add-combatant-row">
         <span class="checkbox">
@@ -338,10 +217,10 @@ export async function promptSceneCombatantAdditions(combat, scene = canvas?.scen
           selected.push({ ...choice, bracket });
         }
         return selected;
-      }},
-      { action: "cancel", label: "Cancel", callback: () => null }
+      } },
+      { action: "cancel", label: "Cancel", callback: () => null },
     ],
-    rejectClose: false
+    rejectClose: false,
   }) ?? [];
 }
 
@@ -352,7 +231,7 @@ export async function addSceneCombatantsToCombat(combat, selections, scene = can
   const created = await combat.createEmbeddedDocuments("Combatant", list.map((entry) => ({
     tokenId: entry.tokenId,
     actorId: entry.actorId,
-    sceneId: scene.id
+    sceneId: scene.id,
   })));
   if (!combat.started) return created;
   const selectionMap = new Map(list.map((entry) => [String(entry.tokenId || ""), entry]));
@@ -363,7 +242,7 @@ export async function addSceneCombatantsToCombat(combat, selections, scene = can
       await combatant.update({ initiative: 1 });
       continue;
     }
-    await setCombatantBracket(combatant, selection.bracket || "before");
+    await ui.combat.setCombatantBracket(combatant, selection.bracket || "before");
   }
   return created;
 }
@@ -406,13 +285,13 @@ export async function applyAdvanceTurnGM(combat, fromCombatantId, mode) {
   const index = turns.findIndex((turn) => turn.id === targetId);
   if (index === -1) return;
   await current.setFlag("hollows", "acted", true);
-  
+
   if (move === "after-to-entity") {
     const nextRound = (combat.round || 0) + 1;
     await combat.update({ round: nextRound, turn: index }, { hollowsPassInitiative: true });
   } else {
     await combat.update({ turn: index }, { hollowsPassInitiative: true });
   }
-  
+
   ui.combat?.render();
 }

@@ -8,7 +8,7 @@ import { chooseHunterWeapon } from "../../helpers/weapon-utils.js";
 import { getUpgradeRank, getPrimaryRefugeActor } from "../../data/refuge/index.js";
 import { getWeaponAbilityDocs, grantWeaponAbilityToHunter, isDuplicateWeaponAbility } from "./ability-grant.js";
 import { runUserQuery, dispatchToGM } from "../../helpers/queries.js";
-import { confirmDialog, pickOne, promptForm } from "../../applications/apps/selection-dialogs.js";
+import { confirmDialog, pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
 import { getActiveHollowActor } from "../../canvas/zone.js";
 import { setActorFlagSafe } from "../../utils/flag-utils.js";
 import { getContentPacks } from "../../helpers/extensions.js";

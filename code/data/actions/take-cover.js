@@ -14,7 +14,7 @@ import { adjustHunterResource } from "../../documents/actor/resources.js";
 import { buildStandardRollCardHtml } from "../../applications/ui/roll-card.js";
 import { HunterStatRollFlow } from "../../dice/flow.js";
 import { triggerUseOnManoeuvre } from "./use.js";
-import { pickOne, promptForm } from "../../applications/apps/selection-dialogs.js";
+import { pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
 import { applyInterceptors } from "../../helpers/extensions.js";
 
 export async function openTakeCoverForActor(actor, opts = {}) {
@@ -69,7 +69,7 @@ export async function openTakeCoverForActor(actor, opts = {}) {
     const tag = String(picked.tag || "elevated");
     const targetTokenUuid = expandTargeting
       ? String(picked.targetId || "")
-      : (getActorTokenOnScene(actor)?.document?.uuid || getActorTokenOnScene(actor)?.uuid || ""); 
+      : (getActorTokenOnScene(actor)?.document?.uuid || getActorTokenOnScene(actor)?.uuid || "");
     const targetToken = targetTokenUuid ? await fromUuid(targetTokenUuid) : getActorTokenOnScene(actor);
     if (!targetToken) {
       ui.notifications.warn("Target token not found.");
@@ -205,7 +205,7 @@ export async function openTakeCoverForActor(actor, opts = {}) {
 
     return await applyFailure({ roll, results, chosen, useFocus, effectiveMode });
   };
-  
+
   const picked = await promptForm({ title: reason, fields, applyLabel: skipRoll ? "Apply" : "Roll" });
   const tcResult = picked ? await runFlow(picked) : null;
   if (tcResult !== null) await triggerUseOnManoeuvre(actor, "take-cover");

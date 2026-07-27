@@ -14,7 +14,7 @@ import {
 } from "../../canvas/zone.js";
 import { getEntityEngineAbilities } from "../entity/resolvers.js";
 import { isEntityEngineAbilityActive } from "../../documents/entity/entity-stats.js";
-import { chooseOneTarget, chooseOneZone } from "../../applications/apps/selection-dialogs.js";
+import { chooseOneTarget, chooseOneZone } from "../../applications/apps/selection-dialogs.mjs";
 import { getTotalStatForActor } from "../../documents/actor/hunter-combat.js";
 import { HunterStatRollFlow } from "../../dice/flow.js";
 import { isSuccessOutcomeLabel } from "../../dice/roll-outcome.js";

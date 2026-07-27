@@ -1,4 +1,4 @@
-import { promptForZoneSelection } from "../../applications/apps/selection-dialogs.js";
+import { promptForZoneSelection } from "../../applications/apps/selection-dialogs.mjs";
 import { getAdjacentZones, getTokenZone, filterZonesByGroup, getZoneList, sceneHunterTokens } from "../../canvas/zone.js";
 import {
   buildEntityAfterAttackConfigs,

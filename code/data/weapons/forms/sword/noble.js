@@ -10,7 +10,7 @@ export const NOBLE_FEINT_REACTION = new Reaction("sword.form.noble.feint", {
     const { getActorZone } = await import("../../../../canvas/zone.js");
     const zone = getActorZone(actor);
     if (!zone) return null;
-    const { chooseHunterInZone } = await import("../../../../applications/apps/selection-dialogs.js");
+    const { chooseHunterInZone } = await import("../../../../applications/apps/selection-dialogs.mjs");
     const target = await chooseHunterInZone(zone, "Feint (Noble): Choose Hunter to Guard");
     if (!target) return null;
     return { targetId: target.id };

@@ -1,4 +1,4 @@
-import { promptForm } from "../../../applications/apps/selection-dialogs.js";
+import { promptForm } from "../../../applications/apps/selection-dialogs.mjs";
 import { getTokenZone, sceneHunterTokens } from "../../../canvas/zone.js";
 import {
   createFollowUpConfig,

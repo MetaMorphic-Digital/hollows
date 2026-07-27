@@ -6,7 +6,7 @@ import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-s
 import { hasCondition } from "../documents/actor/conditions.js";
 import { openInterruptPromptForHunterEnd } from "../data/entity/actions/entity-interrupt.js";
 import { runEndOfTurnAbilities, runOnTurnEnd } from "./weapon-abilities/dispatchers.js";
-import { chooseOneTarget } from "../applications/apps/selection-dialogs.js";
+import { chooseOneTarget } from "../applications/apps/selection-dialogs.mjs";
 import {
   getActorZone,
   getRegionThreatData,

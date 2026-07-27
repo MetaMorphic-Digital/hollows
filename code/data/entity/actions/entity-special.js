@@ -7,8 +7,8 @@ import {
   getZoneList,
   sceneHunterTokens
 } from "../../../canvas/zone.js";
-import { promptForZoneSelection } from "../../../applications/apps/selection-dialogs.js";
-import { chooseOneTarget } from "../../../applications/apps/selection-dialogs.js";
+import { promptForZoneSelection } from "../../../applications/apps/selection-dialogs.mjs";
+import { chooseOneTarget } from "../../../applications/apps/selection-dialogs.mjs";
 import {
   createDefaultEntityAttack,
   createDefaultEntityInterrupt,

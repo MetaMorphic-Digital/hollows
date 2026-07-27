@@ -1,28 +1,7 @@
-import {
-  EntityDataModel,
-  HazardDataModel,
-  HollowDataModel,
-  HunterDataModel,
-  NpcDataModel,
-  RefugeDataModel,
-  registerActorDataModelHooks,
-  ThrallDataModel
-} from "../data/actor-models.js";
-import {
-  EchoDataModel,
-  EntityAbilityDataModel,
-  EntityEnhancementDataModel,
-  EquipmentDataModel,
-  RelicDataModel,
-  RumourDataModel,
-  WeaponAbilityDataModel,
-  WeaponDataModel
-} from "../data/item-models.js";
+import { registerActorDataModelHooks } from "../data/actor-models.js";
 import { getEffectiveEntityStat } from "../documents/entity/entity-stats.js";
 import { HOLLOWS_CONDITIONS } from "../data/_module.mjs";
-import { applyHollowsCombatTrackerEntryContext } from "./combat-runtime.js";
 import { registerHollowsHandlebarsHelpers } from "./handlebars.js";
-import { registerHollowsSheets } from "../applications/sheets/registry.js";
 import { preloadHollowsTemplates } from "./templates.js";
 import { registerQueries } from "./queries.js";
 
@@ -30,14 +9,8 @@ export function runHollowsInit() {
   console.log("Hollows | System init (Blackjack Engine)");
 
   try {
-    registerHollowsSheets();
-  } catch (err) {
-    console.error("Hollows | Failed to register sheets during init", err);
-  }
-
-  try {
     registerActorDataModelHooks({
-      getEffectiveEntityStat
+      getEffectiveEntityStat,
     });
   } catch (err) {
     console.error("Hollows | Failed to register actor data model hooks", err);
@@ -54,35 +27,10 @@ export function runHollowsInit() {
       id: cfg.id,
       name: cfg.label,
       icon: cfg.icon,
-      img: cfg.icon
+      img: cfg.icon,
     }));
   } catch (err) {
     console.error("Hollows | Failed to register status effects", err);
-  }
-
-  try {
-    CONFIG.Actor.dataModels.hunter = HunterDataModel;
-    CONFIG.Actor.dataModels.entity = EntityDataModel;
-    CONFIG.Actor.dataModels.npc = NpcDataModel;
-    CONFIG.Actor.dataModels.thrall = ThrallDataModel;
-    CONFIG.Actor.dataModels.refuge = RefugeDataModel;
-    CONFIG.Actor.dataModels.hollow = HollowDataModel;
-    CONFIG.Actor.dataModels.hazard = HazardDataModel;
-  } catch (err) {
-    console.error("Hollows | Failed to register actor data models", err);
-  }
-
-  try {
-    CONFIG.Item.dataModels.weapon = WeaponDataModel;
-    CONFIG.Item.dataModels["weapon-ability"] = WeaponAbilityDataModel;
-    CONFIG.Item.dataModels.equipment = EquipmentDataModel;
-    CONFIG.Item.dataModels.echo = EchoDataModel;
-    CONFIG.Item.dataModels["entity-ability"] = EntityAbilityDataModel;
-    CONFIG.Item.dataModels["entity-enhancement"] = EntityEnhancementDataModel;
-    CONFIG.Item.dataModels.relic = RelicDataModel;
-    CONFIG.Item.dataModels.rumour = RumourDataModel;
-  } catch (err) {
-    console.error("Hollows | Failed to register item data models", err);
   }
 
   try {
@@ -106,17 +54,5 @@ export function runHollowsInit() {
       return this;
     };
     game.hollows._originalRollInitiative = originalRollInitiative;
-  }
-
-  const FoundryCombatTracker = foundry?.applications?.sidebar?.tabs?.CombatTracker || null;
-  if (!game.hollows._combatTrackerEntryContextPatched && FoundryCombatTracker) {
-    game.hollows._combatTrackerEntryContextPatched = true;
-    const originalGetEntryContextOptions = FoundryCombatTracker.prototype._getEntryContextOptions;
-    FoundryCombatTracker.prototype._getEntryContextOptions = function (...args) {
-      const options = typeof originalGetEntryContextOptions === "function"
-        ? originalGetEntryContextOptions.apply(this, args)
-        : [];
-      return applyHollowsCombatTrackerEntryContext(options);
-    };
   }
 }

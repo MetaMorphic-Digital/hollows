@@ -2,7 +2,7 @@ import { STAT_LABELS } from "../../data/_module.mjs";
 import { HunterStatRollFlow } from "../../dice/_module.mjs";
 import { requestDoomAdjust } from "../../data/entity/actions/entity-doom.js";
 import { getActiveHollowActor, getActiveHunterForUser } from "../../canvas/zone.js";
-import { pickMany, pickOne, promptForm } from "../../applications/apps/selection-dialogs.js";
+import { pickMany, pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
 import { buildStandardRollCardHtml } from "../../applications/ui/roll-card.js";
 import { getTotalStatForActor } from "./hunter-combat.js";
 import { adjustHunterResource } from "./resources.js";

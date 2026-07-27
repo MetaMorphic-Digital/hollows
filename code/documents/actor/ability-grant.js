@@ -3,7 +3,7 @@
  * compendium docs and grant them to a hunter. Shared, not Refuge-owned:
  * consumed by Refuge, character creation, and Echo.
  */
-import { pickOne } from "../../applications/apps/selection-dialogs.js";
+import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
 import { getWeaponAbilityPack } from "../../helpers/weapon-utils.js";
 import { getContentPacks } from "../../helpers/extensions.js";
 
