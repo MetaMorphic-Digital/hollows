@@ -16,7 +16,7 @@
     "main.mjs"
   ],
   "styles": [
-    "styles/hollows.css"
+    "main.css"
   ],
   "packs": [
     {
