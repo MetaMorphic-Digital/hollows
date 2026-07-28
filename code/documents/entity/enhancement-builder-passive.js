@@ -66,7 +66,7 @@ function modifierTargetsAction(modifier, enhancementItem, context = {}) {
 
 function enhancementItems(entityActor) {
   if (!entityActor || entityActor.type !== "entity") return [];
-  return entityActor.items.filter((entry) => entry.type === "entity-enhancement" && builderEnabled(entry));
+  return entityActor.items.filter((entry) => entry.type === "entityEnhancement" && builderEnabled(entry));
 }
 
 function matchingActionModifiers(entityActor, context = {}) {

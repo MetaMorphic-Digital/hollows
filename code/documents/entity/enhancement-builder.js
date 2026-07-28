@@ -36,7 +36,7 @@ function selectedStat(enhancementItem, fallback = "hard") {
 function entityAbilityData(enhancementItem, name, system, img = enhancementItem.img) {
   return {
     name: String(name || enhancementItem.name || "Enhancement Ability"),
-    type: "entity-ability",
+    type: "entityAbility",
     img,
     system,
     flags: { hollows: { generatedByEnhancement: enhancementItem.id } }
@@ -114,7 +114,7 @@ export function getBuilderEligibleActionFilter(enhancementItem) {
     || !!rule.requiresDamage
     || !!String(rule.targetMode || "");
   if (!hasRule) return null;
-  return (item) => item.type === "entity-ability" && abilityEligible(item, rule);
+  return (item) => item.type === "entityAbility" && abilityEligible(item, rule);
 }
 
 export function getBuilderActionChoiceLabel(enhancementItem) {
@@ -140,7 +140,7 @@ function generatedConfigFor(entityActor, abilityItem) {
   const enhancementId = String(abilityItem?.getFlag?.("hollows", "generatedByEnhancement") || "");
   if (!enhancementId) return null;
   const enhancementItem = entityActor?.items?.get(enhancementId) || null;
-  if (enhancementItem?.type !== "entity-enhancement") return null;
+  if (enhancementItem?.type !== "entityEnhancement") return null;
   return generatedAbilityConfig(enhancementItem);
 }
 
@@ -170,7 +170,7 @@ export function builderGeneratedAbilityFeasible({ entityActor, ability, abilityI
   if (choice === "basic:shrug" || choice === "basic:turn") return true;
   if (choice.startsWith("item:")) {
     const item = entityActor?.items?.get(choice.slice(5));
-    return item?.type === "entity-ability" && String(item.system?.kind || "") === "manoeuvre";
+    return item?.type === "entityAbility" && String(item.system?.kind || "") === "manoeuvre";
   }
   if (choice !== "basic:prowl") return false;
   const options = threatenedProwlOptions(entityActor, ability, abilityItem);
@@ -191,7 +191,7 @@ export async function executeBuilderGeneratedAbility({ entityActor, ability, abi
   if (choice === "basic:turn") return { handled: true, result: await openEntityTurnAroundDialog(entityActor) };
   if (choice.startsWith("item:")) {
     const item = entityActor?.items?.get(choice.slice(5));
-    if (item?.type !== "entity-ability" || String(item.system?.kind || "") !== "manoeuvre") return { handled: true, result: false };
+    if (item?.type !== "entityAbility" || String(item.system?.kind || "") !== "manoeuvre") return { handled: true, result: false };
     return { handled: true, result: await performEntityManoeuvre(entityActor, item) };
   }
   return { handled: true, result: false };
@@ -286,7 +286,7 @@ async function runBuilderOperation(effect, context = {}) {
       await chat(entityActor, `<strong>${esc(effect.title || "Reaction")}</strong>: ${esc(entityActor.name)} may immediately make an attack or Interrupt against <strong>the Hunter who inflicted the damage</strong>. That target defends with advantage.`);
       return undefined;
     }
-    const abilities = entityActor.items.filter((item) => item.type === "entity-ability" && ["attack", "interrupt"].includes(String(item.system?.kind || "")));
+    const abilities = entityActor.items.filter((item) => item.type === "entityAbility" && ["attack", "interrupt"].includes(String(item.system?.kind || "")));
     if (!abilities.length) return undefined;
     const itemId = await pickOne({
       title: effect.title || "Reaction",

@@ -112,7 +112,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
       }),
     );
     const weapons = this.actor.items.filter(i => i.type === "weapon");
-    const abilities = this.actor.items.filter(i => i.type === "weapon-ability");
+    const abilities = this.actor.items.filter(i => i.type === "weaponAbility");
     data.hasReloadableWeapons = weapons.some(w => getEffectiveCapacity(w) > 0 || isShotgunWeapon(w));
     data.reloadableWeapons = weapons
       .filter(w => getEffectiveCapacity(w) > 0 || isShotgunWeapon(w))
@@ -742,7 +742,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
 
   _countPermanentTier1(weaponType) {
     return this.actor.items
-      .filter(i => i.type === "weapon-ability")
+      .filter(i => i.type === "weaponAbility")
       .filter(i => i.system?.weaponType === weaponType)
       .filter(i => Number(i.system?.tier ?? 0) === 1)
       .filter(i => String(i.system?.durationType || "permanent") === "permanent")

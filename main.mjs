@@ -54,9 +54,9 @@ function registerSubtypes() {
   });
 
   Object.assign(CONFIG.Item.dataModels, {
-    "entity-ability": EntityAbilityDataModel,
-    "entity-enhancement": data.items.EntityEnhancementData,
-    "weapon-ability": data.items.WeaponAbilityData,
+    "entityAbility": EntityAbilityDataModel,
+    "entityEnhancement": data.items.EntityEnhancementData,
+    "weaponAbility": data.items.WeaponAbilityData,
     echo: EchoDataModel,
     equipment: data.items.EquipmentData,
     relic: RelicDataModel,
@@ -95,12 +95,12 @@ function registerSheets() {
 
   // Register item sheets.
   register(Item, applications.sheets.items.HollowsEchoSheet, ["echo"]);
-  register(Item, applications.sheets.items.HollowsEntityAbilitySheet, ["entity-ability"]);
-  register(Item, applications.sheets.items.HollowsEntityEnhancementSheet, ["entity-enhancement"]);
+  register(Item, applications.sheets.items.HollowsEntityAbilitySheet, ["entityAbility"]);
+  register(Item, applications.sheets.items.HollowsEntityEnhancementSheet, ["entityEnhancement"]);
   register(Item, applications.sheets.items.HollowsEquipmentSheet, ["equipment"]);
   register(Item, applications.sheets.items.HollowsRelicSheet, ["relic"]);
   register(Item, applications.sheets.items.HollowsRumourSheet, ["rumour"]);
-  register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weapon-ability"]);
+  register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weaponAbility"]);
   register(Item, applications.sheets.items.HollowsWeaponSheet, ["weapon"]);
 }
 

@@ -17,7 +17,7 @@ function getWeaponAbilityPacks() {
 export async function getWeaponAbilityDocs(weaponType, tier) {
   const packDocs = await Promise.all(getWeaponAbilityPacks().map((p) => p.getDocuments()));
   return packDocs.flat()
-    .filter(d => d.type === "weapon-ability")
+    .filter(d => d.type === "weaponAbility")
     .filter(d => String(d.system?.weaponType || "") === String(weaponType || ""))
     .filter(d => Number(d.system?.tier ?? 0) === Number(tier ?? 0))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -35,7 +35,7 @@ export function isDuplicateWeaponAbility(hunter, abilityDoc) {
   const tier = Number(abilityDoc.system?.tier ?? 0);
   const name = String(abilityDoc.name || "");
   return hunter.items
-    .filter(i => i.type === "weapon-ability")
+    .filter(i => i.type === "weaponAbility")
     .some(i => String(i.name || "") === name &&
       String(i.system?.weaponType || "") === weaponType &&
       Number(i.system?.tier ?? 0) === tier);

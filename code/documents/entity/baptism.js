@@ -160,7 +160,7 @@ export async function resolveBaptismReward(hunter) {
 export async function resolveLordBaptismReward(hunter) {
   if (!hunter || hunter.type !== "hunter") return;
   const temporary = hunter.items
-    .filter(i => i.type === "weapon-ability")
+    .filter(i => i.type === "weaponAbility")
     .filter(i => String(i.system?.durationType || "permanent") === "temporary");
   if (!temporary.length) {
     return;

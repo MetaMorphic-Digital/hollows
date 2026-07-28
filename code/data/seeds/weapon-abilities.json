@@ -2,7 +2,7 @@
     {
         "_id": "01dcfe1c24276137",
         "name": "Bulwark",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Armour",
@@ -20,7 +20,7 @@
     {
         "_id": "8eb18f67118e982f",
         "name": "Control",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Armour",
@@ -38,7 +38,7 @@
     {
         "_id": "ed4dd93415a6936f",
         "name": "Martyr",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Armour",
@@ -56,7 +56,7 @@
     {
         "_id": "98de7e988800152e",
         "name": "Masochist",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Armour",
@@ -74,7 +74,7 @@
     {
         "_id": "726a6af5f75c22ad",
         "name": "Resolute",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Armour",
@@ -92,7 +92,7 @@
     {
         "_id": "d742d91b5af083b3",
         "name": "Stoic",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Armour",
@@ -110,7 +110,7 @@
     {
         "_id": "a3bbc38d91941132",
         "name": "Brand",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Book",
@@ -128,7 +128,7 @@
     {
         "_id": "3207e5f60d61eae7",
         "name": "Leash",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Book",
@@ -146,7 +146,7 @@
     {
         "_id": "307712ba4c12057f",
         "name": "Rebuke",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Book",
@@ -164,7 +164,7 @@
     {
         "_id": "ef387ef4145dab55",
         "name": "Remake",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Book",
@@ -182,7 +182,7 @@
     {
         "_id": "aaf53ffa58f9688d",
         "name": "Ward",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Book",
@@ -200,7 +200,7 @@
     {
         "_id": "f06e701abc6ef2a2",
         "name": "Witness",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Book",
@@ -218,7 +218,7 @@
     {
         "_id": "7e7c582e7bb93103",
         "name": "Anointed",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Knife",
@@ -236,7 +236,7 @@
     {
         "_id": "583573dcee09cfa0",
         "name": "Backstab",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Knife",
@@ -254,7 +254,7 @@
     {
         "_id": "676d0b88563ede38",
         "name": "Dodge",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Knife",
@@ -272,7 +272,7 @@
     {
         "_id": "26ff6d207d2b636f",
         "name": "Drink Deep",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Knife",
@@ -290,7 +290,7 @@
     {
         "_id": "9e134c38b2ce66df",
         "name": "Scramble",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Knife",
@@ -308,7 +308,7 @@
     {
         "_id": "806895fce583f907",
         "name": "Whisper-Quick",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Knife",
@@ -326,7 +326,7 @@
     {
         "_id": "15930be2c0185556",
         "name": "Brandish",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Pistol",
@@ -344,7 +344,7 @@
     {
         "_id": "e6f455a81d0ada0a",
         "name": "Dive Shot",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Pistol",
@@ -362,7 +362,7 @@
     {
         "_id": "5ccd1b9610d71016",
         "name": "Duck and Cover",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Pistol",
@@ -380,7 +380,7 @@
     {
         "_id": "63cd1103b1dd31f0",
         "name": "Make It Count",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Pistol",
@@ -398,7 +398,7 @@
     {
         "_id": "479ab64e2ce3d740",
         "name": "Momentum",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Pistol",
@@ -416,7 +416,7 @@
     {
         "_id": "3d453be5b4812289",
         "name": "Skirmisher",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Pistol",
@@ -434,7 +434,7 @@
     {
         "_id": "b3ef18c1348a34fe",
         "name": "Aim For the Head",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Rifle",
@@ -452,7 +452,7 @@
     {
         "_id": "3e64e85232067420",
         "name": "Drill",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Rifle",
@@ -470,7 +470,7 @@
     {
         "_id": "9c7fef0df2327749",
         "name": "Forewarned",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Rifle",
@@ -488,7 +488,7 @@
     {
         "_id": "a83f61a46bb39029",
         "name": "Pristine",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Rifle",
@@ -506,7 +506,7 @@
     {
         "_id": "6bd834567c036541",
         "name": "Satisfaction",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Rifle",
@@ -524,7 +524,7 @@
     {
         "_id": "9eeeaa7d6f758c4c",
         "name": "Walk In Like You Own the Place",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Rifle",
@@ -542,7 +542,7 @@
     {
         "_id": "c4be07192a3c89a9",
         "name": "Frantic",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Shotgun",
@@ -560,7 +560,7 @@
     {
         "_id": "1f615e987ebac951",
         "name": "Hungry",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Shotgun",
@@ -578,7 +578,7 @@
     {
         "_id": "250963b55340da5f",
         "name": "Kicking and Screaming",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Shotgun",
@@ -596,7 +596,7 @@
     {
         "_id": "b98cbe82f6df1fc2",
         "name": "Knockback",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Shotgun",
@@ -614,7 +614,7 @@
     {
         "_id": "e853956b38a08711",
         "name": "Seeing Red",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Shotgun",
@@ -632,7 +632,7 @@
     {
         "_id": "b9293aabea5e1283",
         "name": "Solid Shot",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Shotgun",
@@ -650,7 +650,7 @@
     {
         "_id": "a4cc1753173cea85",
         "name": "Back-To-Back",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Spear",
@@ -668,7 +668,7 @@
     {
         "_id": "2b2d9c417b299d4e",
         "name": "Bristle",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Spear",
@@ -686,7 +686,7 @@
     {
         "_id": "30a8d7069444bab4",
         "name": "Decoy",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Spear",
@@ -704,7 +704,7 @@
     {
         "_id": "48ee8f179418fcc6",
         "name": "Goad",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Spear",
@@ -722,7 +722,7 @@
     {
         "_id": "a9c5dc97d81619c8",
         "name": "Pierce",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Spear",
@@ -740,7 +740,7 @@
     {
         "_id": "828a70dcc88885e3",
         "name": "Trap",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Spear",
@@ -758,7 +758,7 @@
     {
         "_id": "0be0c09caf5cb5f2",
         "name": "Charge",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Sword",
@@ -776,7 +776,7 @@
     {
         "_id": "066c581d8e86a548",
         "name": "Exemplar",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Sword",
@@ -794,7 +794,7 @@
     {
         "_id": "d2fb06faf74fb131",
         "name": "Got Your Back",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Sword",
@@ -812,7 +812,7 @@
     {
         "_id": "03027fa48dcd028d",
         "name": "Misdirection",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Sword",
@@ -830,7 +830,7 @@
     {
         "_id": "219fa5a30876ffc3",
         "name": "Rally",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Sword",
@@ -848,7 +848,7 @@
     {
         "_id": "82fccc08ceaa8e85",
         "name": "War of Attrition",
-        "type": "weapon-ability",
+        "type": "weaponAbility",
         "img": "icons/svg/book.svg",
         "system": {
             "weaponType": "Sword",

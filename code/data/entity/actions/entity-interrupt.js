@@ -285,7 +285,7 @@ async function interruptOutput(ctx) {
 export async function openInterruptPromptForHunterEnd(combat, entityActor) {
   if (!game.user?.isGM) return;
   if (!entityActor) return;
-  const interrupts = entityActor.items.filter(i => i.type === "entity-ability" && i.system?.kind === "interrupt");
+  const interrupts = entityActor.items.filter(i => i.type === "entityAbility" && i.system?.kind === "interrupt");
   const feasible = [];
   for (const item of interrupts) {
     const intr = item.system;

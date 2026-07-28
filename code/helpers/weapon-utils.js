@@ -48,7 +48,7 @@ export function getWeaponAbilityByName(actor, name) {
   if (!actor || !name) return null;
   const needle = String(name).trim().toLowerCase();
   return (actor.items || []).find((i) => {
-    if (i.type !== "weapon-ability") return false;
+    if (i.type !== "weaponAbility") return false;
     const n = String(i.name || "").trim().toLowerCase();
     return n === needle;
   }) || null;
@@ -58,7 +58,7 @@ export function getWeaponAbilityByKey(actor, key) {
   if (!actor || !key) return null;
   const needle = String(key).trim().toLowerCase();
   return (actor.items || []).find((i) => {
-    if (i.type !== "weapon-ability") return false;
+    if (i.type !== "weaponAbility") return false;
     const k = String(i.system?.key || "").trim().toLowerCase();
     return k === needle;
   }) || null;
@@ -80,7 +80,7 @@ export async function cleanupWeaponAbilitiesForActor(actor) {
   const weapons = (actor.items || []).filter((i) => i.type === "weapon");
   const weaponIds = new Set(weapons.map(w => w.id));
   const weaponTypes = new Set(weapons.map(w => String(w.system?.weaponType || "")));
-  const abilities = (actor.items || []).filter((i) => i.type === "weapon-ability");
+  const abilities = (actor.items || []).filter((i) => i.type === "weaponAbility");
   const toDelete = abilities.filter((ability) => {
     const boundId = String(ability.system?.boundWeaponId || "");
     if (boundId && !weaponIds.has(boundId)) return true;
@@ -205,7 +205,7 @@ export async function ensureWeaponAbilityCompendiumFolders(packArg = null) {
   // hold different weapon/tier slices, so the tree is derived from content.
   const neededTiers = new Map();
   for (const doc of docs) {
-    if (doc.type !== "weapon-ability") continue;
+    if (doc.type !== "weaponAbility") continue;
     const wt = String(doc.system?.weaponType || "");
     const tier = Number(doc.system?.tier ?? 0);
     if (!wt || !tier) continue;
@@ -229,7 +229,7 @@ export async function ensureWeaponAbilityCompendiumFolders(packArg = null) {
   }
 
   for (const doc of docs) {
-    if (doc.type !== "weapon-ability") continue;
+    if (doc.type !== "weaponAbility") continue;
     const wt = String(doc.system?.weaponType || "");
     const tier = Number(doc.system?.tier ?? 0);
     const target = tierFolderByKey.get(`${wt}|${tier}`) || null;

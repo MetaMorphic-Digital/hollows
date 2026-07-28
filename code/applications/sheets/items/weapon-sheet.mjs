@@ -141,7 +141,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     const itemOwner = this.item.parent;
     if (itemOwner?.type === "hunter") {
       data.assignedAbilities = itemOwner.items
-        .filter(i => i.type === "weapon-ability")
+        .filter(i => i.type === "weaponAbility")
         .filter(a => {
           const boundId = String(a.system?.boundWeaponId || "");
           if (boundId) return boundId === this.item.id;
@@ -221,7 +221,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     const owner = this.item.parent;
     if (!owner || owner.type !== "hunter") return;
     const ability = owner.items.get(abilityId);
-    if (!ability || ability.type !== "weapon-ability") return;
+    if (!ability || ability.type !== "weaponAbility") return;
     await ability.update({ "system.boundWeaponId": "" });
     this.render();
   }
@@ -232,7 +232,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     const owner = this.item.parent;
     if (!owner || owner.type !== "hunter") return;
     const ability = owner.items.get(abilityId);
-    if (!ability || ability.type !== "weapon-ability") return;
+    if (!ability || ability.type !== "weaponAbility") return;
     await ability.delete();
     this.render();
   }
@@ -258,7 +258,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     try {
       dropped = await Item.implementation.fromDropData(dropData);
     } catch { dropped = null; }
-    if (!dropped || dropped.type !== "weapon-ability") return;
+    if (!dropped || dropped.type !== "weaponAbility") return;
     const droppedWeaponType = String(dropped.system?.weaponType || "");
     if (!droppedWeaponType || droppedWeaponType !== targetWeaponType) {
       ui.notifications.warn(`Only ${targetWeaponType} abilities can be assigned to this weapon.`);

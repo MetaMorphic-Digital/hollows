@@ -82,7 +82,7 @@ function buildTriggeredAbilityChoices(item) {
   const actor = item?.parent;
   if (!actor?.items) return choices;
   const abilities = actor.items
-    .filter((entry) => entry.type === "entity-ability" && ["attack", "interrupt"].includes(String(entry.system?.kind || "")))
+    .filter((entry) => entry.type === "entityAbility" && ["attack", "interrupt"].includes(String(entry.system?.kind || "")))
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
   for (const ability of abilities) {
     const kind = String(ability.system?.kind || "");
