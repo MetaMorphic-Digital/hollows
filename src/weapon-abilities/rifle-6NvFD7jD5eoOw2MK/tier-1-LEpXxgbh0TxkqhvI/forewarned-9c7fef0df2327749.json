@@ -1,0 +1,36 @@
+{
+  "_id": "9c7fef0df2327749",
+  "name": "Forewarned",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Rifle",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Avoiding pain and suffering is simply a matter of not standing in the way of an enemy's attacks. When you would suffer or spend Resolve or Wound damage, you may immediately spend Focus up to the amount you currently hold. Reduce the damage suffered by the amount of Focus spent.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Rifle/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "LEpXxgbh0TxkqhvI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!9c7fef0df2327749"
+}

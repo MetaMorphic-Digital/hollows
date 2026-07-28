@@ -1,0 +1,36 @@
+{
+  "_id": "7e7c582e7bb93103",
+  "name": "Anointed",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Knife",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Daub your body in the blood of the beast. While the Entity is Bleeding and you are in Close, when your turn ends, restore 2 Resolve.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Knife/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "jwFB1fmyE8qSiRNu",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!7e7c582e7bb93103"
+}

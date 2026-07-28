@@ -1,0 +1,36 @@
+{
+  "_id": "8eb18f67118e982f",
+  "name": "Control",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Armour",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "You unravel the chaos of combat into reason. While you are Ready, when your turn ends, you may Shift 1 Threat in your or an adjacent area. During your turn, you may expend Ready to grant an ally in your area an immediate Reload, Take Cover or Move manoeuvre.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Armour/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "KJFM7cZVgbITyLhI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521558,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!8eb18f67118e982f"
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Tier 1",
+  "type": "Item",
+  "folder": "BK4E6pTDZGZKi0tY",
+  "sorting": "m",
+  "_id": "jwFB1fmyE8qSiRNu",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521617,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!folders!jwFB1fmyE8qSiRNu"
+}

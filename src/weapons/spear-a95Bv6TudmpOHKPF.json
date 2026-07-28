@@ -1,0 +1,282 @@
+{
+  "_id": "a95Bv6TudmpOHKPF",
+  "name": "Spear",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "Arm?s Reach. It?s a tiring task, but you keep the beast at\nbay. Once per round during your turn, as an immediate\naction, you may spend Resolve up to the amount of\nThreat in your area to remove Threat from your area\nequal to the Resolve spent.",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 4
+    },
+    "weaponType": "Spear",
+    "form": "",
+    "outlook": "The Spear is, in all likelihood, the oldest man-made weapon\nin existence. It has evolved from a length of wood that's\nsharper on one end than it is on the other to a panoply of\n\npolearms that defined the shape of warfare for thousands of\nyears. Whilst it lacks the idealism attached to the Sword or\nthe utility bound up in the Knife, the Spear was the weapon of\nchoice for the common soldier until upstart firearms arrived and\npushed it off the top spot.\nThe ubiquity and archaic nature of the Spear makes it\nunfashionable, but the Spear doesn't mind. The Spear was there\nat the dawn of time when the first humans decided that they\nwanted to bring down beasts ten times their size, or to stab\nsomeone whilst staying out of stabbing range themselves. The\nSpear predates machines, structures, clothing, the written word,\nlanguage, and numeracy. The Spear has watched the rise and fall\nof other pretenders - the aloof longbow, the cackling crossbow,\nthe spiteful warhammer - and knows that it will be here long after\nthe cities have crumbled to dust and the last bullet has been fired.",
+    "lies": "The Spear knows that the home - the hearth, the space you claim\nas your own - is sacred. It wants to help you keep it sacred by\nensuring the profane - which is to say anything you decide you don't\nlike - is excluded by force. To breach the sacred is unthinkable,\nand anyone who would even consider it should be destroyed.\n\"Home\", of course, is a malleable concept. Home can be the house\nin which you live, but it can be your church. Your town. Your nation.\nYour kingdom. Wherever people who look like you exist. Wherever\npeople who share your ideals make a stand. When it comes to\nHollows, an entire plane of reality - as battered and bruised as it is -\ncan be a home, and worth defending. The Spear doesn't like to think\nof itself as attacking. Anything the Spear does is defence, no matter\nhow pre-emptive it might seem or if it has to be carried over borders\nand jammed in some poor bastard's guts to do it.\nYou are supposed to be here. You are entitled to occupy this\nspace, and furthermore, you are entitled to everything within\nit. Anyone you let inside is yours to protect, but yours to use as\nyou will, and can be expelled whenever you please. They owe you\ntheir life, after all.",
+    "fears": "The Spear is terrified of being abandoned. Although it is\nvery picky about who it lets inside what it considers to be\nhome, it knows (but would hesitate to say) that it needs others\nto survive. What good is a King who is reliant on his subjects?\nWhat good is a man who cannot protect his family with his own\nstrength and cunning alone?\nIt brags of sole mastery over its domain - of permissions granted\nand contracts bestowed, of sworn oaths and kind allowances - but\ndreads the day that its power is found wanting and those under its\nprotection are killed, or worse, decide to leave before it is ready to\nlet them go. The crossed spears, a symbol of barring and refusal,\nare just as frequently used against those under the Spear's authority\nas they are against those who stand against it.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Quick",
+        "defence": "Close"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Strong",
+            "defence": "Close"
+          }
+        ],
+        "name": "Heavy",
+        "damage": {
+          "resolve": 2,
+          "wounds": 3
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Strong +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 1,
+              "hard": 0,
+              "quick": 1,
+              "sharp": 0
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 0,
+              "hard": 0,
+              "quick": 2,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Strong +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "Modifier: +1 Quick.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          }
+        ],
+        "name": "Light",
+        "damage": {
+          "resolve": 2,
+          "wounds": 3
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +2 Strong +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 1,
+              "hard": 0,
+              "quick": 2,
+              "sharp": 0
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +3 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 0,
+              "hard": 0,
+              "quick": 3,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Strong +2 Quick +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 2,
+              "hard": 0,
+              "quick": 1,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          }
+        ],
+        "name": "Long",
+        "damage": {
+          "resolve": 3,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Strong +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 1,
+              "hard": 0,
+              "quick": 1,
+              "sharp": 0
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 0,
+              "hard": 0,
+              "quick": 2,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Strong +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Quick +1 Strong +1 Wise -1",
+        "modifiers": {
+          "wise": -1,
+          "strong": 1,
+          "hard": 0,
+          "quick": 1,
+          "sharp": 0
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Quick +2 Wise -1",
+        "modifiers": {
+          "wise": -1,
+          "strong": 0,
+          "hard": 0,
+          "quick": 2,
+          "sharp": 0
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Strong +2 Wise -1",
+        "modifiers": {
+          "wise": -1,
+          "strong": 2,
+          "hard": 0,
+          "quick": 0,
+          "sharp": 0
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 7000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521517,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!a95Bv6TudmpOHKPF"
+}

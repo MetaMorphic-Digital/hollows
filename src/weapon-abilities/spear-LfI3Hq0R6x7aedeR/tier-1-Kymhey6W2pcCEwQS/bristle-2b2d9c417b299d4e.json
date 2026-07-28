@@ -1,0 +1,36 @@
+{
+  "_id": "2b2d9c417b299d4e",
+  "name": "Bristle",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Spear",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "You've given it something to think about. Once per round, when you miss with an attack, you may remove 1 Threat from your area or an adjacent area as an immediate action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Spear/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "Kymhey6W2pcCEwQS",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!2b2d9c417b299d4e"
+}

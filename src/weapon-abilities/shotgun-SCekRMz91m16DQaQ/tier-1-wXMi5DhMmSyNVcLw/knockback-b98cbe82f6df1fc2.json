@@ -1,0 +1,36 @@
+{
+  "_id": "b98cbe82f6df1fc2",
+  "name": "Knockback",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Shotgun",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Send it stumbling. When you inflict Resolve damage with the Shotgun, you may Reposition one Hunter in Close or remove 1 Threat from your area.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Shotgun/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "wXMi5DhMmSyNVcLw",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!b98cbe82f6df1fc2"
+}

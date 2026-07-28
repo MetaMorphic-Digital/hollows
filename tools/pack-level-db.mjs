@@ -126,7 +126,6 @@ function cleanPackEntry(data, { documentName, isEmbedded }) {
     if (USER_ID && data._stats.lastModifiedBy) data._stats.lastModifiedBy = USER_ID;
   }
 
-  sortRootKeys(data);
 }
 
 /* -------------------------------------------------- */

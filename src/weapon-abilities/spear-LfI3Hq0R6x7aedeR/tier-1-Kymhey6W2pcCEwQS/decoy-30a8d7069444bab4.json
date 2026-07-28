@@ -1,0 +1,36 @@
+{
+  "_id": "30a8d7069444bab4",
+  "name": "Decoy",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Spear",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "A sacrifice worth making. When an ally makes a ranged attack through your area, that attack gains +1/+1.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Spear/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "Kymhey6W2pcCEwQS",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!30a8d7069444bab4"
+}

@@ -1,0 +1,36 @@
+{
+  "_id": "250963b55340da5f",
+  "name": "Kicking and Screaming",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Shotgun",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Never miss a chance to hurt something. While you are in Close, when you Reload the Shotgun, you may make an immediate 1/1 attack with Hard before flipping the Shotgun to Loaded. This attack is treated as an untyped attack, as though it is made with no Weapon, and is not treated as a Shotgun attack.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Shotgun/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "wXMi5DhMmSyNVcLw",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!250963b55340da5f"
+}

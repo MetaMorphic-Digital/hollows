@@ -1,0 +1,36 @@
+{
+  "_id": "a83f61a46bb39029",
+  "name": "Pristine",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Rifle",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Don't let them touch you. While you have your maximum number of Wounds or higher, +1 to all stats.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Rifle/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "LEpXxgbh0TxkqhvI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!a83f61a46bb39029"
+}

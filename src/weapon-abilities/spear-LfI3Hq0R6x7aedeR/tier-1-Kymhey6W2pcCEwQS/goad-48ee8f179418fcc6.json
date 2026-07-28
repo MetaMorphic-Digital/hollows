@@ -1,0 +1,36 @@
+{
+  "_id": "48ee8f179418fcc6",
+  "name": "Goad",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Spear",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "The stupid creature is two steps behind you. When you Guard, you may also place 1 Threat on your area or an adjacent area, or Shift 1 Threat in your area or an adjacent area.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Spear/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "Kymhey6W2pcCEwQS",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!48ee8f179418fcc6"
+}
