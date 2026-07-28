@@ -1,0 +1,302 @@
+{
+  "_id": "xxbvfTXEU4k16S3D",
+  "name": "Pistol",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 3
+    },
+    "weaponType": "Pistol",
+    "form": "",
+    "outlook": "The Pistol is chief amongst the new gods of bloodshed;\ngunpowder and lead put a lightning strike in the\npalm of the everyman, and almost every hero of every\nstory now clutches a handgun at some point in the tale.\nWhere clergymen would bless swords, they now pray\nover pistols and ask the gods to guide the shooter's hand.\nAdvertisements on street corners and the back pages of\nperiodicals boast of skull-cracking strength, quick-draw\ndesigns and affordable ammunition.\nThe Sword has been replaced as a mark of personal\nprowess - no longer do you have to train for years to use\na weapon, or risk your skin by coming close to those you\nwant to hurt. Anyone with a few quid and a vendetta can\nset the odds in their favour with a Pistol in their pocket.",
+    "lies": "The Pistol tells you: you're the best there is. No-one\nhas what you've got; you're unique, and special, and\nfascinating. The world is chaotic and unfocused but you,\nPistol gripped against your skin, rise above the noise and\nmove unfettered.\nA lack of success or prosperity should be no indication that\nmaybe you've overestimated yourself; instead, it's everyone\nelse's fault that you've not made it yet. Your ideas are too\nnew, too revolutionary, to be accepted. Anyone who passes\nyou over or looks down on you knows the truth: they're\njealous of your ability and scared of what you might do.\nThis absolute refusal to change based on new\ninformation brings with it a bullet-proof confidence, and\nthe Pistol wants to propel its bearers forward into the\nfuture on the back of it. Reality is what you make it, and\nyou're the guy holding the gun.",
+    "fears": "Ignore the flash and the posturing. The Pistol believes\nthat it isn't supposed to be here, but as long as no-one\nelse finds out, it's fine. It's fine.\nIt's not an instrument of war; no great glories, no stern\nsacrifices, no tactical masterstrokes owe it thanks. It's not a\ntool for hunting, either; thick hides turn aside little bullets,\nrifles outrange it, and it's a coward's crutch next to the cut\nand thrust of finishing the beast with blade and bludgeon.\nIt's not a part of anything greater, or ancient, or more noble.\nNo abstraction or artifice masks it with the sacrosanct.\nAll it does is kill people. Is that enough? Is the Pistol\nenough?\nIt spins stories of its own prowess and whispers feverish\nin the ears of those who carry it: you're the best, you're\nthe greatest, you're streets ahead of these fools. It keeps\neveryone and everything at arm's length. It never shows\nan ounce of weakness or confusion if it can help it. The\nalternative is unthinkable; a crash and burn, a dethroning,\nand a cold eternity of exile. Better to keep up the act\nforever than run the risk of discovery.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Quick",
+        "defence": "Close"
+      },
+      {
+        "range": "Ranged",
+        "stat": "Sharp",
+        "defence": "Ranged"
+      }
+    ],
+    "forms": [
+      {
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "name": "Automatic",
+        "text": "Capacity 5. When you Reload,\\nrestore Capacity to full.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "damage": {
+          "resolve": 1,
+          "wounds": 1
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Sharp +1 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "quick": 1,
+              "wise": 0,
+              "strong": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "quick": 2,
+              "wise": 0,
+              "strong": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "sharp": 2,
+              "wise": 0,
+              "quick": 0,
+              "strong": 0
+            },
+            "id": "c3"
+          }
+        ],
+        "capacity": {
+          "value": 5,
+          "max": 5
+        }
+      },
+      {
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "name": "Hand Cannon",
+        "text": "",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "damage": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Sharp +1 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "quick": 1,
+              "wise": 0,
+              "strong": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "quick": 2,
+              "wise": 0,
+              "strong": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "sharp": 2,
+              "wise": 0,
+              "quick": 0,
+              "strong": 0
+            },
+            "id": "c3"
+          }
+        ],
+        "capacity": {
+          "value": 1,
+          "max": 1
+        }
+      },
+      {
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "name": "Single Action",
+        "text": "",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "damage": {
+          "resolve": 2,
+          "wounds": 1
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Sharp +1 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "quick": 1,
+              "wise": 0,
+              "strong": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "quick": 2,
+              "wise": 0,
+              "strong": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Hard -1",
+            "modifiers": {
+              "hard": -1,
+              "sharp": 2,
+              "wise": 0,
+              "quick": 0,
+              "strong": 0
+            },
+            "id": "c3"
+          }
+        ],
+        "capacity": {
+          "value": 3,
+          "max": 3
+        }
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Quick +1 Sharp +1 Hard -1",
+        "modifiers": {
+          "hard": -1,
+          "quick": 1,
+          "wise": 0,
+          "strong": 0,
+          "sharp": 1
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Quick +2 Hard -1",
+        "modifiers": {
+          "hard": -1,
+          "quick": 2,
+          "wise": 0,
+          "strong": 0,
+          "sharp": 0
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Sharp +2 Hard -1",
+        "modifiers": {
+          "hard": -1,
+          "sharp": 2,
+          "wise": 0,
+          "quick": 0,
+          "strong": 0
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 4000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521518,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!xxbvfTXEU4k16S3D"
+}

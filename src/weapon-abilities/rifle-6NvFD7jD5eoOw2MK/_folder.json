@@ -1,0 +1,23 @@
+{
+  "name": "Rifle",
+  "type": "Item",
+  "folder": null,
+  "sorting": "m",
+  "_id": "6NvFD7jD5eoOw2MK",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521625,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!folders!6NvFD7jD5eoOw2MK"
+}

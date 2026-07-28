@@ -1,0 +1,23 @@
+{
+  "name": "Sword",
+  "type": "Item",
+  "folder": null,
+  "sorting": "m",
+  "_id": "9C86ALK2FuXrhmyM",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521643,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!folders!9C86ALK2FuXrhmyM"
+}

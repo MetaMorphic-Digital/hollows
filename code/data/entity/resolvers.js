@@ -5,7 +5,7 @@ import { EDGE_DEFS } from "./edges.js";
 
 export function getEntityEnhancementItems(entityActor) {
   if (!entityActor || entityActor.type !== "entity") return [];
-  return entityActor.items.filter((item) => item.type === "entity-enhancement");
+  return entityActor.items.filter((item) => item.type === "entityEnhancement");
 }
 
 // Entity "engine" abilities (special/doom/etc.) — entity-ability items by kind.
@@ -13,7 +13,7 @@ export function getEntityEngineAbilities(entityActor, kinds = ["special", "doom"
   if (!entityActor || entityActor.type !== "entity") return [];
   const kindSet = new Set((Array.isArray(kinds) ? kinds : [kinds]).map((value) => String(value || "")));
   return entityActor.items.filter((item) =>
-    item.type === "entity-ability" && kindSet.has(String(item.system?.kind || ""))
+    item.type === "entityAbility" && kindSet.has(String(item.system?.kind || ""))
   );
 }
 

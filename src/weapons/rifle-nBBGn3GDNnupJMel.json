@@ -1,0 +1,302 @@
+{
+  "_id": "nBBGn3GDNnupJMel",
+  "name": "Rifle",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "Terribly Calm. Slow is smooth, smooth is fast. You may\nhold up to 5 Focus. Discard all your current Focus when\nyou become Broken or enter Support. Unless you have\nabilities which state otherwise, you still begin each battle\nwith 0 Focus.",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 3
+    },
+    "weaponType": "Rifle",
+    "form": "",
+    "outlook": "The Rifle conquered the world. When the dominion\nof the Isles was at its height, it was at the heart of\nevery conquering force: trade and diplomacy may be\nwhat cements an empire in place, but violence digs the\nfoundations. The Rifle was the perfect tool for the job:\naccurate, reliable, and deadly. The long barrel and heavy\ncharge of gunpowder let soldiers engage with the enemy\nat a respectable distance - no swirling melee, no barbaric\nbrawling, but a measured march towards victory. With a\nRifle, you can kill a man and never see the fear in his eyes,\nor smell the stench of death, or hear the last breath stutter\nstaccato out of his foaming mouth.\nBut one Rifle doesn't win a war; ten thousand Rifles\ndo. To deliver ten thousand Rifles - and the ammunition\nneeded to fire them, and the tools to maintain them, and\nthe spare parts to swap out during a campaign, and the\nsoldiers to carry them - you need infrastructure. You need\nsteel refineries and weapons manufacturers and cargo ships\nand iron ore mines and anti-union laws and strikebreakers\nand vassal nations and bloodlines and flags and the\ncontinual threat, whether implied or explicit, of absolute\nviolence against those who disagree with you. You need\ncivilisation.\nThe Rifle is the foremost, sharpest point of the grand\nmachine that was the empire.",
+    "lies": "Stand up straight and walk tall - you've earned it. A life\nof hard work and good decisions, backed up by the\nhard work and good decisions of your forefathers, sets\nyou apart from the rest. You've earned your money, your\ncomfort, your security.\nYou are untouchable, unimpeachable, unflappable. You\ncan do whatever you want because you are in charge and\nwhatever you want is the right thing to do. Those who think\ndifferently to you are weak, immoral, bestial, petty, deluded.\nThings instead of people.\nYou're the conquering army. You're the state. You're the\nrules. You're the boys' club, the back-room deal, the secret\nhandshake, the right choice made at the right time with the\nright people. You cannot be stopped.",
+    "fears": "What use is a Rifle without bullets? What happens when\nthe sights misalign, when the mechanism jams, when\nthe bolt sticks in the chamber or the powder's too wet to fire?\nIt's just dead weight to carry around - an obligation you've\nbrought upon yourself and that you're too proud to forsake.\nThe Rifle is scared of being unsupported and alone -\naway from supply lines, from convenience and comfort,\nfrom those it deems peer or peon. It knows that, if left\nalone and told to manifest its destiny, it's dead in the water.\nIt needs everything underneath it ticking like clockwork to\neven survive.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Sharp",
+        "defence": "Close"
+      },
+      {
+        "range": "Ranged",
+        "stat": "Sharp",
+        "defence": "Ranged"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 1,
+          "max": 1
+        },
+        "text": "Modifier: -1 Quick.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "High Calibre",
+        "damage": {
+          "resolve": 2,
+          "wounds": 4
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Sharp +1 Wise +1 Quick -2",
+            "modifiers": {
+              "wise": 1,
+              "strong": 0,
+              "hard": 0,
+              "quick": -2,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Sharp +2 Quick -2",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": 0,
+              "quick": -2,
+              "sharp": 2
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Wise +2 Quick -2",
+            "modifiers": {
+              "wise": 2,
+              "strong": 0,
+              "hard": 0,
+              "quick": -2,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 4,
+          "max": 4
+        },
+        "text": "",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "Repeating",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Sharp +1 Wise +1 Quick -1",
+            "modifiers": {
+              "wise": 1,
+              "strong": 0,
+              "hard": 0,
+              "quick": -1,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Sharp +2 Quick -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": 0,
+              "quick": -1,
+              "sharp": 2
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Wise +2 Quick -1",
+            "modifiers": {
+              "wise": 2,
+              "strong": 0,
+              "hard": 0,
+              "quick": -1,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 1,
+          "max": 1
+        },
+        "text": "Modifier: +1 Sharp.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "Scoped",
+        "damage": {
+          "resolve": 2,
+          "wounds": 3
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Sharp +2 Wise +1 Quick -1",
+            "modifiers": {
+              "wise": 1,
+              "strong": 0,
+              "hard": 0,
+              "quick": -1,
+              "sharp": 2
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Sharp +3 Quick -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": 0,
+              "quick": -1,
+              "sharp": 3
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Wise +2 Sharp +1 Quick -1",
+            "modifiers": {
+              "wise": 2,
+              "strong": 0,
+              "hard": 0,
+              "quick": -1,
+              "sharp": 1
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Sharp +1 Wise +1 Quick -2",
+        "modifiers": {
+          "wise": 1,
+          "strong": 0,
+          "hard": 0,
+          "quick": -2,
+          "sharp": 1
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Sharp +2 Quick -2",
+        "modifiers": {
+          "wise": 0,
+          "strong": 0,
+          "hard": 0,
+          "quick": -2,
+          "sharp": 2
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Wise +2 Quick -2",
+        "modifiers": {
+          "wise": 2,
+          "strong": 0,
+          "hard": 0,
+          "quick": -2,
+          "sharp": 0
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 5000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521517,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!nBBGn3GDNnupJMel"
+}

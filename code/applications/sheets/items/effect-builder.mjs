@@ -69,7 +69,7 @@ export default class EffectBuilderItemSheet extends HandlebarsApplicationMixin(I
     for (const actor of (game.actors?.contents || [])) {
       if (actor.type !== "entity") continue;
       data.entityAbilityMap[actor.id] = actor.items
-        .filter((entry) => entry.type === "entity-ability")
+        .filter((entry) => entry.type === "entityAbility")
         .sort((a, b) => a.name.localeCompare(b.name))
         .map((entry) => ({ id: entry.id, name: entry.name }));
     }

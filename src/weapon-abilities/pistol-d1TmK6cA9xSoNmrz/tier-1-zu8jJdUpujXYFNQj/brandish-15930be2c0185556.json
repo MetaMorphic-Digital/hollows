@@ -1,0 +1,36 @@
+{
+  "_id": "15930be2c0185556",
+  "name": "Brandish",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Pistol",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "The monster can wait; you've got things to do. Instead of your attack action each turn, you may make two manoeuvres (allowing you to make three manoeuvres in total on your turn).",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Pistol/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "zu8jJdUpujXYFNQj",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!15930be2c0185556"
+}

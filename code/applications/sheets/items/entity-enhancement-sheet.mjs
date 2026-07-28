@@ -116,7 +116,7 @@ function buildEntityAbilityChoices(item) {
   if (!actor?.items) return { "": "Attach to an Entity" };
   const choices = { "": "Choose Ability" };
   const abilities = actor.items
-    .filter((entry) => entry.type === "entity-ability" && ["attack", "interrupt"].includes(String(entry.system?.kind || "")))
+    .filter((entry) => entry.type === "entityAbility" && ["attack", "interrupt"].includes(String(entry.system?.kind || "")))
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
   for (const ability of abilities) {
     const kind = String(ability.system?.kind || "");
@@ -130,7 +130,7 @@ function buildManoeuvreChoices(item) {
   const actor = item?.parent;
   if (!actor?.items) return choices;
   const manoeuvres = actor.items
-    .filter((entry) => entry.type === "entity-ability" && String(entry.system?.kind || "") === "manoeuvre")
+    .filter((entry) => entry.type === "entityAbility" && String(entry.system?.kind || "") === "manoeuvre")
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
   for (const ability of manoeuvres) {
     choices[`item:${ability.id}`] = ability.name || "Entity Manoeuvre";

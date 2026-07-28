@@ -1,5 +1,4 @@
 export * from "./combat-end-of-turn.js";
-export * from "./compendium-seeding.js";
 export * from "./combat-first-pick.js";
 export * from "./combat-lifecycle.js";
 export * from "./combat-runtime.js";

@@ -1,0 +1,36 @@
+{
+  "_id": "9e134c38b2ce66df",
+  "name": "Scramble",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Knife",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Nothing can stop you from getting where you need to be. Once per round, when you miss with an attack, you may Move as an immediate action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Knife/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "jwFB1fmyE8qSiRNu",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!9e134c38b2ce66df"
+}

@@ -1,0 +1,36 @@
+{
+  "_id": "a9c5dc97d81619c8",
+  "name": "Pierce",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Spear",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Gouge a hole in its guts. While you are in Flank, inflict +0/+1 damage.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Spear/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "Kymhey6W2pcCEwQS",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521561,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!a9c5dc97d81619c8"
+}

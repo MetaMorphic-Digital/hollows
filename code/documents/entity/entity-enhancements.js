@@ -90,7 +90,7 @@ function getGeneratedAbilityForEnhancement(enhancementItem) {
   const entityActor = enhancementItem.parent;
   if (!entityActor || entityActor.type !== "entity") return null;
   return entityActor.items.find((item) =>
-    item.type === "entity-ability" &&
+    item.type === "entityAbility" &&
     String(item.getFlag("hollows", "generatedByEnhancement") || "") === String(enhancementItem.id || "")
   );
 }
@@ -122,7 +122,7 @@ export async function promptEntityEnhancementSelection() {
   const packs = getContentPacks("entity-enhancements").map((id) => game.packs.get(id)).filter(Boolean);
   const docs = (await Promise.all(packs.map((pack) => pack.getDocuments()))).flat();
   const items = docs
-    .filter((doc) => doc.type === "entity-enhancement")
+    .filter((doc) => doc.type === "entityEnhancement")
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
   if (!items.length) { ui.notifications.warn("No Entity Enhancements available."); return null; }
   const options = items.map((doc) => `<option value="${doc.id}">${doc.name}</option>`).join("");

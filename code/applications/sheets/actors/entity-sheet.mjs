@@ -95,8 +95,8 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     data.actor = actor;
     data.system = system;
     data.defenceLabels = DEFENCE_LABELS;
-    const abilities = actor.items.filter(i => i.type === "entity-ability");
-    const enhancements = actor.items.filter(i => i.type === "entity-enhancement");
+    const abilities = actor.items.filter(i => i.type === "entityAbility");
+    const enhancements = actor.items.filter(i => i.type === "entityEnhancement");
     const byKind = (kind) => abilities.filter(a => a.system?.kind === kind);
     data.entityAttacks = byKind("attack");
     data.entityInterrupts = byKind("interrupt");
@@ -281,7 +281,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     };
     await actor.createEmbeddedDocuments("Item", [{
       name: names[kind] || "New Ability",
-      type: "entity-ability",
+      type: "entityAbility",
       system: createDefaultEntityAbility(kind),
     }]);
   }

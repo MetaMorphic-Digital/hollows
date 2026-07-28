@@ -1,0 +1,36 @@
+{
+  "_id": "a3bbc38d91941132",
+  "name": "Brand",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Book",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Carve your dominion into its flesh. When you inflict damage on the Entity with a Book attack, one Hunter in your area or an adjacent area may Focus as an immediate action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Book/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "qW787lKSuc7YBgoJ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521558,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!a3bbc38d91941132"
+}

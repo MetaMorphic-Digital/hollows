@@ -1,0 +1,36 @@
+{
+  "_id": "676d0b88563ede38",
+  "name": "Dodge",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Knife",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "They're going to wish they'd killed you sooner. Once per round, when an Entity attacks you, you may spend 1 Resolve to defend with Quick instead of any other stat. If you roll under your Quick on this defence roll, you may Move to any adjacent area as an immediate action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Knife/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "jwFB1fmyE8qSiRNu",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!676d0b88563ede38"
+}

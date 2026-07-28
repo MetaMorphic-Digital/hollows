@@ -56,7 +56,7 @@ export async function triggerEntitySpecialsOnPhase(phase) {
   if (!entity) return;
   await triggerEntityTriggeredAbilities(entity, phase, {}, ["special", "doom"]);
   const specials = entity.items
-    .filter((item) => item.type === "entity-ability" && item.system?.kind === "special");
+    .filter((item) => item.type === "entityAbility" && item.system?.kind === "special");
   if (!specials.length) return;
   const hunters = canvas?.tokens?.placeables
     ?.filter((token) => token.actor?.type === "hunter") || [];

@@ -1,0 +1,36 @@
+{
+  "_id": "1f615e987ebac951",
+  "name": "Hungry",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Shotgun",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "More! MORE! While your Shotgun is Empty, when your turn ends, you must spend either 1 Resolve or 1 Wound to make an immediate Reload action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Shotgun/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "wXMi5DhMmSyNVcLw",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!1f615e987ebac951"
+}

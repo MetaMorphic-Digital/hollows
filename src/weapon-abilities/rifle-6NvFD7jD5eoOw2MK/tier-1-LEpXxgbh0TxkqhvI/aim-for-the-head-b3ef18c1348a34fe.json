@@ -1,0 +1,36 @@
+{
+  "_id": "b3ef18c1348a34fe",
+  "name": "Aim For the Head",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Rifle",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "One shot is all you need. When you spend Focus as part of an attack, you may activate this ability. The attack gains +1/+1 for each Focus spent, but you do not roll with advantage as you normally would.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Rifle/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "LEpXxgbh0TxkqhvI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!b3ef18c1348a34fe"
+}

@@ -26,7 +26,7 @@
     },
     {
       "name": "weapon-abilities",
-      "label": "HOLLOWS.PACKS.WEAPON_ABILIIES",
+      "label": "HOLLOWS.PACKS.WEAPON_ABILITIES",
       "type": "Item"
     }
   ],
@@ -59,11 +59,11 @@
     },
     "Item": {
       "weapon": {},
-      "weapon-ability": {},
+      "weaponAbility": {},
       "equipment": {},
       "echo": {},
-      "entity-ability": {},
-      "entity-enhancement": {},
+      "entityAbility": {},
+      "entityEnhancement": {},
       "relic": {},
       "rumour": {}
     }

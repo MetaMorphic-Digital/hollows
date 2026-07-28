@@ -31,13 +31,13 @@ const HOLLOWS_THRALL_WOUNDS_PRE_UPDATE = new Map();
 
 async function syncGeneratedAbilityForEnhancementItem(item) {
   if (!game.user?.isGM) return;
-  if (item?.type !== "entity-enhancement") return;
+  if (item?.type !== "entityEnhancement") return;
   await syncGeneratedEnhancementAbility(item);
 }
 
 async function deleteGeneratedAbilityForEnhancementItem(item, options) {
   if (!game.user?.isGM) return;
-  if (item?.type !== "entity-enhancement") return;
+  if (item?.type !== "entityEnhancement") return;
   if (options?.hollowsSkipGeneratedCleanup) return;
   await deleteGeneratedEnhancementAbility(item);
 }
@@ -51,7 +51,7 @@ async function replaceHunterRelicFlow(actor, itemData) {
 
 export function registerActorHooks() {
   Hooks.on("preCreateItem", (item, data, options, userId) => {
-    if (item.type !== "weapon-ability") return;
+    if (item.type !== "weaponAbility") return;
     const hasDuration = foundry.utils.getProperty(data, "system.durationType");
     if (!hasDuration) {
       item.updateSource({ "system.durationType": "permanent" });

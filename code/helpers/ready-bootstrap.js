@@ -1,9 +1,5 @@
 import { ensureWeaponAbilityCompendiumFolders, isShotgunWeapon, syncHunterLoadedStatusFromShotguns } from "./weapon-utils.js";
 import { removeCoreDeadCondition } from "../documents/actor/conditions.js";
-import {
-  ensureWeaponAbilitiesSeeded,
-  ensureWeaponsSeeded,
-} from "./compendium-seeding.js";
 import { getHollowsWeaponIndex, setHollowsWeaponIndex } from "./runtime-state.js";
 import { getWeaponPackDocs } from "../data/weapons/index.js";
 
@@ -184,13 +180,10 @@ async function normalizeActorDefaultsForWorld() {
 
 export async function runHollowsReady() {
   await normalizeHollowsSheetFlags();
-  await ensureWeaponsSeeded();
-  await ensureWeaponAbilitiesSeeded();
   await buildWeaponIndex();
   await hydrateWeaponsFromPack();
   await ensureWeaponCoreDefaults();
   await normalizeActorDefaultsForWorld();
   await ensureWeaponAbilityCompendiumFolders();
-  // After system seeding, so module pack writes don't race compendiumConfiguration.
   Hooks.callAll("hollows.ready");
 }

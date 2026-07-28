@@ -1,0 +1,36 @@
+{
+  "_id": "d2fb06faf74fb131",
+  "name": "Got Your Back",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Sword",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Gather them around you. While you are in an area with at least one ally, inflict +1/+0 damage with your attacks. While there is Threat in your area, allies in that area also inflict +1/+0 damage with their attacks.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Sword/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "F4jjyZsazTKqzVXw",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521561,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!d2fb06faf74fb131"
+}

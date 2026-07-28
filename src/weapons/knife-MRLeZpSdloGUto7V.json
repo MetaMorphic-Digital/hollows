@@ -1,0 +1,287 @@
+{
+  "_id": "MRLeZpSdloGUto7V",
+  "name": "Knife",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "Bleeding. Let the life drain from its veins. When you inflict\na Wound with the Knife, the Entity begins Bleeding.\nPlace the Bleeding token next to the Entity as a reminder.\nBleeding is treated as a separate damage source, so can't\nbe boosted by abilities that affect a Hunter's damage, and\ndoes not trigger Threat placement.\nAt the start of the Entity's turn, a Bleeding Entity\nsuffers 2 Resolve damage or, if it is Broken, 1 Wound\ndamage. Then, toss the Bleeding token like a coin. If it\nshows Bleeding, the Entity retains the Bleeding status.\nIf it shows Whole, the Bleeding status is removed.\nWhen the Entity restores Resolve, it also removes\nBleeding.\nAn Entity is either Bleeding or not. Bleeding cannot\nbe applied twice at the same time, and Bleeding damage\ndoes not stack and is only inflicted once per round.\nBleeding persists if the Knife-wielding Hunter dies,\nalong with any passive abilities which apply while the\nEntity is Bleeding, until it is removed.",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 3
+    },
+    "weaponType": "Knife",
+    "form": "",
+    "outlook": "The Knife is the perpetual underdog. Every\nwarrior in every army throughout history has\ncarried a Knife, but they carried a proper Weapon\ntoo. Something you can wave around and threaten\npeople with, something with a bit of heft behind it,\nsomething you can hang on the wall when you come\nback from the chaos. Something that means business.\nThe Knife wants to show those bastards that it\nmeans business.\nIt's sharp. One cut will kill you. No hustle and\nbluster; nothing but blood.\nIt's everywhere. It's in every house in the kingdom,\nevery pocket in the street. It's out of the shadows and\nat their throats. No-one sees it coming.\nAnd it's personal. You kill something with a Knife,\nyou have to want it dead. You open yourself up to\nattack. You grip white-knuckled to the fucker and\nstab until your arms ache. By the end, you're soaked\nin scarlet. You earn your kill.",
+    "lies": "Outlook\n\n\nThe Knife is the perpetual underdog. Every\nwarrior in every army throughout history has\ncarried a Knife, but they carried a proper Weapon\ntoo. Something you can wave around and threaten\npeople with, something with a bit of heft behind it,\nsomething you can hang on the wall when you come\nback from the chaos. Something that means business.\nThe Knife wants to show those bastards that it\nmeans business.\nIt's sharp. One cut will kill you. No hustle and\nbluster; nothing but blood.\nIt's everywhere. It's in every house in the kingdom,\nevery pocket in the street. It's out of the shadows and\nat their throats. No-one sees it coming.\nAnd it's personal. You kill something with a Knife,\nyou have to want it dead. You open yourself up to\nattack. You grip white-knuckled to the fucker and\nstab until your arms ache. By the end, you're soaked\nin scarlet. You earn your kill.\n\nLies\n\n\nThe Knife knows that the world is out to get you.\nYou never wanted this to happen; maybe it's the\nway you look, or who your parents were, or what side\nof the river you grew up on. The odds were stacked\nagainst you before you even drew a card. At every\nturn, someone's arrived to steal what you've fought so\nhard for without giving you a second thought.\nYou're not the aggressor, says the Knife: you're\ntaking revenge. Every drop of blood is justified. They\nand theirs have kept you down for too long; you need\nto fight back and take what you're owed. Your only\nmistake was not doing it sooner.\nIf you win, you're a hero. If you lose, you were never\nsupposed to succeed. There's a comfort in occupying\nthe bottom rung, especially when it opens your\nenemies up to retribution.",
+    "fears": "Some of the bearers that the Knife chooses are, in\nfact, the sort of embittered underdogs it believes\nthem to be - but many aren't. They wear their\nimagined persecution as a badge of honour and think\nthat, if so many people are dead-set against them,\nthey must be doing something revolutionary to shake\nup the status quo.\nThe Knife is scared of not being underestimated.\nOf not being hated. It doesn't want to be accepted.\nIt doesn't want people to think it's important, or\nwelcome it as a part of something larger and more\nimportant. It can only imagine the world as a frantic\nbattle, and for its unceasing, spiteful aggression to\nmake any sort of sense, it must be under constant\nattack. If it's not a victim, it's nothing.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Quick",
+        "defence": "Close"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "Instead of inflicting Bleeding\non Wound damage only,\nyou inflict Bleeding when\nyou inflict any damage with the Knife.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          }
+        ],
+        "name": "Bloody",
+        "damage": {
+          "resolve": 2,
+          "wounds": 1
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Sharp +1 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 1,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 2,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "In addition to the Knife?s Close attack, you\nmay now attack with Sharp from Ranged.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "Weighted",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Sharp +1 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 1,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 2,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you inflict Wound damage\nwith this Weapon, heal 1 Wound.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          }
+        ],
+        "name": "Wicked",
+        "damage": {
+          "resolve": 1,
+          "wounds": 3
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Quick +1 Sharp +1 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 1,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Quick +2 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 2,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Hard -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": -1,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Quick +1 Sharp +1 Hard -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": 0,
+          "hard": -1,
+          "quick": 1,
+          "sharp": 1
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Quick +2 Hard -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": 0,
+          "hard": -1,
+          "quick": 2,
+          "sharp": 0
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Sharp +2 Hard -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": 0,
+          "hard": -1,
+          "quick": 0,
+          "sharp": 2
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 3000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521516,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!MRLeZpSdloGUto7V"
+}

@@ -1,0 +1,36 @@
+{
+  "_id": "806895fce583f907",
+  "name": "Whisper-Quick",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Knife",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Kill them before they can hurt you. As an immediate action, spend 1 Resolve to make your next attack with Quick instead of any other stat. If this attack inflicts Wound damage, restore 2 Resolve.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Knife/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "jwFB1fmyE8qSiRNu",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!806895fce583f907"
+}

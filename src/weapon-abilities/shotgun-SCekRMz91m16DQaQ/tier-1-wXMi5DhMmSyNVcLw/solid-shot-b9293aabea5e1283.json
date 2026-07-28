@@ -1,0 +1,36 @@
+{
+  "_id": "b9293aabea5e1283",
+  "name": "Solid Shot",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Shotgun",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Thumb-sized slugs that tear and tumble. When you attack with the Shotgun, inflict +0/+1 damage.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Shotgun/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "wXMi5DhMmSyNVcLw",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!b9293aabea5e1283"
+}

@@ -10,7 +10,7 @@ export async function triggerEntityWhenBrokenAbilities(entityActor, sourceHunter
   const brokenCount = sameCombat ? Number(state.brokenCount ?? 0) : 0;
   const nextCount = brokenCount + 1;
   let triggered = false;
-  for (const ability of entityActor.items.filter((item) => item.type === "entity-ability" && item.system?.kind === "whenBroken")) {
+  for (const ability of entityActor.items.filter((item) => item.type === "entityAbility" && item.system?.kind === "whenBroken")) {
     const sys = ability.system || {};
     const mode = String(sys.whenBroken?.mode || "first");
     if (mode === "first" && brokenCount > 0) continue;

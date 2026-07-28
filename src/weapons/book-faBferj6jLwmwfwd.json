@@ -1,0 +1,302 @@
+{
+  "_id": "faBferj6jLwmwfwd",
+  "name": "Book",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 4
+    },
+    "weaponType": "Book",
+    "form": "",
+    "outlook": "The Book is the latest form of an ancient concept -\nknowledge, materialised, that can be shared or jealously\nhoarded. What is now paper and ink was once chiselled\ntablets of stone or rich pigment daubed across the walls of\nfirelit caves. It sees the world not as a chaotic mess, but instead\na series of rules which can be manipulated to its advantage.\nThe Book's violence is more subtle than that of its\ncompanions in the Weapons' bloodstained pantheon. Every\nWeapon is a tool through which humans impose their will\nupon the world, and where the others may do so directly\nwith fire and iron, the Book holds itself above such base\nmatters. Violence is not only the crack of bone and tang\nof blood; pure violence, unsullied by the sweat and pain of\nthe melee, is the subjugation of that which you deem to be\nbeneath you. The Book knows that everything is beneath it.",
+    "lies": "The Old Faith spoke of the power of words. Their\ngodlings possessed true names that could be used to\ncontrol them by simply being spoken aloud, and the Book\nsees the wisdom in this concept. Let others grunt and strain\nto make an impact; to understand something is to control it.\nAbsolute truth is not only possible but extant, and it lies\nwithin the pages of the Book. Where others stumble around in\ndarkness, you have the intellect and the determination to pierce\nthe veil of ignorance and see the world for what it really is.\nNot only that; when you impose structure on the world\naround you, you give it a form pleasing to your eye. You\ncreate species and periodic tables, constellations and\ncountries, ethnicities and social classes, heretics and saints.\nEverything you see is yours to control and order with you,\nbright and brilliant as the sun, at the centre.",
+    "fears": "The thought that the Book might be one day disproved fills it\nwith an existential dread. It cannot allow any part of itself to\nbecome false; to do so would be to invalidate its entire existence.\nOnce conjecture coalesces into truth, that truth becomes\nbrittle and breakable. The stern wisdom that the Book\nprovides offers no quarter and permits no incursion upon its\nsanctity. Those who build their foundations upon the Book's\ntruth are moral and sensible and good; those who offer an\nalternative viewpoint are, logically (and the Book loves logic)\nimmoral, foolish, and evil. Genuine truths do not bend and\nadapt in the presence of conflicting evidence, but instead\nmust be defended against deluded and malicious agents hellbent on their destruction.\nIt isn't stupid. It knows that, from the moment its final\npage is written, any insight it offers becomes less relevant.\nContexts shift and erode. Touchstones crumble, idioms\ninvert themselves, and audiences die out. The Book is true\nonly as long as people believe it is, and that truth - the only\ntruth the Book can really guarantee - is at the root of its\nimplacable refusal to compromise.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Wise",
+        "defence": "Wyrd"
+      },
+      {
+        "range": "Ranged",
+        "stat": "Wise",
+        "defence": "Wyrd"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you Focus, the Entity\nsuffers 1 Resolve damage.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Wise",
+            "defence": "Wyrd"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Wise",
+            "defence": "Wyrd"
+          }
+        ],
+        "name": "Eldritch",
+        "damage": {
+          "resolve": 1,
+          "wounds": 1
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Wise +1 Sharp +1 Strong -1",
+            "modifiers": {
+              "wise": 1,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Wise +2 Strong -1",
+            "modifiers": {
+              "wise": 2,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Wise",
+            "defence": "Wyrd"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Wise",
+            "defence": "Wyrd"
+          }
+        ],
+        "name": "Profane",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Wise +1 Sharp +1 Strong -1",
+            "modifiers": {
+              "wise": 1,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Wise +2 Strong -1",
+            "modifiers": {
+              "wise": 2,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you Guard, an ally\nmay restore 1 Resolve.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Wise",
+            "defence": "Wyrd"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Wise",
+            "defence": "Wyrd"
+          }
+        ],
+        "name": "Sacred",
+        "damage": {
+          "resolve": 1,
+          "wounds": 1
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Wise +1 Sharp +1 Strong -1",
+            "modifiers": {
+              "wise": 1,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Wise +2 Strong -1",
+            "modifiers": {
+              "wise": 2,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Wise +1 Sharp +1 Strong -1",
+        "modifiers": {
+          "wise": 1,
+          "strong": -1,
+          "hard": 0,
+          "quick": 0,
+          "sharp": 1
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Wise +2 Strong -1",
+        "modifiers": {
+          "wise": 2,
+          "strong": -1,
+          "hard": 0,
+          "quick": 0,
+          "sharp": 0
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Sharp +2 Strong -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": -1,
+          "hard": 0,
+          "quick": 0,
+          "sharp": 2
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 2000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521517,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!faBferj6jLwmwfwd"
+}

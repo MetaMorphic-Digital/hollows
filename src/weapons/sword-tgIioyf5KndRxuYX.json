@@ -1,0 +1,282 @@
+{
+  "_id": "tgIioyf5KndRxuYX",
+  "name": "Sword",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "Flourish. Show the beast that you mean business. Once\nduring your turn you may place 2 Threat on your area to\nFeint as an immediate action. Feint is a special action only\navailable to Sword-wielders.",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 3
+    },
+    "weaponType": "Sword",
+    "form": "",
+    "outlook": "The Sword is the King of Weapons. Ancient empires\nrose and fell at its point. For millennia, the Sword has\nbeen a symbol of power and authority beyond measure:\n\na tool for the masters of men to wield with skill and\ngrace. To cut away the weakest parts of society and to do\nwhat must be done to ensure civilisation's survival and\nprosperity.\nFate coalesces around the Sword's point. The Sword\nmakes myths. It rests in stones waiting for someone\ndeserving of the honour to rule the kingdom. It severs the\nheads of tyrants and rests upon the right hands of great\nmen. It can elevate a common citizen to knighthood with\nbut a touch.\nNext to the Sword, the frantic fear of the Knife and the\nSpear fall away to nothing. The brutish Bludgeon falters\nand stumbles. The Book is cut to shreds, the Staff sliced\nin twain, the Armour rent asunder and the sound and fury\nof the firearm silenced. It gladly bears the burden laid\nupon its shoulders - someone's got to do it. Someone has\nto lead the charge.",
+    "lies": "The Sword believes in heroes in the ancient sense of\nthe word. It wants to convince its wielders that they\nstand proudly ahead of their peers: that there are those\nwho are born to lead, thanks to some indefinable spark of\ngreatness deep within their being, and it is their duty to\nshepherd the people beneath them.\nBut the glorious ages of the past have died. The world\nhas grown sour and corrupt, and the concepts of which\nthe Sword sings - honour, duty, nobility and sacrifice -\nare twisted and withered things. It spits hate on the\nfeckless masses and preaches exceptionalism. It tells you:\nyou alone are meant for greatness. These pitiful creatures\nare nothing without you to lead them. You are worthy of\nthe respect you see glinting in their bovine eyes.",
+    "fears": "The Sword's time in the sun is over, and it clings to\nwhat little relevance it retains. As the rifle and the\nfield gun scar the globe into new and terrible empires, the\nSword sees their eyes on the throne. It feels itself slipping\ninto rite and ritual as it becomes a relic of bygone days.\nThe Sword only matters if the people know it matters. Its\nauthority is not innate, but granted with conditions. Spears\noutreach it. Knives carve and craft and make. It glances off\nArmour's skin and every single gun outranges it.\nSo it speaks of honourable combat. It admonishes those\nwho fight dirty and births schools of duellists, manuals\nof techniques, and reams of rules designed to fashion\nthe grim business of ending lives into something that\ndemands admiration and grace. It is desperate to dictate\nthe battlefield and hold onto its unfair advantage, because\nwithout it, it is nothing but a length of sharpened steel.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Strong",
+        "defence": "Close"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you Feint, your Sword damage\nincreases to 3/3 until the end of your turn.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Strong",
+            "defence": "Close"
+          }
+        ],
+        "name": "Mighty",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Strong +1 Quick +1 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 1,
+              "hard": 0,
+              "quick": 1,
+              "sharp": -1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Strong +2 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": -1
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Quick +2 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": 0,
+              "quick": 2,
+              "sharp": -1
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you Feint, one Hunter in your\narea may Guard as an immediate action.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Strong",
+            "defence": "Close"
+          }
+        ],
+        "name": "Noble",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Strong +1 Quick +1 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 1,
+              "hard": 0,
+              "quick": 1,
+              "sharp": -1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Strong +2 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": -1
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Quick +2 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": 0,
+              "quick": 2,
+              "sharp": -1
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you Feint, one Hunter in your\narea may Focus as an immediate action.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Strong",
+            "defence": "Close"
+          }
+        ],
+        "name": "Short",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 3
+        },
+        "modifierChoices": [
+          {
+            "label": "Strong +1 Quick +1 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 1,
+              "hard": 0,
+              "quick": 1,
+              "sharp": -1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Strong +2 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": -1
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Quick +2 Sharp -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": 0,
+              "hard": 0,
+              "quick": 2,
+              "sharp": -1
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Strong +1 Quick +1 Sharp -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": 1,
+          "hard": 0,
+          "quick": 1,
+          "sharp": -1
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Strong +2 Sharp -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": 2,
+          "hard": 0,
+          "quick": 0,
+          "sharp": -1
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Quick +2 Sharp -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": 0,
+          "hard": 0,
+          "quick": 2,
+          "sharp": -1
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 9000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521518,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!tgIioyf5KndRxuYX"
+}

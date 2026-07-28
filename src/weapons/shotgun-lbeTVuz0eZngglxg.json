@@ -1,0 +1,302 @@
+{
+  "_id": "lbeTVuz0eZngglxg",
+  "name": "Shotgun",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "Loaded. All or nothing. The Shotgun doesn?t have Capacity\nlike other ranged Weapons. Instead, it is either Empty\nor Loaded. At the start of each fight, the Shotgun is\nLoaded: place the Shotgun token on your character\nsheet with the Loaded side up. While it?s Loaded, you\ncan make an attack by flipping it to Empty; while it?s\nEmpty, you can make a Reload manoeuvre to flip it to\nLoaded. You can only make attacks with the Shotgun\nwhile it is Loaded. You may only use the sections of your\nabilities matching the current state of your Weapon.\nIn general, effects that restore Capacity also allow you\nto flip the Shotgun from Empty to Loaded.",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 3,
+      "wounds": 4
+    },
+    "weaponType": "Shotgun",
+    "form": "",
+    "outlook": "The Shotgun (or blunderbuss, or dragon, or\nscattergun, or coach gun) uses a sizeable charge\nto fire multiple projectiles at a target. On the upside,\nthe spread of shot means that accuracy is no longer a\nconcern - on the downside, the laborious process of\nloading the ammunition leaves the bearer vulnerable to\nattack once they've pulled the trigger.\nIt is not a new or complicated concept. Whilst\nthe Rifle and Pistol have made recent advances with\nregards to accuracy, capacity and rate of fire, the\nShotgun has been perfectly happy to blast great clouds\nof debris downrange for centuries with very little\nchange in its construction. It is easy to make, easy to\nuse, and you can fire pretty much anything out of it\nand still make an impact.\nIt is immediate and indiscriminate violence in physical\nform. It promises absolute destruction at the pull of\na trigger: an attack without patience or restraint that\nsends even the fiercest foe reeling.",
+    "lies": "What if, the Shotgun asks, you no longer held\nback? The world is a web of carefully-maintained\nsocial constructs designed to hold our baser impulses in\ncheck and, not coincidentally, keep power in the hands\nof those who already possess it. The game is rigged\nfrom the start, but you don't have to play it. There's an\nadvantage in being the wild card, and to ignore all the\nrestrictions and boundaries placed upon you. To do the\nunthinkable. To kill and maim and ruin.\nCertainly intimidation and fear have their place, but\nthat's not what the blood-hungry Shotgun is interested\nin. It wants action. It wants to blow the world clean\nin half and relish in the aftermath. It wants to break\nthings to prove that they can be broken. Violence is the\nonly form of communication that matters, and you've\ngot the ultimate solution to any given problem: death.",
+    "fears": "Death is not the ultimate solution to any problem.\nThe Shotgun knows this.\nThose carefully-maintained social constructs can't\nbe torn asunder so easily. The Shotgun doesn't like to\nthink about what happens after the shot is fired and\nthe smoke clears; that it is empty, and powerless, and\nopen to retribution.\nIt hates being unloaded, and it hates not being fired.\nWhat it desires is impossible and intoxicating: no\nwaiting and no need for recovery, but only an endless\ninstant of fury. It exists solely for that brief moment of\nfire and noise and the fleeting taste of absolute power.\nThe lies it tells are wild and unsustainable, but to the\nright person, they'll hold together long enough.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Sharp",
+        "defence": "Close"
+      },
+      {
+        "range": "Ranged",
+        "stat": "Sharp",
+        "defence": "Ranged"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "Roll with advantage when you attack\nfrom Ranged with the Shotgun.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "Long-Barrel",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Hard +1 Sharp +1 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 1,
+              "quick": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Hard +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 2,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you would flip the Shotgun\nto Empty, toss the Shotgun token\nlike a coin. If it shows Loaded, it?s\nLoaded; if it shows Empty, it?s Empty.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "Repeater",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Hard +1 Sharp +1 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 1,
+              "quick": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Hard +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 2,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "Roll with advantage when you attack\nfrom Close with the Shotgun.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          },
+          {
+            "range": "Ranged",
+            "stat": "Sharp",
+            "defence": "Ranged"
+          }
+        ],
+        "name": "Sawn-Off",
+        "damage": {
+          "resolve": 2,
+          "wounds": 2
+        },
+        "healthBonus": {
+          "resolve": 3,
+          "wounds": 4
+        },
+        "modifierChoices": [
+          {
+            "label": "Hard +1 Sharp +1 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 1,
+              "quick": 0,
+              "sharp": 1
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Hard +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 2,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Sharp +2 Strong -1",
+            "modifiers": {
+              "wise": 0,
+              "strong": -1,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 2
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Hard +1 Sharp +1 Strong -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": -1,
+          "hard": 1,
+          "quick": 0,
+          "sharp": 1
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Hard +2 Strong -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": -1,
+          "hard": 2,
+          "quick": 0,
+          "sharp": 0
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Sharp +2 Strong -1",
+        "modifiers": {
+          "wise": 0,
+          "strong": -1,
+          "hard": 0,
+          "quick": 0,
+          "sharp": 2
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 6000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521517,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!lbeTVuz0eZngglxg"
+}

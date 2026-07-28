@@ -1,0 +1,36 @@
+{
+  "_id": "726a6af5f75c22ad",
+  "name": "Resolute",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Armour",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Your anger is yours and yours alone; use it. Once per round, when you miss with an attack, you may become Ready as an immediate action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Armour/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "KJFM7cZVgbITyLhI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521558,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!726a6af5f75c22ad"
+}

@@ -1,0 +1,36 @@
+{
+  "_id": "98de7e988800152e",
+  "name": "Masochist",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Armour",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Violence makes the heart grow stronger. When an Entity targets you with any attack, you may expend Ready as an immediate action to heal 1 Wound.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Armour/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "KJFM7cZVgbITyLhI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521558,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!98de7e988800152e"
+}

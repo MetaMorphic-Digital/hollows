@@ -1,0 +1,287 @@
+{
+  "_id": "WUptGdl5qd0feCbC",
+  "name": "Armour",
+  "type": "weapon",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "coreAbility": "Be Ready. Stand your ground and brace for impact. When combat begins, you are Ready; when you become Broken or expend Ready, you are not. When you Guard, you become Ready again, in addition to the other benefits of Guarding. Track Ready with a dedicated coin or token. Some abilities are only active while you are Ready; others require you to expend Ready to activate them. Unless stated otherwise, expending Ready is an immediate action you can perform once on your turn.",
+    "capacity": {
+      "value": 0,
+      "max": 0
+    },
+    "modifiers": {
+      "hard": 0,
+      "quick": 0,
+      "wise": 0,
+      "strong": 0,
+      "sharp": 0
+    },
+    "health_bonus": {
+      "resolve": 2,
+      "wounds": 5
+    },
+    "weaponType": "Armour",
+    "form": "",
+    "outlook": "utting something sturdier than skin over the top of\nyour skin has been perennially popular ever since\nhumans discovered they can pull the fur off things\nthey've killed and wear it on their heads, but ramshackle\nprotection like that isn't real Armour. It wouldn't be seen\ndead in uncured pelts these days.\nArmour is expensive. If it's not, it's not Armour - it's just\nsafety equipment. No-one gives a shit about aprons but\neveryone wants to wear the Armour.\nArmour is polished steel, layered silk, lacquered wood\nand hardened leather. Armour is as much the filigree\nand flash as it is a physical barrier. The Armour is a\nmessage, turning the wearer into a beacon of security and\nprosperity. The Armour says: you've made it, and it wants\nothers to hear.",
+    "lies": "The Armour wants you to understand that what people\nthink of you is infinitely more important than what you\ndo or who you are. Honesty, integrity and earnestness are\nall well and good but they're useless compared to letting\nothers bask in your glory. Everyone else is looking blindly\nfor the answers to questions they don't even know how to\nask, but you can show them the way.\nNot that you want them to become like you, you\nunderstand. Not that they could. You're better than these\npeople; you've cut through the horseshit and you see how to\nplay the system to your advantage. You want them in your\nwake, singing your praises, carrying your kit and paying you\ntithes. You are their champion, leading the fight against those\nthey despise, protecting that which they value. You want\nthem to believe they're dependent on you.\nThe Armour's favourite lie is of the self-made man - that\nthe bearer did it all themselves, that they had no unfair\nadvantages on their path to success, and that similar\noutcomes are possible to anyone who applies themselves\nwith enough gumption. It laughs at the thought that\nanyone helped them get to the top. It despises the idea of\nluck. You don't need luck when you're this good.",
+    "fears": "The Armour is a shell to keep the world out. It hates\nintimacy. Everyone who sees you without the Armour,\nwho witnesses the vulnerable human you are and not the\nshining paragon you project, has leverage over you. It longs\nto be as close to your heart as possible and to be the only\nthing that gives you strength.\nSpend long enough with it and you welcome the lies\ninto your life for the power they provide. Your allies\nshelter behind you when the storm rolls in, and it feels\ngood to be impenetrable. Each time you drown out the\nweak part of you inside, what little humanity remains\nis made smaller and weaker, until only the image of the\nArmour remains and you are left strange and empty.",
+    "attackProfiles": [
+      {
+        "range": "Close",
+        "stat": "Hard",
+        "defence": "Close"
+      }
+    ],
+    "forms": [
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "While you are Ready, when you would suffer Resolve damage from an Entity attack, you suffer 1 less damage.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Hard",
+            "defence": "Close"
+          }
+        ],
+        "name": "Hide",
+        "damage": {
+          "resolve": 1,
+          "wounds": 1
+        },
+        "healthBonus": {
+          "resolve": 2,
+          "wounds": 5
+        },
+        "modifierChoices": [
+          {
+            "label": "Hard +1 Strong +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 1,
+              "hard": 1,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Hard +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 0,
+              "hard": 2,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Strong +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "When you would suffer Wound damage from an Entity attack, you may expend Ready to reduce the damage suffered by 1.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Hard",
+            "defence": "Close"
+          }
+        ],
+        "name": "Metal",
+        "damage": {
+          "resolve": 2,
+          "wounds": 1
+        },
+        "healthBonus": {
+          "resolve": 2,
+          "wounds": 5
+        },
+        "modifierChoices": [
+          {
+            "label": "Hard +1 Strong +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 1,
+              "hard": 1,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Hard +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 0,
+              "hard": 2,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Strong +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      },
+      {
+        "capacity": {
+          "value": 0,
+          "max": 0
+        },
+        "text": "Attack with Quick or Sharp from Close (choose one when you take this Weapon; you can Reforge it (p. 155) to change to the other option). When you Take Cover or Move, become Ready.",
+        "attackProfiles": [
+          {
+            "range": "Close",
+            "stat": "Quick",
+            "defence": "Close"
+          },
+          {
+            "range": "Close",
+            "stat": "Sharp",
+            "defence": "Close"
+          }
+        ],
+        "name": "Silk",
+        "damage": {
+          "resolve": 1,
+          "wounds": 1
+        },
+        "healthBonus": {
+          "resolve": 2,
+          "wounds": 5
+        },
+        "modifierChoices": [
+          {
+            "label": "Hard +1 Strong +1 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 1,
+              "hard": 1,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c1"
+          },
+          {
+            "label": "Hard +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 0,
+              "hard": 2,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c2"
+          },
+          {
+            "label": "Strong +2 Wise -1",
+            "modifiers": {
+              "wise": -1,
+              "strong": 2,
+              "hard": 0,
+              "quick": 0,
+              "sharp": 0
+            },
+            "id": "c3"
+          }
+        ]
+      }
+    ],
+    "selectedForm": "",
+    "customForm": {
+      "damage": {
+        "resolve": 0,
+        "wounds": 0
+      },
+      "name": "",
+      "attackProfiles": [],
+      "text": "",
+      "capacity": {
+        "max": 0
+      }
+    },
+    "modifierChoice": "",
+    "formAttackChoice": "",
+    "loaded": false,
+    "modifierChoices": [
+      {
+        "label": "Hard +1 Strong +1 Wise -1",
+        "modifiers": {
+          "wise": -1,
+          "strong": 1,
+          "hard": 1,
+          "quick": 0,
+          "sharp": 0
+        },
+        "id": "c1"
+      },
+      {
+        "label": "Hard +2 Wise -1",
+        "modifiers": {
+          "wise": -1,
+          "strong": 0,
+          "hard": 2,
+          "quick": 0,
+          "sharp": 0
+        },
+        "id": "c2"
+      },
+      {
+        "label": "Strong +2 Wise -1",
+        "modifiers": {
+          "wise": -1,
+          "strong": 2,
+          "hard": 0,
+          "quick": 0,
+          "sharp": 0
+        },
+        "id": "c3"
+      }
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 10000,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521516,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!WUptGdl5qd0feCbC"
+}

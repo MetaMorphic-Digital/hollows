@@ -1,0 +1,36 @@
+{
+  "_id": "9eeeaa7d6f758c4c",
+  "name": "Walk In Like You Own the Place",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Rifle",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "The decor isn't up to much, but at least it's sturdy. As an immediate action on your turn, you may spend Focus to claim a terrain tag.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Rifle/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "LEpXxgbh0TxkqhvI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521560,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!9eeeaa7d6f758c4c"
+}

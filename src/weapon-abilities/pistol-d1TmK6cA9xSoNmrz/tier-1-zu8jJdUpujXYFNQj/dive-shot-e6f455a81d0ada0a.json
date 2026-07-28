@@ -1,0 +1,36 @@
+{
+  "_id": "e6f455a81d0ada0a",
+  "name": "Dive Shot",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Pistol",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Serves you right for showing off; at least you landed somewhere safe. Once per round, when you miss with an attack, you may claim a terrain tag.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Pistol/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "zu8jJdUpujXYFNQj",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!e6f455a81d0ada0a"
+}

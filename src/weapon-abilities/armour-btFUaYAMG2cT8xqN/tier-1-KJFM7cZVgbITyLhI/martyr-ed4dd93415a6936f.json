@@ -1,0 +1,36 @@
+{
+  "_id": "ed4dd93415a6936f",
+  "name": "Martyr",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Armour",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Your body bears a litany of scars. When an ally in your area would suffer Wound damage, you may expend Ready as an immediate action; they take no damage, and you take the inflicted Wound damage -1 instead.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Armour/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "KJFM7cZVgbITyLhI",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521558,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!ed4dd93415a6936f"
+}

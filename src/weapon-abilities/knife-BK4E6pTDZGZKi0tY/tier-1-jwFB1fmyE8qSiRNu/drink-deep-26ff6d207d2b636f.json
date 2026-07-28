@@ -1,0 +1,36 @@
+{
+  "_id": "26ff6d207d2b636f",
+  "name": "Drink Deep",
+  "type": "weaponAbility",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "weaponType": "Knife",
+    "tier": 1,
+    "durationType": "permanent",
+    "text": "Take your fill and bleed the bastard dry. While the Entity is Bleeding, when its turn starts, instead of inflicting damage and tossing the token, you may opt to remove it. If you do so, all Hunters in your area may Focus as an immediate action.",
+    "boundWeaponId": ""
+  },
+  "flags": {
+    "hollows": {
+      "folderHint": "Knife/Tier 1"
+    }
+  },
+  "effects": [],
+  "folder": "jwFB1fmyE8qSiRNu",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_stats": {
+    "coreVersion": "14.365",
+    "systemId": "hollows",
+    "systemVersion": "1.0.0",
+    "createdTime": 1785241521559,
+    "modifiedTime": null,
+    "lastModifiedBy": "hollowsBuilder00",
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!26ff6d207d2b636f"
+}

@@ -383,7 +383,7 @@ async function rollMalignancyEcho(actor, attempt = 0) {
 async function applyWeaponSecretEcho(actor, weapon) {
   const weaponType = String(weapon.system?.weaponType || "");
   const existingPermanent = actor.items.filter(i =>
-    i.type === "weapon-ability" &&
+    i.type === "weaponAbility" &&
     String(i.system?.durationType || "") === "permanent" &&
     (String(i.system?.boundWeaponId || "") === weapon.id || String(i.system?.weaponType || "") === weaponType)
   );
