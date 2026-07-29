@@ -1,5 +1,15 @@
 {
   "HOLLOWS": {
+    "ACTOR": {
+      "HUNTER": {
+        "add": "Add",
+        "addFromCompendium": "Add from Compendium",
+        "addWeapon": "Add Weapon",
+        "selectWeapon": "Select Weapon",
+        "warningOnlyTwoWeapons": "A Hunter can only have two weapons.",
+        "warningNoWeaponsFound": "No weapons found in any compendiums."
+      }
+    },
     "COMBAT": {
       "after": "After",
       "apply": "Apply",

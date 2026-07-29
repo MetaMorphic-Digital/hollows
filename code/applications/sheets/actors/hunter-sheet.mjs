@@ -2,7 +2,7 @@ import { STAT_LABELS } from "../../../data/_module.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
-import { getActiveEntityActor, getActorZone, getHuntersInZone, getTokenZone, isCloseZone, isRangedZone } from "../../../canvas/zone.js";
+import { getActorZone } from "../../../canvas/zone.js";
 import { getTotalStatForActor } from "../../../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, getFocusLimit } from "../../../documents/actor/resources.js";
 import { openTakeCoverForActor } from "../../../data/actions/take-cover.js";
@@ -13,43 +13,23 @@ import { applyFocusToActor } from "../../../data/actions/focus.js";
 import { openRecoverForActor } from "../../../data/actions/recover.js";
 import { openHealForActor } from "../../../data/actions/heal.js";
 import { getManoeuvreAvailability } from "../../../data/actions/index.js";
-import { getCombatTurnKey, isSameCombatRound } from "../../../helpers/combat-runtime.js";
 import { getWeaponStatModsForActor } from "../../../data/actor-models.js";
-import {
-  cleanupWeaponAbilitiesForActor,
-  getShotgunWeapons,
-  hasWeaponEquipped,
-  isShotgunLoaded,
-  isShotgunWeapon,
-} from "../../../helpers/weapon-utils.js";
+import { cleanupWeaponAbilitiesForActor, hasWeaponEquipped, isShotgunWeapon } from "../../../helpers/weapon-utils.js";
 import { addCondition, hasCondition, removeCondition, setConditionSafe } from "../../../documents/actor/conditions.js";
 import { getActiveCurseConfig } from "../../../canvas/overlays.js";
-import {
-  deleteHunterEquipmentSlot,
-  getHunterEquipmentItemForSlot,
-} from "../../../documents/actor/hunter-equipment.js";
+import { deleteHunterEquipmentSlot, getHunterEquipmentItemForSlot } from "../../../documents/actor/hunter-equipment.js";
 import { activeRelicEffect } from "../../../documents/item/relic-cypher.js";
 import { postEffectTextChat, relicHasActiveUse, runEffectGroups } from "../../../data/relic/apply-effect.js";
 import {
   addEchoById, applySeedEchoEffect,
   getEchoPacks, hasEchoRollContent, rollEchoFlow,
 } from "../../../documents/actor/echo.js";
-import {
-  getActiveEchoItems, getEchoDamageBonus, hasEchoRestriction,
-} from "../../../data/echo/index.js";
-import { getEffectiveEntityStat } from "../../../documents/entity/entity-stats.js";
-import { triggerEntityTriggeredAbilities } from "../../../data/entity/actions/entity-special.js";
+import { hasEchoRestriction } from "../../../data/echo/index.js";
 import { isNewHunterActor, openCharacterCreationWizard } from "../../apps/character-creation.mjs";
-import { normalizeRange } from "../../../dice/roll-helpers.js";
-import {
-  evaluateResult,
-  outcomeClassFromLabel,
-} from "../../../dice/roll-outcome.js";
+import { evaluateResult, outcomeClassFromLabel } from "../../../dice/roll-outcome.js";
 import { HunterStatRollFlow } from "../../../dice/flow.js";
 import { buildStandardRollCardHtml } from "../../ui/roll-card.js";
-import { dispatchToGM, runGMQuery } from "../../../helpers/queries.js";
-import { activateAbility, evaluateStatOverrideSuccess, getActivatedAbilities, getAttackRollMode, getStatOverrides, runOnAttackResult, tryActivateStatOverride } from "../../../helpers/weapon-abilities/dispatchers.js";
-import { applyEffects } from "../../../data/mechanics/dsl/effects.js";
+import { activateAbility, getActivatedAbilities } from "../../../helpers/weapon-abilities/dispatchers.js";
 import { openAttackDialog } from "../../../data/actions/attack.js";
 import { openExpendReadyDialog } from "../../../data/actions/expend-ready.js";
 import { getEffectiveCapacity } from "../../../documents/item/weapon.js";
@@ -62,30 +42,38 @@ import {
 import { getWeaponAbilityDocs } from "../../../documents/actor/ability-grant.js";
 
 export default class HollowsHunterSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+  /** @inheritdoc */
   static DEFAULT_OPTIONS = {
     classes: ["hollows", "sheet", "actor", "hunter"],
     position: { width: 640, height: 720 },
     window: { resizable: true },
-    form: { submitOnChange: false, closeOnSubmit: false },
+    form: { submitOnChange: true, closeOnSubmit: false },
+    actions: {
+      addWeapon: HollowsHunterSheet.#addWeapon,
+    },
   };
 
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
   static PARTS = {
     sheet: {
       template: "systems/hollows/templates/actor/hunter-sheet.html",
+      scrollable: [""],
       root: true,
     },
   };
 
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
   get title() {
-    return this.actor?.name ?? "Hunter";
+    return this.document.name;
   }
 
-  render(options = {}) {
-    const wc = this.element?.querySelector(".window-content");
-    if (wc) this._savedScrollTop = wc.scrollTop;
-    return super.render(options);
-  }
+  /* -------------------------------------------------- */
 
+  /** @inheritdoc */
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const data = {
@@ -189,21 +177,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     return data;
   }
 
-  async _onChangeForm(formConfig, event) {
-    const input = event?.target;
-    const name = String(input?.name ?? "");
-    if (input?.tagName !== "SELECT" && name && (name === "name" || name.startsWith("system."))) {
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const value = input.type === "checkbox" ? input.checked
-        : input.type === "number" ? (Number(input.value) || 0)
-          : String(input.value ?? "");
-      await this.document.update({ [name]: value }, { render: false });
-      return;
-    }
-    return super._onChangeForm(formConfig, event);
-  }
-
   async _onRender(context, options) {
     await super._onRender(context, options);
     const wc = this.element.querySelector(".window-content");
@@ -253,7 +226,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     };
     bind("[data-roll]", this._onStatRoll);
     bind("[data-ability-chat]", this._onWeaponAbilityChat);
-    bind("[data-action='add-weapon']", this._onAddWeapon);
     bind("[data-action='edit-weapon']", this._onEditWeapon);
     bind("[data-action='remove-weapon']", this._onRemoveWeapon);
     bind("[data-action='replace-weapon']", this._onReplaceWeapon);
@@ -772,55 +744,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
-  async _onAddWeapon(event) {
-    event.preventDefault();
-    const count = this.actor.items.filter(i => i.type === "weapon").length;
-    if (count >= 2) {
-      ui.notifications.warn("A Hunter can only have two weapons.");
-      return;
-    }
-    const docs = await getWeaponPackDocs();
-    if (!docs.length) {
-      ui.notifications.warn("No weapons found in compendiums.");
-      return;
-    }
-    const options = docs
-      .map(d => `<option value="${d.uuid}">${d.name}</option>`)
-      .join("");
-    const content = `
-      <form>
-        <div class="form-group">
-          <label>Select a weapon</label>
-          <select name="weaponId">${options}</select>
-        </div>
-      </form>
-    `;
-    await foundry.applications.api.DialogV2.wait({
-      window: { title: "Add Weapon From Compendium" },
-      content,
-      buttons: [
-        {
-          action: "add",
-          label: "Add",
-          default: true,
-          callback: async (_e, _b, dialog) => {
-            const selectedId = dialog.element.querySelector("[name=weaponId]")?.value;
-            const entry = docs.find(d => d.uuid === selectedId);
-            if (!entry) return;
-            const data = foundry.utils.deepClone(entry.toObject());
-            delete data._id;
-            const created = await this.actor.createEmbeddedDocuments("Item", [data]);
-            const weapon = created?.[0] || null;
-            if (weapon) {
-              await this._assignPermanentTier1IfNeeded(weapon);
-            }
-          },
-        },
-      ],
-      rejectClose: false,
-    });
-  }
-
   async _onEditWeapon(event) {
     event.preventDefault();
     const itemId = event.currentTarget.dataset.itemId;
@@ -897,5 +820,56 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
       }
     }
     return super._onDropItem(event, data);
+  }
+
+  /* -------------------------------------------------- */
+  /*   Event Handlers                                   */
+  /* -------------------------------------------------- */
+
+  /**
+   * Select a weapon from any pack, then add it to the Hunter.
+   * @this HollowsHunterSheet
+   * @param {PointerEvent} event    Initiating click event.
+   * @param {HTMLElement} target    The capturing element that defined the [data-action].
+   */
+  static async #addWeapon(event, target) {
+    if (this.document.items.documentsByType.weapon.length >= 2) {
+      ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningOnlyTwoWeapons");
+      return;
+    }
+
+    const options = [];
+    for (const pack of game.packs) {
+      if (pack.type !== "Item") continue;
+      const group = _loc(pack.label);
+      for (const index of pack.index) {
+        if (index.type !== "weapon") continue;
+        options.push({ value: index.uuid, label: index.name, group });
+      }
+    }
+
+    if (!options.length) {
+      ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningNoWeaponsFound");
+      return;
+    }
+
+    const field = foundry.applications.fields.createFormGroup({
+      label: _loc("HOLLOWS.ACTOR.HUNTER.selectWeapon"),
+      input: foundry.applications.fields.createSelectInput({ options, blank: false, name: "weaponUuid" }),
+    }).outerHTML;
+
+    const result = await foundry.applications.api.Dialog.input({
+      window: { title: "HOLLOWS.ACTOR.HUNTER.addWeapon" },
+      content: field,
+      ok: { label: _loc("HOLLOWS.ACTOR.HUNTER.add") },
+    });
+
+    const weapon = await fromUuid(result?.weaponUuid);
+    if (!weapon) return null;
+
+    const itemData = game.items.fromCompendium(weapon, { clearFolder: true });
+    const created = await getDocumentClass("Item").create(itemData, { parent: this.document });
+    await this._assignPermanentTier1IfNeeded(created);
+    return created;
   }
 }
