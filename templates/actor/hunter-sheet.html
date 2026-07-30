@@ -65,7 +65,7 @@
               </div>
             {{/if}}
           {{/if}}
-          
+
         {{/if}}
       </div>
     </div>
@@ -77,14 +77,13 @@
   <div class="rune-bar" aria-hidden="true"></div>
 
   <nav class="sheet-tabs tabs" data-group="mainTabs">
-    <a class="item" data-tab="stats">Stats</a>
-    <a class="item" data-tab="weapons">Weapons</a>
-    <a class="item" data-tab="echoes">Echoes</a>
-    <a class="item" data-tab="bio">Bio</a>
+    {{#each tabs as |tab|}}
+      <a class="item {{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}">{{localize tab.label}}</a>
+    {{/each}}
   </nav>
 
   <section class="sheet-body">
-    <div class="tab" data-tab="stats" data-group="mainTabs">
+    <div class="tab {{tabs.stats.cssClass}}" data-tab="stats" data-group="mainTabs">
       <section class="sheet-section stats">
         <h2>Stats</h2>
         <div class="stat-grid">
@@ -176,22 +175,22 @@
 
     </div>
 
-    <div class="tab" data-tab="weapons" data-group="mainTabs">
+    <div class="tab {{tabs.weapons.cssClass}}" data-tab="weapons" data-group="mainTabs">
       <section class="sheet-section weapons">
         <div class="abilities-header">
           <h2>Weapons</h2>
-          <button type="button" class="stat-roll" data-action="add-weapon">Add From Compendium</button>
+          <button type="button" class="stat-roll" data-action="addWeapon">{{localize "HOLLOWS.ACTOR.HUNTER.addFromCompendium"}}</button>
         </div>
         {{#if weaponsWithAbilities.length}}
           <nav class="sheet-tabs tabs" data-group="weaponTabs">
             {{#each weaponsWithAbilities as |entry index|}}
-              <a class="item" data-tab="weapon-{{index}}">{{#if entry.weapon.name}}{{entry.weapon.name}}{{else}}Weapon {{index}}{{/if}}</a>
+              <a class="item {{entry.tab.cssClass}}" data-action="tab" data-group="weaponTabs" data-tab="{{entry.tab.id}}">{{#if entry.weapon.name}}{{entry.weapon.name}}{{else}}Weapon {{index}}{{/if}}</a>
             {{/each}}
           </nav>
           <section class="weapon-tabs-content">
             {{#each weaponsWithAbilities as |entry index|}}
               {{#with entry.weapon as |weapon|}}
-                <div class="tab weapon-tab weapon-bg" data-tab="weapon-{{../index}}" data-group="weaponTabs" style="--weapon-bg: url('{{weapon.img}}')">
+                <div class="tab weapon-tab weapon-bg {{entry.tab.cssClass}}" data-tab="{{entry.tab.id}}" data-group="weaponTabs" style="--weapon-bg: url('{{weapon.img}}')">
                   <div class="weapon-actions">
                     <button type="button" class="stat-roll" data-action="edit-weapon" data-item-id="{{weapon.id}}">Edit</button>
                     <button type="button" class="stat-roll" data-action="replace-weapon" data-item-id="{{weapon.id}}">Replace</button>
@@ -273,7 +272,7 @@
       </section>
     </div>
 
-    <div class="tab" data-tab="echoes" data-group="mainTabs">
+    <div class="tab {{tabs.echoes.cssClass}}" data-tab="echoes" data-group="mainTabs">
       <section class="sheet-section echoes">
         <div class="abilities-header">
           <h2>Echoes</h2>
@@ -377,7 +376,7 @@
       </section>
     </div>
 
-    <div class="tab" data-tab="bio" data-group="mainTabs">
+    <div class="tab {{tabs.bio.cssClass}}" data-tab="bio" data-group="mainTabs">
       <section class="sheet-section bio">
         <h2>Identity</h2>
         <div class="hollows-form-section">
