@@ -56,6 +56,20 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   /* -------------------------------------------------- */
 
   /** @inheritdoc */
+  static TABS = {
+    mainTabs: {
+      tabs: [{ id: "stats" }, { id: "weapons" }, { id: "echoes" }, { id: "bio" }],
+      initial: "stats",
+      labelPrefix: "HOLLOWS.ACTOR.HUNTER.TABS",
+    },
+    weaponTabs: {
+      tabs: [],
+    },
+  };
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
   static PARTS = {
     sheet: {
       template: "systems/hollows/templates/actor/hunter-sheet.html",
@@ -69,6 +83,20 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   /** @inheritdoc */
   get title() {
     return this.document.name;
+  }
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
+  _getTabsConfig(group) {
+    const config = super._getTabsConfig(group);
+    if (group !== "weaponTabs") return config;
+    const weapons = this.document.items.documentsByType.weapon;
+    return {
+      ...config,
+      tabs: weapons.map(w => ({ id: w.id, label: w.name })),
+      initial: weapons[0]?.id,
+    };
   }
 
   /* -------------------------------------------------- */
@@ -101,6 +129,9 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     );
     const weapons = this.actor.items.filter(i => i.type === "weapon");
     const abilities = this.actor.items.filter(i => i.type === "weaponAbility");
+    if (!weapons.some(w => w.id === this.tabGroups.weaponTabs)) this.tabGroups.weaponTabs = weapons[0]?.id;
+    data.tabs = this._prepareTabs("mainTabs");
+    data.weaponTabs = this._prepareTabs("weaponTabs");
     data.hasReloadableWeapons = weapons.some(w => getEffectiveCapacity(w) > 0 || isShotgunWeapon(w));
     data.reloadableWeapons = weapons
       .filter(w => getEffectiveCapacity(w) > 0 || isShotgunWeapon(w))
@@ -125,6 +156,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
       return {
         weapon,
         index,
+        tab: data.weaponTabs[weapon.id],
         abilities: abilities.filter((a) => {
           const boundId = String(a.system?.boundWeaponId || "");
           if (boundId) return boundId === weapon.id;
@@ -181,33 +213,8 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await super._onRender(context, options);
     const wc = this.element.querySelector(".window-content");
     wc?.classList.add("hollows-sheet");
-    if (this._savedScrollTop && wc) {
-      wc.scrollTop = this._savedScrollTop;
-      this._savedScrollTop = 0;
-    }
 
-    this._applyHeaderActionButtonLayout(this.element);
     this._renderEquipmentDeleteButtons(this.element);
-
-    if (!this._activeMainTab) this._activeMainTab = "stats";
-    for (const tab of this.element.querySelectorAll(".sheet-tabs[data-group='mainTabs'] [data-tab]")) {
-      tab.addEventListener("click", e => {
-        e.preventDefault();
-        this._activeMainTab = tab.dataset.tab;
-        this._activateHunterTab("mainTabs", "sheet-body", this._activeMainTab);
-      });
-    }
-    this._activateHunterTab("mainTabs", "sheet-body", this._activeMainTab);
-
-    if (!this._activeWeaponTab) this._activeWeaponTab = "weapon-0";
-    for (const tab of this.element.querySelectorAll(".sheet-tabs[data-group='weaponTabs'] [data-tab]")) {
-      tab.addEventListener("click", e => {
-        e.preventDefault();
-        this._activeWeaponTab = tab.dataset.tab;
-        this._activateHunterTab("weaponTabs", "weapon-tabs-content", this._activeWeaponTab);
-      });
-    }
-    this._activateHunterTab("weaponTabs", "weapon-tabs-content", this._activeWeaponTab);
 
     if (this.isEditable) {
       this.element.querySelector("[data-edit=\"img\"]")?.addEventListener("click", () => {
@@ -250,35 +257,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     bind("[data-action='echo-delete']", this._onDeleteEcho);
     bind("[data-action='echo-trigger']", this._onTriggerEcho);
     bind("[data-action='echo-reset']", this._onResetEchoes);
-  }
-
-  _activateHunterTab(group, containerClass, tabName) {
-    if (!tabName || !this.element) return;
-    for (const tab of this.element.querySelectorAll(`.sheet-tabs[data-group='${group}'] [data-tab]`)) {
-      tab.classList.toggle("active", tab.dataset.tab === tabName);
-    }
-    for (const panel of this.element.querySelectorAll(`.${containerClass} > .tab`)) {
-      const isActive = panel.dataset.tab === tabName;
-      panel.classList.toggle("active", isActive);
-    }
-  }
-
-  _applyHeaderActionButtonLayout(html) {
-    const headerActions = html.querySelector(".header-actions");
-    const actionStack = headerActions?.querySelector(".hunter-action-stack");
-    const actionRows = actionStack?.querySelectorAll(".hunter-action-stack-row") || [];
-    const actionButtons = [];
-    actionRows.forEach(row => row.querySelectorAll(":scope > .stat-roll").forEach(b => actionButtons.push(b)));
-    const stackWidth = Math.max(0, Math.floor(actionStack?.clientWidth || headerActions?.clientWidth || 0));
-    if (stackWidth > 0) {
-      const width = `${stackWidth}px`;
-      actionRows.forEach(row => { row.style.width = width; });
-      actionButtons.forEach(button => {
-        button.style.width = width;
-        button.style.minWidth = width;
-        button.style.maxWidth = width;
-      });
-    }
   }
 
   _renderEquipmentDeleteButtons(html) {
@@ -834,14 +812,14 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
    */
   static async #addWeapon(event, target) {
     if (this.document.items.documentsByType.weapon.length >= 2) {
-      ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningOnlyTwoWeapons");
+      ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningOnlyTwoWeapons", { localize: true });
       return;
     }
 
     const options = [];
     for (const pack of game.packs) {
-      if (pack.type !== "Item") continue;
-      const group = _loc(pack.label);
+      if (pack.documentName !== "Item") continue;
+      const group = _loc(pack.title);
       for (const index of pack.index) {
         if (index.type !== "weapon") continue;
         options.push({ value: index.uuid, label: index.name, group });
@@ -849,7 +827,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     }
 
     if (!options.length) {
-      ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningNoWeaponsFound");
+      ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningNoWeaponsFound", { localize: true });
       return;
     }
 

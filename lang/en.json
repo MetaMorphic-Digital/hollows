@@ -2,6 +2,12 @@
   "HOLLOWS": {
     "ACTOR": {
       "HUNTER": {
+        "TABS": {
+          "stats": "Stats",
+          "weapons": "Weapons",
+          "echoes": "Echoes",
+          "bio": "Bio"
+        },
         "add": "Add",
         "addFromCompendium": "Add from Compendium",
         "addWeapon": "Add Weapon",
