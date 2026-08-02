@@ -3,13 +3,9 @@ import {
   HOLLOWS_PREV_COMBATANT_BY_COMBAT_ID,
   getCombatantBracket,
   getCombatantOwners,
-  getCombatantsInBracket
+  getCombatantsInBracket,
 } from "./combat-runtime.js";
-import {
-  cleanupCombatStates,
-  initializeHunterCoreStatesForCombat
-} from "../documents/actor/hunter-combat.js";
-import { clearAllCurseTrackers } from "../canvas/overlays.js";
+import { initializeHunterCoreStatesForCombat } from "../documents/actor/hunter-combat.js";
 import { getActiveEntityActor, getActiveHollowActor } from "../canvas/zone.js";
 import { hasCondition, removeCondition } from "../documents/actor/conditions.js";
 import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
@@ -18,7 +14,7 @@ import {
   ensureFirstPickDialog,
   maybeSetTurnToHighest,
   resetHunterRoundFlagsForNewRound,
-  shouldCurrentUserHandleFirstPick
+  shouldCurrentUserHandleFirstPick,
 } from "./combat-first-pick.js";
 import { processEndOfTurn, processStartOfTurn } from "./combat-lifecycle.js";
 
@@ -174,17 +170,6 @@ export async function onCombatStart(combat) {
   const hunters = combat.combatants
     .map((c) => c.actor)
     .filter((a) => a?.type === "hunter");
-  for (const hunter of hunters) {
-    await resetCombatHunterFlags(hunter);
-  }
-}
-
-export async function onDeleteCombat(combat) {
-  await cleanupCombatStates(combat);
-  await clearAllCurseTrackers(combat);
-  HOLLOWS_PREV_COMBATANT_BY_COMBAT_ID.delete(combat.id);
-  HOLLOWS_LAST_COMBATANT_BY_COMBAT_ID.delete(combat.id);
-  const hunters = game.actors?.contents?.filter((actor) => actor?.type === "hunter") || [];
   for (const hunter of hunters) {
     await resetCombatHunterFlags(hunter);
   }

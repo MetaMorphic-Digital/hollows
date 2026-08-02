@@ -2,7 +2,7 @@ import * as applications from "./code/applications/_module.mjs";
 // import * as canvas from "./code/canvas/_module.mjs";
 import * as data from "./code/data/_module.mjs";
 import * as dice from "./code/dice/_module.mjs";
-// import * as documents from "./code/documents/_module.mjs";
+import * as documents from "./code/documents/_module.mjs";
 import * as helpers from "./code/helpers/_module.mjs";
 // import * as utils from "./code/utils/_module.mjs";
 
@@ -16,7 +16,7 @@ globalThis.hollows = {
   // canvas,
   data,
   dice,
-  // documents,
+  documents,
   helpers,
   // utils,
 };
@@ -24,10 +24,20 @@ globalThis.hollows = {
 /* -------------------------------------------------- */
 
 Hooks.once("init", () => {
+  registerDocumentClasses();
   registerSubtypes();
   registerSheets();
   registerSidebars();
 });
+
+/* -------------------------------------------------- */
+
+/**
+ * Register document classes.
+ */
+function registerDocumentClasses() {
+  CONFIG.Combat.documentClass = documents.HollowsCombat;
+}
 
 /* -------------------------------------------------- */
 
@@ -54,9 +64,9 @@ function registerSubtypes() {
   });
 
   Object.assign(CONFIG.Item.dataModels, {
-    "entityAbility": EntityAbilityDataModel,
-    "entityEnhancement": data.items.EntityEnhancementData,
-    "weaponAbility": data.items.WeaponAbilityData,
+    entityAbility: EntityAbilityDataModel,
+    entityEnhancement: data.items.EntityEnhancementData,
+    weaponAbility: data.items.WeaponAbilityData,
     echo: EchoDataModel,
     equipment: data.items.EquipmentData,
     relic: RelicDataModel,

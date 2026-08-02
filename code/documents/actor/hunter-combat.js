@@ -1,11 +1,9 @@
-import {
-  getActorZone
-} from "../../canvas/zone.js";
+import { getActorZone } from "../../canvas/zone.js";
 import { updateTerrainPool } from "../../canvas/terrain-pool.js";
 import {
   hasCondition, addCondition, removeCondition,
   isFreeTerrainTag, getSpecialConditionStatDelta,
-  getTerrainTagKeys, isPooledTerrainTag
+  getTerrainTagKeys, isPooledTerrainTag,
 } from "../actor/conditions.js";
 import { adjustHunterResource, getFocusCount, setFocusCount } from "./resources.js";
 import { getEchoStatMods } from "../../data/echo/index.js";
@@ -14,7 +12,7 @@ import {
   getShotgunWeapons,
   restoreWeaponsCapacity,
   setShotgunsLoaded,
-  hasWeaponEquipped
+  hasWeaponEquipped,
 } from "../../helpers/weapon-utils.js";
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { getStatModifier } from "../../helpers/weapon-abilities/dispatchers.js";
@@ -55,8 +53,6 @@ export async function clearSkirmisherBonus(actor) {
   }
 }
 
-
-
 export async function initializeHunterCoreStatesForCombat(combat) {
   if (!game.user?.isGM) return;
   if (!combat?.started) return;
@@ -72,7 +68,7 @@ export async function initializeHunterCoreStatesForCombat(combat) {
       await removeCondition(hunter, "ready");
     }
     await setShotgunsLoaded(hunter, true);
-    if (hasWeaponEquipped(hunter, "Rifle") && getFocusCount(hunter) > 0) {
+    if (hasWeaponEquipped(hunter, "Rifle") && (getFocusCount(hunter) > 0)) {
       await setFocusCount(hunter, 0);
     }
     await applyInterceptors("combat-start-hunter", { hunter }, null);
@@ -81,8 +77,10 @@ export async function initializeHunterCoreStatesForCombat(combat) {
 }
 
 export async function cleanupCombatStates(combat) {
-  if (!game.user?.isGM) return;
-  const actors = combat?.combatants?.map((c) => c.actor).filter((a) => !!a) || [];
+  if (!game.user.isGM || !combat) return;
+  const actors = new Set(combat.combatants.map((c) => c.actor).filter(_ => _));
+  const operations = [];
+
   const poolRestore = {};
   for (const actor of actors) {
     for (const tag of getTerrainTagKeys()) {
@@ -92,11 +90,15 @@ export async function cleanupCombatStates(combat) {
       }
       await removeCondition(actor, tag);
     }
-    if (actor.type === "hunter" && getFocusCount(actor) > 0) {
+    if ((actor.type === "hunter") && (getFocusCount(actor) > 0)) {
       await setFocusCount(actor, 0);
     }
-    try { await actor.unsetFlag("hollows", "wardGranted"); } catch (err) {}
-    try { await actor.unsetFlag("hollows", "wardSuppressed"); } catch (err) {}
+
+    const flags = {
+      wardGranted: _del,
+      wardSuppressed: _del,
+    };
+
     if (actor.type === "hunter") {
       if (hasCondition(actor, "dying")) {
         await removeCondition(actor, "dying");
@@ -104,18 +106,29 @@ export async function cleanupCombatStates(combat) {
       if (hasCondition(actor, "dead")) {
         await removeCondition(actor, "dead");
       }
-      try { await actor.unsetFlag("hollows", "dead"); } catch (err) {}
-      try { await actor.setFlag("hollows", "dyingRevivedOnce", false); } catch (err) {}
-      try { await actor.unsetFlag("hollows", "echoReplaceDyingUsed"); } catch (err) {}
+
+      flags.dead = _del;
+      flags.dyingRevivedOnce = false;
+      flags.echoReplaceDyingUsed = _del;
     }
+
+    operations.push({
+      action: "update",
+      documentName: actor.documentName,
+      parent: actor.parent,
+      updates: [{ _id: actor.id, [`flags.${hollows.id}`]: flags }],
+    });
   }
+
+  await foundry.documents.modifyBatch(operations);
+
   for (const [tag, count] of Object.entries(poolRestore)) {
     if (count > 0) await updateTerrainPool(tag, count);
   }
 }
 
 export async function applySupportStartOfTurn(actor) {
-  if (!actor || actor.type !== "hunter") return;
+  if (!actor || (actor.type !== "hunter")) return;
   const zone = getActorZone(actor);
   if (zone !== "Support") return;
   await adjustHunterResource(actor, { resolve: 2 });
