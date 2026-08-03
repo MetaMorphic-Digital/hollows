@@ -4,9 +4,16 @@ import { HOLLOWS_CONDITIONS } from "../data/_module.mjs";
 import { registerHollowsHandlebarsHelpers } from "./handlebars.js";
 import { preloadHollowsTemplates } from "./templates.js";
 import { registerQueries } from "./queries.js";
+import { registerHollowsSettings } from "./settings.js";
 
 export function runHollowsInit() {
   console.log("Hollows | System init (Blackjack Engine)");
+
+  try {
+    registerHollowsSettings();
+  } catch (err) {
+    console.error("Hollows | Failed to register settings", err);
+  }
 
   try {
     registerActorDataModelHooks({
