@@ -2,7 +2,6 @@ import { registerActorHooks } from "./helpers/actor-hooks.js";
 import { registerCanvasHooks } from "./helpers/canvas-hooks.js";
 import { registerChatMessageHooks } from "./helpers/chat-hooks-runtime.js";
 import { registerChatUiHooks } from "./applications/ui/chat-hooks.js";
-import { registerCombatRuntimeHooks } from "./helpers/combat-hooks.js";
 import { registerInitHooks } from "./helpers/init-hooks.js";
 import { registerReadyHooks } from "./helpers/ready-hooks.js";
 
@@ -16,7 +15,6 @@ export default function doThing() {
   registerCanvasHooks();
   registerChatMessageHooks();
   registerChatUiHooks();
-  registerCombatRuntimeHooks();
   registerInitHooks();
   registerReadyHooks();
 }

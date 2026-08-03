@@ -1,9 +1,7 @@
 import { getActorZone } from "../../canvas/zone.js";
-import { updateTerrainPool } from "../../canvas/terrain-pool.js";
 import {
   hasCondition, addCondition, removeCondition,
-  isFreeTerrainTag, getSpecialConditionStatDelta,
-  getTerrainTagKeys, isPooledTerrainTag,
+  getSpecialConditionStatDelta, getTerrainTagKeys,
 } from "../actor/conditions.js";
 import { adjustHunterResource, getFocusCount, setFocusCount } from "./resources.js";
 import { getEchoStatMods } from "../../data/echo/index.js";
@@ -16,6 +14,15 @@ import {
 } from "../../helpers/weapon-utils.js";
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { getStatModifier } from "../../helpers/weapon-abilities/dispatchers.js";
+
+/** Hunter flags cleared when a combat ends, mapped to the value they reset to. */
+const COMBAT_RESET_FLAGS = {
+  wardGranted: _del,
+  wardSuppressed: _del,
+  dead: _del,
+  echoReplaceDyingUsed: _del,
+  dyingRevivedOnce: false,
+};
 
 function getSkirmisherBonusForActor(actor, statKey) {
   if (!actor || !statKey) return 0;
@@ -79,52 +86,47 @@ export async function initializeHunterCoreStatesForCombat(combat) {
 export async function cleanupCombatStates(combat) {
   if (!game.user.isGM || !combat) return;
   const actors = new Set(combat.combatants.map((c) => c.actor).filter(_ => _));
-  const operations = [];
 
-  const poolRestore = {};
   for (const actor of actors) {
     for (const tag of getTerrainTagKeys()) {
-      if (!hasCondition(actor, tag)) continue;
-      if (isPooledTerrainTag(tag) && !isFreeTerrainTag(actor, tag)) {
-        poolRestore[tag] = (poolRestore[tag] || 0) + 1;
-      }
-      await removeCondition(actor, tag);
+      // removeCondition refunds the pool itself for non-free pooled tags.
+      if (hasCondition(actor, tag)) await removeCondition(actor, tag);
     }
-    if ((actor.type === "hunter") && (getFocusCount(actor) > 0)) {
-      await setFocusCount(actor, 0);
+  }
+}
+
+/** Reset combat state on every hunter in the world: a hunter whose token is gone no longer resolves from its combatant. */
+export async function resetHunterCombatFlags() {
+  if (!game.user.isGM) return;
+  const operations = [];
+
+  for (const actor of game.actors.filter((a) => a.type === "hunter")) {
+    for (const tag of getTerrainTagKeys()) {
+      // Anything left here did not come from the pool of the current entity,
+      // so clear the tag without paying it back.
+      if (hasCondition(actor, tag)) await removeCondition(actor, tag, { skipPoolRefund: true });
+    }
+    if (hasCondition(actor, "dying")) await removeCondition(actor, "dying");
+    if (hasCondition(actor, "dead")) await removeCondition(actor, "dead");
+    if (getFocusCount(actor) > 0) await setFocusCount(actor, 0);
+
+    const flags = actor.flags[hollows.id] ?? {};
+    const update = {};
+    for (const [key, value] of Object.entries(COMBAT_RESET_FLAGS)) {
+      if (!(key in flags) || (flags[key] === value)) continue;
+      update[key] = value;
     }
 
-    const flags = {
-      wardGranted: _del,
-      wardSuppressed: _del,
-    };
-
-    if (actor.type === "hunter") {
-      if (hasCondition(actor, "dying")) {
-        await removeCondition(actor, "dying");
-      }
-      if (hasCondition(actor, "dead")) {
-        await removeCondition(actor, "dead");
-      }
-
-      flags.dead = _del;
-      flags.dyingRevivedOnce = false;
-      flags.echoReplaceDyingUsed = _del;
-    }
-
+    if (foundry.utils.isEmpty(update)) continue;
     operations.push({
       action: "update",
       documentName: actor.documentName,
       parent: actor.parent,
-      updates: [{ _id: actor.id, [`flags.${hollows.id}`]: flags }],
+      updates: [{ _id: actor.id, [`flags.${hollows.id}`]: update }],
     });
   }
 
-  await foundry.documents.modifyBatch(operations);
-
-  for (const [tag, count] of Object.entries(poolRestore)) {
-    if (count > 0) await updateTerrainPool(tag, count);
-  }
+  if (operations.length) await foundry.documents.modifyBatch(operations);
 }
 
 export async function applySupportStartOfTurn(actor) {

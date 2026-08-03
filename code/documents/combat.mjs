@@ -1,45 +1,221 @@
-import { clearAllCurseTrackers } from "../canvas/overlays";
-import { HOLLOWS_LAST_COMBATANT_BY_COMBAT_ID, HOLLOWS_PREV_COMBATANT_BY_COMBAT_ID } from "../helpers/combat-runtime";
-import { hasCondition, removeCondition } from "./actor/conditions";
-import { cleanupCombatStates } from "./actor/hunter-combat";
+import { clearAllCurseTrackers } from "../canvas/overlays.js";
+import { getActiveEntityActor, getActiveHollowActor } from "../canvas/zone.js";
+import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
+import {
+  beginFirstPick,
+  clearActedForBracket,
+  ensureFirstPickDialog,
+  maybeSetTurnToHighest,
+  resetHunterRoundFlagsForNewRound,
+  shouldCurrentUserHandleFirstPick,
+} from "../helpers/combat-first-pick.js";
+import { processEndOfTurn, processStartOfTurn } from "../helpers/combat-lifecycle.js";
+import { getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from "../helpers/combat-runtime.js";
+import { hasCondition } from "./actor/conditions.js";
+import {
+  cleanupCombatStates,
+  initializeHunterCoreStatesForCombat,
+  resetHunterCombatFlags,
+} from "./actor/hunter-combat.js";
 
 /**
  * System implementation of the Combat class.
  * @extends {foundry.documents.Combat}
  */
 export default class HollowsCombat extends foundry.documents.Combat {
+  /**
+   * The combatant that acted last in bracket order, which is not the tracker's previous combatant.
+   * @type {string|null}
+   */
+  lastCombatantId = null;
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
+  async startCombat() {
+    // Before super, so this still runs against the pre-start round and turn.
+    if (game.user.isGM) {
+      const hollow = getActiveHollowActor();
+      if (hollow) await hollow.unsetFlag("hollows", "explorationTNMod");
+      this.lastCombatantId = this.combatant?.id || null;
+      await triggerEntityTriggeredAbilities(getActiveEntityActor(), "battleStart", {}, ["special", "doom"]);
+      await resetHunterCombatFlags();
+    }
+    return super.startCombat();
+  }
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
+  async _preUpdate(changed, options, user) {
+    if (game.user.isGM && (("turn" in changed) || ("round" in changed))) {
+      options.hollows = { ...options.hollows, prevCombatantId: this.combatant?.id || null };
+    }
+    return super._preUpdate(changed, options, user);
+  }
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
+  _onUpdate(changed, options, userId) {
+    super._onUpdate(changed, options, userId);
+
+    // Above the guard: the dialog is opened by whichever user was picked to choose.
+    this.#onAwaitingFirstPickUpdate(changed);
+
+    if (!game.user.isActiveGM) return;
+
+    // Must stay unchained — awaiting the first delays the turn machine and double-advances the round.
+    this.#onInitializeUpdate();
+    this.#onTurnChange(changed, options);
+  }
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
+  _onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId) {
+    super._onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId);
+    if (collection !== "combatants") return;
+    if (!game.user.isActiveGM) return;
+    const relevant = changes.some(c => c.flags?.hollows?.setup || ("initiative" in c));
+    if (relevant) maybeSetTurnToHighest(this);
+  }
+
+  /* -------------------------------------------------- */
+
   /** @inheritdoc */
   async _onDelete(options, userId) {
     super._onDelete(options, userId);
 
     if (!game.user.isActiveGM) return;
 
-    // TODO: Refactor these two methods as well into the operations below.
-    // The cleanupCombatStates method has an issue where it removes flags that are also removed below.
     await cleanupCombatStates(this);
+    await resetHunterCombatFlags();
     await clearAllCurseTrackers(this);
+  }
 
-    // TODO: Refactor further to move these into being properties on the Combat class or the instance of a combat?
-    // Their purpose is not at all clear.
-    HOLLOWS_PREV_COMBATANT_BY_COMBAT_ID.delete(this.id);
-    HOLLOWS_LAST_COMBATANT_BY_COMBAT_ID.delete(this.id);
+  /* -------------------------------------------------- */
+  /*   Update Handling                                  */
+  /* -------------------------------------------------- */
 
-    const hunters = new Set(this.combatants.filter(c => c.actor?.type === "hunter").map(c => c.actor));
+  /** Reopen the first-pick dialog for the user who owns the pending choice. */
+  #onAwaitingFirstPickUpdate(changed) {
+    if (!this.started) return;
+    if (!Object.hasOwn(changed?.flags?.hollows || {}, "awaitingFirstPick")) return;
+    const awaiting = this.getFlag("hollows", "awaitingFirstPick") || null;
+    if (!awaiting) return;
+    if (!shouldCurrentUserHandleFirstPick(awaiting)) return;
+    window.setTimeout(() => ensureFirstPickDialog(this), 0);
+  }
 
-    // This is the 'resetCombatHunterFlags' method which should be removed at some point.
-    const operations = Array.from(hunters).map(actor => {
-      const flags = actor.flags[hollows.id] ?? {};
-      const update = { _id: actor.id };
+  /** Seed hunter state once the combat is under way. */
+  async #onInitializeUpdate() {
+    if (!this.started && ((this.round ?? 0) <= 0)) return;
+    await initializeHunterCoreStatesForCombat(this);
+  }
 
-      if (flags.dyingRevivedOnce) update[`flags.${hollows.id}.dyingRevivedOnce`] = false;
-      if (flags.dead) update[`flags.${hollows.id}.dead`] = _del;
+  /** Bracket turn machine: the transition is derived from the previous combatant, not the turn index. */
+  async #onTurnChange(changed, options) {
+    if (!this.started) return;
+    if (!("turn" in changed) && !("round" in changed)) return;
+    if (options.hollowsSkipTurnProcessing) return;
+    const awaiting = this.getFlag("hollows", "awaitingFirstPick");
+    if (awaiting?.reason === "setup") return;
+    const passInitiative = !!options.hollowsPassInitiative;
+    const manualMakeActive = !!options.hollowsManualMakeActive;
 
-      // TODO: Can this be added to the operations?
-      if (hasCondition(actor, "dead")) removeCondition(actor, "dead");
+    const newCombatantId = this.combatant?.id || null;
+    const prevCombatantId = (options.hollows?.prevCombatantId ?? null) || this.lastCombatantId;
+    if (!prevCombatantId) {
+      this.lastCombatantId = newCombatantId;
+      return;
+    }
 
-      return { action: "update", documentName: actor.documentName, parent: actor.parent, updates: [update] };
-    });
+    const prevCombatant = this.combatants.get(prevCombatantId);
+    const newCombatant = newCombatantId ? this.combatants.get(newCombatantId) : null;
+    const prevIsEntity = prevCombatant?.actor?.type === "entity";
+    if (newCombatantId === prevCombatantId) {
+      this.lastCombatantId = newCombatantId;
+      return;
+    }
 
-    foundry.documents.modifyBatch(operations);
+    if ((newCombatant?.actor?.type === "hunter") && hasCondition(newCombatant.actor, "dead")) {
+      await this.#advancePastDeadHunter(newCombatantId);
+      return;
+    }
+
+    if (prevCombatant?.actor?.type === "hunter") {
+      await prevCombatant.setFlag("hollows", "acted", true);
+    }
+
+    const prevBracket = getCombatantBracket(prevCombatant);
+    const newBracket = getCombatantBracket(newCombatant);
+    const afterExists = getCombatantsInBracket(this, "after").length > 0;
+
+    if (prevIsEntity) {
+      await processEndOfTurn(this, prevCombatant);
+      await clearActedForBracket(this, "after");
+      await clearActedForBracket(this, "before");
+      if (passInitiative) {
+        if (newCombatant) await processStartOfTurn(this, newCombatant);
+        if ((newBracket === "before") && !afterExists) await this.#beginNewRound();
+        this.lastCombatantId = prevCombatantId;
+        return;
+      }
+      if (afterExists) {
+        await beginFirstPick(this, "after", prevCombatantId, "after-entity", null, true, true);
+      } else if (getCombatantsInBracket(this, "before").length) {
+        await beginFirstPick(this, "before", prevCombatantId, "round-start", null, true, true);
+      }
+      this.lastCombatantId = prevCombatantId;
+      return;
+    }
+
+    if ((prevBracket === "after") && (newBracket === "before")) {
+      const owners = getCombatantOwners(prevCombatant?.actor);
+      const chooser = owners.find((u) => !u.isGM)?.id || owners[0]?.id || null;
+      await processEndOfTurn(this, prevCombatant);
+      await beginFirstPick(this, "before", prevCombatantId, "round-start", chooser, true, true);
+      this.lastCombatantId = prevCombatantId;
+      return;
+    }
+
+    if (!manualMakeActive && (prevBracket === "after") && (newCombatant?.actor?.type === "entity")
+      && !getCombatantsInBracket(this, "before").length) {
+      await processEndOfTurn(this, prevCombatant);
+      await this.#beginNewRound();
+      if (newCombatant) await processStartOfTurn(this, newCombatant);
+      this.lastCombatantId = newCombatantId;
+      return;
+    }
+
+    await processEndOfTurn(this, prevCombatant);
+    await processStartOfTurn(this, newCombatant);
+    this.lastCombatantId = newCombatantId;
+  }
+
+  /* -------------------------------------------------- */
+
+  /** Skip the turn forward to the next combatant who is not a dead hunter. */
+  async #advancePastDeadHunter(fromCombatantId) {
+    const turns = this.turns || [];
+    const startIndex = turns.findIndex((t) => t.id === fromCombatantId);
+    if (startIndex === -1) return;
+    for (let i = 1; i <= turns.length; i++) {
+      const index = (startIndex + i) % turns.length;
+      const candidate = turns[index];
+      const actor = candidate?.actor || this.combatants.get(candidate.id)?.actor;
+      if (!actor || (actor.type !== "hunter") || !hasCondition(actor, "dead")) {
+        await this.update({ turn: index }, { hollowsSkipDeadAdvance: true, turnEvents: false });
+        return;
+      }
+    }
+  }
+
+  /** Advance to the next round and clear per-round hunter state. */
+  async #beginNewRound() {
+    const round = Math.max(1, Number(this.round || 0) + 1);
+    await this.update({ round }, { hollowsSkipTurnProcessing: true, turnEvents: false });
+    await resetHunterRoundFlagsForNewRound();
   }
 }
