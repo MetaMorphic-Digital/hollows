@@ -31,4 +31,11 @@
     <h2>Text</h2>
     <textarea name="system.text" rows="6">{{system.text}}</textarea>
   </section>
+
+  <section class="sheet-section">
+    <h2>Automation</h2>
+    {{> "systems/hollows/templates/item/parts/script-controls.html"
+        label="Script" action="editAbilityScript"
+        block=system.script scriptsAllowed=scriptsAllowed}}
+  </section>
 </form>

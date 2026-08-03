@@ -1,0 +1,15 @@
+<div class="hollows-form-row">
+  <div class="stat-label">{{label}}</div>
+  <div class="script-controls">
+    <button type="button" class="stat-roll" data-action="{{action}}">Edit Script</button>
+    <span class="muted">
+      {{#unless scriptsAllowed}}
+        Custom scripts are disabled in system settings
+      {{else if block.enabled}}
+        Script active — {{block.hook}}
+      {{else}}
+        No active script
+      {{/unless}}
+    </span>
+  </div>
+</div>

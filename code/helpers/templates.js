@@ -16,6 +16,8 @@ export const HOLLOWS_TEMPLATE_PATHS = [
   "systems/hollows/templates/item/parts/entity-passive-group.html",
   "systems/hollows/templates/item/parts/effect-group.html",
   "systems/hollows/templates/item/rumour-sheet.html",
+  "systems/hollows/templates/item/script-editor.html",
+  "systems/hollows/templates/item/parts/script-controls.html",
   "systems/hollows/templates/chat/entity/defence-card.html",
   "systems/hollows/templates/chat/entity/notice-card.html",
   "systems/hollows/templates/chat/entity/test-card.html"

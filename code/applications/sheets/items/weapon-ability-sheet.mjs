@@ -1,3 +1,5 @@
+import { customScriptsAllowed } from "../../../helpers/settings.js";
+
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
 
@@ -7,6 +9,15 @@ export default class HollowsWeaponAbilitySheet extends HandlebarsApplicationMixi
     position: { width: 520, height: 520 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
+    actions: {
+      editAbilityScript: async function() {
+        if (!this.isEditable) return;
+        const { openScriptEditor } = await import("../../apps/script-editor.mjs");
+        openScriptEditor(this.item, "system.script", {
+          title: `${this.item.name} — Ability Script`,
+        });
+      },
+    },
   };
 
   static PARTS = {
@@ -29,6 +40,7 @@ export default class HollowsWeaponAbilitySheet extends HandlebarsApplicationMixi
       editable: this.isEditable,
       owner: this.document.isOwner,
       limited: this.document.limited,
+      scriptsAllowed: customScriptsAllowed(),
     };
   }
 

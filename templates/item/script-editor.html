@@ -1,0 +1,91 @@
+<form class="hollows-sheet script-editor" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <div class="name">{{documentName}}</div>
+      <div class="subline">Mechanic Script</div>
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <div class="hollows-form-row">
+      <div class="stat-label">Active</div>
+      <input type="checkbox" name="enabled" {{#if block.enabled}}checked{{/if}} />
+    </div>
+    <div class="hollows-form-row">
+      <div class="stat-label">Label</div>
+      <input type="text" name="label" value="{{block.label}}" placeholder="Shown on buttons and in chat" />
+    </div>
+    <div class="hollows-form-row">
+      <div class="stat-label">Runs</div>
+      <select name="hook">
+        {{#each hookChoices as |label key|}}
+          <option value="{{key}}" {{#if (eq ../block.hook key)}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="hollows-form-row script-event-row" {{#unless selectedHook.hasEvent}}hidden{{/unless}}>
+      <div class="stat-label">Event</div>
+      <select name="eventType">
+        {{#each eventChoices as |label key|}}
+          <option value="{{key}}" {{#if (eq ../block.eventType key)}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="hollows-form-row script-turn-row" {{#unless selectedHook.hasOn}}hidden{{/unless}}>
+      <div class="stat-label">Whose turn</div>
+      <select name="on">
+        {{#each turnScopes as |label key|}}
+          <option value="{{key}}" {{#if (eq ../block.on key)}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="hollows-form-row">
+      <div class="stat-label">Limit</div>
+      <select name="rateLimit">
+        {{#each rateLimits as |label key|}}
+          <option value="{{key}}" {{#if (eq ../block.rateLimit key)}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Script</h2>
+    <div class="script-context muted">
+      Available: {{#each selectedHook.ctx as |key|}}<code>ctx.{{key}}</code> {{/each}}
+    </div>
+    {{#if runsOn}}
+      <div class="script-context muted">
+        Runs on: <strong>{{runsOn}}</strong> — helpers marked <em>direct</em> below only work
+        there if that client owns the document they touch.
+      </div>
+    {{/if}}
+    {{#if selectedHook.sync}}
+      <div class="script-context muted">Synchronous hook: no <code>await</code>, read-only helpers only.</div>
+    {{/if}}
+    {{#if selectedHook.returns}}
+      <div class="script-context muted">Return: {{selectedHook.returns}}</div>
+    {{/if}}
+    <textarea name="source" rows="18" spellcheck="false">{{block.source}}</textarea>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Helper Glossary</h2>
+    <div class="muted">
+      <strong>read</strong> — safe anywhere &middot;
+      <strong>routed</strong> — mutates, falls back to the GM when you lack rights &middot;
+      <strong>direct</strong> — only on the GM or the document's owner
+    </div>
+    {{#each glossary as |group|}}
+      <div class="hollows-form-row">
+        <div class="stat-label">{{group.name}} <span class="muted">({{group.level}})</span></div>
+        <div class="hollows-form-value">{{group.members}}</div>
+      </div>
+    {{/each}}
+  </section>
+
+  <footer class="sheet-footer">
+    <button type="button" class="stat-roll" data-action="save">Save</button>
+    <button type="button" class="stat-roll" data-action="close">Close</button>
+  </footer>
+</form>

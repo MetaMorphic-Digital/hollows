@@ -127,6 +127,26 @@
     <textarea name="system.coreAbility" rows="4">{{system.coreAbility}}</textarea>
   </section>
 
+  <section class="sheet-section">
+    <h2>Weapon of Renown</h2>
+    <div class="hollows-form-row">
+      <div class="stat-label">Renowned</div>
+      <input type="checkbox" name="system.renown.enabled" {{#if system.renown.enabled}}checked{{/if}} />
+    </div>
+    {{#if system.renown.enabled}}
+      <div class="hollows-form-row">
+        <div class="stat-label">Ability</div>
+        <input type="text" name="system.renown.name" value="{{system.renown.name}}" placeholder="Unique ability name" />
+      </div>
+      <div class="hollows-form-section">
+        <textarea name="system.renown.text" rows="4" placeholder="Describe the unique ability.">{{system.renown.text}}</textarea>
+      </div>
+      {{> "systems/hollows/templates/item/parts/script-controls.html"
+          label="Automation" action="editRenownScript"
+          block=system.renown.script scriptsAllowed=scriptsAllowed}}
+    {{/if}}
+  </section>
+
   <section class="sheet-section ability-drop-zone">
     <h2>Assigned Abilities</h2>
     <div class="muted">Drag a Weapon Ability item here to assign it to this weapon.</div>

@@ -12,7 +12,8 @@ import { getActiveHunterForUser } from "../../canvas/zone.js";
 const TABS = [];
 export default TABS;
 
-function registerRefugeTab(def) {
+// Public: content packs register their own Refuge tabs here.
+export function registerRefugeTab(def) {
   if (!def?.id || TABS.some((t) => t.id === def.id)) return;
   TABS.push(def);
   TABS.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
