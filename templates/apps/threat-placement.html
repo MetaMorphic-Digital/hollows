@@ -1,0 +1,18 @@
+  <p class="hint">{{localize "HOLLOWS.THREAT.intro"}}</p>
+  {{#if rules.length}}
+  <p class="hint">{{localize "HOLLOWS.THREAT.rulesActive"}}: {{#each rules}}{{this}}{{#unless @last}} · {{/unless}}{{/each}}</p>
+  {{/if}}
+  <fieldset>
+    <legend>{{localize "HOLLOWS.THREAT.zones"}}</legend>
+    {{#each zones}}
+    <div class="form-group">
+      <label>{{zoneLabel this.zoneId}} <span class="hint">({{localize "HOLLOWS.THREAT.now" value=this.current}})</span></label>
+      <div class="form-fields threat-step">
+        <button type="button" data-step="-1"><i class="fa-solid fa-minus"></i></button>
+        <input type="number" name="threat.{{@index}}" value="{{this.current}}" min="0" step="1" />
+        <button type="button" data-step="1"><i class="fa-solid fa-plus"></i></button>
+      </div>
+    </div>
+    {{/each}}
+  </fieldset>
+  <div class="threat-placement-status"></div>

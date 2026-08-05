@@ -123,7 +123,7 @@
         <label>Allowed Zones <span class="hint">(none = all)</span></label>
         <div class="zone-grid">
           {{#each profileZones as |z|}}
-          <label class="zone-chip {{#if (includes ../system.profile.allowedZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.profile.allowedZones" data-value="{{z}}" {{#if (includes ../system.profile.allowedZones z)}}checked{{/if}} />{{z}}</label>
+          <label class="zone-chip {{#if (includes ../system.profile.allowedZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.profile.allowedZones" data-value="{{z}}" {{#if (includes ../system.profile.allowedZones z)}}checked{{/if}} />{{zoneLabel z}}</label>
           {{/each}}
         </div>
       </div>
@@ -307,7 +307,7 @@
       <label>Zones <span class="hint">(none = all)</span></label>
       <div class="zone-grid">
         {{#each zoneList as |z|}}
-        <label class="zone-chip {{#if (includes ../system.restoreResolve.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.restoreResolve.zones" data-value="{{z}}" {{#if (includes ../system.restoreResolve.zones z)}}checked{{/if}} />{{z}}</label>
+        <label class="zone-chip {{#if (includes ../system.restoreResolve.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.restoreResolve.zones" data-value="{{z}}" {{#if (includes ../system.restoreResolve.zones z)}}checked{{/if}} />{{zoneLabel z}}</label>
         {{/each}}
       </div>
     </div>
@@ -343,7 +343,7 @@
       {{#each passiveConditionGroups as |keys groupName|}}<optgroup label="{{groupName}}">{{#each keys as |key|}}<option value="{{key}}" {{#if (eq key @root.system.special.passive.condition)}}selected{{/if}}>{{lookup @root.choices.passiveCondition key}}</option>{{/each}}</optgroup>{{/each}}
     </select></div></div>
     {{#if (eq system.special.passive.condition "targetInZones")}}
-    <div class="form-group stacked"><label>Condition Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.passive.conditionZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.conditionZones" data-value="{{z}}" {{#if (includes ../system.special.passive.conditionZones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    <div class="form-group stacked"><label>Condition Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.passive.conditionZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.conditionZones" data-value="{{z}}" {{#if (includes ../system.special.passive.conditionZones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
     {{/if}}
     <div class="form-group"><label>Amount</label><div class="form-fields"><select name="system.special.passive.amountMode">{{selectOptions choices.damageMode selected=system.special.passive.amountMode localize=false}}</select></div></div>
     {{#if (eq system.special.passive.amountMode "dynamic")}}
@@ -351,7 +351,7 @@
     {{#unless (eq system.special.passive.amountSource "curseEntity")}}{{#unless (eq system.special.passive.amountSource "entityTerrain")}}
     <div class="form-group sub"><label>Zones</label><div class="form-fields"><select name="system.special.passive.amountScope">{{selectOptions choices.zoneScope selected=system.special.passive.amountScope localize=false}}</select></div></div>
     {{#if (eq system.special.passive.amountScope "select")}}
-    <div class="form-group stacked"><label>Select Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.passive.amountZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.amountZones" data-value="{{z}}" {{#if (includes ../system.special.passive.amountZones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    <div class="form-group stacked"><label>Select Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.passive.amountZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.amountZones" data-value="{{z}}" {{#if (includes ../system.special.passive.amountZones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
     {{/if}}
     {{/unless}}{{/unless}}
     {{else}}
@@ -374,7 +374,7 @@
     <div class="form-group"><label>Effect</label><div class="form-fields"><select name="system.special.trigger.effectType">{{selectOptions choices.effectType selected=system.special.trigger.effectType localize=false}}</select></div></div>
     <div class="form-group"><label>Targets</label><div class="form-fields"><select name="system.special.trigger.targetMode">{{selectOptions choices.triggerTargetMode selected=system.special.trigger.targetMode localize=false}}</select></div></div>
     {{#if showSpecialTriggerZones}}
-    <div class="form-group stacked"><label>Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.trigger.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.trigger.zones" data-value="{{z}}" {{#if (includes ../system.special.trigger.zones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    <div class="form-group stacked"><label>Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../system.special.trigger.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.trigger.zones" data-value="{{z}}" {{#if (includes ../system.special.trigger.zones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
     {{/if}}
     {{#if (eq system.special.trigger.effectType "afterEffects")}}
     <div class="form-group stacked"><label>After Effects</label></div>

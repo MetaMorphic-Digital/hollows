@@ -43,7 +43,7 @@
   </div></div>
 
   {{#if (or (eq group.target.hunterScope "chosenZone") (and (eq group.target.side "zone") (eq group.target.zoneMode "selected")))}}
-    <div class="form-group stacked"><label>Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../group.target.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.target.zones" data-value="{{z}}" {{#if (includes ../group.target.zones z)}}checked{{/if}} />{{z}}</label>{{/each}}</div></div>
+    <div class="form-group stacked"><label>Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../group.target.zones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.target.zones" data-value="{{z}}" {{#if (includes ../group.target.zones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
   {{/if}}
   {{#if (and (eq group.target.side "zone") (eq group.target.zoneMode "adjacent"))}}
     <div class="form-group stacked"><label>Adjacency</label><div class="toggle-row">

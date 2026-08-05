@@ -1,4 +1,4 @@
-.hollows-entity {
+.hollows.sheet.actor.entity .window-content.hollows-sheet {
   background:
     radial-gradient(800px 380px at 20% -120px, rgba(184, 74, 58, 0.22), transparent 60%),
     radial-gradient(900px 420px at 90% -160px, rgba(109, 124, 138, 0.2), transparent 65%),
@@ -11,8 +11,9 @@
   overflow-x: hidden;
 }
 
-.hollows.sheet.actor.entity .window-content > form.hollows-sheet {
-  min-height: 100%;
+.hollows.sheet.actor.entity .window-content.hollows-sheet > .sheet-body {
+  min-height: 0;
+  overflow: visible;
 }
 
 .hollows.sheet.actor.entity .sheet-header,
@@ -21,18 +22,18 @@
   flex: 0 0 auto;
 }
 
-.hollows-entity .name {
+.hollows.sheet.actor.entity .name {
   background: #1a1b20;
   color: #f6f1e8;
 }
 
-.hollows-entity .checkbox-group {
+.hollows.sheet.actor.entity .checkbox-group {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 10px;
 }
 
-.hollows-entity .checkbox-group .checkbox {
+.hollows.sheet.actor.entity .checkbox-group .checkbox {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -42,56 +43,56 @@
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
 }
 
-.hollows-entity .checkbox-group .checkbox input + span,
-.hollows-entity .checkbox-group .checkbox,
-.hollows-entity .curse-engine .checkbox {
+.hollows.sheet.actor.entity .checkbox-group .checkbox input + span,
+.hollows.sheet.actor.entity .checkbox-group .checkbox,
+.hollows.sheet.actor.entity .curse-engine .checkbox {
   color: #efe6d8 !important;
 }
 
-.hollows-entity select,
-.hollows-entity .hollows-form-row select,
-.hollows-entity .stat-grid select {
+.hollows.sheet.actor.entity select,
+.hollows.sheet.actor.entity .hollows-form-row select,
+.hollows.sheet.actor.entity .stat-grid select {
   background: #1a1c22 !important;
   color: #f3e7d6 !important;
   border: 1px solid #3b3430;
 }
 
-.hollows-entity .curse-engine input[type="number"],
-.hollows-entity .curse-engine input[type="text"],
-.hollows-entity .curse-engine select {
+.hollows.sheet.actor.entity .curse-engine input[type="number"],
+.hollows.sheet.actor.entity .curse-engine input[type="text"],
+.hollows.sheet.actor.entity .curse-engine select {
   background: #1a1c22 !important;
   color: #f3e7d6 !important;
   border: 1px solid #3b3430;
 }
 
-.hollows-entity .curse-engine .stat-label {
+.hollows.sheet.actor.entity .curse-engine .stat-label {
   color: #efe6d8 !important;
 }
 
-.hollows-entity select option {
+.hollows.sheet.actor.entity select option {
   background: #1a1c22;
   color: #f3e7d6;
 }
 
-.hollows-entity .ability-card,
-.hollows-entity .ability-card input {
+.hollows.sheet.actor.entity .ability-card,
+.hollows.sheet.actor.entity .ability-card input {
   color: #efe6d8;
 }
 
-.hollows-entity .ability-card .stat-label {
+.hollows.sheet.actor.entity .ability-card .stat-label {
   color: #efe6d8;
 }
 
-.hollows-entity .checkbox-group label {
+.hollows.sheet.actor.entity .checkbox-group label {
   color: #f6f1e8;
 }
 
-.hollows-entity .entity-quick-actions .ability-row {
+.hollows.sheet.actor.entity .entity-quick-actions .ability-row {
   align-items: flex-start;
   min-width: 0;
 }
 
-.hollows-entity .entity-quick-actions .ability-actions {
+.hollows.sheet.actor.entity .entity-quick-actions .ability-actions {
   display: flex;
   gap: 6px;
   flex: 1 1 auto;
@@ -102,7 +103,7 @@
   max-width: 100%;
 }
 
-.hollows-entity .entity-quick-actions .ability-actions .stat-roll {
+.hollows.sheet.actor.entity .entity-quick-actions .ability-actions .stat-roll {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -116,28 +117,75 @@
   max-width: 100%;
 }
 
-.threat-grid {
+.hollows.sheet.actor.entity .threat-grid {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.threat-row {
+.hollows.sheet.actor.entity .threat-row {
   display: grid;
   grid-template-columns: 1fr 120px;
   gap: 8px;
   align-items: center;
 }
 
-.threat .health-label,
-.terrain .health-label {
+.hollows.sheet.actor.entity .threat-placement {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.hollows.sheet.actor.entity .threat-placement-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.hollows.sheet.actor.entity .threat-placement-row select {
+  flex: 1 1 140px;
+}
+
+.hollows.sheet.actor.entity .threat-placement-row input[type="number"] {
+  width: 56px;
+}
+
+.hollows.sheet.actor.entity .threat-placement .zone-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 2px 0 6px;
+}
+
+.hollows.sheet.actor.entity .threat-placement .zone-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hollows.sheet.actor.entity .threat-placement .zone-chip.on {
+  font-weight: 700;
+}
+
+.hollows.sheet.actor.entity .hint {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.hollows.sheet.actor.entity .threat .health-label,
+.hollows.sheet.actor.entity .terrain .health-label {
   color: #f9f2e6;
   font-weight: 700;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
 }
 
-.threat input[type="number"],
-.terrain input[type="number"] {
+.hollows.sheet.actor.entity .threat input[type="number"],
+.hollows.sheet.actor.entity .terrain input[type="number"] {
   background: #20232b;
   color: #ffffff;
   border: 1px solid #5a4f49;

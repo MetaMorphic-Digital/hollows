@@ -1,9 +1,10 @@
+import { getEntityAbilityText } from "../action-schema.js";
 import {
   getActorZone,
   getActorTokenOnScene,
   getTokenZone,
   getThreatInZone,
-  isThreatZone
+  isThreatZone,
 } from "../../../canvas/zone.js";
 import {
   buildEntityAfterAttackConfigs,
@@ -14,27 +15,28 @@ import {
   hasEnabledAfterAttackGroups,
   isInterruptFeasible,
   resolveEntityAbilityDamage,
-  resolveEntityAbilityTN
+  resolveEntityAbilityTN,
 } from "../action-rules.js";
 import { requestAfterAttackApply } from "../../../documents/entity/attack-effects.js";
 import { runEntityActionPauses } from "../../../helpers/weapon-abilities/dispatchers.js";
 import {
   applyEntityActionCost,
   getEntityActionCost,
-  getEntityInterruptCost
+  getEntityInterruptCost,
 } from "../../../documents/entity/entity-threat.js";
 import { getEntitySelfActionTargetingOverride } from "../../../helpers/entity-dispatchers.js";
 import {
   builderGeneratedAbilityFeasible,
-  executeBuilderGeneratedAbility
+  executeBuilderGeneratedAbility,
 } from "../../../documents/entity/enhancement-builder.js";
 import {
   resolveActionTargets,
   resolveRestoreResolve,
-  runEntityAction
+  runEntityAction,
 } from "../action-flow.js";
 import { createEntityDefenceRequest, createEntityNoticeCard, createEntityTestRequest, getEntityActionWhisper } from "../action-cards.js";
 
+/** Run an Entity interrupt ability. */
 export async function triggerEntityInterrupt(entityActor, interrupt, interruptItem = null, options = {}) {
   if (!entityActor || !interrupt) return false;
   const ctx = {
@@ -50,8 +52,8 @@ export async function triggerEntityInterrupt(entityActor, interrupt, interruptIt
     scratch: {
       forceAdvantage: !!options.forceDefenceAdvantage,
       interruptCost: getEntityInterruptCost(interrupt, entityActor, interruptItem),
-      interruptCostType: getEntityActionCost(interrupt).type
-    }
+      interruptCostType: getEntityActionCost(interrupt).type,
+    },
   };
   return runEntityAction(ctx, interruptPipeline);
 }
@@ -61,7 +63,7 @@ const interruptPipeline = {
     const generatedExecution = await executeBuilderGeneratedAbility({
       entityActor: ctx.entityActor,
       ability: ctx.action,
-      abilityItem: ctx.actionItem
+      abilityItem: ctx.actionItem,
     });
     if (generatedExecution.handled) return { handled: true, result: generatedExecution.result };
     if (!ctx.options.reaction && !isInterruptFeasible(ctx.action, ctx.entityActor)) {
@@ -83,7 +85,7 @@ const interruptPipeline = {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       actionKind: "interrupt",
-      actionType
+      actionType,
     });
     const targeting = targetOverride.mode ? targetOverride : profile;
     const selection = await resolveActionTargets({
@@ -92,7 +94,7 @@ const interruptPipeline = {
       zoneFilter: interruptZoneFilter,
       actionType,
       targeting,
-      warnNoValidZones: "No valid zones for this Interrupt."
+      warnNoValidZones: "No valid zones for this Interrupt.",
     });
     ctx.selectedZones = Array.isArray(selection?.zones) ? selection.zones.filter(Boolean) : [];
     return Array.isArray(selection?.targets) ? selection.targets : [];
@@ -108,7 +110,7 @@ const interruptPipeline = {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       targetTokens: ctx.targets,
-      selectedZones: ctx.selectedZones
+      selectedZones: ctx.selectedZones,
     });
     if (pause.cancelled) return { cancelled: true };
     if (Array.isArray(pause.targetTokens)) ctx.targets = pause.targetTokens;
@@ -123,11 +125,11 @@ const interruptPipeline = {
     if (ctx.options?.freeCost) return true;
     const targetZones = Array.from(new Set([
       ...ctx.targets.map((t) => getTokenZone(t)).filter((z) => !!z),
-      ...ctx.selectedZones
+      ...ctx.selectedZones,
     ]));
     return applyEntityActionCost(ctx.action, ctx.entityActor, ctx.targets, targetZones, {
       amount: ctx.scratch.interruptCost,
-      source: "entityInterrupt"
+      source: "entityInterrupt",
     });
   },
 
@@ -136,9 +138,10 @@ const interruptPipeline = {
     if (pause.cancelled) return { cancelled: true };
   },
 
-  output: interruptOutput
+  output: interruptOutput,
 };
 
+/** Post the interrupt card and roll data. */
 async function interruptOutput(ctx) {
   const { entityActor, actionItem: interruptItem, action: interrupt, actionType, options } = ctx;
   const { forceAdvantage } = ctx.scratch;
@@ -159,8 +162,8 @@ async function interruptOutput(ctx) {
     await createEntityNoticeCard({
       actor: entityActor,
       titleHtml: `${foundry.utils.escapeHTML(entityActor.name)} uses interrupt: ${safeName}`,
-      text: String(profile.text || profile.effectText || ""),
-      whisper
+      text: getEntityAbilityText(interrupt),
+      whisper,
     });
     const afterAttack = buildEntityAfterAttackConfigs(interrupt, "always");
     if (!filteredTargets.length && selectedZones.length && hasEnabledAfterAttackGroups(afterAttack)) {
@@ -188,7 +191,7 @@ async function interruptOutput(ctx) {
         dynamicSource: profile.tnDynamicSource,
         setSource: profile.tnSetSource,
         setDefence: profile.tnSetDefence,
-        setStat: profile.tnSetStat
+        setStat: profile.tnSetStat,
       }, entityActor, targetToken) + modify.tn + getEntityActionTNBonus(entityActor, interruptItem, targetToken, "interrupt");
       const testName = interruptItem?.name || interrupt.name || "Interrupt";
       const safeName = foundry.utils.escapeHTML(testName);
@@ -210,7 +213,7 @@ async function interruptOutput(ctx) {
         afterAttack,
         modifySelfDamage: modify.selfDamage || null,
         targetZone,
-        targetSnapshot: snapshot
+        targetSnapshot: snapshot,
       });
       continue;
     }
@@ -222,7 +225,7 @@ async function interruptOutput(ctx) {
         entityActor,
         target,
         targetToken,
-        targetZone
+        targetZone,
       });
       if (paused.target && paused.target.id !== target.id) {
         target = paused.target;
@@ -238,7 +241,7 @@ async function interruptOutput(ctx) {
       dynamicSource: profile.tnDynamicSource,
       setSource: profile.tnSetSource,
       setDefence: profile.tnSetDefence,
-      setStat: profile.tnSetStat
+      setStat: profile.tnSetStat,
     }, entityActor, targetToken) + modify.tn + getEntityActionTNBonus(entityActor, interruptItem, targetToken, "interrupt");
     const damageBonus = getEntityActionDamageBonus(entityActor, interruptItem, targetToken, "interrupt");
     const interruptDamage = resolveEntityAbilityDamage(
@@ -249,7 +252,7 @@ async function interruptOutput(ctx) {
       entityActor,
       targetToken,
       profile.damageDynamicReduce,
-      profile.damageDynamicFloor
+      profile.damageDynamicFloor,
     );
     const damageResolve = Math.max(0, interruptDamage.resolve + damageBonus.resolve + modify.damage.resolve);
     const damageWounds = Math.max(0, interruptDamage.wounds + damageBonus.wounds + modify.damage.wounds);
@@ -276,12 +279,13 @@ async function interruptOutput(ctx) {
         modifySelfDamage: modify.selfDamage || null,
         afterAttack,
         followUp: { enabled: false },
-        skipDefencePrompt: true
-      }
+        skipDefencePrompt: true,
+      },
     });
   }
 }
 
+/** Open the GM interrupt prompt at hunter turn end. */
 export async function openInterruptPromptForHunterEnd(combat, entityActor) {
   if (!game.user?.isGM) return;
   if (!entityActor) return;
@@ -322,10 +326,10 @@ export async function openInterruptPromptForHunterEnd(combat, entityActor) {
           const item = entityActor.items.get(id);
           if (!item) return;
           await triggerEntityInterrupt(entityActor, item.system, item);
-        }
+        },
       },
-      { action: "skip", label: "Skip", callback: () => null }
+      { action: "skip", label: "Skip", callback: () => null },
     ],
-    rejectClose: false
+    rejectClose: false,
   });
 }

@@ -1,4 +1,5 @@
 import { ZONE_GROUPS } from "../../gameplay-constants.js";
+import { getEntityAbilityText } from "../action-schema.js";
 import {
   getActorZone,
   getAdjacentZones,
@@ -6,7 +7,8 @@ import {
   getZoneList,
   isCloseZone,
   isRangedZone,
-  sceneHunterTokens
+  localizeZone,
+  sceneHunterTokens,
 } from "../../../canvas/zone.js";
 import { buildMoveOutcomeCardHtml } from "../../../applications/ui/move-card.js";
 import {
@@ -14,14 +16,14 @@ import {
   getBeforeAttackTargetSnapshot,
   getEntityModifyIfResult,
   hasEnabledAfterAttackGroups,
-  resolveEntityAbilityTN
+  resolveEntityAbilityTN,
 } from "../action-rules.js";
 import {
   normalizeAllowedZones,
   pickActionZones,
   resolveRestoreResolve,
   resolveSingleTargets,
-  runEntityAction
+  runEntityAction,
 } from "../action-flow.js";
 import { requestAfterAttackApply } from "../../../documents/entity/attack-effects.js";
 import { applyEntityActionCost } from "../../../documents/entity/entity-threat.js";
@@ -30,13 +32,14 @@ import { runEntityActionPauses } from "../../../helpers/weapon-abilities/dispatc
 import { performEntityAttack } from "./entity-attack.js";
 import { createEntityNoticeCard, createEntityTestRequest } from "../action-cards.js";
 
+/** Run an Entity manoeuvre ability. */
 export async function performEntityManoeuvre(entityActor, manoeuvreItem) {
   entityActor = game.actors?.get(entityActor?.id) || entityActor;
   const pause = await runEntityActionPauses({
     actionType: "manoeuvre",
     stage: "beforeResolve",
     entityActor,
-    actionName: manoeuvreItem?.name || "Manoeuvre"
+    actionName: manoeuvreItem?.name || "Manoeuvre",
   });
   if (pause.cancelled) return;
   const manoeuvre = manoeuvreItem.system || {};
@@ -55,7 +58,7 @@ export async function performEntityManoeuvre(entityActor, manoeuvreItem) {
     targets: [],
     selectedZones: [],
     noTargetsMessage: "No valid targets for this manoeuvre.",
-    scratch: {}
+    scratch: {},
   };
   return runEntityAction(ctx, manoeuvrePipeline);
 }
@@ -81,7 +84,7 @@ const manoeuvrePipeline = {
       hunters,
       select: "multi",
       requireHunters: !allowEmptyZones,
-      warnNoValidZones: "No valid zones with Hunters for this manoeuvre."
+      warnNoValidZones: "No valid zones with Hunters for this manoeuvre.",
     });
     if (actionType === "other") return [];
     return hunters.filter((t) => ctx.selectedZones.includes(getTokenZone(t)));
@@ -103,9 +106,10 @@ const manoeuvrePipeline = {
     await resolveRestoreResolve(ctx.action, ctx.entityActor);
   },
 
-  output: manoeuvreOutput
+  output: manoeuvreOutput,
 };
 
+/** Post the manoeuvre card and roll data. */
 async function manoeuvreOutput(ctx) {
   const { entityActor, actionItem: manoeuvreItem, action: manoeuvre, actionType } = ctx;
   const profile = manoeuvre.profile;
@@ -117,7 +121,7 @@ async function manoeuvreOutput(ctx) {
     await createEntityNoticeCard({
       actor: entityActor,
       titleHtml: safeName,
-      text: String(profile.text || "")
+      text: getEntityAbilityText(manoeuvre),
     });
     const afterAttack = buildEntityAfterAttackConfigs(manoeuvre, "always");
     if (!filteredTargets.length && selectedZones.length && hasEnabledAfterAttackGroups(afterAttack)) {
@@ -145,7 +149,7 @@ async function manoeuvreOutput(ctx) {
       dynamicSource: profile.tnDynamicSource,
       setSource: profile.tnSetSource,
       setDefence: profile.tnSetDefence,
-      setStat: profile.tnSetStat
+      setStat: profile.tnSetStat,
     }, entityActor, targetToken);
     const testName = manoeuvreItem?.name || manoeuvre.name || "Manoeuvre";
     const safeName = foundry.utils.escapeHTML(testName);
@@ -171,18 +175,19 @@ async function manoeuvreOutput(ctx) {
       modifySelfDamage,
       targetZone,
       targetSnapshot: snapshot,
-      allowGM: true
+      allowGM: true,
     });
   }
 }
 
+/** Prompt a hunter shift into an adjacent zone. */
 export async function promptShiftHunterToAdjacentZone(sourceActor, targetActor, reason, currentZoneOverride = "") {
   if (!sourceActor || !targetActor) return false;
   const currentZone = String(currentZoneOverride || getActorZone(targetActor) || "");
   if (!currentZone) return false;
   const candidates = getAdjacentZones(currentZone).filter((zone) => isCloseZone(zone) || isRangedZone(zone));
   if (!candidates.length) return false;
-  const options = candidates.map((zone) => `<option value="${zone}">${zone}</option>`).join("");
+  const options = candidates.map((zone) => `<option value="${zone}">${localizeZone(zone)}</option>`).join("");
   const chosen = await foundry.applications.api.DialogV2.wait({
     window: { title: reason },
     content: `
@@ -195,9 +200,9 @@ export async function promptShiftHunterToAdjacentZone(sourceActor, targetActor, 
       `,
     buttons: [
       { action: "apply", label: "Apply", default: true, callback: (_e, _b, dialog) => String(dialog.element.querySelector("[name=zone]")?.value || "") },
-      { action: "cancel", label: "Cancel", callback: () => null }
+      { action: "cancel", label: "Cancel", callback: () => null },
     ],
-    rejectClose: false
+    rejectClose: false,
   }) ?? "";
   if (!chosen) return false;
   await ChatMessage.create({
@@ -205,18 +210,20 @@ export async function promptShiftHunterToAdjacentZone(sourceActor, targetActor, 
     content: buildMoveOutcomeCardHtml({
       reason: reason || "Shift",
       moveType: "Shift",
-      moves: [{ subjectName: targetActor.name, sourceZone: currentZone, destinationZone: chosen }]
-    })
+      moves: [{ subjectName: targetActor.name, sourceZone: currentZone, destinationZone: chosen }],
+    }),
   });
   return true;
 }
 
+/** Find the next Close zone in a rotation. */
 function getTurnAroundTargetZone(zone, direction = "clockwise") {
-  const clockwise = { "Front": "Flank Right", "Flank Right": "Rear", "Rear": "Flank Left", "Flank Left": "Front" };
-  const counter = { "Front": "Flank Left", "Flank Left": "Rear", "Rear": "Flank Right", "Flank Right": "Front" };
+  const clockwise = { Front: "Flank Right", "Flank Right": "Rear", Rear: "Flank Left", "Flank Left": "Front" };
+  const counter = { Front: "Flank Left", "Flank Left": "Rear", Rear: "Flank Right", "Flank Right": "Front" };
   return (direction === "counter" ? counter : clockwise)[zone] || null;
 }
 
+/** Run Prowl with its zone prompt. */
 export async function performEntityProwl(entityActor, options = {}) {
   if (!entityActor || entityActor.type !== "entity") return false;
   const esc = (value) => foundry.utils.escapeHTML(String(value ?? ""));
@@ -233,7 +240,7 @@ export async function performEntityProwl(entityActor, options = {}) {
     ui.notifications.warn(options.noSourceZonesMessage || `No zones found for ${title}.`);
     return false;
   }
-  const zoneOptions = zones.map((zone) => `<option value="${esc(zone)}">${esc(zone)}</option>`).join("");
+  const zoneOptions = zones.map((zone) => `<option value="${esc(zone)}">${esc(localizeZone(zone))}</option>`).join("");
   const selection = await foundry.applications.api.DialogV2.wait({
     window: { title },
     content: `
@@ -255,9 +262,9 @@ export async function performEntityProwl(entityActor, options = {}) {
         default: true,
         callback: (_e, _b, dialog) => ({
           sourceZone: String(dialog.element.querySelector("[name=sourceZone]")?.value || ""),
-          adjacentZone: String(dialog.element.querySelector("[name=adjacentZone]")?.value || "")
-        })
-      }
+          adjacentZone: String(dialog.element.querySelector("[name=adjacentZone]")?.value || ""),
+        }),
+      },
     ],
     rejectClose: false,
     render: (_e, dialog) => {
@@ -267,11 +274,11 @@ export async function performEntityProwl(entityActor, options = {}) {
       const updateAdjacent = () => {
         const src = String(source?.value || "");
         const opts = getAdjacentZones(src).filter((zone) => !destinationFilter || destinationFilter(zone));
-        adjacent.innerHTML = opts.map((zone) => `<option value="${esc(zone)}">${esc(zone)}</option>`).join("");
+        adjacent.innerHTML = opts.map((zone) => `<option value="${esc(zone)}">${esc(localizeZone(zone))}</option>`).join("");
       };
       source?.addEventListener("change", updateAdjacent);
       updateAdjacent();
-    }
+    },
   }) ?? null;
   if (!selection?.sourceZone || !selection?.adjacentZone) return false;
 
@@ -281,7 +288,7 @@ export async function performEntityProwl(entityActor, options = {}) {
   if (!hunters.length) {
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: entityActor }),
-      content: `<div class="hollows-chat"><strong>${esc(testName)}</strong>: no Hunters in ${esc(selection.sourceZone)}.</div>`
+      content: `<div class="hollows-chat"><strong>${esc(testName)}</strong>: no Hunters in ${esc(selection.sourceZone)}.</div>`,
     });
     return false;
   }
@@ -291,7 +298,7 @@ export async function performEntityProwl(entityActor, options = {}) {
     const paid = await applyEntityActionCost(null, entityActor, [], [selection.sourceZone], {
       amount: cost,
       source: "entityInterrupt",
-      warn: !options.costFailureMessage
+      warn: !options.costFailureMessage,
     });
     if (!paid && options.costFailureMessage) ui.notifications.warn(options.costFailureMessage);
     if (!paid) return false;
@@ -320,26 +327,29 @@ export async function performEntityProwl(entityActor, options = {}) {
         on: "failure",
         sourceZone: selection.sourceZone,
         destinationZone: selection.adjacentZone,
-        subjectName: actor.name
-      }
+        subjectName: actor.name,
+      },
     });
   }
   return true;
 }
 
+/** Open Prowl from the sheet. */
 export async function openEntityProwlDialog(entityActor) {
   return performEntityProwl(entityActor);
 }
 
+/** Shrug Off: restores 3 Resolve. */
 export async function applyEntityShrugOff(entityActor) {
   if (!entityActor || entityActor.type !== "entity") return;
   await adjustEntityResource(entityActor, { resolve: 3 });
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: entityActor }),
-    content: `<div class="hollows-chat"><strong>${entityActor.name}</strong> uses <strong>Shrug Off</strong> and restores <strong>3 Resolve</strong>.</div>`
+    content: `<div class="hollows-chat"><strong>${entityActor.name}</strong> uses <strong>Shrug Off</strong> and restores <strong>3 Resolve</strong>.</div>`,
   });
 }
 
+/** Open Turn Around for Close-zone hunters. */
 export async function openEntityTurnAroundDialog(entityActor) {
   if (!entityActor || entityActor.type !== "entity") return;
   const closeHunters = sceneHunterTokens()
@@ -370,26 +380,26 @@ export async function openEntityTurnAroundDialog(entityActor) {
           if (!closeHunters.length) {
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: entityActor }),
-              content: `<div class="hollows-chat"><strong>Turn Around</strong>: no Hunters in Close.</div>`
+              content: `<div class="hollows-chat"><strong>Turn Around</strong>: no Hunters in Close.</div>`,
             });
             return;
           }
           const moves = closeHunters.map((h) => ({
             subjectName: h.actor.name,
             sourceZone: h.zone,
-            destinationZone: getTurnAroundTargetZone(h.zone, direction) || ""
+            destinationZone: getTurnAroundTargetZone(h.zone, direction) || "",
           }));
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: entityActor }),
             content: buildMoveOutcomeCardHtml({
               moveType: "Move",
               reason: `Turn Around (${direction === "clockwise" ? "Clockwise" : "Counter-Clockwise"})`,
-              moves
-            })
+              moves,
+            }),
           });
-        }
-      }
+        },
+      },
     ],
-    rejectClose: false
+    rejectClose: false,
   });
 }
