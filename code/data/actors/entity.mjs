@@ -29,10 +29,7 @@ export default class EntityData extends foundry.abstract.TypeDataModel {
         placement: new fields.ArrayField(
           new fields.SchemaField({
             scope: new fields.StringField({ initial: "all", choices: Object.keys(THREAT_PLACEMENT_SCOPE_LABELS) }),
-            zones: new fields.ArrayField(
-              new fields.StringField({ initial: "" }),
-              { initial: [] },
-            ),
+            zones: new fields.ArrayField(new fields.StringField({ required: true, blank: false })),
             amount: new fields.NumberField({ initial: 0, min: 0 }),
             perZoneMax: new fields.NumberField({ initial: 0, min: 0 }),
           }),
