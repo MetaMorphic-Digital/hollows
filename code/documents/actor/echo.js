@@ -1,9 +1,4 @@
-import {
-  ECHO_TABLE_NAMES,
-  MALIGNANCY_LIST,
-  getEchoItems,
-  getHunterMalignancy,
-} from "../../data/echo/index.js";
+import { ECHO_TABLE_NAMES, MALIGNANCY_LIST } from "../../data/echo/index.js";
 import { chooseHunterWeapon } from "../../helpers/weapon-utils.js";
 import { getUpgradeRank, getPrimaryRefugeActor } from "../../data/refuge/index.js";
 import { getWeaponAbilityDocs, grantWeaponAbilityToHunter, isDuplicateWeaponAbility } from "./ability-grant.js";
@@ -130,19 +125,17 @@ function echoRollLine(result, corruption, trophyMod) {
 }
 
 function hasEchoDuplicate(actor, data) {
-  const category = String(data?.system?.category || "");
-  const subtype = String(data?.system?.subtype || "");
-  const name = String(data?.name || "");
-  return getEchoItems(actor).some(e => {
-    const eCategory = String(e.system?.category || "");
-    const eSubtype = String(e.system?.subtype || "");
-    if (subtype) return eCategory === category && eSubtype === subtype;
-    return String(e.name || "") === name;
+  const category = data.system.category;
+  const subtype = data.system.subtype;
+  const name = data.name;
+  return actor.items.documentsByType.echo.some(echo => {
+    if (echo.system.subtype) return (echo.system.category === category) && (echo.system.subtype === subtype);
+    return echo.name === name;
   });
 }
 
 async function chooseEchoReplacement(actor, echoType) {
-  const echoes = getEchoItems(actor).filter(e => String(e.system?.echoType || "") === echoType);
+  const echoes = actor.items.documentsByType.echo.filter(echo => echo.system.echoType === echoType);
   if (echoes.length < 2) return null;
   return await pickOne({
     title: "Replace Echo",
@@ -197,7 +190,7 @@ export async function addEchoFromDoc(actor, doc, overrides = {}) {
   }
   const echoType = String(merged.system?.echoType || "");
   if (echoType) {
-    const count = getEchoItems(actor).filter(e => String(e.system?.echoType || "") === echoType).length;
+    const count = actor.items.documentsByType.echo.filter(echo => echo.system.echoType === echoType).length;
     if (count >= 2) {
       const replaceId = await chooseEchoReplacement(actor, echoType);
       if (!replaceId) return null;
@@ -334,7 +327,7 @@ async function rollWeaponEcho(actor, attempt = 0) {
 }
 
 async function rollMalignancyEcho(actor, attempt = 0) {
-  const malignancy = getHunterMalignancy(actor);
+  const malignancy = actor.system.malignancy;
   if (!malignancy) {
     const pick = await pickOne({
       title: "Choose Malignancy",

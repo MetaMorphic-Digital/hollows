@@ -94,7 +94,7 @@ export class EchoDataModel extends foundry.abstract.TypeDataModel {
         wounds: new fields.NumberField({ initial: 1 }),
         groups: effectGroupsField(),
       }),
-      restrictions: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
+      restrictions: new fields.ArrayField(new fields.StringField({ initial: "" })),
       text: new fields.StringField({ initial: "" }),
       gmText: new fields.StringField({ initial: "" }),
     };

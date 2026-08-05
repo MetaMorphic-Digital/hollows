@@ -9,44 +9,36 @@
  *
  * Consumers:
  *   - HollowsHunterSheet#_onAttackEntity (the Attack action button)
- *   - Counterattack reaction (Armour T2 immediate attack)
+ *   - Counterattack reaction (Armour T2 immediate attack).
  *
  * `openAttackDialog(actor, { title })` resolves to `{ dealtWounds }` so
  * callers that branch on the outcome (Counterattack regaining Ready) can.
  */
-import {
-  STAT_LABELS
-} from "../_module.mjs";
+import { STAT_LABELS } from "../_module.mjs";
 import {
   getAttackOptions, renderAttackOptionHtml, prepareAttackOptions,
   applyAttackOptionBeforeRoll, applyAttackOptionDamageBonuses,
-  applyAttackOptionAfterDamage
+  applyAttackOptionAfterDamage,
 } from "./attack-options.js";
 import { getActorZone, isCloseZone } from "../../canvas/zone.js";
 import { addThreatToZone } from "../../canvas/overlays.js";
 import { placeThreatFromHunter } from "../../canvas/threat-ops.js";
 import { getTotalStatForActor } from "../../documents/actor/hunter-combat.js";
 import { getFocusCount, adjustHunterResource, StandardDamage } from "../../documents/actor/resources.js";
-import { hasCondition, addCondition, getEntityTerrainTotal } from "../../documents/actor/conditions.js";
+import { hasCondition, getEntityTerrainTotal } from "../../documents/actor/conditions.js";
 import { adjustEntityTerrain } from "../../canvas/terrain-pool.js";
+import { getEchoDamageBonus } from "../echo/index.js";
 import {
-  getActiveEchoItems, getEchoDamageBonus
-} from "../echo/index.js";
-import {
-  getEffectiveEntityStat, isEntityColossal, entityAllowsTerrainShield
+  getEffectiveEntityStat, isEntityColossal, entityAllowsTerrainShield,
 } from "../../documents/entity/entity-stats.js";
 import { triggerEntityTriggeredAbilities } from "../entity/actions/entity-special.js";
 import { getEntityPassiveSpecialDamageReduction } from "../entity/action-rules.js";
 import { maybeTriggerEntitySuffersWoundEnhancements } from "../../documents/entity/entity-enhancements.js";
 import { resolveEntityKillRewardsFromMessage } from "../../documents/entity/baptism.js";
-import {
-  hasWeaponAbility, isShotgunWeapon,
-  isShotgunLoaded,
-  bindSuggestedRollMode
-} from "../../helpers/weapon-utils.js";
+import { isShotgunWeapon, isShotgunLoaded, bindSuggestedRollMode } from "../../helpers/weapon-utils.js";
 import {
   getStatOverrides, getAttackRollMode, applyAttackDamageChanges,
-  tryActivateStatOverride, evaluateStatOverrideSuccess, runOnAttackResult
+  tryActivateStatOverride, evaluateStatOverrideSuccess, runOnAttackResult,
 } from "../../helpers/weapon-abilities/dispatchers.js";
 import { normalizeRange, normalizeRollModeValue } from "../../dice/roll-helpers.js";
 import { HunterStatRollFlow } from "../../dice/flow.js";
@@ -55,7 +47,7 @@ import { applyEffects } from "../mechanics/dsl/effects.js";
 import {
   getEffectiveWeaponAttackProfiles,
   getEffectiveWeaponCapacity,
-  getEffectiveWeaponDamage
+  getEffectiveWeaponDamage,
 } from "../weapons/index.js";
 
 function getCenteredDialogPosition(width = 420, height = 420) {
@@ -64,7 +56,7 @@ function getCenteredDialogPosition(width = 420, height = 420) {
   return {
     width,
     left: Math.max(16, Math.round((viewportWidth - width) / 2)),
-    top: Math.max(16, Math.round((viewportHeight - height) / 2))
+    top: Math.max(16, Math.round((viewportHeight - height) / 2)),
   };
 }
 
@@ -153,7 +145,7 @@ export async function applyHunterAttackDamage(message) {
   const weaponType = String(weapon?.system?.weaponType || data.weaponType || "");
   const { entity, targetActor, isEntityTarget } = resolveAttackDamageTarget({
     targetType: String(data.targetType || ""),
-    targetId: String(data.targetId || "")
+    targetId: String(data.targetId || ""),
   });
 
   if (!targetActor) {
@@ -173,7 +165,7 @@ export async function applyHunterAttackDamage(message) {
     if (effectiveDamage <= 0 && attacker?.type === "hunter") {
       await triggerEntityTriggeredAbilities(entity, "hunterInflictsNoDamage", {
         targetActor: attacker,
-        targetZone: threatZone
+        targetZone: threatZone,
       }, ["special", "doom"]);
     }
   }
@@ -185,13 +177,13 @@ export async function applyHunterAttackDamage(message) {
       const swap = await foundry.applications.api.DialogV2.confirm({
         window: { title: "Improvised Defences" },
         content: `<p>Destroy a terrain tag on <strong>${entity.name}</strong> instead of inflicting <strong>${effectiveDamage} Wound${effectiveDamage === 1 ? "" : "s"}</strong>?</p>`,
-        rejectClose: false
+        rejectClose: false,
       });
       if (swap) {
         await adjustEntityTerrain(entity, "any", -1, { byHunter: true, hunterId: attacker?.type === "hunter" ? attacker.id : "" });
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: entity }),
-          content: `<div class="hollows-chat"><strong>${entity.name}</strong> destroys a terrain tag instead of taking ${effectiveDamage} Wound${effectiveDamage === 1 ? "" : "s"}.</div>`
+          content: `<div class="hollows-chat"><strong>${entity.name}</strong> destroys a terrain tag instead of taking ${effectiveDamage} Wound${effectiveDamage === 1 ? "" : "s"}.</div>`,
         });
         await message?.setFlag("hollows", "applyDamage", { applied: true });
         return true;
@@ -206,7 +198,7 @@ export async function applyHunterAttackDamage(message) {
   await targetActor.update({ [resourcePath]: next }, {
     hollowsSourceHunterId: attacker?.type === "hunter" ? attacker.id : "",
     hollowsDamageType: damageType,
-    hollowsDamageValue: effectiveDamage
+    hollowsDamageValue: effectiveDamage,
   });
 
   if (damageType === "Resolve") {
@@ -223,7 +215,7 @@ export async function applyHunterAttackDamage(message) {
         previousResolve: current,
         nextResolve: next,
         brokeEntity: current > 0 && next <= 0,
-        attackerZone: threatZone
+        attackerZone: threatZone,
       });
     }
   } else {
@@ -239,11 +231,11 @@ export async function applyHunterAttackDamage(message) {
         weaponType,
         previousWounds: current,
         nextWounds: next,
-        attackerZone: threatZone
+        attackerZone: threatZone,
       });
       await triggerEntityTriggeredAbilities(entity, "hunterInflictsWoundsDamage", {
         targetActor: attacker,
-        targetZone: threatZone
+        targetZone: threatZone,
       }, ["special", "doom"]);
       await maybeTriggerEntitySuffersWoundEnhancements(targetActor);
     }
@@ -252,7 +244,7 @@ export async function applyHunterAttackDamage(message) {
   if (isEntityTarget && damageType === "Resolve" && effectiveDamage > 0) {
     await triggerEntityTriggeredAbilities(entity, "hunterInflictsResolveDamage", {
       targetActor: attacker,
-      targetZone: threatZone
+      targetZone: threatZone,
     }, ["special", "doom"]);
   }
 
@@ -262,7 +254,7 @@ export async function applyHunterAttackDamage(message) {
     if (attacker?.type === "hunter") {
       await placeThreatFromHunter(attacker, threatZone, 1, {
         source: "attack",
-        reason: "Attack"
+        reason: "Attack",
       });
     } else {
       await addThreatToZone(threatZone, 1);
@@ -273,7 +265,7 @@ export async function applyHunterAttackDamage(message) {
         zone: threatZone,
         weapon,
         weaponId: weapon?.id || weaponId,
-        weaponType
+        weaponType,
       });
     }
   }
@@ -281,7 +273,7 @@ export async function applyHunterAttackDamage(message) {
   if (effectiveDamage > 0 && attacker?.type === "hunter") {
     await runOnAttackResult(attacker, "hit", {
       timing: "afterDamage",
-      zone: getActorZone(attacker)
+      zone: getActorZone(attacker),
     });
   }
 
@@ -484,14 +476,14 @@ export async function openAttackDialog(actor, options = {}) {
           const abilityRollMode = getAttackRollMode(actor, { weapon, zone });
           return [abilityRollMode === "dis", String(weapon?.system?.weaponType || "") === "Rifle" && isCloseZone];
         },
-        watch: ["weaponId", "profileIndex", "useFocus"]
+        watch: ["weaponId", "profileIndex", "useFocus"],
       });
       refreshProfiles();
       prepareAttackOptions(attackOptions, el, {
         actor,
         zone,
         focusCount: getFocusCount(actor),
-        updateSuggestedMode
+        updateSuggestedMode,
       });
       updateSuggestedMode();
     },
@@ -524,7 +516,7 @@ export async function openAttackDialog(actor, options = {}) {
           const selectedMode = dialog.element.querySelector("[name=mode]")?.value || "normal";
           const useFocus = !!dialog.element.querySelector("[name=useFocus]")?.checked;
           const requestedAttackOverrides = attackOverrides.filter(
-            (o) => !!dialog.element.querySelector(`[name="statOverride:${o.key}"]`)?.checked
+            (o) => !!dialog.element.querySelector(`[name="statOverride:${o.key}"]`)?.checked,
           );
           const focusCount = getFocusCount(actor);
           let useFocusAdv = useFocus && focusCount > 0;
@@ -585,7 +577,7 @@ export async function openAttackDialog(actor, options = {}) {
             statBonus: 0,
             damageResolve: 0,
             damageWounds: 0,
-            cardLines: []
+            cardLines: [],
           };
           await applyAttackOptionBeforeRoll(attackOptions, dialog.element, actor, attackState, {
             zone,
@@ -593,7 +585,7 @@ export async function openAttackDialog(actor, options = {}) {
             profile,
             targetActor,
             targetType,
-            statKey
+            statKey,
           });
           if (attackState.cancelled) return;
           const statValue = getTotalStatForActor(actor, statKey)
@@ -604,10 +596,10 @@ export async function openAttackDialog(actor, options = {}) {
             title: `${weapon?.name || windowTitle} Attack`,
             statLabel: STAT_LABELS[statKey] || statKey,
             statValue,
-            tn
+            tn,
           }).roll({
             mode: attackState.rollMode ? normalizeRollModeValue(attackState.rollMode) : mode,
-            useFocus: false
+            useFocus: false,
           });
           const r = chosen.value;
           const outcome = chosen.outcome;
@@ -629,7 +621,7 @@ export async function openAttackDialog(actor, options = {}) {
               attackerZone: zone,
               weapon,
               weaponType: weapon?.system?.weaponType || "",
-              suppressItemBonuses
+              suppressItemBonuses,
             });
             damageResolve = changed.resolve;
             damageWounds = changed.wounds;
@@ -653,7 +645,7 @@ export async function openAttackDialog(actor, options = {}) {
             weapon,
             profile,
             targetActor,
-            targetType
+            targetType,
           });
           useFocusAdv = attackState.useFocusAdv;
           damageResolve = attackState.damageResolve;
@@ -682,8 +674,8 @@ export async function openAttackDialog(actor, options = {}) {
             {
               mode: "attack",
               outcomeLabel,
-              targetResolve: StandardDamage.targetResolve(targetActor)
-            }
+              targetResolve: StandardDamage.targetResolve(targetActor),
+            },
           );
           damageType = resolvedDamage.damageType;
           damageValue = resolvedDamage.damageValue;
@@ -702,7 +694,7 @@ export async function openAttackDialog(actor, options = {}) {
             weapon,
             profile,
             targetActor,
-            targetType
+            targetType,
           });
 
           for (const override of activeAttackOverrides) {
@@ -722,13 +714,12 @@ export async function openAttackDialog(actor, options = {}) {
               targetType,
               targetActor,
               attackerZone: zone,
-              useFocusAdv
+              useFocusAdv,
             });
             if (resultChanges?.damageType) damageType = resultChanges.damageType;
             if (resultChanges?.damageValue != null) damageValue = Number(resultChanges.damageValue || 0);
             if (Array.isArray(resultChanges?.cardLines)) attackState.cardLines.push(...resultChanges.cardLines);
           }
-
 
           const dealtDamage = !!damageType && Number(damageValue) > 0;
           const entityDamage = damageType ? {
@@ -738,12 +729,12 @@ export async function openAttackDialog(actor, options = {}) {
             weaponType: String(weapon?.system?.weaponType || ""),
             weaponId: String(weapon?.id || ""),
             targetType,
-            targetId: String(targetActor.id || "")
+            targetId: String(targetActor.id || ""),
           } : null;
 
           const outcomeClass = outcomeClassFromLabel(outcomeLabel);
-          const echoItems = getActiveEchoItems(actor).filter((e) => {
-            const b = e.system?.damageBonus || {};
+          const echoItems = actor.activeEchoes.filter((e) => {
+            const b = e.system.damageBonus || {};
             return Number(b.resolve ?? 0) || Number(b.wounds ?? 0);
           });
           const attackTitle = weapon?.name ? `${weapon.name} Attack` : windowTitle;
@@ -752,18 +743,18 @@ export async function openAttackDialog(actor, options = {}) {
               <h3>${foundry.utils.escapeHTML(attackTitle)}</h3>
               <div><strong>Profile:</strong> ${profile.range} / ${profile.stat} vs ${profile.defence}</div>
               <div><strong>Roll:</strong> ${r} vs ${statValue} (TN ${tn})</div>
-              ${useFocusAdv ? `<div><strong>Focus:</strong> Spent for Advantage.</div>` : ""}
+              ${useFocusAdv ? "<div><strong>Focus:</strong> Spent for Advantage.</div>" : ""}
               ${attackState.cardLines.join("")}
               ${activeAttackOverrides.map((o) => `<div><strong>${foundry.utils.escapeHTML(o.name)}:</strong> Attack used ${(STAT_LABELS[o.newStat] || o.newStat)}.</div>`).join("")}
-              ${!useFocusAdv && selectedMode === "normal" && mode === "adv" ? `<div><strong>Elevated:</strong> Advantage applied automatically.</div>` : ""}
+              ${!useFocusAdv && selectedMode === "normal" && mode === "adv" ? "<div><strong>Elevated:</strong> Advantage applied automatically.</div>" : ""}
               ${mode === "normal" ? "" : `<div><strong>Rolls:</strong> ${results.join(", ")} (${mode})</div>`}
               ${(echoBonus.resolve || echoBonus.wounds)
                 ? `<div><strong>Echo Bonus:</strong> +${echoBonus.resolve}/+${echoBonus.wounds} (${echoBonus.sources.map((s) => foundry.utils.escapeHTML(s)).join(", ")})</div>`
-                : (echoItems.length ? `<div><strong>Echo Bonus:</strong> none (no weapon match)</div>` : "")}
+                : (echoItems.length ? "<div><strong>Echo Bonus:</strong> none (no weapon match)</div>" : "")}
               <div><strong>Outcome:</strong> ${outcomeLabel}</div>
               ${damageType ? `<div><strong>Damage:</strong> ${damageValue} ${damageType}</div>` : ""}
               ${dealtDamage && originZone && targetType === "entity" ? `<div><strong>Threat:</strong> +1 in ${originZone} on Apply Damage</div>` : ""}
-              ${damageType ? `<button type="button" class="hollows-apply-damage">Apply Damage</button>` : ""}
+              ${damageType ? "<button type=\"button\" class=\"hollows-apply-damage\">Apply Damage</button>" : ""}
             </div>
           `;
 
@@ -773,23 +764,23 @@ export async function openAttackDialog(actor, options = {}) {
             content: cardContent,
             flags: {
               hollows: {
-                entityDamage
-              }
-            }
+                entityDamage,
+              },
+            },
           });
           if (!dealtDamage && !rollOnly && targetType === "entity" && entity) {
             await triggerEntityTriggeredAbilities(entity, "hunterInflictsNoDamage", {
               targetActor: actor,
-              targetZone: zone || ""
+              targetZone: zone || "",
             }, ["special", "doom"]);
           }
           result.dealtWounds = damageType === "Wounds" && Number(damageValue) > 0;
           result.rolled = true;
           result.hit = !isMiss;
-        }
-      }
+        },
+      },
     ],
-    rejectClose: false
+    rejectClose: false,
   });
 
   return result;

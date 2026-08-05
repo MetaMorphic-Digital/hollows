@@ -1,5 +1,4 @@
 import { OnDeath } from "../mechanics/OnDeath.js";
-import { getActiveEchoItems } from "./resolvers.js";
 import { addCondition, removeCondition } from "../../documents/actor/conditions.js";
 import { applyEffectGroupGM } from "../relic/apply-effect.js";
 
@@ -9,8 +8,13 @@ const echoChat = (actor, body) =>
     content: `<div class="hollows-chat">${body}</div>`,
   });
 
+/**
+ * Find a dying replacement echo.
+ * @param {HollowsActor} actor
+ * @returns {HollowsItem|null}
+ */
 function getDyingReplacementEcho(actor) {
-  return getActiveEchoItems(actor).find((e) => e.system?.replaceDyingState?.enabled) || null;
+  return actor.activeEchoes.find(echo => echo.system.replaceDyingState.enabled);
 }
 
 async function markReplacementUsed(actor, echoItem, cfg) {
