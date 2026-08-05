@@ -144,8 +144,8 @@ async function openEntityThreatPlacementDialog(combat, entityActor) {
   const content = await foundry.applications.handlebars.renderTemplate(THREAT_PLACEMENT_TEMPLATE, {
     zones,
     rules: rules.map((rule) => (rule.perZoneMax
-      ? game.i18n.format("HOLLOWS.THREAT.ruleSummaryPerZone", { rule: ruleLabel(rule), max: rule.amount, perZone: rule.perZoneMax })
-      : game.i18n.format("HOLLOWS.THREAT.ruleSummary", { rule: ruleLabel(rule), max: rule.amount }))),
+      ? _loc("HOLLOWS.THREAT.ruleSummaryPerZone", { rule: ruleLabel(rule), max: rule.amount, perZone: rule.perZoneMax })
+      : _loc("HOLLOWS.THREAT.ruleSummary", { rule: ruleLabel(rule), max: rule.amount }))),
   });
 
   await foundry.applications.api.DialogV2.wait({
