@@ -36,7 +36,15 @@ Hooks.once("init", () => {
  * Register document classes.
  */
 function registerDocumentClasses() {
+  CONFIG.ActiveEffect.documentClass = documents.HollowsActiveEffect;
+  CONFIG.Actor.documentClass = documents.HollowsActor;
+  CONFIG.ChatMessage.documentClass = documents.HollowsChatMessage;
   CONFIG.Combat.documentClass = documents.HollowsCombat;
+  CONFIG.Combatant.documentClass = documents.HollowsCombatant;
+  CONFIG.Item.documentClass = documents.HollowsItem;
+  CONFIG.Region.documentClass = documents.HollowsRegionDocument;
+  CONFIG.Scene.documentClass = documents.HollowsScene;
+  CONFIG.Token.documentClass = documents.HollowsTokenDocument;
 }
 
 /* -------------------------------------------------- */

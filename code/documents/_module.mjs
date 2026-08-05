@@ -1,1 +1,9 @@
+export { default as HollowsActiveEffect } from "./active-effect.mjs";
+export { default as HollowsActor } from "./actor.mjs";
+export { default as HollowsChatMessage } from "./chat-message.mjs";
 export { default as HollowsCombat } from "./combat.mjs";
+export { default as HollowsCombatant } from "./combatant.mjs";
+export { default as HollowsItem } from "./item.mjs";
+export { default as HollowsRegionDocument } from "./region.mjs";
+export { default as HollowsScene } from "./scene.mjs";
+export { default as HollowsTokenDocument } from "./token.mjs";
