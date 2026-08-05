@@ -1,4 +1,5 @@
 import { getSelectedWeaponForm } from "../weapons/resolvers.js";
+import { scriptField } from "./script-schema.js";
 
 export default class WeaponData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
@@ -40,6 +41,13 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
       }),
       modifierChoice: new fields.StringField({ initial: "" }),
       modifierChoices: new fields.ArrayField(modifierChoiceSchema, { initial: [] }),
+      // Additive on top of the weapon's normal stats and abilities;
+      renown: new fields.SchemaField({
+        enabled: new fields.BooleanField({ initial: false }),
+        name: new fields.StringField({ initial: "" }),
+        text: new fields.StringField({ initial: "" }),
+        script: scriptField(),
+      }),
       loaded: new fields.BooleanField({ initial: true }),
       coreAbility: new fields.StringField({ initial: "" }),
       outlook: new fields.StringField({ initial: "" }),
