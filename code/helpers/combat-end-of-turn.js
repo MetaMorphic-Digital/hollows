@@ -90,7 +90,7 @@ function placementViolation(rules, increments) {
 /** Display label for a placement rule. */
 function ruleLabel(rule) {
   if (rule.scope === "select") return rule.zones.map(localizeZone).join(" / ");
-  return game.i18n.localize(THREAT_PLACEMENT_SCOPE_LABELS[rule.scope]);
+  return _loc(THREAT_PLACEMENT_SCOPE_LABELS[rule.scope]);
 }
 
 /** Localized message for a placement violation. */
