@@ -12,7 +12,8 @@ import {
 import { processEndOfTurn, processStartOfTurn } from "../helpers/combat-lifecycle.js";
 import { getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from "../helpers/combat-runtime.js";
 import { getTerrainTagKeys, hasCondition, removeCondition } from "./actor/conditions.js";
-import { initializeHunterCoreStatesForCombat, resetHunterCombatFlags } from "./actor/hunter-combat.js";
+import { initializeHunterCoreStatesForCombat } from "./actor/hunter-combat.js";
+import { getFocusCount, setFocusCount } from "./actor/resources.js";
 
 /**
  * System implementation of the Combat class.
@@ -30,12 +31,12 @@ export default class HollowsCombat extends foundry.documents.Combat {
   /** @inheritdoc */
   async startCombat() {
     // Before super, so this still runs against the pre-start round and turn.
-    if (game.user.isGM) {
+    if (game.user.isActiveGM) {
       const hollow = getActiveHollowActor();
       if (hollow) await hollow.unsetFlag("hollows", "explorationTNMod");
       this.lastCombatantId = this.combatant?.id || null;
       await triggerEntityTriggeredAbilities(getActiveEntityActor(), "battleStart", {}, ["special", "doom"]);
-      await resetHunterCombatFlags();
+      await this.#resetHunterCombatFlags();
     }
     return super.startCombat();
   }
@@ -94,8 +95,46 @@ export default class HollowsCombat extends foundry.documents.Combat {
       }
     }
 
-    await resetHunterCombatFlags();
+    await this.#resetHunterCombatFlags();
     await clearAllCurseTrackers(this);
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Reset combat state on every hunter that participate(s/d) in this combat.
+   * @returns {Promise<void>}
+   */
+  async #resetHunterCombatFlags() {
+    const operations = [];
+
+    /** Hunter flags cleared when a combat ends. */
+    const COMBAT_RESET_FLAGS = {
+      wardGranted: _del,
+      wardSuppressed: _del,
+      dead: _del,
+      echoReplaceDyingUsed: _del,
+      dyingRevivedOnce: false,
+    };
+
+    const hunters = new Set(this.combatants.map(c => c.actor).filter(a => a?.type === "hunter"));
+    for (const actor of hunters) {
+      for (const tag of getTerrainTagKeys()) {
+        if (hasCondition(actor, tag)) await removeCondition(actor, tag, { skipPoolRefund: true });
+      }
+      if (hasCondition(actor, "dying")) await removeCondition(actor, "dying");
+      if (hasCondition(actor, "dead")) await removeCondition(actor, "dead");
+      if (getFocusCount(actor) > 0) await setFocusCount(actor, 0);
+
+      operations.push({
+        action: "update",
+        documentName: "Actor",
+        parent: actor.parent,
+        updates: [{ _id: actor.id, flags: { [hollows.id]: { ...COMBAT_RESET_FLAGS } } }],
+      });
+    }
+
+    await foundry.documents.modifyBatch(operations);
   }
 
   /* -------------------------------------------------- */
@@ -112,11 +151,15 @@ export default class HollowsCombat extends foundry.documents.Combat {
     window.setTimeout(() => ensureFirstPickDialog(this), 0);
   }
 
+  /* -------------------------------------------------- */
+
   /** Seed hunter state once the combat is under way. */
   async #onInitializeUpdate() {
     if (!this.started && ((this.round ?? 0) <= 0)) return;
     await initializeHunterCoreStatesForCombat(this);
   }
+
+  /* -------------------------------------------------- */
 
   /** Bracket turn machine: the transition is derived from the previous combatant, not the turn index. */
   async #onTurnChange(changed, options) {
@@ -215,6 +258,8 @@ export default class HollowsCombat extends foundry.documents.Combat {
       }
     }
   }
+
+  /* -------------------------------------------------- */
 
   /** Advance to the next round and clear per-round hunter state. */
   async #beginNewRound() {
