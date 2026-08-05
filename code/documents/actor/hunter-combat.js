@@ -1,5 +1,5 @@
 import { getActorZone } from "../../canvas/zone.js";
-import { hasCondition, addCondition, removeCondition, getSpecialConditionStatDelta } from "../actor/conditions.js";
+import { addCondition, removeCondition, getSpecialConditionStatDelta } from "../actor/conditions.js";
 import { adjustHunterResource, getFocusCount, setFocusCount } from "./resources.js";
 import { getEchoStatMods } from "../../data/echo/index.js";
 import { getWeaponStatModsForActor } from "../../data/actor-models.js";
@@ -59,7 +59,7 @@ export async function initializeHunterCoreStatesForCombat(combat) {
   for (const hunter of hunters) {
     if (hasWeaponEquipped(hunter, "Armour")) {
       await addCondition(hunter, "ready");
-    } else if (hasCondition(hunter, "ready")) {
+    } else if (hunter.statuses.has("ready")) {
       await removeCondition(hunter, "ready");
     }
     await setShotgunsLoaded(hunter, true);
@@ -77,7 +77,7 @@ export async function applySupportStartOfTurn(actor) {
   if (zone !== "Support") return;
   await adjustHunterResource(actor, { resolve: 2 });
   await restoreWeaponsCapacity(actor);
-  if (hasWeaponEquipped(actor, "Armour") && !hasCondition(actor, "ready")) {
+  if (hasWeaponEquipped(actor, "Armour") && !actor.statuses.has("ready")) {
     await addCondition(actor, "ready");
   }
   if (getShotgunWeapons(actor).length) {

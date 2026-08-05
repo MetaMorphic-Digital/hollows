@@ -3,7 +3,6 @@ import { IncomingDamageModifier } from "../../mechanics/IncomingDamageModifier.j
 import { getActorZone, getHuntersInZone } from "../../../canvas/zone.js";
 import { adjustHunterResource } from "../../../documents/actor/resources.js";
 import { runGMQuery } from "../../../helpers/queries.js";
-import { hasCondition } from "../../../documents/actor/conditions.js";
 import { hasWeaponAbility } from "../../../helpers/weapon-utils.js";
 
 export const WARD = new ActivatedAbility({
@@ -12,11 +11,30 @@ export const WARD = new ActivatedAbility({
   name: "Ward Ally",
   run: async (actor, ctx) => {
     const zone = getActorZone(actor);
-    if (!zone) { ui.notifications.warn("You must be in a zone to use Ward."); ctx._cancelled = true; return; }
-    if (!hasCondition(actor, "sheltered")) { ui.notifications.warn("Ward requires Sheltered."); ctx._cancelled = true; return; }
-    if (Number(actor.system.health.wounds.value ?? 0) <= 0) { ui.notifications.warn("Not enough Wounds to use Ward."); ctx._cancelled = true; return; }
+    if (!zone) {
+      ui.notifications.warn("You must be in a zone to use Ward.");
+      ctx._cancelled = true;
+      return;
+    }
+
+    if (!actor.statuses.has("sheltered")) {
+      ui.notifications.warn("Ward requires Sheltered.");
+      ctx._cancelled = true;
+      return;
+    }
+
+    if (Number(actor.system.health.wounds.value ?? 0) <= 0) {
+      ui.notifications.warn("Not enough Wounds to use Ward.");
+      ctx._cancelled = true;
+      return;
+    }
+
     const candidates = getHuntersInZone(zone).filter((a) => a.id !== actor.id);
-    if (!candidates.length) { ui.notifications.warn("No allies in your area for Ward."); ctx._cancelled = true; return; }
+    if (!candidates.length) {
+      ui.notifications.warn("No allies in your area for Ward.");
+      ctx._cancelled = true;
+      return;
+    }
 
     const esc = (v) => foundry.utils.escapeHTML(String(v ?? ""));
     const options = candidates.map((a) => `<option value="${a.id}">${esc(a.name)}</option>`).join("");
@@ -26,8 +44,8 @@ export const WARD = new ActivatedAbility({
       rejectClose: false,
       buttons: [
         { action: "apply", label: "Apply", default: true, callback: (_e, _b, d) => String(d.element.querySelector("[name=targetId]")?.value || "") },
-        { action: "cancel", label: "Cancel", callback: () => "" }
-      ]
+        { action: "cancel", label: "Cancel", callback: () => "" },
+      ],
     }) ?? "";
     if (!targetId) { ctx._cancelled = true; return; }
 
@@ -43,9 +61,9 @@ export const WARD = new ActivatedAbility({
     }
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
-      content: `<div class="hollows-chat"><strong>${esc(actor.name)}</strong> wards <strong>${esc(target.name)}</strong> (Ward).</div>`
+      content: `<div class="hollows-chat"><strong>${esc(actor.name)}</strong> wards <strong>${esc(target.name)}</strong> (Ward).</div>`,
     });
-  }
+  },
 });
 
 export const WARD_DAMAGE_REDUCTION = new IncomingDamageModifier({
@@ -56,19 +74,19 @@ export const WARD_DAMAGE_REDUCTION = new IncomingDamageModifier({
   damageSource: "entity",
   timing: "postMitigation",
   apply: ({ target, damageValue, shelteredApplied }) => {
-    const selfWard = hasCondition(target, "sheltered")
+    const selfWard = target.statuses.has("sheltered")
       && !target.getFlag("hollows", "wardSuppressed")
       && hasWeaponAbility(target, {
         key: "book.t1.ward",
         name: "Ward",
         weaponType: "Book",
-        tier: 1
+        tier: 1,
       });
     const grantedWard = !!target.getFlag("hollows", "wardGranted");
     if (!selfWard && !grantedWard) return null;
     return {
       damageValue: Math.max(0, Number(damageValue || 0) - (shelteredApplied ? 1 : 2)),
-      note: "Ward: -2"
+      note: "Ward: -2",
     };
-  }
+  },
 });

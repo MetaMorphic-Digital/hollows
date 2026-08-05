@@ -5,20 +5,20 @@ import {
   getHunterTokensInZone,
   getTokenZone,
   getZoneList,
-  sceneHunterTokens
+  sceneHunterTokens,
 } from "../../../canvas/zone.js";
 import { promptForZoneSelection } from "../../../applications/apps/selection-dialogs.mjs";
 import { chooseOneTarget } from "../../../applications/apps/selection-dialogs.mjs";
 import {
   createDefaultEntityAttack,
   createDefaultEntityInterrupt,
-  createEntityActionProfile
+  createEntityActionProfile,
 } from "../action-schema.js";
 import { buildEntityAfterAttackConfigs } from "../action-rules.js";
 import { getEntityEngineAbilities } from "../resolvers.js";
 import { isEntityEngineAbilityActive } from "../../../documents/entity/entity-stats.js";
 import { requestAfterAttackApply } from "../../../documents/entity/attack-effects.js";
-import { hasCondition, removeCondition } from "../../../documents/actor/conditions.js";
+import { removeCondition } from "../../../documents/actor/conditions.js";
 import { adjustEntityResource } from "../../../documents/actor/resources.js";
 import { getCombatTurnKey, isSameCombatRound } from "../../../helpers/combat-runtime.js";
 import { performEntityAttack } from "./entity-attack.js";
@@ -97,7 +97,7 @@ function buildSpecialTriggeredCustomAbility(source) {
   const profile = createEntityActionProfile({
     ...base.profile,
     ...(trigger.profile || {}),
-    actionType: "attack"
+    actionType: "attack",
   });
   return {
     id: "",
@@ -105,8 +105,8 @@ function buildSpecialTriggeredCustomAbility(source) {
     system: {
       ...base,
       profile,
-      kind: kind === "interrupt" ? "interrupt" : "attack"
-    }
+      kind: kind === "interrupt" ? "interrupt" : "attack",
+    },
   };
 }
 
@@ -174,7 +174,7 @@ export async function maybeTriggerEntityCurseThresholdAbilities(subjectActor) {
     if (!wasTriggered && nowTriggered) {
       await applyEntityTriggeredAbilityEffects(ability, entity, {
         targetActor: isHunter ? subjectActor : null,
-        targetZone: isHunter ? getActorZone(subjectActor) : ""
+        targetZone: isHunter ? getActorZone(subjectActor) : "",
       });
     }
     if (wasTriggered !== nowTriggered) { state[key] = nowTriggered; changed = true; }
@@ -183,8 +183,8 @@ export async function maybeTriggerEntityCurseThresholdAbilities(subjectActor) {
 }
 
 async function applyEntityBleedingDamageAndCoin(entity) {
-  if (!entity || entity.type !== "entity") return;
-  if (!hasCondition(entity, "bleeding")) return;
+  if (entity?.type !== "entity") return;
+  if (!entity.statuses.has("bleeding")) return;
   const resolveValue = Number(entity.system?.health?.resolve?.value ?? 0);
   const broken = resolveValue <= 0;
   let damageType = "Resolve", damageAmount = 2;
@@ -209,14 +209,14 @@ async function applyEntityBleedingDamageAndCoin(entity) {
         <div>Bleeding coin: <strong>${coinLabel}</strong> (${coinValue}) - ${outcomeText}.</div>
       </div>
     `,
-    rolls: [coin]
+    rolls: [coin],
   });
 }
 
 export async function applyEntityBleedingStartOfTurn(entity) {
-  if (!entity || entity.type !== "entity") return;
-  if (!hasCondition(entity, "bleeding")) return;
-  if (!game.user?.isGM) return;
+  if (entity?.type !== "entity") return;
+  if (!entity.statuses.has("bleeding")) return;
+  if (!game.user.isGM) return;
   const turnKey = getCombatTurnKey(game.combat);
   const pending = entity.getFlag("hollows", "bleedingStartChecked");
   if (turnKey && pending && isSameCombatRound(pending, turnKey)) return;

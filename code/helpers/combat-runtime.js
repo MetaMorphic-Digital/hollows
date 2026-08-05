@@ -1,4 +1,3 @@
-import { hasCondition } from "../documents/actor/conditions.js";
 import { getTotalStatForActor } from "../documents/actor/hunter-combat.js";
 
 export function getCombatTurnKey(combat) {
@@ -124,11 +123,11 @@ export function getCombatantBracket(combatant) {
 export function getCombatantsInBracket(combat, bracket) {
   if (!combat || !bracket) return [];
   return combat.combatants.filter((combatant) => {
-    if (!combatant || getCombatantBracket(combatant) !== bracket) return false;
+    if (!combatant || (getCombatantBracket(combatant) !== bracket)) return false;
     const actor = combatant.actor || null;
-    if (!actor || actor.type !== "hunter") return false;
+    if (!actor || (actor.type !== "hunter")) return false;
     if (combatant.defeated) return false;
-    if (hasCondition(actor, "dead")) return false;
+    if (actor.statuses.has("dead")) return false;
     return true;
   });
 }

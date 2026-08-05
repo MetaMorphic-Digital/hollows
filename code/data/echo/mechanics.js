@@ -66,7 +66,6 @@ async function applyEchoDyingReplacement(actor, echoItem) {
 
     await removeCondition(actor, "dying");
     await addCondition(actor, "dead");
-    await actor.setFlag("hollows", "dead", true);
     await echoChat(actor, `<strong>${foundry.utils.escapeHTML(actor.name)}</strong> has died (${foundry.utils.escapeHTML(echoItem.name)}).`);
     if (echoItem.system.state.has("onePerHollow")) {
       const state = new Set(echoItem.system.state);

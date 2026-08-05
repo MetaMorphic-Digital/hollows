@@ -1,7 +1,6 @@
 import { addThreatToZone } from "../canvas/overlays.js";
 import { getEffectiveEntityStat } from "../documents/entity/entity-stats.js";
 import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
-import { hasCondition } from "../documents/actor/conditions.js";
 import { openInterruptPromptForHunterEnd } from "../data/entity/actions/entity-interrupt.js";
 import { runEndOfTurnAbilities, runOnTurnEnd } from "./weapon-abilities/dispatchers.js";
 import { THREAT_PLACEMENT_SCOPE_LABELS } from "../data/gameplay-constants.js";
@@ -31,7 +30,7 @@ export async function runEndOfTurnEffects(combat, prevCombatant) {
     await openEntityThreatPlacementDialog(combat, actor);
     return;
   }
-  if (actor?.type !== "hunter" || hasCondition(actor, "dead")) return;
+  if ((actor?.type !== "hunter") || actor.statuses.has("dead")) return;
 
   await runEndOfTurnAbilities(actor);
   await runOnTurnEnd(actor);

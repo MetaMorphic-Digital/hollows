@@ -1,7 +1,4 @@
 import { STAT_LABELS } from "../../../data/_module.mjs";
-
-const { HandlebarsApplicationMixin } = foundry.applications.api;
-const { ActorSheetV2 } = foundry.applications.sheets;
 import { getActorZone } from "../../../canvas/zone.js";
 import { getTotalStatForActor } from "../../../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, getFocusLimit } from "../../../documents/actor/resources.js";
@@ -15,7 +12,7 @@ import { openHealForActor } from "../../../data/actions/heal.js";
 import { getManoeuvreAvailability } from "../../../data/actions/index.js";
 import { getWeaponStatModsForActor } from "../../../data/actor-models.js";
 import { cleanupWeaponAbilitiesForActor, hasWeaponEquipped, isShotgunWeapon } from "../../../helpers/weapon-utils.js";
-import { addCondition, hasCondition, removeCondition, setConditionSafe } from "../../../documents/actor/conditions.js";
+import { addCondition, removeCondition } from "../../../documents/actor/conditions.js";
 import { getActiveCurseConfig } from "../../../canvas/overlays.js";
 import { deleteHunterEquipmentSlot, getHunterEquipmentItemForSlot } from "../../../documents/actor/hunter-equipment.js";
 import { activeRelicEffect } from "../../../documents/item/relic-cypher.js";
@@ -40,6 +37,9 @@ import {
   getWeaponPackDocs,
 } from "../../../data/weapons/index.js";
 import { getWeaponAbilityDocs } from "../../../documents/actor/ability-grant.js";
+
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { ActorSheetV2 } = foundry.applications.sheets;
 
 export default class HollowsHunterSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   /** @inheritdoc */
@@ -179,12 +179,12 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     data.activatedManoeuvres = getActivatedAbilities(this.actor)
       .filter((a) => a.cost?.condition !== "ready")
       .map((a) => ({ key: a.key, name: a.getLabel ? a.getLabel(this.actor) : (a.buttonLabel || a.name) }));
-    data.focusActive = hasCondition(this.actor, "focus");
+    data.focusActive = this.actor.statuses.has("focus");
     data.canFocus = getManoeuvreAvailability(this.actor, "focus", { source: "turn", silent: true }).available;
     data.canGuard = getManoeuvreAvailability(this.actor, "guard", { source: "turn", silent: true }).available;
     data.canUse = hasActiveUseOptions();
-    data.isDying = hasCondition(this.actor, "dying");
-    data.isDead = hasCondition(this.actor, "dead") || !!this.actor.getFlag("hollows", "dead");
+    data.isDying = this.actor.statuses.has("dying");
+    data.isDead = this.actor.statuses.has("dead");
     data.isNewHunter = isNewHunterActor(this.actor);
     data.currentZone = getActorZone(this.actor);
     data.isInSupport = data.currentZone === "Support";
@@ -533,11 +533,10 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   /** Trigger an Echo. */
   async _onTriggerEcho(event) {
     event.preventDefault();
-    if (!game.user?.isGM) return;
-    const echoId = String(event.currentTarget.dataset.echoId || "");
-    if (!echoId) return;
-    const echo = this.actor.items.get(echoId);
-    if (!echo || echo.type !== "echo") return;
+    if (!game.user.isGM) return;
+
+    const echo = this.actor.items.get(event.currentTarget.dataset.echoId);
+    if (!echo) return;
     await applySeedEchoEffect(this.actor, echo, { countAsGain: false });
   }
 
@@ -558,21 +557,17 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   async _onClingToLife(event) {
     event.preventDefault();
     const actor = this.actor;
-    if (!actor || actor.type !== "hunter") return;
-    if (hasCondition(actor, "dead")) return;
-    if (!hasCondition(actor, "dying")) return;
-    const statLabel = STAT_LABELS.hard || "Hard";
+    if (actor.statuses.has("dead") || !actor.statuses.has("dying")) return;
     const statValue = this._getTotalStat("hard");
-    const roll = await (new Roll("1d20")).evaluate();
+    const roll = await new foundry.dice.Roll("1d20").evaluate();
     const rolled = Number(roll.terms?.[0]?.results?.[0]?.result ?? 20);
     const outcome = evaluateResult(rolled, statValue, null);
-    const success = outcome.label === "Success" || outcome.label === "Superior Success" || outcome.label === "Critical Success";
+    const success = ["Success", "Superior Success", "Critical Success"].includes(outcome.label);
     const critical = outcome.label === "Critical Success";
 
     if (!success) {
       await removeCondition(actor, "dying");
       await addCondition(actor, "dead");
-      await actor.setFlag("hollows", "dead", true);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
         content: `<div class="hollows-chat"><strong>${actor.name}</strong> fails to cling to life and dies.</div>`,

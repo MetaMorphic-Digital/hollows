@@ -1,7 +1,7 @@
 import { WEAPON_TYPE_ORDER } from "../data/_module.mjs";
 import { resolveSuggestedRollMode } from "../dice/_module.mjs";
 import { getEffectiveWeaponCapacity } from "../data/weapons/index.js";
-import { hasCondition, addCondition, removeCondition } from "../documents/actor/conditions.js";
+import { addCondition, removeCondition } from "../documents/actor/conditions.js";
 
 /**
  * Weapon type checks, has-equipped helpers, weapon getters, and weapon ability lookups.
@@ -264,12 +264,12 @@ export async function syncHunterLoadedStatusFromShotguns(actor) {
   try {
     const shotguns = getShotgunWeapons(actor);
     if (!shotguns.length) {
-      if (hasCondition(actor, "loaded")) await removeCondition(actor, "loaded");
+      if (actor.statuses.has("loaded")) await removeCondition(actor, "loaded");
       return;
     }
     const anyLoaded = shotguns.some((w) => isShotgunLoaded(w));
     if (anyLoaded) await addCondition(actor, "loaded");
-    else if (hasCondition(actor, "loaded")) await removeCondition(actor, "loaded");
+    else if (actor.statuses.has("loaded")) await removeCondition(actor, "loaded");
   } finally {
     HOLLOWS_SHOTGUN_SYNC_LOCKS.delete(actor.id);
   }

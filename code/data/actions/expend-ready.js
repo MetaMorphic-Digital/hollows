@@ -8,17 +8,28 @@
  * which in turn fires the conditionRemoved event — so Barbed and other
  * Ready-discharge reactions trigger uniformly here too.
  */
-import { hasCondition, removeCondition } from "../../documents/actor/conditions.js";
+import { removeCondition } from "../../documents/actor/conditions.js";
 import {
   getApplyToZoneAbilities, getApplyToZoneTargets,
-  getActivatedAbilities, activateAbility, activateApplyToZone
+  getActivatedAbilities, activateAbility, activateApplyToZone,
 } from "../../helpers/weapon-abilities/dispatchers.js";
 
+/**
+ * @import HollowsActor from "../../documents/actor.mjs";
+ */
+
+/**
+ * Escape a string.
+ */
 const esc = (v) => foundry.utils.escapeHTML(String(v ?? ""));
 
+/**
+ * Open expend-ready dialog.
+ * @param {HollowsActor} actor
+ */
 export async function openExpendReadyDialog(actor) {
-  if (!actor || actor.type !== "hunter") return;
-  if (!hasCondition(actor, "ready")) {
+  if (!actor || (actor.type !== "hunter")) return;
+  if (!actor.statuses.has("ready")) {
     ui.notifications.warn(`${actor.name} is not Ready.`);
     return;
   }
@@ -34,11 +45,11 @@ export async function openExpendReadyDialog(actor) {
   const zoneTargets = new Map();
   for (const a of zoneAbilities) zoneTargets.set(a.key, getApplyToZoneTargets(actor, a));
 
-  const modeOptions = [`<option value="unready" selected>Become Unready</option>`];
+  const modeOptions = ["<option value=\"unready\" selected>Become Unready</option>"];
   for (const a of zoneAbilities) {
     const hasTargets = (zoneTargets.get(a.key) || []).length > 0;
     modeOptions.push(
-      `<option value="zone:${esc(a.key)}"${hasTargets ? "" : " disabled"}>${esc(a.label || a.name)}${hasTargets ? "" : " — no ally in your area"}</option>`
+      `<option value="zone:${esc(a.key)}"${hasTargets ? "" : " disabled"}>${esc(a.label || a.name)}${hasTargets ? "" : " — no ally in your area"}</option>`,
     );
   }
   for (const a of activatedAbilities) modeOptions.push(`<option value="act:${esc(a.key)}">${esc(a.label || a.name)}</option>`);
@@ -116,17 +127,17 @@ export async function openExpendReadyDialog(actor) {
               mode: "zone",
               key,
               targetId: String(el.querySelector("[name=targetId]")?.value || ""),
-              subValue: String(el.querySelector(`[name="sub:${key}"]`)?.value || "")
+              subValue: String(el.querySelector(`[name="sub:${key}"]`)?.value || ""),
             };
           }
           if (mode.startsWith("act:")) {
             return { mode: "act", key: mode.slice(4) };
           }
           return null;
-        }
+        },
       },
-      { action: "cancel", label: "Cancel", callback: () => false }
-    ]
+      { action: "cancel", label: "Cancel", callback: () => false },
+    ],
   });
 
   if (!choice) return;
@@ -135,7 +146,7 @@ export async function openExpendReadyDialog(actor) {
     await removeCondition(actor, "ready");
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
-      content: `<div class="hollows-chat"><strong>${actor.name}</strong> expends <strong>Ready</strong> and becomes <strong>Unready</strong>.</div>`
+      content: `<div class="hollows-chat"><strong>${actor.name}</strong> expends <strong>Ready</strong> and becomes <strong>Unready</strong>.</div>`,
     });
     return;
   }

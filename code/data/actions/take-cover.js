@@ -1,13 +1,11 @@
 import { HOLLOWS_CONDITIONS } from "../_module.mjs";
 import {
   getActorZone, getAdjacentZones, getHunterTokensInZone,
-  getActorTokenOnScene, getTokenZone
+  getActorTokenOnScene, getTokenZone,
 } from "../../canvas/zone.js";
 import { getTerrainPoolValue, spendTerrainPoolTag } from "../../canvas/terrain-pool.js";
 import { placeThreatFromHunter } from "../../canvas/threat-ops.js";
-import {
-  hasCondition, requestTerrainConditionApply, isPooledTerrainTag
-} from "../../documents/actor/conditions.js";
+import { requestTerrainConditionApply, isPooledTerrainTag } from "../../documents/actor/conditions.js";
 import { runOnTakeCover, getTakeCoverModifier } from "../../helpers/weapon-abilities/dispatchers.js";
 import { getTotalStatForActor } from "../../documents/actor/hunter-combat.js";
 import { adjustHunterResource } from "../../documents/actor/resources.js";
@@ -54,15 +52,15 @@ export async function openTakeCoverForActor(actor, opts = {}) {
     type: "select", name: "tag", label: "Terrain Tag",
     options: allowedTags.map((tag) => ({
       value: tag,
-      label: `${HOLLOWS_CONDITIONS[tag]?.label || tag}${tag === "elevated" ? ` (${statElevated})` : tag === "sheltered" ? ` (${statSheltered})` : ""}`
-    }))
+      label: `${HOLLOWS_CONDITIONS[tag]?.label || tag}${tag === "elevated" ? ` (${statElevated})` : tag === "sheltered" ? ` (${statSheltered})` : ""}`,
+    })),
   }];
   if (expandTargeting) fields.push({
     type: "select", name: "targetId", label: "Recipient",
     options: uniqueTargets.map((t) => ({
       value: t.document?.uuid || t.uuid || "",
-      label: t.name || t.actor?.name || "Hunter"
-    }))
+      label: t.name || t.actor?.name || "Hunter",
+    })),
   });
 
   const runFlow = async (picked) => {
@@ -85,12 +83,12 @@ export async function openTakeCoverForActor(actor, opts = {}) {
     const statValue = getTotalStatForActor(actor, statKey);
     const conditionTarget = targetToken.actor || targetActor;
     const tokenUuid = targetToken.document?.uuid || targetToken.uuid || "";
-    if (hasCondition(conditionTarget, tag)) {
+    if (conditionTarget.has(tag)) {
       ui.notifications.warn(`${targetActor.name} already has ${HOLLOWS_CONDITIONS[tag].label}.`);
       return false;
     }
     const available = getTerrainPoolValue(tag);
-    if (available !== null && available <= 0) {
+    if ((available !== null) && (available <= 0)) {
       ui.notifications.warn(`No ${HOLLOWS_CONDITIONS[tag].label} terrain tags left in pool.`);
       return false;
     }
@@ -99,7 +97,7 @@ export async function openTakeCoverForActor(actor, opts = {}) {
 
     const applyTerrainTag = async () => {
       const replaced = await applyInterceptors("take-cover", {
-        actor: targetActor, userId: game.user?.id || "", zone: claimZone, token: targetToken, tag
+        actor: targetActor, userId: game.user?.id || "", zone: claimZone, token: targetToken, tag,
       }, "");
       if (!replaced) {
         await requestTerrainConditionApply(conditionTarget, tag, tokenUuid, true);
@@ -117,9 +115,9 @@ export async function openTakeCoverForActor(actor, opts = {}) {
         options: failureModes.map((mode) => ({
           value: mode,
           label: mode === "resolve" ? "Suffer 1 Resolve Damage"
-               : mode === "threat" ? "Place 1 Threat"
-               : "Discard Terrain Tag"
-        }))
+            : mode === "threat" ? "Place 1 Threat"
+              : "Discard Terrain Tag",
+        })),
       });
       if (!failMode) return null;
       let replaced = "";
@@ -147,14 +145,14 @@ export async function openTakeCoverForActor(actor, opts = {}) {
           `<div><strong>${targetLabel}</strong> fails to claim <strong>${HOLLOWS_CONDITIONS[tag].label}</strong>.</div>`,
           `<div>Consequence: <strong>${failMode}</strong>.</div>`,
           failMode !== "lose" && !replaced && isPooledTerrainTag(tag) ? `<span class="hollows-terrain-event" data-terrain-event="claim" data-terrain-tag="${tag}"></span>` : "",
-          failMode !== "lose" && replaced ? `<div>Replaced with <strong>${foundry.utils.escapeHTML(replaced)}</strong>.</div>` : ""
-        ]
+          failMode !== "lose" && replaced ? `<div>Replaced with <strong>${foundry.utils.escapeHTML(replaced)}</strong>.</div>` : "",
+        ],
       });
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
         flavor: reason,
         content: chatContent,
-        rolls: roll ? [roll] : []
+        rolls: roll ? [roll] : [],
       });
       return true;
     };
@@ -166,10 +164,10 @@ export async function openTakeCoverForActor(actor, opts = {}) {
     const rollOutcome = await new HunterStatRollFlow(actor, {
       title: reason,
       statLabel: statKey.charAt(0).toUpperCase() + statKey.slice(1),
-      statValue
+      statValue,
     }).roll({
       mode: "normal",
-      useFocus: false
+      useFocus: false,
     });
     if (!rollOutcome) return false;
     const { roll, results, chosen, useFocus, effectiveMode } = rollOutcome;
@@ -190,15 +188,15 @@ export async function openTakeCoverForActor(actor, opts = {}) {
         extraLines: [
           `<div><strong>${targetLabel}</strong> claims <strong>${HOLLOWS_CONDITIONS[tag].label}</strong>.</div>`,
           replaced ? `<div>Replaced with <strong>${foundry.utils.escapeHTML(replaced)}</strong>.</div>` : "",
-          !replaced && isPooledTerrainTag(tag) ? `<span class="hollows-terrain-event" data-terrain-event="claim" data-terrain-tag="${tag}"></span>` : ""
-        ]
+          !replaced && isPooledTerrainTag(tag) ? `<span class="hollows-terrain-event" data-terrain-event="claim" data-terrain-tag="${tag}"></span>` : "",
+        ],
       });
 
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
         flavor: reason,
         content: chatContent,
-        rolls: [roll]
+        rolls: [roll],
       });
       return true;
     }

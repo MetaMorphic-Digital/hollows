@@ -4,7 +4,7 @@ import {
   getActorTokenOnScene,
   getActiveEntityActor,
   getRegionCurseData,
-  isCloseZone
+  isCloseZone,
 } from "../../canvas/zone.js";
 import { adjustEntityTerrain, getAvailableTerrainTags } from "../../canvas/terrain-pool.js";
 import { isEntityColossal } from "./entity-stats.js";
@@ -15,18 +15,17 @@ import { getEffectiveWeaponCapacity } from "../../data/weapons/index.js";
 import { resolveTerrainDiscardOptions } from "../../data/actions/terrain-discard-options.js";
 import { shouldApplyAfterAttackEffects, shouldApplyBeforeAttackEffects } from "../../data/entity/action-rules.js";
 import {
-  hasCondition,
   addCondition,
   removeCondition,
   discardTerrainCondition,
   applySpecialConditionSlot,
-  getTerrainTagKeys
+  getTerrainTagKeys,
 } from "../actor/conditions.js";
 import {
   adjustHunterResource,
   adjustEntityResource,
   getFocusCount,
-  setFocusCount
+  setFocusCount,
 } from "../actor/resources.js";
 import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
 
@@ -43,14 +42,14 @@ export async function applyEntitySelfDamage(entity, selfDamage) {
   if (!entity || !selfDamage) return;
   const sResolve = Number(selfDamage.resolve ?? 0);
   const sWounds = Number(selfDamage.wounds ?? 0);
-  if (!(sResolve > 0 || sWounds > 0)) return;
+  if (!((sResolve > 0) || (sWounds > 0))) return;
   await adjustEntityResource(entity, {
     resolve: sResolve > 0 ? -sResolve : 0,
-    wounds: sWounds > 0 ? -sWounds : 0
+    wounds: sWounds > 0 ? -sWounds : 0,
   });
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: entity }),
-    content: `<div class="hollows-chat"><strong>${entity.name}</strong> suffers <strong>${sResolve}/${sWounds}</strong> (Resolve/Wounds).</div>`
+    content: `<div class="hollows-chat"><strong>${entity.name}</strong> suffers <strong>${sResolve}/${sWounds}</strong> (Resolve/Wounds).</div>`,
   });
   try { entity.sheet?.render(false); } catch (err) {}
 }
@@ -66,7 +65,7 @@ async function applyColossalThrowFree(target, targetZone, entityActor) {
   await adjustHunterResource(target, { wounds: -1 });
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: target }),
-    content: `<div class="hollows-chat"><strong>${target.name}</strong> suffers <strong>1 Wound</strong>, thrown free of the Colossal Entity.</div>`
+    content: `<div class="hollows-chat"><strong>${target.name}</strong> suffers <strong>1 Wound</strong>, thrown free of the Colossal Entity.</div>`,
   });
 }
 
@@ -78,7 +77,7 @@ async function applyAfterAttackShift(group, targetZone) {
     direction: String(shift.direction || "towardEntity"),
     amount: Number(shift.amount || 0),
     zone: String(shift.zone || ""),
-    targetZone: String(targetZone || "")
+    targetZone: String(targetZone || ""),
   });
 }
 
@@ -93,7 +92,7 @@ async function resolveAnyTerrainTag(entity, delta, fromPool) {
   const picked = await pickOne({
     title: "Entity Terrain",
     label: delta > 0 ? "Place which terrain?" : "Remove which terrain?",
-    options: available.map((key) => ({ value: key, label: HOLLOWS_CONDITIONS[key]?.label || key }))
+    options: available.map((key) => ({ value: key, label: HOLLOWS_CONDITIONS[key]?.label || key })),
   });
   return picked || "any";
 }
@@ -110,14 +109,14 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
     if (!shouldApplyEffects(group, {
       ...context,
       target,
-      targetZone
+      targetZone,
     })) continue;
 
     if (target && group.destroyTerrain) {
       const removed = [];
       let lostElevated = false;
       for (const key of getTerrainTagKeys()) {
-        if (!hasCondition(target, key)) continue;
+        if (!target.statuses.has(key)) continue;
         if (await resolveTerrainDiscardOptions(target, key, { source: "entityAttack" })) continue;
         await removeCondition(target, key);
         if (key === "elevated") lostElevated = true;
@@ -126,27 +125,27 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
       if (removed.length) {
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: target }),
-          content: `<div class="hollows-chat"><strong>${target.name}</strong> loses <strong>${removed.join(", ")}</strong> (Destroyed).</div>`
+          content: `<div class="hollows-chat"><strong>${target.name}</strong> loses <strong>${removed.join(", ")}</strong> (Destroyed).</div>`,
         });
       }
       if (lostElevated) await applyColossalThrowFree(target, targetZone, entityActor);
     }
 
     if (target && group.discardTerrain) {
-      const hadElevated = hasCondition(target, "elevated");
+      const hadElevated = target.statuses.has("elevated");
       for (const key of getTerrainTagKeys()) {
-        if (hasCondition(target, key)) {
+        if (target.statuses.has(key)) {
           await discardTerrainCondition(target, key, "", { source: "entityAttack" });
         }
       }
-      if (hadElevated && !hasCondition(target, "elevated")) await applyColossalThrowFree(target, targetZone, entityActor);
+      if (hadElevated && !target.statuses.has("elevated")) await applyColossalThrowFree(target, targetZone, entityActor);
     }
 
-    if (target && group.removeFocus && getFocusCount(target) > 0) {
+    if (target && group.removeFocus && (getFocusCount(target) > 0)) {
       await setFocusCount(target, 0);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: target }),
-        content: `<div class="hollows-chat"><strong>${target.name}</strong> loses all <strong>Focus</strong>.</div>`
+        content: `<div class="hollows-chat"><strong>${target.name}</strong> loses all <strong>Focus</strong>.</div>`,
       });
     }
 
@@ -162,18 +161,17 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
       if (updates.length) {
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: target }),
-          content: `<div class="hollows-chat"><strong>${target.name}</strong> loses <strong>Capacity</strong>.</div>`
+          content: `<div class="hollows-chat"><strong>${target.name}</strong> loses <strong>Capacity</strong>.</div>`,
         });
       }
     }
 
-    if (target && group.killHunter && target.type === "hunter" && !hasCondition(target, "dead")) {
-      if (hasCondition(target, "dying")) await removeCondition(target, "dying");
+    if (target && group.killHunter && (target.type === "hunter") && !target.statuses.has("dead")) {
+      if (target.statuses.has("dying")) await removeCondition(target, "dying");
       await addCondition(target, "dead");
-      await target.setFlag("hollows", "dead", true);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: target }),
-        content: `<div class="hollows-chat"><strong>${target.name}</strong> is killed outright.</div>`
+        content: `<div class="hollows-chat"><strong>${target.name}</strong> is killed outright.</div>`,
       });
     }
 
@@ -206,14 +204,14 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
     if (target && (group.targetDelta?.resolve || group.targetDelta?.wounds)) {
       await adjustHunterResource(target, {
         resolve: -Number(group.targetDelta.resolve || 0),
-        wounds: -Number(group.targetDelta.wounds || 0)
+        wounds: -Number(group.targetDelta.wounds || 0),
       });
     }
 
     if ((group.entityDelta?.resolve || group.entityDelta?.wounds) && entityActor) {
       await adjustEntityResource(entityActor, {
         resolve: -Number(group.entityDelta.resolve || 0),
-        wounds: -Number(group.entityDelta.wounds || 0)
+        wounds: -Number(group.entityDelta.wounds || 0),
       });
     }
 
@@ -230,20 +228,20 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
       if (changed > 0) {
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: entityActor }),
-          content: `<div class="hollows-chat"><strong>${entityActor.name}</strong> ${delta > 0 ? "gains" : "loses"} <strong>${changed}</strong> terrain tag${changed === 1 ? "" : "s"}.</div>`
+          content: `<div class="hollows-chat"><strong>${entityActor.name}</strong> ${delta > 0 ? "gains" : "loses"} <strong>${changed}</strong> terrain tag${changed === 1 ? "" : "s"}.</div>`,
         });
       }
     }
 
     // Pluck: discard a terrain tag from the Hunter and place it on the Entity.
     if (target && group.transferTerrainToEntity && entityActor) {
-      const moved = ["elevated", "sheltered"].find((k) => hasCondition(target, k));
+      const moved = ["elevated", "sheltered"].find((k) => target.statuses.has(k));
       if (moved) {
         await removeCondition(target, moved, { skipPoolRefund: true });
         await adjustEntityTerrain(entityActor, moved, 1, { fromPool: false });
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: entityActor }),
-          content: `<div class="hollows-chat"><strong>${target.name}</strong>'s ${HOLLOWS_CONDITIONS[moved]?.label || moved} tag is moved onto <strong>${entityActor.name}</strong>.</div>`
+          content: `<div class="hollows-chat"><strong>${target.name}</strong>'s ${HOLLOWS_CONDITIONS[moved]?.label || moved} tag is moved onto <strong>${entityActor.name}</strong>.</div>`,
         });
       }
     }
@@ -252,14 +250,14 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
       await applySpecialConditionSlot(target, group.specialCondition);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: target }),
-        content: `<div class="hollows-chat"><strong>${target.name}</strong> gains a <strong>Special Condition</strong> (${group.specialCondition.slot || "special1"}).</div>`
+        content: `<div class="hollows-chat"><strong>${target.name}</strong> gains a <strong>Special Condition</strong> (${group.specialCondition.slot || "special1"}).</div>`,
       });
     }
 
     if (group.otherText) {
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: target || entityActor || null }),
-        content: `<div class="hollows-chat"><strong>Effect:</strong> ${foundry.utils.escapeHTML(group.otherText)}</div>`
+        content: `<div class="hollows-chat"><strong>Effect:</strong> ${foundry.utils.escapeHTML(group.otherText)}</div>`,
       });
     }
   }
@@ -275,7 +273,7 @@ export async function requestAfterAttackApply(target, targetZone, afterAttack, e
     await applyAfterAttackEffectsDirect(target, targetZone, groups, {
       ...context,
       entityActor,
-      targetZone
+      targetZone,
     });
     if (selfDamage) await applyEntitySelfDamage(entity, selfDamage);
     return;
@@ -289,7 +287,7 @@ export async function requestAfterAttackApply(target, targetZone, afterAttack, e
     afterAttack,
     entityId,
     selfDamage,
-    context
+    context,
   });
 }
 
@@ -306,7 +304,7 @@ export async function applyAfterAttackPayload(data = {}) {
   await applyAfterAttackEffectsDirect(actor, targetZone, afterAttack, {
     ...(data.context || {}),
     entityActor,
-    targetZone
+    targetZone,
   });
   if (selfDamage) await applyEntitySelfDamage(entityActor, selfDamage);
 }

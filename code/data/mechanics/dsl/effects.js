@@ -180,8 +180,8 @@ async function applyOne(eff, ctx) {
           rejectClose: false,
           buttons: [
             { action: "apply", label: "Apply", default: true, callback: (_e, _b, d) => String(d.element.querySelector("[name=targetId]")?.value || "") },
-            { action: "cancel", label: "Skip", callback: () => "" }
-          ]
+            { action: "cancel", label: "Skip", callback: () => "" },
+          ],
         }) ?? "";
         if (!pick) return;
         target = game.actors.get(pick) || candidates[0];
@@ -218,8 +218,8 @@ async function applyOne(eff, ctx) {
         rejectClose: false,
         buttons: [
           { action: "apply", label: "Apply", default: true, callback: (_e, _b, d) => Number(d.element.querySelector("[name=amount]")?.value ?? 0) },
-          { action: "cancel", label: "Cancel", callback: () => -1 }
-        ]
+          { action: "cancel", label: "Cancel", callback: () => -1 },
+        ],
       }) ?? -1;
       const amount = Math.max(0, Math.min(max, Number(picked ?? 0)));
       if (picked === -1 || amount <= 0) { ctx._cancelled = true; return; }
@@ -256,8 +256,8 @@ async function applyOne(eff, ctx) {
         rejectClose: false,
         buttons: [
           { action: "yes", label: eff.yesLabel || "Apply", default: true, callback: () => true },
-          { action: "no", label: eff.noLabel || "Skip", callback: () => false }
-        ]
+          { action: "no", label: eff.noLabel || "Skip", callback: () => false },
+        ],
       }) ?? false;
       if (ok !== true) ctx._cancelled = true;
       return;
@@ -269,14 +269,14 @@ async function applyOne(eff, ctx) {
         action: `opt${i}`,
         label: o.label,
         default: i === 0,
-        callback: () => i
+        callback: () => i,
       }));
       buttons.push({ action: "skip", label: eff.skipLabel || "Skip", callback: () => -1 });
       const picked = await foundry.applications.api.DialogV2.wait({
         window: { title: eff.title || "Choose" },
         content: `<div class="hollows-roll-dialog"><div>${eff.message || "Choose one:"}</div></div>`,
         rejectClose: false,
-        buttons
+        buttons,
       });
       const idx = Number.isInteger(picked) ? picked : -1;
       if (idx < 0 || !opts[idx]) return;
@@ -315,7 +315,7 @@ async function applyOne(eff, ctx) {
       if (!message) return;
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: actor || undefined }),
-        content: `<div class="hollows-chat">${message}</div>`
+        content: `<div class="hollows-chat">${message}</div>`,
       });
       return;
     }
@@ -338,7 +338,7 @@ async function applyOne(eff, ctx) {
         destConstraint: "adjacentToSource",
         excludeSupport: true,
         label: "Control: Shift Threat",
-        reason: "Control"
+        reason: "Control",
       });
       return;
     }
@@ -376,7 +376,7 @@ async function applyOne(eff, ctx) {
       if (recipients.length > 1) {
         const pickedId = await promptSelect(
           "Grant Manoeuvre", "Hunter",
-          recipients.map((a) => ({ value: a.id, label: a.name }))
+          recipients.map((a) => ({ value: a.id, label: a.name })),
         );
         recipient = pickedId ? recipients.find((a) => a.id === pickedId) : null;
         if (!recipient) { ctx._cancelled = true; return; }
@@ -386,7 +386,7 @@ async function applyOne(eff, ctx) {
       await reactions.GRANT_MANOEUVRE.offer(owner, {
         targetId: recipient.id,
         manoeuvre: eff.manoeuvre || null,
-        options: eff.options || null
+        options: eff.options || null,
       });
       return;
     }
@@ -399,20 +399,20 @@ async function applyOne(eff, ctx) {
       }
       const choice = await foundry.applications.api.DialogV2.wait({
         window: { title: eff.label || "Claim Terrain Tag" },
-        content: `<div class="hollows-roll-dialog"><div>Claim a terrain tag (no test).</div></div>`,
+        content: "<div class=\"hollows-roll-dialog\"><div>Claim a terrain tag (no test).</div></div>",
         rejectClose: false,
         buttons: [
           { action: "elevated", label: "Take Elevated", default: true, callback: () => "elevated" },
           { action: "sheltered", label: "Take Sheltered", callback: () => "sheltered" },
-          { action: "skip", label: "Skip", callback: () => "" }
-        ]
+          { action: "skip", label: "Skip", callback: () => "" },
+        ],
       }) ?? "";
       if (!choice) {
         ctx._cancelled = true;
         return;
       }
-      const { hasCondition } = await import("../../../documents/actor/conditions.js");
-      if (hasCondition(actor, choice)) {
+
+      if (actor.statuses.has(choice)) {
         ui.notifications?.warn?.(`${actor.name} already has ${HOLLOWS_CONDITIONS[choice]?.label || choice}.`);
         ctx._cancelled = true;
         return;
@@ -427,7 +427,7 @@ async function applyOne(eff, ctx) {
       await addCondition(actor, choice);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: `<div class="hollows-chat"><strong>${actor.name}</strong> claims <strong>${choice === "sheltered" ? "Sheltered" : "Elevated"}</strong>${eff.label ? ` (${eff.label})` : ""}.</div>`
+        content: `<div class="hollows-chat"><strong>${actor.name}</strong> claims <strong>${choice === "sheltered" ? "Sheltered" : "Elevated"}</strong>${eff.label ? ` (${eff.label})` : ""}.</div>`,
       });
       return;
     }
@@ -448,7 +448,7 @@ async function applyOne(eff, ctx) {
       await actor.setFlag("hollows", "skirmisherBonus", next);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: `<div class="hollows-chat"><strong>${actor.name}</strong> gains <strong>+2 ${stat === "sharp" ? "Sharp" : "Quick"}</strong> until the start of their next turn (Skirmisher).</div>`
+        content: `<div class="hollows-chat"><strong>${actor.name}</strong> gains <strong>+2 ${stat === "sharp" ? "Sharp" : "Quick"}</strong> until the start of their next turn (Skirmisher).</div>`,
       });
       return;
     }
@@ -458,7 +458,7 @@ async function applyOne(eff, ctx) {
         actorId: actor?.id || "",
         resolve: Number(eff.resolve || 0),
         wounds: Number(eff.wounds || 0),
-        label: eff.label || ""
+        label: eff.label || "",
       });
       return;
     }

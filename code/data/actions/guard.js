@@ -6,10 +6,8 @@
  * Moved out of weapon-utils.js into data/actions/ per the action-layer
  * architecture (orchestration lives in data/).
  */
-import {
-  getActorZone, getTokenZone, getActorTokenOnScene
-} from "../../canvas/zone.js";
-import { hasCondition, addCondition, removeCondition } from "../../documents/actor/conditions.js";
+import { getActorZone, getTokenZone, getActorTokenOnScene } from "../../canvas/zone.js";
+import { addCondition, removeCondition } from "../../documents/actor/conditions.js";
 import { adjustHunterResource } from "../../documents/actor/resources.js";
 import { hasWeaponEquipped } from "../../helpers/weapon-utils.js";
 import { runOnGuard } from "../../helpers/weapon-abilities/dispatchers.js";
@@ -17,18 +15,16 @@ import { runOnGuard } from "../../helpers/weapon-abilities/dispatchers.js";
 export async function openGuardDialogForActor(actor, sourceActor = null) {
   const self = actor;
   const selfZone = getActorZone(self);
-  const zoneTokens = (canvas?.tokens?.placeables || [])
-    .filter((t) => t.actor?.type === "hunter")
-    .filter((t) => t.actor?.id !== self.id)
-    .filter((t) => getTokenZone(t) && getTokenZone(t) === selfZone)
-    .filter((t) => hasCondition(t.actor, "dying"))
-    .filter((t) => !hasCondition(t.actor, "dead"))
-    .filter((t) => !t.actor.getFlag("hollows", "dyingRevivedOnce"));
+  const zoneTokens = canvas.tokens.placeables.filter(token => {
+    const actor = token.actor;
+    if (actor?.type !== "hunter") return false;
+    return (actor.id !== self.id) && (getTokenZone(token) === selfZone) && actor.isRevivable;
+  });
 
   const reviveOptions = zoneTokens
     .map((t) => `<option value="${t.document?.uuid || t.uuid}">${t.name}</option>`)
     .join("");
-  const canRevive = !!selfZone && zoneTokens.length > 0;
+  const canRevive = !!selfZone && (zoneTokens.length > 0);
   const content = `
     <form class="hollows-roll-dialog">
       <div class="form-group">
@@ -85,31 +81,22 @@ export async function openGuardDialogForActor(actor, sourceActor = null) {
                   hollows: {
                     guardRevive: {
                       sourceTokenUuid: sourceToken?.document?.uuid || sourceToken?.uuid || "",
-                      targetTokenUuid: targetToken?.document?.uuid || targetToken?.uuid || ""
-                    }
-                  }
-                }
+                      targetTokenUuid: targetToken?.document?.uuid || targetToken?.uuid || "",
+                    },
+                  },
+                },
               });
               return true;
             }
-            if (!hasCondition(target, "dying")) {
-              ui.notifications.warn("Target is not in Dying state.");
-              return false;
-            }
-            if (hasCondition(target, "dead")) {
-              ui.notifications.warn("This Hunter is dead.");
-              return false;
-            }
-            if (target.getFlag("hollows", "dyingRevivedOnce")) {
-              ui.notifications.warn("This Hunter cannot be revived again.");
-              return false;
-            }
+
+            if (!actor.isRevivable) return false;
+
             await removeCondition(target, "dying");
             await adjustHunterResource(target, { resolve: 1, wounds: 1 });
             await target.setFlag("hollows", "dyingRevivedOnce", true);
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: sourceActor || self }),
-              content: `<div class="hollows-chat"><strong>${self.name}</strong> Guards and revives <strong>${target.name}</strong> (+1 Resolve, +1 Wound).</div>`
+              content: `<div class="hollows-chat"><strong>${self.name}</strong> Guards and revives <strong>${target.name}</strong> (+1 Resolve, +1 Wound).</div>`,
             });
             if (hasWeaponEquipped(self, "Armour")) await addCondition(self, "ready");
             return true;
@@ -118,13 +105,13 @@ export async function openGuardDialogForActor(actor, sourceActor = null) {
           await adjustHunterResource(self, { resolve: 2 });
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: sourceActor || self }),
-            content: `<div class="hollows-chat"><strong>${self.name}</strong> Guards and restores <strong>2 Resolve</strong>.</div>`
+            content: `<div class="hollows-chat"><strong>${self.name}</strong> Guards and restores <strong>2 Resolve</strong>.</div>`,
           });
           if (hasWeaponEquipped(self, "Armour")) await addCondition(self, "ready");
           return true;
-        }
-      }
-    ]
+        },
+      },
+    ],
   });
   if (applied) {
     // Generic guard event — abilities subscribe via event-Reactions.
