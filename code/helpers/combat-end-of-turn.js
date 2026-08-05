@@ -40,8 +40,8 @@ export async function runEndOfTurnEffects(combat, prevCombatant) {
   if (ward?.sourceId) {
     // Non-owners reach this path too, so the flag writes are allowed to fail.
     const source = game.actors.get(ward.sourceId);
-    await source?.unsetFlag("hollows", "wardSuppressed").catch(() => null);
-    await actor.unsetFlag("hollows", "wardGranted").catch(() => null);
+    await source?.unsetFlag("hollows", "wardSuppressed");
+    await actor.unsetFlag("hollows", "wardGranted");
   }
 
   const entityCombatant = combat.combatants.find((combatant) => combatant.actor?.type === "entity");
