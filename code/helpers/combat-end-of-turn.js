@@ -163,7 +163,7 @@ async function openEntityThreatPlacementDialog(combat, entityActor) {
           perRound, cap, total: totalNow, target: state.total,
         });
         const verdict = state.valid
-          ? game.i18n.format("HOLLOWS.THREAT.valid", { mode: game.i18n.localize(MODE_LABELS[state.mode]) })
+          ? _loc("HOLLOWS.THREAT.valid", { mode: _loc(MODE_LABELS[state.mode]) })
           : violationMessage(state.violation);
         statusEl.innerHTML = `
           <p class="hint">${foundry.utils.escapeHTML(summary)}</p>
