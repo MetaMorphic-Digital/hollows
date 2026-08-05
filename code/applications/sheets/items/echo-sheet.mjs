@@ -51,6 +51,7 @@ export default class HollowsEchoSheet extends EffectBuilderItemSheet {
       ...context,
       item: this.item,
       system: this.item.system,
+      systemFields: this.item.system.schema.fields,
       editable: this.isEditable,
       owner: this.document.isOwner,
       limited: this.document.limited,
@@ -59,7 +60,7 @@ export default class HollowsEchoSheet extends EffectBuilderItemSheet {
       isMalignancyEcho: category === "malignancy",
       echoTypeChoices: { boon: "Boon", bane: "Bane" },
       categoryChoices: { seed: "Seed", weapon: "Weapon", malignancy: "Malignancy" },
-      malignancyChoices: choiceMap(MALIGNANCY_LIST.map((name) => ({ value: name, label: name }))),
+      malignancyChoices: MALIGNANCY_LIST.map(name => ({ value: name, label: name })),
       weaponTypeChoices: choiceMap(Object.values(WEAPONS).map((weapon) => ({
         value: weapon.key,
         label: weapon.label,

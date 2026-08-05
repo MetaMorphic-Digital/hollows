@@ -295,24 +295,21 @@
             <h3>Boons ({{echoCounts.boon}}/2)</h3>
             {{#if echoes.boons.length}}
               {{#each echoes.boons as |echo|}}
-                <div class="echo-card {{#if echo.system.suppressed}}suppressed{{/if}}">
+                <div class="echo-card {{#if echo.system.isSuppressed}}suppressed{{/if}}">
                   <div class="echo-header">
                     <div class="echo-name">{{echo.name}}</div>
                     <div class="echo-tags">
                       <span class="echo-tag">{{echo.system.category}}</span>
-                      {{#if echo.system.onePerHollow}}
-                        <span class="echo-tag">Once per Hollow</span>
-                      {{/if}}
-                      {{#if echo.system.usedThisHollow}}
-                        <span class="echo-tag">Used</span>
-                      {{/if}}
+                      {{#each echo.system.stateTags}}
+                      <span class="echo-tag">{{this}}</span>
+                      {{/each}}
                     </div>
                     <div class="echo-actions">
                       <button type="button" class="stat-roll" data-action="echo-toggle" data-echo-id="{{echo.id}}">
-                        {{#if echo.system.suppressed}}Unsuppress{{else}}Suppress{{/if}}
+                        {{ifThen echo.system.isSuppressed "Unsuppress" "Suppress"}}
                       </button>
-                      {{#if echo.system.onePerHollow}}
-                        <button type="button" class="stat-roll" data-action="echo-trigger" data-echo-id="{{echo.id}}" {{#if echo.system.usedThisHollow}}disabled{{/if}}>Trigger</button>
+                      {{#if echo.system.isOnce}}
+                        <button type="button" class="stat-roll" data-action="echo-trigger" data-echo-id="{{echo.id}}" {{disabled echo.system.isUsed}}>Trigger</button>
                       {{/if}}
                       {{#if ../isGM}}
                         <button type="button" class="stat-roll danger" data-action="echo-delete" data-echo-id="{{echo.id}}">Delete</button>
@@ -336,24 +333,21 @@
             <h3>Banes ({{echoCounts.bane}}/2)</h3>
             {{#if echoes.banes.length}}
               {{#each echoes.banes as |echo|}}
-                <div class="echo-card {{#if echo.system.suppressed}}suppressed{{/if}}">
+                <div class="echo-card {{#if echo.system.isSuppressed}}suppressed{{/if}}">
                   <div class="echo-header">
                     <div class="echo-name">{{echo.name}}</div>
                     <div class="echo-tags">
                       <span class="echo-tag">{{echo.system.category}}</span>
-                      {{#if echo.system.onePerHollow}}
-                        <span class="echo-tag">Once per Hollow</span>
-                      {{/if}}
-                      {{#if echo.system.usedThisHollow}}
-                        <span class="echo-tag">Used</span>
-                      {{/if}}
+                      {{#each echo.system.stateTags}}
+                      <span class="echo-tag">{{this}}</span>
+                      {{/each}}
                     </div>
                     <div class="echo-actions">
                       <button type="button" class="stat-roll" data-action="echo-toggle" data-echo-id="{{echo.id}}">
-                        {{#if echo.system.suppressed}}Unsuppress{{else}}Suppress{{/if}}
+                        {{ifThen echo.system.isSuppressed "Unsuppress" "Suppress"}}
                       </button>
-                      {{#if echo.system.onePerHollow}}
-                        <button type="button" class="stat-roll" data-action="echo-trigger" data-echo-id="{{echo.id}}" {{#if echo.system.usedThisHollow}}disabled{{/if}}>Trigger</button>
+                      {{#if echo.system.isOnce}}
+                        <button type="button" class="stat-roll" data-action="echo-trigger" data-echo-id="{{echo.id}}" {{disabled echo.system.isUsed}}>Trigger</button>
                       {{/if}}
                       {{#if ../isGM}}
                         <button type="button" class="stat-roll danger" data-action="echo-delete" data-echo-id="{{echo.id}}">Delete</button>

@@ -38,6 +38,7 @@ export class RelicDataModel extends foundry.abstract.TypeDataModel {
 }
 
 export class EchoDataModel extends foundry.abstract.TypeDataModel {
+  /** @inheritdoc */
   static defineSchema() {
     const fields = foundry.data.fields;
     return {
@@ -47,9 +48,13 @@ export class EchoDataModel extends foundry.abstract.TypeDataModel {
       malignancy: new fields.StringField({ initial: "" }),
       weaponType: new fields.StringField({ initial: "" }),
       sourceWeaponId: new fields.StringField({ initial: "" }),
-      suppressed: new fields.BooleanField({ initial: false }),
-      onePerHollow: new fields.BooleanField({ initial: false }),
-      usedThisHollow: new fields.BooleanField({ initial: false }),
+      state: new fields.SetField(new fields.StringField({
+        choices: {
+          suppressed: "HOLLOWS.ITEM.ECHO.STATES.suppressed",
+          onePerHollow: "HOLLOWS.ITEM.ECHO.STATES.onePerHollow",
+          usedThisHollow: "HOLLOWS.ITEM.ECHO.STATES.usedThisHollow",
+        },
+      })),
       modifiers: new fields.SchemaField({
         strong: new fields.NumberField({ initial: 0 }),
         hard: new fields.NumberField({ initial: 0 }),
@@ -89,12 +94,82 @@ export class EchoDataModel extends foundry.abstract.TypeDataModel {
         wounds: new fields.NumberField({ initial: 1 }),
         groups: effectGroupsField(),
       }),
-      restrictions: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
+      restrictions: new fields.ArrayField(new fields.StringField({ initial: "" })),
       text: new fields.StringField({ initial: "" }),
       gmText: new fields.StringField({ initial: "" }),
     };
   }
+
+  /* -------------------------------------------------- */
+
+  /** @inheritdoc */
+  static LOCALIZATION_PREFIXES = [
+    ...super.LOCALIZATION_PREFIXES,
+    "HOLLOWS.ITEM.ECHO",
+  ];
+
+  /* -------------------------------------------------- */
+
+  static migrateData(source, options) {
+    if (!options.partial && !source.state) {
+      const state = [];
+      if (source.suppressed) state.push("suppressed");
+      if (source.usedThisHollow) state.push("usedThisHollow");
+      if (source.onePerHollow) state.push("onePerHollow");
+      if (state.length) {
+        source.state = state;
+        delete source.suppressed;
+        delete source.usedThisHollow;
+        delete source.onePerHollow;
+      }
+    }
+
+    return super.migrateData(source, options);
+  }
+
+  /* -------------------------------------------------- */
+
+  get stateTags() {
+    const tags = [];
+
+    if (this.state.has("onePerHollow")) tags.push(_loc("HOLLOWS.ITEM.ECHO.TAGS.onePerHollow"));
+    if (this.state.has("usedThisHollow")) tags.push(_loc("HOLLOWS.ITEM.ECHO.TAGS.used"));
+
+    return tags;
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Is this echo suppressed?
+   * @type {boolean}
+   */
+  get isSuppressed() {
+    return this.state.has("suppressed");
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Is this echo once per hollow?
+   * @type {boolean}
+   */
+  get isOnce() {
+    return this.state.has("onePerHollow");
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Is this echo used in this hollow already?
+   * @type {boolean}
+   */
+  get isUsed() {
+    return this.state.has("usedThisHollow");
+  }
 }
+
+/* -------------------------------------------------- */
 
 export class EntityAbilityDataModel extends foundry.abstract.TypeDataModel {
   static defineSchema() {

@@ -4,19 +4,10 @@
  * consumers (hunter combat, attack, sheet, canvas hooks). Moved out of echo.js.
  */
 
-export function getEchoItems(actor) {
-  if (!actor) return [];
-  return (actor.items || []).filter(i => i.type === "echo");
-}
-
-export function getActiveEchoItems(actor) {
-  return getEchoItems(actor).filter(e => !e.system?.suppressed);
-}
-
 export function getEchoStatMods(actor) {
   const mods = { strong: 0, hard: 0, quick: 0, sharp: 0, wise: 0 };
-  for (const echo of getActiveEchoItems(actor)) {
-    const m = echo.system?.modifiers || {};
+  for (const echo of actor.activeEchoes) {
+    const m = echo.system.modifiers || {};
     mods.strong += Number(m.strong ?? 0);
     mods.hard += Number(m.hard ?? 0);
     mods.quick += Number(m.quick ?? 0);
@@ -31,7 +22,7 @@ export function getEchoDamageBonus(actor, weapon = null) {
   const weaponId = weapon?.id || "";
   const weaponType = String(weapon?.system?.weaponType || "");
   const sources = [];
-  for (const echo of getActiveEchoItems(actor)) {
+  for (const echo of actor.activeEchoes) {
     const b = echo.system?.damageBonus || {};
     const res = Number(b.resolve ?? 0);
     const wnd = Number(b.wounds ?? 0);
@@ -53,12 +44,7 @@ export function getEchoDamageBonus(actor, weapon = null) {
 
 export function hasEchoRestriction(actor, restrictionKey) {
   if (!restrictionKey) return false;
-  return getActiveEchoItems(actor).some(e => {
-    const list = Array.isArray(e.system?.restrictions) ? e.system.restrictions : [];
-    return list.includes(restrictionKey);
+  return actor.activeEchoes.some(e => {
+    return e.system.restrictions.includes(restrictionKey);
   });
-}
-
-export function getHunterMalignancy(actor) {
-  return String(actor?.system?.malignancy || "").trim();
 }

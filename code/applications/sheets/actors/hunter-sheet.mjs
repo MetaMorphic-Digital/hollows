@@ -511,11 +511,14 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   /** Toggle Echo suppression. */
   async _onToggleEcho(event) {
     event.preventDefault();
-    const echoId = String(event.currentTarget.dataset.echoId || "");
-    if (!echoId) return;
-    const echo = this.actor.items.get(echoId);
-    if (!echo || echo.type !== "echo") return;
-    await echo.update({ "system.suppressed": !echo.system?.suppressed });
+    const echo = this.actor.items.get(event.currentTarget.dataset.echoId);
+    if (echo?.type !== "echo") return;
+
+    const state = new Set(echo.system.state);
+    if (state.has("suppressed")) state.delete("suppressed");
+    else state.add("suppressed");
+
+    await echo.update({ "system.state": [...state] });
   }
 
   /** Delete an Echo. */
@@ -543,10 +546,11 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     event.preventDefault();
     if (!game.user?.isGM) return;
     try { await this.actor.unsetFlag("hollows", "seedEchoCounts"); } catch (err) {}
-    const updates = this.actor.items
-      .filter(i => i.type === "echo" && i.system?.usedThisHollow)
-      .map(i => ({ _id: i.id, "system.usedThisHollow": false }));
-    if (updates.length) await this.actor.updateEmbeddedDocuments("Item", updates);
+
+    const updates = this.actor.items.documentsByType.echo
+      .filter(item => item.system.state.has("usedThisHollow"))
+      .map(item => ({ _id: item.id, "system.state": [...item.system.state].filter(s => s !== "usedThisHollow") }));
+    await this.actor.updateEmbeddedDocuments("Item", updates);
     ui.notifications.info("Echoes reset for a new Hollow.");
   }
 

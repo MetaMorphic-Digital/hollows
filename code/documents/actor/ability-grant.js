@@ -10,7 +10,7 @@ import { getContentPacks } from "../../helpers/extensions.js";
 function getWeaponAbilityPacks() {
   return [
     getWeaponAbilityPack(),
-    ...getContentPacks("weapon-abilities").map((id) => game.packs.get(id))
+    ...getContentPacks("weapon-abilities").map((id) => game.packs.get(id)),
   ].filter(Boolean);
 }
 
