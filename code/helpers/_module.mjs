@@ -3,8 +3,6 @@ export * from "./combat-first-pick.js";
 export * from "./combat-lifecycle.js";
 export * from "./combat-runtime.js";
 export * from "./combat-start-of-turn.js";
-export * from "./combat-turn-hooks.js";
-export * from "./combat-hooks.js";
 export * from "./handlebars.js";
 export * from "./init-bootstrap.js";
 export * from "./init-hooks.js";

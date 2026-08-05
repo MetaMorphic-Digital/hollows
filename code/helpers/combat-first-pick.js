@@ -1,7 +1,4 @@
-import {
-  HOLLOWS_LAST_COMBATANT_BY_COMBAT_ID,
-  getCombatantsInBracket
-} from "./combat-runtime.js";
+import { getCombatantsInBracket } from "./combat-runtime.js";
 import { processEndOfTurn, processStartOfTurn } from "./combat-lifecycle.js";
 import { dispatchToGM } from "./queries.js";
 
@@ -63,12 +60,12 @@ export async function applyFirstPickSelection(combat, combatantId, prevCombatant
       updateData.round = Math.max(1, Number(combat.round || 0) + 1);
       await resetHunterRoundFlagsForNewRound();
     }
-    await combat.update(updateData, { hollowsSkipTurnProcessing: true });
+    await combat.update(updateData, { hollowsSkipTurnProcessing: true, turnEvents: false });
   }
 
   const newCombatant = combat.combatants.get(combatantId);
   await processStartOfTurn(combat, newCombatant);
-  HOLLOWS_LAST_COMBATANT_BY_COMBAT_ID.set(combat.id, combatantId);
+  combat.lastCombatantId = combatantId;
 }
 
 export function shouldCurrentUserHandleFirstPick(awaiting = null) {
@@ -240,7 +237,7 @@ function getFirstPickOpenKey(combatId, nonce = "", bracket = "") {
   return `${String(combatId || "")}:${String(nonce || "")}:${String(bracket || "")}`;
 }
 
-async function clearActedForBracket(combat, bracket) {
+export async function clearActedForBracket(combat, bracket) {
   const list = getCombatantsInBracket(combat, bracket);
   for (const combatant of list) {
     if (combatant.getFlag("hollows", "acted")) {
