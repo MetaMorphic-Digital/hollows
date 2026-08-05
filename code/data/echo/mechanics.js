@@ -6,7 +6,7 @@ import { applyEffectGroupGM } from "../relic/apply-effect.js";
 const echoChat = (actor, body) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
-    content: `<div class="hollows-chat">${body}</div>`
+    content: `<div class="hollows-chat">${body}</div>`,
   });
 
 function getDyingReplacementEcho(actor) {
@@ -49,18 +49,26 @@ async function applyEchoDyingReplacement(actor, echoItem) {
       const wMax = Number(actor.system?.health?.wounds?.max ?? 0);
       await actor.update({
         "system.health.resolve.value": Math.min(rMax || 999, Math.max(0, Number(cfg.resolve ?? 1) || 0)),
-        "system.health.wounds.value": Math.min(wMax || 999, Math.max(1, Number(cfg.wounds ?? 1) || 1))
+        "system.health.wounds.value": Math.min(wMax || 999, Math.max(1, Number(cfg.wounds ?? 1) || 1)),
       });
-      await echoChat(actor, `<strong>${foundry.utils.escapeHTML(actor.name)}</strong> survives (${foundry.utils.escapeHTML(echoItem.name || "Echo")}).`);
-      if (echoItem.system?.onePerHollow) await echoItem.update({ "system.usedThisHollow": true });
+      await echoChat(actor, `<strong>${foundry.utils.escapeHTML(actor.name)}</strong> survives (${foundry.utils.escapeHTML(echoItem.name)}).`);
+      if (echoItem.system.state.has("onePerHollow")) {
+        const state = new Set(echoItem.system.state);
+        state.add("usedThisHollow");
+        await echoItem.update({ "system.state": [...state] });
+      }
       return { handled: true, preventedDeath: true };
     }
 
     await removeCondition(actor, "dying");
     await addCondition(actor, "dead");
     await actor.setFlag("hollows", "dead", true);
-    await echoChat(actor, `<strong>${foundry.utils.escapeHTML(actor.name)}</strong> has died (${foundry.utils.escapeHTML(echoItem.name || "Echo")}).`);
-    if (echoItem.system?.onePerHollow) await echoItem.update({ "system.usedThisHollow": true });
+    await echoChat(actor, `<strong>${foundry.utils.escapeHTML(actor.name)}</strong> has died (${foundry.utils.escapeHTML(echoItem.name)}).`);
+    if (echoItem.system.state.has("onePerHollow")) {
+      const state = new Set(echoItem.system.state);
+      state.add("usedThisHollow");
+      await echoItem.update({ "system.state": [...state] });
+    }
     return { handled: true, preventedDeath: false };
   } finally {
     await actor.unsetFlag("hollows", "replaceDyingStateProcessing");
@@ -75,5 +83,5 @@ export const ECHO_REPLACE_DYING_STATE = new OnDeath({
   handler: async (actor) => {
     const echo = getDyingReplacementEcho(actor);
     return echo ? applyEchoDyingReplacement(actor, echo) : { handled: false };
-  }
+  },
 });

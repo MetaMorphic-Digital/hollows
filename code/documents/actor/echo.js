@@ -2,7 +2,7 @@ import {
   ECHO_TABLE_NAMES,
   MALIGNANCY_LIST,
   getEchoItems,
-  getHunterMalignancy
+  getHunterMalignancy,
 } from "../../data/echo/index.js";
 import { chooseHunterWeapon } from "../../helpers/weapon-utils.js";
 import { getUpgradeRank, getPrimaryRefugeActor } from "../../data/refuge/index.js";
@@ -67,7 +67,7 @@ async function promptTrophiesModifier() {
   if (!max) return 0;
   const res = await promptForm({
     title: "Trophies Modifier",
-    fields: [{ type: "number", name: "mod", label: `Trophies modifier (-${max} to +${max})`, min: -max, max, value: 0 }]
+    fields: [{ type: "number", name: "mod", label: `Trophies modifier (-${max} to +${max})`, min: -max, max, value: 0 }],
   });
   return Number(res?.mod ?? 0);
 }
@@ -114,13 +114,13 @@ async function postEchoChat(actor, title, lines = []) {
   `;
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
-    content
+    content,
   });
 }
 
 async function postEchoGained(actor, created, suffix = "") {
   await postEchoChat(actor, "Echo Gained", [
-    `Added: <strong>${esc(created?.name || "Echo")}</strong>${suffix}.`
+    `Added: <strong>${esc(created?.name || "Echo")}</strong>${suffix}.`,
   ]);
 }
 
@@ -148,7 +148,7 @@ async function chooseEchoReplacement(actor, echoType) {
     title: "Replace Echo",
     label: `Replace an existing ${echoType}`,
     options: echoes.map(e => ({ value: e.id, label: e.name })),
-    applyLabel: "Replace"
+    applyLabel: "Replace",
   });
 }
 
@@ -174,7 +174,7 @@ export async function createEchoFromCompendium(actor, echoKey, overrides = {}) {
     const entry = index.find(e =>
       String(e._id || "") === String(echoKey || "") ||
       String(e.name || "") === String(echoKey || "") ||
-      String(e.system?.key || "") === String(echoKey || "")
+      String(e.system?.key || "") === String(echoKey || ""),
     );
     if (entry) {
       doc = await pack.getDocument(entry._id);
@@ -224,7 +224,7 @@ export async function handleCorruptionIncrease(actor, prevValue, nextValue) {
     await runUserQuery(owner || game.user, "hollows.echoRollOffer", {
       actorId: actor.id,
       prev: prevValue,
-      next: nextValue
+      next: nextValue,
     });
   } catch (err) {
     console.warn("Hollows | Echo roll offer failed", err);
@@ -236,7 +236,7 @@ async function promptEchoRoll(actor, prevValue, nextValue) {
     title: "Corruption Increased",
     bodyHtml: `<p><strong>${esc(actor?.name || "Hunter")}</strong> gained Corruption (${prevValue} → ${nextValue}).</p><p>Roll an Echo now?</p>`,
     yesLabel: "Roll Echo",
-    noLabel: "Skip"
+    noLabel: "Skip",
   });
 }
 
@@ -246,13 +246,13 @@ export async function rollEchoFlow(actor, attempt = 0) {
   const category = String(categoryRoll?.label || "");
   if (!category) return;
   await postEchoChat(actor, "Echo Roll", [
-    `Category roll: <strong>${categoryRoll.total}</strong> → <strong>${esc(category)}</strong>.`
+    `Category roll: <strong>${categoryRoll.total}</strong> → <strong>${esc(category)}</strong>.`,
   ]);
   const proceed = await confirmDialog({
     title: "Echo Roll",
     bodyHtml: `<p>Category: <strong>${esc(category)}</strong> (rolled ${categoryRoll.total}).</p>`,
     yesLabel: `Roll ${category} Echo`,
-    noLabel: "Cancel"
+    noLabel: "Cancel",
   });
   if (!proceed) return;
   if (category === "Seed") return rollSeedEcho(actor, attempt);
@@ -267,7 +267,7 @@ async function rollSeedEcho(actor, attempt = 0) {
   const label = String(result?.label || "");
   await postEchoChat(actor, "Seed Echo", [
     echoRollLine(result, corruption, trophyMod),
-    `Result: <strong>${esc(label || "None")}</strong>.`
+    `Result: <strong>${esc(label || "None")}</strong>.`,
   ]);
   const echoId = await findEchoKeyByMatch({ subtype: label.toLowerCase() });
   if (!echoId) return;
@@ -275,7 +275,7 @@ async function rollSeedEcho(actor, attempt = 0) {
     title: "Seed Echo",
     bodyHtml: `<p>Result: <strong>${esc(label)}</strong> (rolled ${result?.total ?? "?"}).</p>`,
     yesLabel: "Gain Echo",
-    noLabel: "Cancel"
+    noLabel: "Cancel",
   });
   if (!proceed) return;
   const created = await createEchoFromCompendium(actor, echoId);
@@ -288,7 +288,7 @@ async function rollSeedEcho(actor, attempt = 0) {
 async function createBoundWeaponEcho(actor, echoId, weapon, weaponType, displayName) {
   const created = await createEchoFromCompendium(actor, echoId, {
     name: displayName,
-    system: { sourceWeaponId: weapon.id, weaponType }
+    system: { sourceWeaponId: weapon.id, weaponType },
   });
   if (!created || created.duplicate) return created;
   await created.update({ "system.sourceWeaponId": weapon.id, "system.weaponType": weaponType });
@@ -307,13 +307,13 @@ async function rollWeaponEcho(actor, attempt = 0) {
   await postEchoChat(actor, "Weapon Echo", [
     echoRollLine(result, corruption, trophyMod),
     `Result: <strong>${esc(label || "None")}</strong>.`,
-    `Weapon: <strong>${esc(weapon.name || "Weapon")}</strong> (${esc(weaponType)}).`
+    `Weapon: <strong>${esc(weapon.name || "Weapon")}</strong> (${esc(weaponType)}).`,
   ]);
   const proceed = await confirmDialog({
     title: "Weapon Echo",
     bodyHtml: `<p>Result: <strong>${esc(label || "None")}</strong> (rolled ${result?.total ?? "?"}).</p><p>Weapon: <strong>${esc(weapon.name || "Weapon")}</strong>.</p>`,
     yesLabel: "Gain Echo",
-    noLabel: "Cancel"
+    noLabel: "Cancel",
   });
   if (!proceed) return;
 
@@ -340,7 +340,7 @@ async function rollMalignancyEcho(actor, attempt = 0) {
       title: "Choose Malignancy",
       label: "Malignancy",
       options: MALIGNANCY_LIST.map(m => ({ value: m, label: m })),
-      applyLabel: "Choose"
+      applyLabel: "Choose",
     });
     if (!pick) return;
     await actor.update({ "system.malignancy": pick });
@@ -352,7 +352,7 @@ async function rollMalignancyEcho(actor, attempt = 0) {
     if (created) {
       await postEchoChat(actor, "Malignancy Echo", [
         `Malignancy chosen: <strong>${esc(pick)}</strong>.`,
-        `Added: <strong>${esc(created.name || "Infection")}</strong>.`
+        `Added: <strong>${esc(created.name || "Infection")}</strong>.`,
       ]);
     }
     return;
@@ -364,7 +364,7 @@ async function rollMalignancyEcho(actor, attempt = 0) {
   await postEchoChat(actor, "Malignancy Echo", [
     `Malignancy: <strong>${esc(malignancy)}</strong>.`,
     echoRollLine(result, corruption, trophyMod),
-    `Result: <strong>${esc(label || "None")}</strong>.`
+    `Result: <strong>${esc(label || "None")}</strong>.`,
   ]);
   const echoId = await findEchoKeyByMatch({ subtype: label.toLowerCase(), malignancy });
   if (!echoId) return;
@@ -372,7 +372,7 @@ async function rollMalignancyEcho(actor, attempt = 0) {
     title: "Malignancy Echo",
     bodyHtml: `<p>Malignancy: <strong>${esc(malignancy)}</strong>.</p><p>Result: <strong>${esc(label)}</strong> (rolled ${result?.total ?? "?"}).</p>`,
     yesLabel: "Gain Echo",
-    noLabel: "Cancel"
+    noLabel: "Cancel",
   });
   if (!proceed) return;
   const created = await createEchoFromCompendium(actor, echoId);
@@ -385,7 +385,7 @@ async function applyWeaponSecretEcho(actor, weapon) {
   const existingPermanent = actor.items.filter(i =>
     i.type === "weaponAbility" &&
     String(i.system?.durationType || "") === "permanent" &&
-    (String(i.system?.boundWeaponId || "") === weapon.id || String(i.system?.weaponType || "") === weaponType)
+    (String(i.system?.boundWeaponId || "") === weapon.id || String(i.system?.weaponType || "") === weaponType),
   );
   if (!existingPermanent.length) {
     ui.notifications.warn("No permanent abilities to replace for Secret.");
@@ -395,7 +395,7 @@ async function applyWeaponSecretEcho(actor, weapon) {
     title: "Secret: Replace Permanent Ability",
     label: "Replace Permanent Ability",
     options: existingPermanent.map(a => ({ value: a.id, label: a.name })),
-    applyLabel: "Replace"
+    applyLabel: "Replace",
   });
   if (!replaceId) return;
   const toReplace = actor.items.get(replaceId);
@@ -410,7 +410,7 @@ async function applyWeaponSecretEcho(actor, weapon) {
   await actor.deleteEmbeddedDocuments("Item", [toReplace.id]);
   await grantWeaponAbilityToHunter(actor, pick, "permanent", weapon.id);
   await postEchoChat(actor, "Secret", [
-    `<strong>${esc(actor.name)}</strong> gains <strong>${esc(pick.name)}</strong>.`
+    `<strong>${esc(actor.name)}</strong> gains <strong>${esc(pick.name)}</strong>.`,
   ]);
 }
 
@@ -433,9 +433,9 @@ async function selectWeaponForEcho(actor, echoItem) {
     label: "Weapon",
     options: weapons.map(w => ({
       value: w.id,
-      label: `${w.name} (${w.system?.weaponType || "Weapon"})`
+      label: `${w.name} (${w.system?.weaponType || "Weapon"})`,
     })),
-    applyLabel: "Select"
+    applyLabel: "Select",
   });
   return pick ? actor.items.get(String(pick)) : null;
 }
@@ -446,7 +446,7 @@ async function bindEchoWeapon(actor, echoItem) {
   if (!weapon) return null;
   await echoItem.update({
     "system.sourceWeaponId": weapon.id,
-    "system.weaponType": String(weapon.system?.weaponType || "")
+    "system.weaponType": String(weapon.system?.weaponType || ""),
   });
   return weapon;
 }
@@ -490,8 +490,8 @@ export async function applySeedEchoEffect(actor, echoItem, options = {}) {
       label: "Apply an effect now",
       options: [
         { value: "exploration", label: `Increase TN +${delta}` },
-        { value: "hazard", label: "Create Hazard" }
-      ]
+        { value: "hazard", label: "Create Hazard" },
+      ],
     });
     if (!choice) return;
     enhancesExploration = choice === "exploration";
@@ -503,7 +503,7 @@ export async function applySeedEchoEffect(actor, echoItem, options = {}) {
     const next = Number(hollow?.getFlag("hollows", "explorationTNMod") ?? 0) + delta;
     if (hollow) await setActorFlagSafe(hollow, "explorationTNMod", next);
     await postEchoChat(actor, echoItem.name || "Seed Echo", [
-      `Exploration TNs +${delta} (current mod: ${next}).`
+      `Exploration TNs +${delta} (current mod: ${next}).`,
     ]);
   }
 
@@ -515,8 +515,10 @@ export async function applySeedEchoEffect(actor, echoItem, options = {}) {
     await requestEchoWandererCreate(actor, repeat, echoItem);
   }
 
-  if (echoItem.system?.onePerHollow) {
-    await echoItem.update({ "system.usedThisHollow": true });
+  if (echoItem.system.state.has("onePerHollow")) {
+    const state = new Set(echoItem.system.state);
+    state.add("usedThisHollow");
+    await echoItem.update({ "system.state": [...state] });
   }
 }
 
@@ -527,7 +529,7 @@ async function requestEchoHazardCreate(actor, delta, echoItem) {
     actorId: actor.id,
     delta,
     sourceName: echoItem?.name || "",
-    hazard: echoItem?.system?.onAcquire?.hazard || {}
+    hazard: echoItem?.system?.onAcquire?.hazard || {},
   });
 }
 
@@ -546,8 +548,8 @@ async function createEchoHazardActor(actor, delta, sourceName = "", stats = {}) 
       damageSuccessResolve: Number(stats.resolve ?? 2),
       damageFailureWounds: Number(stats.wounds ?? 2),
       doomOnFailure: 0,
-      notes: label
-    }
+      notes: label,
+    },
   }, { renderSheet: true });
   await postEchoChat(actor, label, [`Hazard created (${esc(hazard.name)}).`]);
 }
@@ -557,7 +559,7 @@ async function requestEchoWandererCreate(actor, upgraded, echoItem) {
     actorId: actor.id,
     upgraded: !!upgraded,
     sourceName: echoItem?.name || "",
-    thrall: echoItem?.system?.onAcquire?.thrall || {}
+    thrall: echoItem?.system?.onAcquire?.thrall || {},
   });
 }
 
@@ -577,8 +579,8 @@ async function createEchoWandererThrall(actor, upgraded, sourceName = "", stats 
       tn: Number(stats.tn ?? 8),
       damage: { resolve: dResolve, wounds: dWounds },
       health: { resolve: { value: hResolve, max: hResolve }, wounds: { value: hWounds, max: hWounds } },
-      notes: label
-    }
+      notes: label,
+    },
   });
   await postEchoChat(actor, label, [`Thrall created (${esc(thrall.name)}).`]);
 }

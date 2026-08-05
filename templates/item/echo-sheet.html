@@ -30,15 +30,7 @@
       </div>
     </div>
     {{#if isMalignancyEcho}}
-    <div class="form-group">
-      <label>Malignancy</label>
-      <div class="form-fields">
-        <select name="system.malignancy">
-          <option value="">None</option>
-          {{selectOptions malignancyChoices selected=system.malignancy localize=false}}
-        </select>
-      </div>
-    </div>
+    {{formGroup systemFields.malignancy options=malignancyChoices blank=(localize 'COMMON.None') value=system.malignancy}}
     {{/if}}
     {{#if isWeaponEcho}}
     {{#if hasHunterParent}}
@@ -64,14 +56,8 @@
     </div>
     {{/unless}}
     {{/if}}
-    <div class="form-group">
-      <label>State</label>
-      <div class="form-fields">
-        <label class="checkbox"><input type="checkbox" name="system.suppressed" {{#if system.suppressed}}checked{{/if}} /> Suppressed</label>
-        <label class="checkbox"><input type="checkbox" name="system.onePerHollow" {{#if system.onePerHollow}}checked{{/if}} /> One per Hollow</label>
-        <label class="checkbox"><input type="checkbox" name="system.usedThisHollow" {{#if system.usedThisHollow}}checked{{/if}} /> Used this Hollow</label>
-      </div>
-    </div>
+
+    {{formGroup systemFields.state value=system.state type="checkboxes" localize=true}}
   </section>
 
   <section class="sheet-section">

@@ -10,7 +10,7 @@ export function getEchoItems(actor) {
 }
 
 export function getActiveEchoItems(actor) {
-  return getEchoItems(actor).filter(e => !e.system?.suppressed);
+  return actor.items.documentsByType.echo.filter(item => !item.system.state.has("suppressed"));
 }
 
 export function getEchoStatMods(actor) {

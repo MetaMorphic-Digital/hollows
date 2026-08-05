@@ -113,6 +113,27 @@
       "FlankLeft": "Flank Left",
       "FlankRight": "Flank Right"
     },
+    "ITEM": {
+      "ECHO": {
+        "FIELDS": {
+          "malignancy": {
+            "label": "Malignancy"
+          },
+          "state": {
+            "label": "State"
+          }
+        },
+        "STATES": {
+          "suppressed": "Suppressed",
+          "onePerHollow": "One Per Hollow",
+          "usedThisHollow": "Used This Hollow"
+        },
+        "TAGS": {
+          "onePerHollow": "One Per Hollow",
+          "used": "Used"
+        }
+      }
+    },
     "PACKS": {
       "WEAPONS": "Hollows - Weapons",
       "WEAPON_ABILITIES": "Hollows - Weapon Abilities"
