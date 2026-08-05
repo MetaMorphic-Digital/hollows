@@ -32,9 +32,6 @@ export function isSameCombatTurn(a, b) {
 }
 import { buildStandardRollCardHtml } from "../applications/ui/roll-card.js";
 
-export const HOLLOWS_PREV_COMBATANT_BY_COMBAT_ID = new Map();
-export const HOLLOWS_LAST_COMBATANT_BY_COMBAT_ID = new Map();
-
 export function getCombatantOwners(actor) {
   if (!actor) return [];
   return game.users.filter((user) => actor.testUserPermission(user, "OWNER"));
@@ -287,8 +284,13 @@ export async function applyAdvanceTurnGM(combat, fromCombatantId, mode) {
   await current.setFlag("hollows", "acted", true);
 
   if (move === "after-to-entity") {
+    // The round is advanced here, so flag the update as manual to stop the turn machine
+    // from advancing it a second time.
     const nextRound = (combat.round || 0) + 1;
-    await combat.update({ round: nextRound, turn: index }, { hollowsPassInitiative: true });
+    await combat.update({ round: nextRound, turn: index }, {
+      hollowsPassInitiative: true,
+      hollowsManualMakeActive: true,
+    });
   } else {
     await combat.update({ turn: index }, { hollowsPassInitiative: true });
   }
