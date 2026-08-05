@@ -11,12 +11,8 @@ import {
 } from "../helpers/combat-first-pick.js";
 import { processEndOfTurn, processStartOfTurn } from "../helpers/combat-lifecycle.js";
 import { getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from "../helpers/combat-runtime.js";
-import { hasCondition } from "./actor/conditions.js";
-import {
-  cleanupCombatStates,
-  initializeHunterCoreStatesForCombat,
-  resetHunterCombatFlags,
-} from "./actor/hunter-combat.js";
+import { getTerrainTagKeys, hasCondition, removeCondition } from "./actor/conditions.js";
+import { initializeHunterCoreStatesForCombat, resetHunterCombatFlags } from "./actor/hunter-combat.js";
 
 /**
  * System implementation of the Combat class.
@@ -89,7 +85,15 @@ export default class HollowsCombat extends foundry.documents.Combat {
 
     if (!game.user.isActiveGM) return;
 
-    await cleanupCombatStates(this);
+    // Clean up combat states.
+    const actors = new Set(this.combatants.map(c => c.actor).filter(_ => _));
+    for (const actor of actors) {
+      for (const tag of getTerrainTagKeys()) {
+        // Refund the pool itself for non-free pooled tags.
+        if (hasCondition(actor, tag)) await removeCondition(actor, tag);
+      }
+    }
+
     await resetHunterCombatFlags();
     await clearAllCurseTrackers(this);
   }

@@ -83,18 +83,6 @@ export async function initializeHunterCoreStatesForCombat(combat) {
   await combat.setFlag("hollows", "coreStatesInitialized", true);
 }
 
-export async function cleanupCombatStates(combat) {
-  if (!game.user.isGM || !combat) return;
-  const actors = new Set(combat.combatants.map((c) => c.actor).filter(_ => _));
-
-  for (const actor of actors) {
-    for (const tag of getTerrainTagKeys()) {
-      // removeCondition refunds the pool itself for non-free pooled tags.
-      if (hasCondition(actor, tag)) await removeCondition(actor, tag);
-    }
-  }
-}
-
 /** Reset combat state on every hunter in the world: a hunter whose token is gone no longer resolves from its combatant. */
 export async function resetHunterCombatFlags() {
   if (!game.user.isGM) return;
@@ -110,23 +98,15 @@ export async function resetHunterCombatFlags() {
     if (hasCondition(actor, "dead")) await removeCondition(actor, "dead");
     if (getFocusCount(actor) > 0) await setFocusCount(actor, 0);
 
-    const flags = actor.flags[hollows.id] ?? {};
-    const update = {};
-    for (const [key, value] of Object.entries(COMBAT_RESET_FLAGS)) {
-      if (!(key in flags) || (flags[key] === value)) continue;
-      update[key] = value;
-    }
-
-    if (foundry.utils.isEmpty(update)) continue;
     operations.push({
       action: "update",
       documentName: actor.documentName,
       parent: actor.parent,
-      updates: [{ _id: actor.id, [`flags.${hollows.id}`]: update }],
+      updates: [{ _id: actor.id, [`flags.${hollows.id}`]: { ...COMBAT_RESET_FLAGS } }],
     });
   }
 
-  if (operations.length) await foundry.documents.modifyBatch(operations);
+  await foundry.documents.modifyBatch(operations);
 }
 
 export async function applySupportStartOfTurn(actor) {
