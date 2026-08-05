@@ -1,3 +1,5 @@
+import { THREAT_PLACEMENT_SCOPE_LABELS } from "../gameplay-constants.js";
+
 export default class EntityData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
   static defineSchema() {
@@ -24,6 +26,15 @@ export default class EntityData extends foundry.abstract.TypeDataModel {
       threat: new fields.SchemaField({
         perRound: new fields.NumberField({ initial: 0, min: 0 }),
         max: new fields.NumberField({ initial: 0, min: 0 }),
+        placement: new fields.ArrayField(
+          new fields.SchemaField({
+            scope: new fields.StringField({ initial: "all", choices: Object.keys(THREAT_PLACEMENT_SCOPE_LABELS) }),
+            zones: new fields.ArrayField(new fields.StringField({ required: true, blank: false })),
+            amount: new fields.NumberField({ initial: 0, min: 0 }),
+            perZoneMax: new fields.NumberField({ initial: 0, min: 0 }),
+          }),
+          { initial: [] },
+        ),
       }),
       curse: new fields.SchemaField({
         enabled: new fields.BooleanField({ initial: false }),
@@ -43,70 +54,6 @@ export default class EntityData extends foundry.abstract.TypeDataModel {
         elevated: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         sheltered: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       }),
-      abilities: new fields.ArrayField(
-        new fields.SchemaField({
-          name: new fields.StringField({ initial: "Ability" }),
-          text: new fields.StringField({ initial: "" }),
-        }),
-        { initial: [] },
-      ),
-      attacks: new fields.ArrayField(
-        new fields.SchemaField({
-          name: new fields.StringField({ initial: "Attack" }),
-          defenceStat: new fields.StringField({ initial: "hard" }),
-          tn: new fields.NumberField({ initial: 0 }),
-          damage: new fields.SchemaField({
-            resolve: new fields.NumberField({ initial: 0 }),
-            wounds: new fields.NumberField({ initial: 0 }),
-          }),
-          targetMode: new fields.StringField({ initial: "single" }),
-          allowedZones: new fields.ArrayField(
-            new fields.StringField({ initial: "" }),
-            { initial: [] },
-          ),
-          conditionText: new fields.StringField({ initial: "" }),
-          followUpEnabled: new fields.BooleanField({ initial: false }),
-          followUpWhen: new fields.StringField({ initial: "success" }),
-          followUpTargets: new fields.StringField({ initial: "" }),
-          followUpDamage: new fields.SchemaField({
-            resolve: new fields.NumberField({ initial: 0 }),
-            wounds: new fields.NumberField({ initial: 0 }),
-          }),
-          followUpDefenceStat: new fields.StringField({ initial: "" }),
-          followUpTN: new fields.NumberField({ initial: 0 }),
-          followUpTargetMode: new fields.StringField({ initial: "multiZone" }),
-          followUpZoneSource: new fields.StringField({ initial: "same" }),
-          followUpZoneCount: new fields.StringField({ initial: "all" }),
-          followUpAllowedZones: new fields.ArrayField(
-            new fields.StringField({ initial: "" }),
-            { initial: [] },
-          ),
-          followUpExcludeOriginal: new fields.BooleanField({ initial: true }),
-        }),
-        { initial: [] },
-      ),
-      interrupts: new fields.ArrayField(
-        new fields.SchemaField({
-          name: new fields.StringField({ initial: "Interrupt" }),
-          cost: new fields.NumberField({ initial: 1 }),
-          targetMode: new fields.StringField({ initial: "single" }),
-          allowedZones: new fields.ArrayField(
-            new fields.StringField({ initial: "" }),
-            { initial: [] },
-          ),
-          actionType: new fields.StringField({ initial: "attack" }),
-          defenceStat: new fields.StringField({ initial: "hard" }),
-          testStat: new fields.StringField({ initial: "hard" }),
-          tn: new fields.NumberField({ initial: 0 }),
-          damage: new fields.SchemaField({
-            resolve: new fields.NumberField({ initial: 0 }),
-            wounds: new fields.NumberField({ initial: 0 }),
-          }),
-          conditionText: new fields.StringField({ initial: "" }),
-          effectText: new fields.StringField({ initial: "" }),
-        }),
-        { initial: [] },
-      ),
     };
   }
 

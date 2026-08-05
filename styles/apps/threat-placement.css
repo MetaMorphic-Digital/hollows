@@ -1,0 +1,20 @@
+.hollows-threat-placement .threat-step {
+  align-items: center;
+  gap: 4px;
+}
+
+.hollows-threat-placement .threat-step button {
+  flex: 0 0 28px;
+  height: 28px;
+  padding: 0;
+  line-height: 1;
+}
+
+.hollows-threat-placement .threat-step input[type="number"] {
+  flex: 0 0 64px;
+  text-align: center;
+}
+
+.hollows-threat-placement .threat-placement-status p {
+  margin: 4px 0 0;
+}

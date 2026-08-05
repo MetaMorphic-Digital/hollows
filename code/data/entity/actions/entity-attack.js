@@ -1,9 +1,10 @@
 import { promptForm } from "../../../applications/apps/selection-dialogs.mjs";
-import { getTokenZone, sceneHunterTokens } from "../../../canvas/zone.js";
+import { getTokenZone, localizeZone, sceneHunterTokens } from "../../../canvas/zone.js";
 import {
   createFollowUpConfig,
   createRepeatConfig,
-  normalizeEntityAttackBuilderMode
+  getEntityAbilityText,
+  normalizeEntityAttackBuilderMode,
 } from "../action-schema.js";
 import {
   buildEntityAfterAttackConfigs,
@@ -14,32 +15,33 @@ import {
   getEntityModifyIfResult,
   matchesEntityAttackConditions,
   resolveEntityAbilityDamage,
-  resolveEntityAbilityTN
+  resolveEntityAbilityTN,
 } from "../action-rules.js";
 import {
   normalizeAllowedZones,
   resolveActionTargets,
-  runEntityAction
+  runEntityAction,
 } from "../action-flow.js";
 import { createEntityDefenceRequest } from "../action-cards.js";
 import {
   initEntityAttackGroup,
-  maybeRunEntityAttackEnhancementGate
+  maybeRunEntityAttackEnhancementGate,
 } from "../../../documents/entity/entity-enhancements.js";
 import { getEffectiveEntityStat } from "../../../documents/entity/entity-stats.js";
 import {
   applyEntityActionCost,
   getEffectiveThreatEnhancement,
   getEntityAttackCost,
-  promptEntityThreatEnhance
+  promptEntityThreatEnhance,
 } from "../../../documents/entity/entity-threat.js";
 import { getEntitySelfActionTargetingOverride } from "../../../helpers/entity-dispatchers.js";
 import {
   runEntityActionPauses,
-  runOnEntityAttack
+  runOnEntityAttack,
 } from "../../../helpers/weapon-abilities/dispatchers.js";
 import { requestAfterAttackApply } from "../../../documents/entity/attack-effects.js";
 
+/** Run an Entity attack ability. */
 export async function performEntityAttack(entityActor, attackItem, options = {}) {
   if (!attackItem) return;
   entityActor = game.actors?.get(entityActor?.id) || entityActor;
@@ -66,8 +68,8 @@ export async function performEntityAttack(entityActor, attackItem, options = {})
       repeatConfig,
       forceAdvantage: !!options.forceDefenceAdvantage,
       zoneSpend: {},
-      manualConfig: null
-    }
+      manualConfig: null,
+    },
   };
   return runEntityAction(ctx, attackPipeline);
 }
@@ -85,7 +87,7 @@ const attackPipeline = {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       actionKind: "attack",
-      actionType: "attack"
+      actionType: "attack",
     });
     const mode = targetOverride.mode
       ? String(targetOverride.mode)
@@ -96,7 +98,7 @@ const attackPipeline = {
       hunters: sceneHunterTokens(),
       actionType: "attack",
       targeting: targetOverride.mode ? targetOverride : profile,
-      warnNoValidZones: "No valid zones with Hunters for this attack."
+      warnNoValidZones: "No valid zones with Hunters for this attack.",
     });
     ctx.selectedZones = mode === "single" || mode === "noTargets" ? [] : (selection?.zones || []);
     return selection?.targets || [];
@@ -117,7 +119,7 @@ const attackPipeline = {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       targetTokens: ctx.targets,
-      selectedZones: ctx.selectedZones
+      selectedZones: ctx.selectedZones,
     });
     if (pause.cancelled) return { cancelled: true };
     if (Array.isArray(pause.targetTokens)) ctx.targets = pause.targetTokens;
@@ -136,7 +138,7 @@ const attackPipeline = {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       targets: ctx.targets,
-      selectedZones: ctx.selectedZones
+      selectedZones: ctx.selectedZones,
     });
     if (gate.cancelled) return { cancelled: true };
   },
@@ -146,10 +148,10 @@ const attackPipeline = {
     if (!(builderMode === "advanced" && (repeatCount <= 0 || repeatConfig.hasCost))) return true;
     const targetZones = Array.from(new Set([
       ...ctx.targets.map((target) => getTokenZone(target)).filter(Boolean),
-      ...ctx.selectedZones
+      ...ctx.selectedZones,
     ]));
     return applyEntityActionCost(ctx.action, ctx.entityActor, ctx.targets, targetZones, {
-      amount: getEntityAttackCost(ctx.action, ctx.entityActor, ctx.actionItem)
+      amount: getEntityAttackCost(ctx.action, ctx.entityActor, ctx.actionItem),
     });
   },
 
@@ -172,8 +174,8 @@ const attackPipeline = {
               { value: "strong", label: "Strong" },
               { value: "quick", label: "Quick" },
               { value: "sharp", label: "Sharp" },
-              { value: "wise", label: "Wise" }
-            ]
+              { value: "wise", label: "Wise" },
+            ],
           },
           {
             type: "select",
@@ -182,13 +184,13 @@ const attackPipeline = {
             options: [
               { value: "normal", label: "Normal" },
               { value: "dis", label: "Disadvantage" },
-              { value: "adv", label: "Advantage" }
-            ]
+              { value: "adv", label: "Advantage" },
+            ],
           },
           { type: "number", name: "tn", label: "TN", value: 0 },
           { type: "number", name: "damageResolve", label: "Resolve Damage", value: 0 },
-          { type: "number", name: "damageWounds", label: "Wounds Damage", value: 0 }
-        ]
+          { type: "number", name: "damageWounds", label: "Wounds Damage", value: 0 },
+        ],
       });
       if (!ctx.scratch.manualConfig) return { cancelled: true };
     }
@@ -198,9 +200,10 @@ const attackPipeline = {
 
   async afterEmit(ctx) {
     await runOnEntityAttack(ctx.entityActor, ctx.targets);
-  }
+  },
 };
 
+/** Apply before-attack effect groups. */
 async function applyBeforeAttackEffects(ctx) {
   const groups = buildEntityBeforeAttackConfigs(ctx.action);
   if (!groups.length) return;
@@ -211,15 +214,17 @@ async function applyBeforeAttackEffects(ctx) {
     await requestAfterAttackApply(target, targetZone, groups, ctx.entityActor.id, null, {
       entityActor: ctx.entityActor,
       targetZone,
-      effectTiming: "beforeAttack"
+      effectTiming: "beforeAttack",
     });
   }
 }
 
+/** Post the attack card and roll data. */
 async function performAttackOutput(ctx) {
   const { entityActor, actionItem: attackItem, action: attack } = ctx;
   const { attackName, builderMode, manualConfig, zoneSpend, repeatConfig, repeatCount, forceAdvantage } = ctx.scratch;
   const profile = attack.profile;
+  const abilityText = getEntityAbilityText(attack);
   const threatSpend = attack.threatSpend;
   const filteredTargets = ctx.targets;
   const generatedByEnhancement = attackItem?.getFlag?.("hollows", "generatedByEnhancement") || "";
@@ -242,13 +247,13 @@ async function performAttackOutput(ctx) {
     let effectiveTn = builderMode === "manual"
       ? Number(manualConfig?.tn ?? 0)
       : resolveEntityAbilityTN(Number(profile.tn ?? 0), {
-          mode: profile.tnMode,
-          type: profile.tnDynamicType,
-          dynamicSource: profile.tnDynamicSource,
-          setSource: profile.tnSetSource,
-          setDefence: profile.tnSetDefence,
-          setStat: profile.tnSetStat
-        }, entityActor, targetToken);
+        mode: profile.tnMode,
+        type: profile.tnDynamicType,
+        dynamicSource: profile.tnDynamicSource,
+        setSource: profile.tnSetSource,
+        setDefence: profile.tnSetDefence,
+        setStat: profile.tnSetStat,
+      }, entityActor, targetToken);
     effectiveTn += getEntityActionTNBonus(entityActor, attackItem, targetToken, "attack");
     const damageBonus = builderMode === "advanced"
       ? getEntityActionDamageBonus(entityActor, attackItem, targetToken, "attack")
@@ -257,19 +262,19 @@ async function performAttackOutput(ctx) {
       ? { resolve: Number(manualConfig?.damageResolve ?? 0), wounds: Number(manualConfig?.damageWounds ?? 0) }
       : builderMode === "basic"
         ? {
-            resolve: Math.max(0, Number(profile.damage?.resolve ?? 0) || 0),
-            wounds: Math.max(0, Number(profile.damage?.wounds ?? 0) || 0)
-          }
+          resolve: Math.max(0, Number(profile.damage?.resolve ?? 0) || 0),
+          wounds: Math.max(0, Number(profile.damage?.wounds ?? 0) || 0),
+        }
         : resolveEntityAbilityDamage(
-            profile.damage,
-            profile.damageMode,
-            profile.damageDynamicMode,
-            profile.damageDynamicSource,
-            entityActor,
-            targetToken,
-            profile.damageDynamicReduce,
-            profile.damageDynamicFloor
-          );
+          profile.damage,
+          profile.damageMode,
+          profile.damageDynamicMode,
+          profile.damageDynamicSource,
+          entityActor,
+          targetToken,
+          profile.damageDynamicReduce,
+          profile.damageDynamicFloor,
+        );
     let damageResolve = attackDamage.resolve + damageBonus.resolve;
     let damageWounds = attackDamage.wounds + damageBonus.wounds;
     if (builderMode === "advanced" && threatSpend.enabled && threatSpend.modifyDamage && enhancementSpend > 0) {
@@ -312,12 +317,12 @@ async function performAttackOutput(ctx) {
       damageResolve,
       damageWounds,
       detailsHtml: [
-        threatRollBonus > 0 ? `<div><strong>Threat Spend:</strong> ${spentInZone} in ${foundry.utils.escapeHTML(targetZone)} (+${threatRollBonus} to Defend roll)</div>` : "",
+        threatRollBonus > 0 ? `<div><strong>Threat Spend:</strong> ${spentInZone} in ${foundry.utils.escapeHTML(localizeZone(targetZone))} (+${threatRollBonus} to Defend roll)</div>` : "",
         builderMode === "advanced" && threatSpend.enabled && enhancementSpend > 0 && threatSpend.specialText
           ? `<div><strong>Threat Spend:</strong> ${foundry.utils.escapeHTML(threatSpend.specialText)}</div>`
           : "",
-        profile.text ? `<div>${foundry.utils.escapeHTML(profile.text)}</div>` : "",
-        builderMode === "advanced" && profile.conditionText ? `<div><strong>Condition:</strong> ${foundry.utils.escapeHTML(profile.conditionText)}</div>` : ""
+        abilityText ? `<div>${foundry.utils.escapeHTML(abilityText)}</div>` : "",
+        builderMode === "advanced" && profile.conditionText ? `<div><strong>Condition:</strong> ${foundry.utils.escapeHTML(profile.conditionText)}</div>` : "",
       ].join(""),
       attackData: {
         rollMod: threatRollBonus,
@@ -332,8 +337,8 @@ async function performAttackOutput(ctx) {
           : [],
         followUp: builderMode === "advanced"
           ? createFollowUpConfig(attack.followUp, damageBonus)
-          : { enabled: false }
-      }
+          : { enabled: false },
+      },
     });
   }
 }

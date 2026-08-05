@@ -1,9 +1,10 @@
 import { DEFENCE_LABELS } from "../../../data/_module.mjs";
+import { THREAT_PLACEMENT_SCOPE_LABELS, ZONE_GROUPS } from "../../../data/gameplay-constants.js";
 import {
   getEffectiveEntityStat,
   getEntityBaseSystem,
 } from "../../../documents/entity/entity-stats.js";
-import { createDefaultEntityAbility } from "../../../data/entity/action-schema.js";
+import { createDefaultEntityAbility, getEntityAbilityText } from "../../../data/entity/action-schema.js";
 import { entityAbilityBlockedBy } from "../../../data/relic/passive.js";
 import {
   configureEntityEnhancementItem,
@@ -24,77 +25,69 @@ import { performEntityManoeuvre } from "../../../data/entity/actions/entity-mano
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
-function getEntityAbilityDisplayText(ability) {
-  const system = ability?.system || {};
-  const profileText = String(system.profile?.text || "").trim();
-  if (profileText) return profileText;
-  const groups = Array.isArray(system.afterAttack?.groups) ? system.afterAttack.groups : [];
-  const other = groups.find((group) => String(group?.otherText || "").trim());
-  return other ? String(other.otherText || "") : "";
-}
+// Zones offered by the Select Zones chips on a placement rule.
+const PLACEMENT_ZONE_CHOICES = [...ZONE_GROUPS.close, ...ZONE_GROUPS.ranged];
 
 export default class HollowsEntitySheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["hollows", "sheet", "actor", "entity"],
     position: { width: 680, height: 780 },
     window: { resizable: true },
-    form: { submitOnChange: false, closeOnSubmit: false },
+    form: { submitOnChange: true, closeOnSubmit: false },
+  };
+
+  /** @inheritdoc */
+  static TABS = {
+    mainTabs: {
+      tabs: [{ id: "stats" }, { id: "attacks" }, { id: "actions" }, { id: "edges" }, { id: "about" }],
+      initial: "stats",
+      labelPrefix: "HOLLOWS.ACTOR.ENTITY.TABS",
+    },
   };
 
   static PARTS = {
     sheet: {
       template: "systems/hollows/templates/actor/entity-sheet.html",
+      scrollable: [""],
       root: true,
     },
   };
 
+  /** @inheritdoc */
   get title() {
     return this.actor?.name ?? "Entity";
   }
 
-  render(options = {}) {
-    const sb = this.element?.querySelector(".sheet-body");
-    if (sb) this._savedScrollTop = sb.scrollTop;
-    return super.render(options);
-  }
-
+  /** Live actor for synthetic-token sheets. */
   _getLiveEntityActor() {
     return game.actors?.get(this.actor.id) || this.actor;
   }
 
+  /** @inheritdoc */
   async _prepareContext(options) {
-    const context = await super._prepareContext(options);
-    const data = {
-      ...context,
-      actor: this.actor,
-      system: this.actor.system,
-      editable: this.isEditable,
-      owner: this.document.isOwner,
-      limited: this.document.limited,
-    };
-    return this._prepareSheetContext(data);
+    return this._prepareSheetContext(await super._prepareContext(options));
   }
 
+  /** Build the Entity sheet context. */
   async _prepareSheetContext(data) {
     const actor = this._getLiveEntityActor();
+    // Inputs are bound to the stored values; modifiers are shown beside them, never written back.
     const system = foundry.utils.deepClone(getEntityBaseSystem(actor));
-    system.defences = system.defences || {};
-    system.health = system.health || {};
-    system.health.resolve = system.health.resolve || {};
-    system.health.wounds = system.health.wounds || {};
-    system.threat = system.threat || {};
-    system.defences.close = getEffectiveEntityStat(actor, "close");
-    system.defences.ranged = getEffectiveEntityStat(actor, "ranged");
-    system.defences.wyrd = getEffectiveEntityStat(actor, "wyrd");
-    system.health.resolve.max = getEffectiveEntityStat(actor, "resolveMax");
-    system.health.wounds.max = getEffectiveEntityStat(actor, "woundsMax");
-    system.health.resolve.value = Math.min(Number(system.health.resolve.value ?? 0), Number(system.health.resolve.max ?? 0));
-    system.health.wounds.value = Math.min(Number(system.health.wounds.value ?? 0), Number(system.health.wounds.max ?? 0));
-    system.threat.perRound = getEffectiveEntityStat(actor, "threatPerRound");
-    system.threat.max = getEffectiveEntityStat(actor, "threatCap");
     data.actor = actor;
     data.system = system;
+    data.tabs = this._prepareTabs("mainTabs");
+    data.effective = {
+      close: getEffectiveEntityStat(actor, "close"),
+      ranged: getEffectiveEntityStat(actor, "ranged"),
+      wyrd: getEffectiveEntityStat(actor, "wyrd"),
+      resolveMax: getEffectiveEntityStat(actor, "resolveMax"),
+      woundsMax: getEffectiveEntityStat(actor, "woundsMax"),
+      threatPerRound: getEffectiveEntityStat(actor, "threatPerRound"),
+      threatCap: getEffectiveEntityStat(actor, "threatCap"),
+    };
     data.defenceLabels = DEFENCE_LABELS;
+    data.threatScopes = THREAT_PLACEMENT_SCOPE_LABELS;
+    data.threatZoneList = PLACEMENT_ZONE_CHOICES;
     const abilities = actor.items.filter(i => i.type === "entityAbility");
     const enhancements = actor.items.filter(i => i.type === "entityEnhancement");
     const byKind = (kind) => abilities.filter(a => a.system?.kind === kind);
@@ -115,25 +108,11 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     return data;
   }
 
+  /** @inheritdoc */
   async _onRender(context, options) {
     await super._onRender(context, options);
     const wc = this.element.querySelector(".window-content");
     wc?.classList.add("hollows-sheet");
-    const sb = this.element.querySelector(".sheet-body");
-    if (this._savedScrollTop && sb) {
-      sb.scrollTop = this._savedScrollTop;
-      this._savedScrollTop = 0;
-    }
-
-    if (!this._activeTab) this._activeTab = "stats";
-    for (const tab of this.element.querySelectorAll(".sheet-tabs[data-group='mainTabs'] [data-tab]")) {
-      tab.addEventListener("click", e => {
-        e.preventDefault();
-        this._activeTab = tab.dataset.tab;
-        this._activateEntityTab(this._activeTab);
-      });
-    }
-    this._activateEntityTab(this._activeTab);
 
     if (this.isEditable) {
       this.element.querySelector("[data-edit=\"img\"]")?.addEventListener("click", () => {
@@ -147,20 +126,13 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
 
     for (const el of this.element.querySelectorAll("[data-ability-hover]")) {
       el.addEventListener("mouseenter", (event) => {
-        const actor = this._getLiveEntityActor();
         const target = event.currentTarget;
-        if (!target) return;
-        if (target.getAttribute("title")) target.removeAttribute("title");
-        if (target.dataset.tooltip) delete target.dataset.tooltip;
         if (target.dataset.hollowsTooltip) return;
-        const itemId = String(target.dataset.itemId || "");
-        if (!itemId) return;
-        const ability = actor.items.get(itemId);
+        const ability = this._getLiveEntityActor().items.get(target.dataset.itemId);
         if (!ability) return;
-        const rawText = getEntityAbilityDisplayText(ability);
-        const trimmed = String(rawText).trim();
-        if (!trimmed) return;
-        target.dataset.hollowsTooltip = trimmed.replaceAll("\r\n", "\n");
+        const text = getEntityAbilityText(ability.system);
+        if (!text) return;
+        target.dataset.hollowsTooltip = text.replaceAll("\r\n", "\n");
       });
       el.addEventListener("click", (event) => {
         if (!event.shiftKey) return;
@@ -201,6 +173,18 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     for (const el of this.element.querySelectorAll("[data-edge-delete]")) {
       el.addEventListener("click", this._onEdgeDelete.bind(this));
     }
+    for (const el of this.element.querySelectorAll("[data-threat-rule-add]")) {
+      el.addEventListener("click", this._onThreatRuleAdd.bind(this));
+    }
+    for (const el of this.element.querySelectorAll("[data-threat-rule-delete]")) {
+      el.addEventListener("click", this._onThreatRuleDelete.bind(this));
+    }
+    for (const el of this.element.querySelectorAll("[data-rule-field]")) {
+      el.addEventListener("change", this._onThreatRuleChange.bind(this));
+    }
+    for (const el of this.element.querySelectorAll("[data-rule-zone]")) {
+      el.addEventListener("change", this._onThreatRuleZoneToggle.bind(this));
+    }
     for (const el of this.element.querySelectorAll("[data-enhancement-add]")) {
       el.addEventListener("click", this._onEnhancementAdd.bind(this));
     }
@@ -219,33 +203,58 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
-  _activateEntityTab(tabName) {
-    if (!tabName || !this.element) return;
-    for (const tab of this.element.querySelectorAll(".sheet-tabs[data-group='mainTabs'] [data-tab]")) {
-      tab.classList.toggle("active", tab.dataset.tab === tabName);
-    }
-    for (const panel of this.element.querySelectorAll(".sheet-body > .tab")) {
-      const isActive = panel.dataset.tab === tabName;
-      panel.classList.toggle("active", isActive);
-    }
+  /** Clone the editable placement rules. */
+  _placementRules() {
+    return foundry.utils.deepClone(getEntityBaseSystem(this._getLiveEntityActor())?.threat?.placement ?? []);
   }
 
-  async _onChangeForm(formConfig, event) {
-    const input = event?.target;
-    const name = String(input?.name ?? "");
-    if (input?.tagName !== "SELECT" && name && (name === "name" || name.startsWith("system."))) {
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const actor = this._getLiveEntityActor();
-      const value = input.type === "checkbox" ? input.checked
-        : input.type === "number" ? (Number(input.value) || 0)
-          : String(input.value ?? "");
-      await actor.update({ [name]: value }, { render: false });
-      return;
-    }
-    return super._onChangeForm(formConfig, event);
+  /** Update one placement rule field. */
+  async _onThreatRuleChange(event) {
+    // These inputs carry no name; stop the event before submitOnChange re-submits the whole form.
+    event.stopPropagation();
+    const target = event.currentTarget;
+    const index = Number(target.dataset.ruleIndex ?? -1);
+    const field = target.dataset.ruleField;
+    const rules = this._placementRules();
+    if (index < 0 || index >= rules.length) return;
+    rules[index][field] = target.type === "number"
+      ? Math.max(0, Number(target.value) || 0)
+      : target.value;
+    await this._getLiveEntityActor().update({ "system.threat.placement": rules });
   }
 
+  /** Update selected zones for one rule. */
+  async _onThreatRuleZoneToggle(event) {
+    event.stopPropagation();
+    const index = Number(event.currentTarget.dataset.ruleIndex ?? -1);
+    const rules = this._placementRules();
+    if (index < 0 || index >= rules.length) return;
+    rules[index].zones = Array.from(this.element.querySelectorAll(`[data-rule-zone][data-rule-index="${index}"]:checked`))
+      .map((checkbox) => checkbox.dataset.ruleZone);
+    await this._getLiveEntityActor().update({ "system.threat.placement": rules });
+  }
+
+  /** Add a placement rule. */
+  async _onThreatRuleAdd(event) {
+    event.preventDefault();
+    const actor = this._getLiveEntityActor();
+    const rules = this._placementRules();
+    const amount = Math.max(1, Number(getEffectiveEntityStat(actor, "threatPerRound")) || 0);
+    rules.push({ scope: "all", zones: [], amount, perZoneMax: 0 });
+    await actor.update({ "system.threat.placement": rules });
+  }
+
+  /** Delete a placement rule. */
+  async _onThreatRuleDelete(event) {
+    event.preventDefault();
+    const index = Number(event.currentTarget.dataset.threatRuleDelete ?? -1);
+    const rules = this._placementRules();
+    if (index < 0 || index >= rules.length) return;
+    rules.splice(index, 1);
+    await this._getLiveEntityActor().update({ "system.threat.placement": rules });
+  }
+
+  /** Run a basic Entity manoeuvre. */
   async _onEntityManoeuvre(event) {
     event.preventDefault();
     const mode = String(event.currentTarget.dataset.entityManoeuvre || "");
@@ -266,6 +275,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
+  /** Create an Entity ability. */
   async _onEntityAbilityAdd(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -286,6 +296,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     }]);
   }
 
+  /** Open the ability editor. */
   async _onEntityAbilityEdit(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -295,6 +306,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     item.sheet?.render(true);
   }
 
+  /** Delete an ability. */
   async _onEntityAbilityDelete(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -304,17 +316,13 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     await item.delete();
   }
 
+  /** Remove an active Edge. */
   async _onEdgeDelete(event) {
     event.preventDefault();
-    const index = Number(event.currentTarget.dataset.edgeDelete ?? -1);
-    const ok = await removeEntityEdge(this.actor, index);
-    if (!ok) {
-      ui.notifications.warn("Failed to remove Edge.");
-      return;
-    }
-    this.render(false);
+    await removeEntityEdge(this.actor, Number(event.currentTarget.dataset.edgeDelete));
   }
 
+  /** Add an enhancement. */
   async _onEnhancementAdd(event) {
     event.preventDefault();
     const doc = await promptEntityEnhancementSelection();
@@ -329,6 +337,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
+  /** Open the enhancement editor. */
   async _onEnhancementEdit(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -338,6 +347,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     item.sheet?.render(true);
   }
 
+  /** Delete an enhancement and any generated ability. */
   async _onEnhancementDelete(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -346,9 +356,9 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     if (!item) return;
     await deleteGeneratedEnhancementAbility(item);
     await actor.deleteEmbeddedDocuments("Item", [itemId], { hollowsSkipGeneratedCleanup: true });
-    this.render(false);
   }
 
+  /** Post an enhancement to chat. */
   async _onEnhancementChat(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -371,6 +381,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     });
   }
 
+  /** Start an ability drag. */
   _onAbilityDragStart(event) {
     const actor = this._getLiveEntityActor();
     const itemId = event.currentTarget?.dataset?.itemId;
@@ -381,6 +392,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
   }
 
+  /** Post an ability to chat. */
   async _onAbilityChat(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -388,7 +400,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     const ability = actor.items.get(itemId);
     if (!ability) return;
     const safeName = foundry.utils.escapeHTML(ability.name || "Ability");
-    const rawText = getEntityAbilityDisplayText(ability);
+    const rawText = getEntityAbilityText(ability?.system);
     const safeText = foundry.utils.escapeHTML(rawText).replaceAll("\n", "<br/>");
     const content = `
       <div class="hollows-ability-chat">
@@ -403,12 +415,14 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     });
   }
 
+  /** Guard against using open ability editors. */
   _ensureAbilityEditorClosed(item) {
     if (!item?.sheet?.rendered) return true;
     ui.notifications.warn("Close or save the ability editor first.");
     return false;
   }
 
+  /** Use an interrupt. */
   async _onInterruptUse(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -419,6 +433,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     await triggerEntityInterrupt(actor, interruptItem.system, interruptItem);
   }
 
+  /** Use an authored manoeuvre. */
   async _onManoeuvreUse(event) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();
@@ -428,6 +443,7 @@ export default class HollowsEntitySheet extends HandlebarsApplicationMixin(Actor
     await performEntityManoeuvre(actor, manoeuvreItem);
   }
 
+  /** Roll an attack. */
   async _onAttackRoll(event, options = {}) {
     event.preventDefault();
     const actor = this._getLiveEntityActor();

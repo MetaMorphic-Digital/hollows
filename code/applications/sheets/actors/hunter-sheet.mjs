@@ -26,7 +26,7 @@ import {
 } from "../../../documents/actor/echo.js";
 import { hasEchoRestriction } from "../../../data/echo/index.js";
 import { isNewHunterActor, openCharacterCreationWizard } from "../../apps/character-creation.mjs";
-import { evaluateResult, outcomeClassFromLabel } from "../../../dice/roll-outcome.js";
+import { evaluateResult } from "../../../dice/roll-outcome.js";
 import { HunterStatRollFlow } from "../../../dice/flow.js";
 import { buildStandardRollCardHtml } from "../../ui/roll-card.js";
 import { activateAbility, getActivatedAbilities } from "../../../helpers/weapon-abilities/dispatchers.js";
@@ -115,6 +115,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     return this._prepareSheetContext(data);
   }
 
+  /** Build the Hunter sheet context. */
   async _prepareSheetContext(data) {
     data.actor = this.actor;
     data.system = this.actor.system;
@@ -209,6 +210,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     return data;
   }
 
+  /** Bind controls after render. */
   async _onRender(context, options) {
     await super._onRender(context, options);
     const wc = this.element.querySelector(".window-content");
@@ -259,6 +261,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     bind("[data-action='echo-reset']", this._onResetEchoes);
   }
 
+  /** Add delete controls for equipped gear. */
   _renderEquipmentDeleteButtons(html) {
     const sections = html.querySelectorAll(".sheet-section.equipment .hollows-form-section");
     const explorationSection = sections[0];
@@ -277,6 +280,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
+  /** Stop actions blocked by a Burden. */
   _blockIfEchoRestricted(actionKey, label) {
     if (hasEchoRestriction(this.actor, actionKey)) {
       ui.notifications.warn(`${this.actor.name} cannot ${label} due to a Burden.`);
@@ -285,6 +289,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     return false;
   }
 
+  /** Stop manoeuvres that are unavailable this turn. */
   _blockIfManoeuvreUnavailable(manoeuvre, label) {
     const availability = getManoeuvreAvailability(this.actor, manoeuvre, { source: "turn" });
     if (availability.available) return false;
@@ -293,6 +298,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     return true;
   }
 
+  /** Roll a Hunter stat test. */
   async _onStatRoll(event) {
     event.preventDefault();
     const statKey = event.currentTarget.dataset.roll;
@@ -317,45 +323,25 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     });
   }
 
+  /** Get a Hunter stat total. */
   _getTotalStat(statKey) {
     return getTotalStatForActor(this.actor, statKey);
   }
 
-  _getEntityActor() {
-    const scene = canvas?.scene;
-    if (scene?.tokens?.size) {
-      const tokenDoc = scene.tokens.contents.find(t => t.actor?.type === "entity");
-      return tokenDoc?.actor || null;
-    }
-    return game.actors.find(a => a.type === "entity") || null;
-  }
-
-  _getThrallActorsInScene() {
-    const scene = canvas?.scene;
-    if (!scene?.tokens?.size) return [];
-    const seen = new Set();
-    const thralls = [];
-    for (const tokenDoc of scene.tokens.contents) {
-      const actor = tokenDoc?.actor;
-      if (!actor || actor.type !== "thrall") continue;
-      if (seen.has(actor.id)) continue;
-      seen.add(actor.id);
-      thralls.push(actor);
-    }
-    return thralls;
-  }
-
+  /** Open the attack flow. */
   async _onAttackEntity(event) {
     event.preventDefault();
     await openAttackDialog(this.actor);
   }
 
+  /** Open the reload prompt. */
   async _onReloadWeapon(event) {
     event.preventDefault();
     if (this._blockIfEchoRestricted("reload", "Reload")) return;
     await openReloadForActor(this.actor);
   }
 
+  /** Take Focus. */
   async _onFocus(event) {
     event.preventDefault();
     if (this._blockIfEchoRestricted("focus", "Focus")) return;
@@ -363,16 +349,19 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await applyFocusToActor(this.actor);
   }
 
+  /** Open character creation. */
   async _onBeginCharacterCreation(event) {
     event.preventDefault();
     await openCharacterCreationWizard(this.actor);
   }
 
+  /** Open Expend Ready. */
   async _onExpendReady(event) {
     event.preventDefault();
     await openExpendReadyDialog(this.actor);
   }
 
+  /** Open the Guard prompt. */
   async _onGuard(event) {
     event.preventDefault();
     if (this._blockIfEchoRestricted("guard", "Guard")) return;
@@ -380,17 +369,20 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await openGuardDialogForActor(this.actor);
   }
 
+  /** Take Cover. */
   async _onTakeCover(event) {
     event.preventDefault();
     if (this._blockIfEchoRestricted("takeCover", "Take Cover")) return;
     await openTakeCoverForActor(this.actor);
   }
 
+  /** Open the Use prompt. */
   async _onUse(event) {
     event.preventDefault();
     await openUseForActor(this.actor);
   }
 
+  /** Use an activated ability. */
   async _onActivatedAbility(event) {
     event.preventDefault();
     const key = String(event.currentTarget?.dataset?.abilityKey || "");
@@ -407,6 +399,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await activateAbility(this.actor, ability);
   }
 
+  /** Use the equipped relic. */
   async _onUseRelic(event) {
     event.preventDefault();
     const item = getHunterEquipmentItemForSlot(this.actor, "relic");
@@ -421,6 +414,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await this._useRelicEffect(item);
   }
 
+  /** Resolve a relic effect. */
   async _useRelicEffect(item) {
     const eff = activeRelicEffect(item);
     await postEffectTextChat(item, {
@@ -439,6 +433,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
+  /** Delete equipped gear. */
   async _onDeleteEquipment(event) {
     event.preventDefault();
     const slot = String(event.currentTarget.dataset.slot || "");
@@ -453,7 +448,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     ui.notifications.info(`${item.name} removed.`);
   }
 
-  // Passive relics post their text to chat without being used/consumed.
+  /** Post relic text without using it. */
   async _onChatRelic(event) {
     event.preventDefault();
     const item = getHunterEquipmentItemForSlot(this.actor, "relic");
@@ -464,11 +459,13 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await postEffectTextChat(item, { speaker: ChatMessage.getSpeaker({ actor: this.actor }), title: item.name || "Relic" });
   }
 
+  /** Roll an Echo. */
   async _onRollEcho(event) {
     event.preventDefault();
     await rollEchoFlow(this.actor);
   }
 
+  /** Add an Echo. */
   async _onAddEcho(event) {
     event.preventDefault();
     if (!game.user?.isGM) {
@@ -511,6 +508,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await addEchoById(this.actor, pickId);
   }
 
+  /** Toggle Echo suppression. */
   async _onToggleEcho(event) {
     event.preventDefault();
     const echoId = String(event.currentTarget.dataset.echoId || "");
@@ -520,6 +518,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await echo.update({ "system.suppressed": !echo.system?.suppressed });
   }
 
+  /** Delete an Echo. */
   async _onDeleteEcho(event) {
     event.preventDefault();
     if (!game.user?.isGM) return;
@@ -528,6 +527,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await this.actor.deleteEmbeddedDocuments("Item", [echoId]);
   }
 
+  /** Trigger an Echo. */
   async _onTriggerEcho(event) {
     event.preventDefault();
     if (!game.user?.isGM) return;
@@ -538,6 +538,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await applySeedEchoEffect(this.actor, echo, { countAsGain: false });
   }
 
+  /** Reset Echo use state. */
   async _onResetEchoes(event) {
     event.preventDefault();
     if (!game.user?.isGM) return;
@@ -549,14 +550,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     ui.notifications.info("Echoes reset for a new Hollow.");
   }
 
-  _evaluateResult(rollValue, statValue, tn) {
-    return evaluateResult(rollValue, statValue, tn);
-  }
-
-  _outcomeClass(label) {
-    return outcomeClassFromLabel(label);
-  }
-
+  /** Roll Cling to Life. */
   async _onClingToLife(event) {
     event.preventDefault();
     const actor = this.actor;
@@ -599,29 +593,19 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     });
   }
 
-  async _rollStatWithOutcome(statLabel, statValue, tn, mode, options = {}) {
-    const flow = new HunterStatRollFlow(this.actor, {
-      title: `${statLabel} Test`,
-      cardTitle: "tests",
-      statLabel,
-      statValue,
-      tn,
-      focusCount: getFocusCount(this.actor),
-      spendFocus: async () => adjustHunterResource(this.actor, { focus: -1 }),
-    });
-    return await flow.roll({ mode, useFocus: !!options.useFocus });
-  }
-
+  /** Recover in Support. */
   async _onSupportRecover(event) {
     event.preventDefault();
     await openRecoverForActor(this.actor);
   }
 
+  /** Heal in Support. */
   async _onSupportHeal(event) {
     event.preventDefault();
     await openHealForActor(this.actor);
   }
 
+  /** Post a weapon ability to chat. */
   async _onWeaponAbilityChat(event) {
     event.preventDefault();
     const abilityId = event.currentTarget.dataset.abilityId;
@@ -642,6 +626,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     });
   }
 
+  /** Prompt for a weapon ability. */
   async _promptAbilityPick(docs, title) {
     if (!docs.length) {
       ui.notifications.warn("No matching weapon abilities found.");
@@ -675,6 +660,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     }) ?? null;
   }
 
+  /** Grant an ability from a document. */
   async _grantAbilityFromDoc(doc, durationType) {
     if (!doc) return null;
     const data = foundry.utils.deepClone(doc.toObject());
@@ -686,10 +672,12 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     return created?.[0] || null;
   }
 
+  /** Count equipped weapons by type. */
   _countWeaponType(weaponType) {
     return this.actor.items.filter(i => i.type === "weapon" && i.system?.weaponType === weaponType).length;
   }
 
+  /** Count permanent Tier 1 abilities. */
   _countPermanentTier1(weaponType) {
     return this.actor.items
       .filter(i => i.type === "weaponAbility")
@@ -699,6 +687,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
       .length;
   }
 
+  /** Assign a missing permanent Tier 1 ability. */
   async _assignPermanentTier1IfNeeded(weapon) {
     if (!weapon || weapon.type !== "weapon") return;
     const weaponType = weapon.system?.weaponType;
@@ -722,6 +711,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
+  /** Open a weapon sheet. */
   async _onEditWeapon(event) {
     event.preventDefault();
     const itemId = event.currentTarget.dataset.itemId;
@@ -730,6 +720,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     item.sheet.render(true);
   }
 
+  /** Remove a weapon. */
   async _onRemoveWeapon(event) {
     event.preventDefault();
     const itemId = event.currentTarget.dataset.itemId;
@@ -739,6 +730,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await cleanupWeaponAbilitiesForActor(this.actor);
   }
 
+  /** Replace a weapon. */
   async _onReplaceWeapon(event) {
     event.preventDefault();
     const itemId = event.currentTarget.dataset.itemId;
@@ -788,6 +780,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     });
   }
 
+  /** Handle item drops. */
   async _onDropItem(event, data) {
     const item = await Item.implementation.fromDropData(data);
     if (item?.type === "weapon") {
@@ -804,12 +797,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   /*   Event Handlers                                   */
   /* -------------------------------------------------- */
 
-  /**
-   * Select a weapon from any pack, then add it to the Hunter.
-   * @this HollowsHunterSheet
-   * @param {PointerEvent} event    Initiating click event.
-   * @param {HTMLElement} target    The capturing element that defined the [data-action].
-   */
+  /** Add a weapon from a pack. */
   static async #addWeapon(event, target) {
     if (this.document.items.documentsByType.weapon.length >= 2) {
       ui.notifications.warn("HOLLOWS.ACTOR.HUNTER.warningOnlyTwoWeapons", { localize: true });
@@ -839,7 +827,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     const result = await foundry.applications.api.Dialog.input({
       window: { title: "HOLLOWS.ACTOR.HUNTER.addWeapon" },
       content: field,
-      ok: { label: _loc("HOLLOWS.ACTOR.HUNTER.add") },
+      ok: { label: _loc("HOLLOWS.COMMON.add") },
     });
 
     const weapon = await fromUuid(result?.weaponUuid);

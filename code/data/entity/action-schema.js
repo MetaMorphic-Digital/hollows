@@ -1,12 +1,4 @@
-/**
- * Canonical nested entity action schema.
- *
- * The typed sub-models live here ONCE as SchemaField factories and are composed
- * into EntityAbilityDataModel (item-models.js) via entityAbilityFields(). Default
- * plain objects for new/generated abilities are derived from the same factories
- * through fieldDefaults(). Runtime readers consume the typed `item.system`
- * directly - there is no parallel re-normalization layer.
- */
+/** Entity ability schema and defaults. */
 import { fieldDefaults } from "../../utils/field-defaults.js";
 
 const damageField = () => {
@@ -33,7 +25,7 @@ const conditionListField = (choices, initial = []) => {
   }), { initial: list.map((condition) => ({ condition })) });
 };
 
-/** Labelled choice maps - single source for both schema validation and builder selects. */
+/** Choices shared by schema fields and builder selects. */
 export const ENTITY_ACTION_CHOICES = {
   kind: { attack: "Attack", interrupt: "Interrupt", manoeuvre: "Manoeuvre", special: "Special", doom: "Doom", whenBroken: "When Broken" },
   builderMode: { basic: "Basic", advanced: "Advanced", manual: "Manual" },
@@ -144,7 +136,7 @@ const threatSpendField = () => {
   });
 };
 
-/** Passive-condition picker grouped for the builder (Curse / Terrain / Threat / Location). */
+/** Passive condition groups for the builder. */
 export const PASSIVE_CONDITION_GROUPS = {
   Curse: ["entityHasCurse", "entityNoCurse", "entityCurseThreshold", "targetHasCurse", "targetNoCurse", "targetCurseThreshold"],
   Terrain: ["entityHasTerrain", "entityNoTerrain", "entityTerrainThreshold", "targetHasTerrain", "targetNoTerrain"],
@@ -410,7 +402,7 @@ const whenBrokenField = () => {
   return new fields.SchemaField({ mode: new fields.StringField({ initial: "first", choices: ENTITY_ACTION_CHOICES.whenBrokenMode }), returnHalfTerrain: new fields.BooleanField({ initial: false }) });
 };
 
-/** Full nested schema for EntityAbilityDataModel.defineSchema(). */
+/** EntityAbilityDataModel schema fields. */
 export function entityAbilityFields() {
   const fields = foundry.data.fields;
   return {
@@ -432,28 +424,43 @@ export function entityAbilityFields() {
   };
 }
 
+/** Normalize builder mode, defaulting to advanced. */
 export function normalizeEntityAttackBuilderMode(mode) {
   const normalized = String(mode || "advanced");
   if (["basic", "advanced", "manual"].includes(normalized)) return normalized;
   return "advanced";
 }
 
+/** Normalize an after-attack condition. */
 export function normalizeAfterAttackApplyIf(value, fallback = "anyDamageDealt") {
   const raw = String(value || "").trim();
   if (!raw) return fallback;
   return raw;
 }
 
+/** Normalize a before-attack condition. */
 export function normalizeBeforeAttackApplyIf(value, fallback = "always") {
   const raw = String(value || "").trim();
   if (!raw) return fallback;
   return raw;
 }
 
+/** Get authored display text for an ability. */
+export function getEntityAbilityText(system) {
+  const profile = system?.profile || {};
+  const authored = String(profile.text || profile.effectText || "").trim();
+  if (authored) return authored;
+  const groups = Array.isArray(system?.afterAttack?.groups) ? system.afterAttack.groups : [];
+  const other = groups.find((group) => String(group?.otherText || "").trim());
+  return other ? String(other.otherText || "").trim() : "";
+}
+
+/** Create an action profile. */
 export function createEntityActionProfile(overrides = {}) {
   return { ...fieldDefaults(profileField()), ...(overrides || {}) };
 }
 
+/** Create repeat config from source data. */
 export function createRepeatConfig(source = {}, repeatCount = 0) {
   const base = { ...fieldDefaults(repeatField()), ...(source || {}) };
   return {
@@ -463,18 +470,22 @@ export function createRepeatConfig(source = {}, repeatCount = 0) {
   };
 }
 
+/** Create an after-attack group. */
 export function createAfterAttackGroupConfig(applyIf = "anyDamageDealt") {
   return fieldDefaults(afterAttackGroupField(applyIf));
 }
 
+/** Create a before-attack group. */
 export function createBeforeAttackGroupConfig() {
   return fieldDefaults(beforeAttackGroupField());
 }
 
+/** Create a conditional-modifier group. */
 export function createModifyIfGroupConfig() {
   return fieldDefaults(modifyGroupField());
 }
 
+/** Create a follow-up group from source data. */
 export function createFollowUpGroupConfig(source = {}, damageBonus = { resolve: 0, wounds: 0 }) {
   return {
     ...fieldDefaults(followUpGroupField()),
@@ -487,6 +498,7 @@ export function createFollowUpGroupConfig(source = {}, damageBonus = { resolve: 
   };
 }
 
+/** Create follow-up config with its groups. */
 export function createFollowUpConfig(source = {}, damageBonus = { resolve: 0, wounds: 0 }) {
   const groups = Array.isArray(source?.groups) ? source.groups : [];
   return {
@@ -495,6 +507,7 @@ export function createFollowUpConfig(source = {}, damageBonus = { resolve: 0, wo
   };
 }
 
+/** Create default attack data. */
 export function createDefaultEntityAttack() {
   return {
     kind: "attack",
@@ -511,6 +524,7 @@ export function createDefaultEntityAttack() {
   };
 }
 
+/** Create default interrupt data. */
 export function createDefaultEntityInterrupt() {
   return {
     kind: "interrupt",
@@ -522,6 +536,7 @@ export function createDefaultEntityInterrupt() {
   };
 }
 
+/** Create default manoeuvre data. */
 function createDefaultEntityManoeuvre() {
   return {
     kind: "manoeuvre",
@@ -534,6 +549,7 @@ function createDefaultEntityManoeuvre() {
   };
 }
 
+/** Create default data for a special-like kind. */
 function createDefaultEntitySpecial(kind = "special") {
   return {
     kind,
@@ -544,6 +560,7 @@ function createDefaultEntitySpecial(kind = "special") {
   };
 }
 
+/** Create default ability data for a kind. */
 export function createDefaultEntityAbility(kind = "attack") {
   if (kind === "attack") return createDefaultEntityAttack();
   if (kind === "interrupt") return createDefaultEntityInterrupt();

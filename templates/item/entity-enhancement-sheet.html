@@ -293,7 +293,7 @@
           <div class="zone-grid">
             {{#each @root.zoneList as |zone|}}
             <label class="zone-chip {{#if (includes effect.zones zone)}}on{{/if}}">
-              <input type="checkbox" class="array-toggle" data-array-path="system.builder.triggers.{{@../../index}}.effects.{{@../index}}.zones" data-value="{{zone}}" {{#if (includes effect.zones zone)}}checked{{/if}} />{{zone}}
+              <input type="checkbox" class="array-toggle" data-array-path="system.builder.triggers.{{@../../index}}.effects.{{@../index}}.zones" data-value="{{zone}}" {{#if (includes effect.zones zone)}}checked{{/if}} />{{zoneLabel zone}}
             </label>
             {{/each}}
           </div>

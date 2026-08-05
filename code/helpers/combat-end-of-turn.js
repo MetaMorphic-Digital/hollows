@@ -1,327 +1,202 @@
-import { applyEntityAttackDamage } from "../documents/entity/attack-damage.js";
 import { addThreatToZone } from "../canvas/overlays.js";
-import { getActiveEntityActor } from "../canvas/zone.js";
 import { getEffectiveEntityStat } from "../documents/entity/entity-stats.js";
 import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
 import { hasCondition } from "../documents/actor/conditions.js";
 import { openInterruptPromptForHunterEnd } from "../data/entity/actions/entity-interrupt.js";
 import { runEndOfTurnAbilities, runOnTurnEnd } from "./weapon-abilities/dispatchers.js";
-import { chooseOneTarget } from "../applications/apps/selection-dialogs.mjs";
+import { THREAT_PLACEMENT_SCOPE_LABELS } from "../data/gameplay-constants.js";
 import {
-  getActorZone,
+  getActiveEntityActor,
   getRegionThreatData,
   getThreatRegionDocs,
-  getTokenZone,
+  localizeZone,
+  resolveThreatPlacementZones,
 } from "../canvas/zone.js";
 
+const THREAT_PLACEMENT_TEMPLATE = "systems/hollows/templates/apps/threat-placement.html";
 
-export async function runEndOfTurnEffects(combat, prevCombatant, { triggerEntitySpecialsOnPhase }) {
+const MODE_LABELS = {
+  place: "HOLLOWS.THREAT.modePlace",
+  shift: "HOLLOWS.THREAT.modeShift",
+  burn: "HOLLOWS.THREAT.modeBurn",
+};
+
+/** Run end-of-turn combat effects. */
+export async function runEndOfTurnEffects(combat, prevCombatant) {
   if (!combat || !prevCombatant) return;
-  const prevIsEntity = prevCombatant?.actor?.type === "entity";
-  const prevIsHunter = prevCombatant?.actor?.type === "hunter";
-  if (prevIsHunter && hasCondition(prevCombatant.actor, "dead")) return;
+  const actor = prevCombatant.actor;
 
-  if (prevIsEntity) {
+  if (actor?.type === "entity") {
     await triggerEntitySpecialsOnPhase("entityEnd");
-    await openEntityThreatPlacementDialog(combat, prevCombatant.actor);
+    await openEntityThreatPlacementDialog(combat, actor);
     return;
   }
+  if (actor?.type !== "hunter" || hasCondition(actor, "dead")) return;
 
-  if (prevIsHunter) {
-    const zone = getActorZone(prevCombatant.actor);
-    await runEndOfTurnAbilities(prevCombatant.actor);
-    await runOnTurnEnd(prevCombatant.actor);
-    const ward = prevCombatant.actor.getFlag("hollows", "wardGranted");
-    if (ward?.sourceId) {
-      const source = game.actors.get(ward.sourceId);
-      if (source) {
-        try { await source.unsetFlag("hollows", "wardSuppressed"); } catch (err) {}
-      }
-      try { await prevCombatant.actor.unsetFlag("hollows", "wardGranted"); } catch (err) {}
-    }
-    const entityCombatant = combat.combatants.find((combatant) => combatant.actor?.type === "entity");
-    const entityActor = entityCombatant?.actor || getActiveEntityActor();
-    if (entityActor) {
-      await openInterruptPromptForHunterEnd(combat, entityActor);
-    }
+  await runEndOfTurnAbilities(actor);
+  await runOnTurnEnd(actor);
+
+  const ward = actor.getFlag("hollows", "wardGranted");
+  if (ward?.sourceId) {
+    // Non-owners reach this path too, so the flag writes are allowed to fail.
+    const source = game.actors.get(ward.sourceId);
+    await source?.unsetFlag("hollows", "wardSuppressed");
+    await actor.unsetFlag("hollows", "wardGranted");
   }
-  if (prevIsHunter) {
-    await triggerEntitySpecialsOnPhase("hunterEnd");
-  }
+
+  const entityCombatant = combat.combatants.find((combatant) => combatant.actor?.type === "entity");
+  const entityActor = entityCombatant?.actor || getActiveEntityActor();
+  if (entityActor) await openInterruptPromptForHunterEnd(combat, entityActor);
+  await triggerEntitySpecialsOnPhase("hunterEnd");
 }
 
+/** Run Entity triggers for a phase. */
 export async function triggerEntitySpecialsOnPhase(phase) {
   if (!game.user?.isGM) return;
   const entity = getActiveEntityActor();
   if (!entity) return;
   await triggerEntityTriggeredAbilities(entity, phase, {}, ["special", "doom"]);
-  const specials = entity.items
-    .filter((item) => item.type === "entityAbility" && item.system?.kind === "special");
-  if (!specials.length) return;
-  const hunters = canvas?.tokens?.placeables
-    ?.filter((token) => token.actor?.type === "hunter") || [];
-  if (!hunters.length) return;
-
-  for (const special of specials) {
-    const sys = special.system || {};
-    if (!sys.triggerEnabled) continue;
-    if (String(sys.triggerOn || "") !== phase) continue;
-    if (String(sys.triggerAction || "") !== "dealDamage") continue;
-    const zones = Array.isArray(sys.triggerZones) ? sys.triggerZones : [];
-    if (!zones.length) continue;
-    const damageType = String(sys.triggerDamageType || "");
-    const amount = Math.max(0, Number(sys.triggerDamageAmount ?? 0) || 0);
-    if (!damageType || !amount) continue;
-
-    let candidates = hunters.filter((token) => zones.includes(getTokenZone(token)));
-    if (!candidates.length) continue;
-
-    let targets = candidates;
-    if (String(sys.triggerTargetMode || "single") === "single") {
-      const chosen = await chooseOneTarget(candidates);
-      targets = chosen ? [chosen] : [];
-    }
-
-    for (const token of targets) {
-      const target = token.actor;
-      if (!target) continue;
-      const targetZone = getTokenZone(token) || "";
-      const owners = game.users
-        .filter((user) => user.isGM || target.testUserPermission(user, "OWNER"))
-        .map((user) => user.id);
-      const data = {
-        targetId: target.id,
-        targetTokenUuid: token.document?.uuid ?? "",
-        damageType,
-        damageValue: amount,
-        altWoundsValue: damageType === "Resolve" ? amount : 0,
-        defenceOptions: {},
-        targetZone
-      };
-      const content = `
-        <div class="hollows-chat hollows-entity-attack">
-          <div class="attack-title">${entity.name} triggers <strong>${special.name || "Special"}</strong> on ${target.name}</div>
-          <div><strong>Damage:</strong> ${amount} ${damageType}</div>
-          ${targetZone ? `<div><strong>Zone:</strong> ${targetZone}</div>` : ""}
-        </div>
-      `;
-      const msg = await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({ actor: entity }),
-        content,
-        whisper: owners,
-        flags: {
-          hollows: {
-            hunterDamage: data
-          }
-        }
-      });
-      if (msg) {
-        await applyEntityAttackDamage(msg);
-      }
-    }
-  }
 }
 
+/** Resolve placement rules against scene zones. */
+function resolvePlacementRules(entityActor, zoneIds, scene) {
+  return entityActor.system.threat.placement.map((rule) => ({
+    scope: rule.scope,
+    zones: resolveThreatPlacementZones(rule, scene).filter((zone) => zoneIds.includes(zone)),
+    amount: rule.amount,
+    perZoneMax: rule.perZoneMax,
+  }));
+}
+
+/** Find the first placement-rule violation. */
+function placementViolation(rules, increments) {
+  if (!rules.length) return null;
+  const outside = increments.find(([zone]) => !rules.some((rule) => rule.zones.includes(zone)));
+  if (outside) return { key: "HOLLOWS.THREAT.errorZone", data: { zone: outside[0] } };
+
+  for (const rule of rules) {
+    const own = increments.filter(([zone]) => rule.zones.includes(zone));
+    const total = own.reduce((sum, [, count]) => sum + count, 0);
+    if (total > rule.amount) {
+      return { key: "HOLLOWS.THREAT.errorRuleTotal", rule, data: { max: rule.amount } };
+    }
+    if (rule.perZoneMax && own.some(([, count]) => count > rule.perZoneMax)) {
+      return { key: "HOLLOWS.THREAT.errorRuleZone", rule, data: { max: rule.perZoneMax } };
+    }
+  }
+  return null;
+}
+
+/** Display label for a placement rule. */
+function ruleLabel(rule) {
+  if (rule.scope === "select") return rule.zones.map(localizeZone).join(" / ");
+  return _loc(THREAT_PLACEMENT_SCOPE_LABELS[rule.scope]);
+}
+
+/** Localized message for a placement violation. */
+function violationMessage(violation) {
+  const data = { ...(violation.data || {}) };
+  if (data.zone) data.zone = localizeZone(data.zone);
+  if (violation.rule) data.rule = ruleLabel(violation.rule);
+  return _loc(violation.key, data);
+}
+
+/** Open the GM prompt for end-of-turn Threat. */
 async function openEntityThreatPlacementDialog(combat, entityActor) {
   if (!game.user?.isGM) return;
   const scene = combat?.scene || canvas?.scene;
   const threatRegions = getThreatRegionDocs(scene);
   if (!threatRegions.length) return;
 
-  const perRound = getEffectiveEntityStat(entityActor, "threatPerRound");
-  const cap = getEffectiveEntityStat(entityActor, "threatCap");
   const zones = threatRegions.map((region) => {
     const data = getRegionThreatData(region);
-    return {
-      zoneId: data.zoneId,
-      current: Math.max(0, Number(data.current) || 0)
-    };
+    return { zoneId: data.zoneId, current: Math.max(0, Number(data.current) || 0) };
   });
-  const initialTargets = zones.map((zone) => zone.current);
+  const perRound = getEffectiveEntityStat(entityActor, "threatPerRound");
+  const cap = getEffectiveEntityStat(entityActor, "threatCap");
   const totalNow = zones.reduce((sum, zone) => sum + zone.current, 0);
+  const rules = resolvePlacementRules(entityActor, zones.map((zone) => zone.zoneId), scene);
 
-  const evaluateTargets = (targets) => {
-    const totalCurrent = totalNow;
-    const totalTarget = targets.reduce((sum, value) => sum + Math.max(0, Number(value) || 0), 0);
-    const inc = targets.reduce((sum, value, index) => {
-      const diff = (Number(value) || 0) - zones[index].current;
-      return sum + Math.max(0, diff);
-    }, 0);
-    const dec = targets.reduce((sum, value, index) => {
-      const diff = zones[index].current - (Number(value) || 0);
-      return sum + Math.max(0, diff);
-    }, 0);
+  const evaluate = (targets) => {
+    const total = targets.reduce((sum, value) => sum + value, 0);
+    const increments = targets
+      .map((value, index) => [zones[index].zoneId, Math.max(0, value - zones[index].current)])
+      .filter(([, count]) => count > 0);
+    const placed = increments.reduce((sum, [, count]) => sum + count, 0);
+    const removed = targets.reduce((sum, value, index) => sum + Math.max(0, zones[index].current - value), 0);
 
-    const overflow = cap > 0 ? Math.max(0, totalCurrent - cap) : 0;
-    const belowCap = cap > 0 ? totalCurrent < cap : true;
-    const atCap = cap > 0 ? totalCurrent === cap : false;
+    let mode = "place";
+    if (cap > 0 && totalNow > cap) mode = "burn";
+    else if (cap > 0 && totalNow === cap) mode = "shift";
+    const budget = mode === "place" && cap > 0 ? Math.max(0, Math.min(perRound, cap - totalNow)) : perRound;
 
-    if (belowCap) {
-      const placeBudget = cap > 0
-        ? Math.max(0, Math.min(perRound, cap - totalCurrent))
-        : perRound;
-      const valid = dec === 0 && inc <= placeBudget;
-      return {
-        mode: "place",
-        valid,
-        totalCurrent,
-        totalTarget,
-        inc,
-        dec,
-        placeBudget,
-        placeRemaining: Math.max(0, placeBudget - inc),
-        shiftRemaining: 0,
-        burnRemaining: 0
-      };
-    }
-
-    if (atCap) {
-      const valid = totalTarget === totalCurrent && inc <= perRound;
-      return {
-        mode: "shift",
-        valid,
-        totalCurrent,
-        totalTarget,
-        inc,
-        dec,
-        placeBudget: 0,
-        placeRemaining: 0,
-        shiftRemaining: Math.max(0, perRound - inc),
-        burnRemaining: 0
-      };
-    }
-
-    const burnApplied = Math.max(0, dec - inc);
-    const burnRemaining = Math.max(0, overflow - burnApplied);
-    const valid = totalTarget === cap && burnRemaining === 0 && inc <= perRound;
-    return {
-      mode: "burn-shift",
-      valid,
-      totalCurrent,
-      totalTarget,
-      inc,
-      dec,
-      placeBudget: 0,
-      placeRemaining: 0,
-      shiftRemaining: Math.max(0, perRound - inc),
-      burnRemaining
-    };
+    let violation = placementViolation(rules, increments);
+    if (!violation && placed > budget) violation = { key: "HOLLOWS.THREAT.errorBudget" };
+    if (!violation && mode === "place" && removed > 0) violation = { key: "HOLLOWS.THREAT.errorDrop" };
+    if (!violation && mode === "shift" && total !== totalNow) violation = { key: "HOLLOWS.THREAT.errorCap" };
+    if (!violation && mode === "burn" && total !== cap) violation = { key: "HOLLOWS.THREAT.errorBurn" };
+    return { mode, total, violation, valid: !violation };
   };
 
-  const rows = zones.map((zone, index) => `
-    <div class="hollows-threat-row" data-index="${index}">
-      <div class="hollows-threat-cell zone">${foundry.utils.escapeHTML(zone.zoneId)}</div>
-      <div class="hollows-threat-cell now">${zone.current}</div>
-      <div class="hollows-threat-cell target">
-        <div class="hollows-threat-controls">
-          <button type="button" class="hollows-threat-step" data-action="dec" data-index="${index}">-</button>
-          <span class="hollows-threat-value" data-index="${index}">${zone.current}</span>
-          <button type="button" class="hollows-threat-step" data-action="inc" data-index="${index}">+</button>
-        </div>
-      </div>
-    </div>
-  `).join("");
+  const readTargets = (root) => Array.from(root.querySelectorAll("input[type='number']"))
+    .map((input) => Math.max(0, Math.round(Number(input.value) || 0)));
 
-  const content = `
-    <form class="hollows-roll-dialog hollows-threat-planner">
-      <p class="hollows-threat-title"><strong>End of Entity Turn:</strong> set target Threat by zone.</p>
-      <div class="hollows-threat-summary"></div>
-      <div class="hollows-threat-table">
-        <div class="hollows-threat-head">
-          <div class="hollows-threat-cell zone">Zone</div>
-          <div class="hollows-threat-cell now">Now</div>
-          <div class="hollows-threat-cell target">Target</div>
-        </div>
-        ${rows}
-      </div>
-      <div class="hollows-threat-actions">
-        <button type="button" class="hollows-threat-reset">Reset</button>
-      </div>
-    </form>
-  `;
+  const content = await foundry.applications.handlebars.renderTemplate(THREAT_PLACEMENT_TEMPLATE, {
+    zones,
+    rules: rules.map((rule) => (rule.perZoneMax
+      ? _loc("HOLLOWS.THREAT.ruleSummaryPerZone", { rule: ruleLabel(rule), max: rule.amount, perZone: rule.perZoneMax })
+      : _loc("HOLLOWS.THREAT.ruleSummary", { rule: ruleLabel(rule), max: rule.amount }))),
+  });
 
   await foundry.applications.api.DialogV2.wait({
-    window: { title: "Threat Placement", width: 720, height: 640 },
+    window: { title: game.i18n.localize("HOLLOWS.THREAT.title") },
+    classes: ["hollows-threat-placement"],
+    position: { width: 420 },
     content,
-    render: (_e, dialog) => {
-      const el = dialog.element;
-      let targets = initialTargets.slice();
-      const summaryEl = el.querySelector(".hollows-threat-summary");
-
-      const renderState = () => {
-        const state = evaluateTargets(targets);
-        for (const span of el.querySelectorAll(".hollows-threat-value")) {
-          const idx = Number(span.dataset.index ?? 0);
-          span.textContent = String(targets[idx] ?? 0);
-        }
-
-        let modeLabel = "";
-        if (state.mode === "place") modeLabel = "Place Threat";
-        else if (state.mode === "shift") modeLabel = "Shift Threat";
-        else modeLabel = "Burn then Shift";
-
-        const status = state.valid
-          ? `<span class="hollows-threat-status valid"><strong>Valid</strong></span>`
-          : `<span class="hollows-threat-status invalid"><strong>Invalid</strong></span>`;
-
-        let details = `
-          <p>Mode: <strong>${modeLabel}</strong> | ${status}</p>
-          <p>Total now: <strong>${state.totalCurrent}</strong> -> target: <strong>${state.totalTarget}</strong></p>
-          <p>Threat Per Round: <strong>${perRound}</strong>, Threat Cap: <strong>${cap}</strong></p>
+    render: (_event, dialog) => {
+      const root = dialog.element;
+      const statusEl = root.querySelector(".threat-placement-status");
+      const applyBtn = root.querySelector("[data-action='apply']");
+      const refresh = () => {
+        const state = evaluate(readTargets(root));
+        const summary = game.i18n.format("HOLLOWS.THREAT.budget", {
+          perRound, cap, total: totalNow, target: state.total,
+        });
+        const verdict = state.valid
+          ? _loc("HOLLOWS.THREAT.valid", { mode: _loc(MODE_LABELS[state.mode]) })
+          : violationMessage(state.violation);
+        statusEl.innerHTML = `
+          <p class="hint">${foundry.utils.escapeHTML(summary)}</p>
+          <p class="notification ${state.valid ? "info" : "warning"}">${foundry.utils.escapeHTML(verdict)}</p>
         `;
-        if (state.mode === "place") {
-          details += `<p>Place budget: <strong>${state.placeBudget}</strong> (remaining: <strong>${state.placeRemaining}</strong>)</p>`;
-        } else if (state.mode === "shift") {
-          details += `<p>Shift budget: <strong>${perRound}</strong> (remaining: <strong>${state.shiftRemaining}</strong>)</p>`;
-        } else {
-          details += `<p>Burn required: <strong>${Math.max(0, state.totalCurrent - cap)}</strong> (remaining: <strong>${state.burnRemaining}</strong>)</p>`;
-          details += `<p>Shift budget: <strong>${perRound}</strong> (remaining: <strong>${state.shiftRemaining}</strong>)</p>`;
-        }
-        summaryEl.innerHTML = details;
-        const applyBtn = el.querySelector("[data-action='apply']");
         if (applyBtn) applyBtn.disabled = !state.valid;
       };
-
-      for (const btn of el.querySelectorAll(".hollows-threat-step")) {
-        btn.addEventListener("click", (ev) => {
-          ev.preventDefault();
-          const idx = Number(btn.dataset.index ?? -1);
-          const action = String(btn.dataset.action || "");
-          if (idx < 0 || idx >= targets.length) return;
-          const current = Number(targets[idx] ?? 0);
-          if (action === "inc") targets[idx] = current + 1;
-          else if (action === "dec") targets[idx] = Math.max(0, current - 1);
-          renderState();
+      for (const button of root.querySelectorAll("[data-step]")) {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          const input = button.parentElement.querySelector("input[type='number']");
+          input.value = String(Math.max(0, (Number(input.value) || 0) + Number(button.dataset.step)));
+          refresh();
         });
       }
-
-      el.querySelector(".hollows-threat-reset")?.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        targets = initialTargets.slice();
-        renderState();
-      });
-
-      renderState();
+      root.addEventListener("input", refresh);
+      refresh();
     },
     buttons: [
-      { action: "apply", label: "Apply", default: true, callback: async (_e, _b, dialog) => {
-        const el = dialog.element;
-        const targets = zones.map((zone, index) => {
-          const raw = el.querySelector(`.hollows-threat-value[data-index="${index}"]`)?.textContent;
-          return Math.max(0, Number(raw ?? zone.current) || 0);
-        });
-        const state = evaluateTargets(targets);
-        if (!state.valid) {
-          ui.notifications.warn("Threat allocation is invalid for current Per Round / Cap rules.");
-          return false;
-        }
-        for (let i = 0; i < zones.length; i++) {
-          const delta = targets[i] - zones[i].current;
-          if (delta !== 0) await addThreatToZone(zones[i].zoneId, delta);
-        }
-      }},
-      { action: "cancel", label: "Cancel", callback: () => null }
+      {
+        action: "apply",
+        label: "HOLLOWS.COMBAT.apply",
+        default: true,
+        callback: async (_event, _button, dialog) => {
+          const targets = readTargets(dialog.element);
+          for (const [index, zone] of zones.entries()) {
+            const delta = targets[index] - zone.current;
+            if (delta !== 0) await addThreatToZone(zone.zoneId, delta);
+          }
+        },
+      },
+      { action: "cancel", label: "COMMON.Cancel" },
     ],
-    rejectClose: false
+    rejectClose: false,
   });
 }
