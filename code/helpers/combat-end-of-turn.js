@@ -98,7 +98,7 @@ function violationMessage(violation) {
   const data = { ...(violation.data || {}) };
   if (data.zone) data.zone = localizeZone(data.zone);
   if (violation.rule) data.rule = ruleLabel(violation.rule);
-  return game.i18n.format(violation.key, data);
+  return _loc(violation.key, data);
 }
 
 /** Open the GM prompt for end-of-turn Threat. */
