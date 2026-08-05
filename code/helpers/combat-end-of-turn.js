@@ -195,7 +195,7 @@ async function openEntityThreatPlacementDialog(combat, entityActor) {
           }
         },
       },
-      { action: "cancel", label: "Cancel" },
+      { action: "cancel", label: "COMMON.Cancel" },
     ],
     rejectClose: false,
   });
