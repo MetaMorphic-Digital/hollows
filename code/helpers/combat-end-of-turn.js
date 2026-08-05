@@ -60,7 +60,7 @@ export async function triggerEntitySpecialsOnPhase(phase) {
 
 /** Resolve placement rules against scene zones. */
 function resolvePlacementRules(entityActor, zoneIds, scene) {
-  return (entityActor?.system?.threat?.placement || []).map((rule) => ({
+  return entityActor.system.threat.placement.map((rule) => ({
     scope: rule.scope,
     zones: resolveThreatPlacementZones(rule, scene).filter((zone) => zoneIds.includes(zone)),
     amount: rule.amount,
