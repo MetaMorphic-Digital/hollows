@@ -14,19 +14,7 @@ const TERRAIN_TAG_KEYS = Object.freeze(
 export function getConditionEffects(actor, key) {
   const cfg = HOLLOWS_CONDITIONS[key];
   if (!cfg) return [];
-  return actor.effects.filter(effect =>
-    (effect.getFlag(hollows.id, "conditionKey") === key)
-    || effect.statuses.has(cfg.id),
-  );
-}
-
-export function getConditionEffect(actor, key) {
-  return getConditionEffects(actor, key)[0] || null;
-}
-
-export async function removeCoreDeadCondition(actor) {
-  const ids = actor.effects.filter(effect => effect.statuses.has("dead")).map(effect => effect.id);
-  await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
+  return actor.effects.filter(effect => effect.statuses.has(cfg.id));
 }
 
 export async function addCondition(actor, key) {
@@ -36,22 +24,17 @@ export async function addCondition(actor, key) {
   if (existing.length) {
     const primary = existing[0];
     if (primary.disabled) await primary.update({ disabled: false });
-    const extras = existing.slice(1);
-    const ids = extras.map(e => e.id);
-    await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
+    const ids = existing.slice(1).map(e => e.id);
+    if (ids.length) await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
     return;
   }
   if (key === "dead") {
-    await removeCoreDeadCondition(actor);
     if ((actor.type === "hunter") && game.user.isGM) {
       const cur = actor.system.corruption.value;
       await actor.update({ "system.corruption.value": cur + 1 });
     }
   }
-  const effect = await actor.toggleStatusEffect(cfg.id, { active: true });
-  if (effect && (typeof effect.update === "function")) {
-    await effect.update({ "flags.hollows.conditionKey": key });
-  }
+  await actor.toggleStatusEffect(cfg.id, { active: true });
 }
 
 export async function removeCondition(actor, key, opts = {}) {

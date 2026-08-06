@@ -83,7 +83,7 @@ export async function openTakeCoverForActor(actor, opts = {}) {
     const statValue = getTotalStatForActor(actor, statKey);
     const conditionTarget = targetToken.actor || targetActor;
     const tokenUuid = targetToken.document?.uuid || targetToken.uuid || "";
-    if (conditionTarget.has(tag)) {
+    if (conditionTarget.statuses.has(tag)) {
       ui.notifications.warn(`${targetActor.name} already has ${HOLLOWS_CONDITIONS[tag].label}.`);
       return false;
     }

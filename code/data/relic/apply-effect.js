@@ -127,7 +127,7 @@ export async function runRelicTriggers(trigger, { bearer = null } = {}) {
 
 export async function runRelicDeathSave(actor) {
   if (!actor || (actor.type !== "hunter") || !game.user.isGM) return false;
-  if (actor.isRevivable) return false;
+  if (!actor.getFlag("hollows", "dyingRevivedOnce")) return false;
   for (const item of heldRelics(actor)) {
     for (const { group } of enabledGroups(item, { trigger: "onDeath", profile: activeRelicProfile(item) })) {
       if (!group.reaction?.enabled || (String(group.reaction.kind || "") !== "deathSave")) continue;

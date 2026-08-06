@@ -1,5 +1,4 @@
 import { ensureWeaponAbilityCompendiumFolders, isShotgunWeapon, syncHunterLoadedStatusFromShotguns } from "./weapon-utils.js";
-import { removeCoreDeadCondition } from "../documents/actor/conditions.js";
 import { getHollowsWeaponIndex, setHollowsWeaponIndex } from "./runtime-state.js";
 import { getWeaponPackDocs } from "../data/weapons/index.js";
 
@@ -128,7 +127,6 @@ async function normalizeActorDefaults(actor) {
     if (actor.system?.focus === undefined) { updateData["system.focus"] = { value: 0 }; changed = true; }
     if (actor.system?.malignancy === undefined) { updateData["system.malignancy"] = ""; changed = true; }
     if (changed) await actor.update(updateData);
-    await removeCoreDeadCondition(actor);
     return;
   }
 

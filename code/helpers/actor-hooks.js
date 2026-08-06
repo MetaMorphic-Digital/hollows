@@ -136,7 +136,7 @@ export function registerActorHooks() {
     if (actor.statuses.has("dead")) return;
 
     if (await runDeathInterceptors(actor)) return;
-    if (!actor.isRevivable) {
+    if (actor.getFlag("hollows", "dyingRevivedOnce")) {
       await removeCondition(actor, "dying");
       await addCondition(actor, "dead");
       await ChatMessage.create({
@@ -323,15 +323,10 @@ export function registerActorHooks() {
     const actor = effect?.parent;
     if (!actor || (actor.type !== "hunter")) return;
     if (!game.user?.isGM && !actor.testUserPermission(game.user, "OWNER")) return;
-    const focusId = HOLLOWS_CONDITIONS?.focus?.id;
-    const loadedId = HOLLOWS_CONDITIONS?.loaded?.id;
-    const effectKey = effect?.flags?.hollows?.conditionKey;
-    const hasFocusStatus = focusId && (effect.statuses?.has?.(focusId) || effect.statuses?.includes?.(focusId));
-    const hasLoadedStatus = loadedId && (effect.statuses?.has?.(loadedId) || effect.statuses?.includes?.(loadedId));
-    if ((effectKey === "focus") || hasFocusStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.focus.id)) {
       await setFocusCount(actor, 0);
     }
-    if ((effectKey === "loaded") || hasLoadedStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.loaded.id)) {
       await setShotgunsLoaded(actor, false);
     }
   });
@@ -342,15 +337,10 @@ export function registerActorHooks() {
     if (!game.user?.isGM && !actor.testUserPermission(game.user, "OWNER")) return;
     if (!Object.prototype.hasOwnProperty.call(changed || {}, "disabled")) return;
     if (!changed.disabled) return;
-    const focusId = HOLLOWS_CONDITIONS?.focus?.id;
-    const loadedId = HOLLOWS_CONDITIONS?.loaded?.id;
-    const effectKey = effect?.flags?.hollows?.conditionKey;
-    const hasFocusStatus = focusId && (effect.statuses?.has?.(focusId) || effect.statuses?.includes?.(focusId));
-    const hasLoadedStatus = loadedId && (effect.statuses?.has?.(loadedId) || effect.statuses?.includes?.(loadedId));
-    if (effectKey === "focus" || hasFocusStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.focus.id)) {
       await setFocusCount(actor, 0);
     }
-    if (effectKey === "loaded" || hasLoadedStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.loaded.id)) {
       await setShotgunsLoaded(actor, false);
     }
   });
