@@ -1,12 +1,3 @@
-/**
- * Martyr — Armour T1. When an ally would take Wounds damage, a Ready Armour
- * hunter in the same area may expend Ready to take the hit instead (-1 wound).
- *
- * MARTYR_TRIGGER detects the "ally about to take Wound damage" outcome and
- * offers the MARTYR reaction to the zone-mate carriers; runOnDefenceResult
- * dispatches it before the damage is applied. The reaction's promptOnPlayer
- * picks the martyr; applyOnGM performs the redirect (carrier takes the hit).
- */
 import { Reaction } from "../../mechanics/Reaction.js";
 import { OnDefenceResultAction } from "../../mechanics/OnDefenceResultAction.js";
 import { removeCondition } from "../../../documents/actor/conditions.js";
@@ -68,7 +59,7 @@ export const MARTYR_TRIGGER = new OnDefenceResultAction({
   result: "damaged",
   damageType: "Wounds",
   scope: "zoneMate",
-  triggers: { actorHasCondition: "ready" },
+  when: ({ actor }) => actor.statuses.has("ready"),
   reaction: "martyr",
   redirectsDamage: true
 });

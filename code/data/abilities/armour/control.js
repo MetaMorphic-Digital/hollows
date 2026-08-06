@@ -1,11 +1,3 @@
-/**
- * Control — Armour T1. When a Ready Control hunter expends Ready, they may
- * grant an ally an immediate Reload, Take Cover, or Move manoeuvre.
- *
- *   CONTROL        — the reaction that runs the granted manoeuvre on the ally.
- *   CONTROL_ACTIVE — the ApplyToZone activation surfaced in the Expend Ready
- *                    dialog (its subSelect picks which manoeuvre to grant).
- */
 import { Reaction } from "../../mechanics/Reaction.js";
 import { ApplyToZone } from "../../mechanics/ApplyToZone.js";
 import { EndOfTurnAction } from "../../mechanics/EndOfTurnAction.js";
@@ -48,7 +40,7 @@ export const CONTROL_EOT = new EndOfTurnAction({
   weapon: "Armour", tier: 1,
   name: "Control",
   text: "You unravel the chaos of combat into reason. While you are Ready, when your turn ends, you may Shift 1 Threat in your or an adjacent area.",
-  triggers: { actorHasCondition: "ready" },
+  when: ({ actor }) => actor.statuses.has("ready"),
   effects: [
     { type: "controlShiftThreat" }
   ]

@@ -8,7 +8,6 @@ import { MECHANIC_BUCKETS } from "../mechanic-registry.js";
 import { runRelicTriggers, runRelicDeathSave, runRelicActionCancel } from "../../data/relic/apply-effect.js";
 import { relicHunterStatDelta, relicIncomingDamageDelta } from "../../data/relic/passive.js";
 import { hasWeaponAbility } from "../weapon-utils.js";
-import { evalTriggers } from "../../data/mechanics/dsl/triggers.js";
 import { applyEffects } from "../../data/mechanics/dsl/effects.js";
 import { getActorZone, getAdjacentZones, getTokenZone, isRangedZone, getActiveSceneHunters } from "../../canvas/zone.js";
 import { AttackDamageChange } from "../../data/mechanics/AttackDamageChange.js";
@@ -380,7 +379,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
 
     if (ability.scope === "self") {
       if (!formMechanicSet.has(ability) && !carries(actor, ability)) continue;
-      if (!evalTriggers(ability.triggers, { actor })) continue;
+      if (ability.when && !ability.when({ actor })) continue;
       if (ability.reaction) {
         const reaction = reactionsMod.getReactionByKey(ability.reaction);
         if (!reaction) continue;
@@ -405,7 +404,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
         .filter((a) => a.id !== actor.id)
         .filter((a) => getActorZone(a) === myZone)
         .filter((a) => carries(a, ability))
-        .filter((a) => evalTriggers(ability.triggers, { actor: a }));
+        .filter((a) => ability.when?.({ actor: a }) ?? true);
       if (!candidates.length) continue;
       if (ability.reaction) {
         const reaction = reactionsMod.getReactionByKey(ability.reaction);
