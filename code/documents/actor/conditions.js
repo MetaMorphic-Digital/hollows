@@ -25,7 +25,7 @@ export async function addCondition(actor, key) {
     const primary = existing[0];
     if (primary.disabled) await primary.update({ disabled: false });
     const ids = existing.slice(1).map(e => e.id);
-    if (ids.length) await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
+    await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
     return;
   }
   if (key === "dead") {
