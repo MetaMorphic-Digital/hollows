@@ -1,4 +1,4 @@
-import { clearAllCurseTrackers } from "../canvas/overlays.js";
+import { updateRegionCurse } from "../canvas/overlays.js";
 import { getActiveEntityActor, getActiveHollowActor } from "../canvas/zone.js";
 import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
 import {
@@ -96,7 +96,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
     }
 
     await this.#resetHunterCombatFlags();
-    await clearAllCurseTrackers(this);
+    await this.#clearAllCurseTrackers();
   }
 
   /* -------------------------------------------------- */
@@ -133,6 +133,28 @@ export default class HollowsCombat extends foundry.documents.Combat {
       });
     }
 
+    await foundry.documents.modifyBatch(operations);
+  }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Clear all curse trackers.
+   * @returns {Promise<void>}
+   */
+  async #clearAllCurseTrackers() {
+    const scene = this.scene ?? canvas.scene;
+    const regions = scene.regions.filter(region => region.getFlag(hollows.id, "lairRegion"));
+    for (const region of regions) await updateRegionCurse(region, 0);
+    const actors = new Set(this.combatants.map(c => c.actor).filter(a => ["hunter", "entity"].includes(a?.type)));
+    const operations = Array.from(actors).map(actor => {
+      return {
+        action: "update",
+        documentName: "Actor",
+        parent: actor.parent,
+        updates: [{ _id: actor.id, "system.curse.value": 0 }],
+      };
+    });
     await foundry.documents.modifyBatch(operations);
   }
 

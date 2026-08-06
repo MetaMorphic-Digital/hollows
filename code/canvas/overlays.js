@@ -9,7 +9,7 @@ import {
   getAdjacentZones,
   isCloseZone,
   isRangedZone,
-  isThreatZone
+  isThreatZone,
 } from "./zone.js";
 import { HOLLOWS_LAIR_LABEL_OFFSETS } from "../data/_module.mjs";
 
@@ -37,8 +37,8 @@ export function getActiveCurseConfig() {
     targets: {
       hunter: !!curse?.targets?.hunter,
       entity: !!curse?.targets?.entity,
-      zone: !!curse?.targets?.zone
-    }
+      zone: !!curse?.targets?.zone,
+    },
   };
 }
 
@@ -50,7 +50,7 @@ function getRegionCenter(regionObj) {
   if (regionObj.bounds) {
     return {
       x: regionObj.bounds.x + regionObj.bounds.width / 2,
-      y: regionObj.bounds.y + regionObj.bounds.height / 2
+      y: regionObj.bounds.y + regionObj.bounds.height / 2,
     };
   }
   if (regionObj.shape?.getBounds) {
@@ -71,7 +71,7 @@ async function updateRegionThreat(regionDoc, next) {
   const current = clampThreat(next, data.max);
   await regionDoc.setFlag("hollows", "threat", {
     current,
-    max: data.max
+    max: data.max,
   });
 }
 
@@ -101,13 +101,13 @@ export async function addThreatToZone(zoneId, amount = 1, opts = {}) {
   try {
     await region.update({
       "flags.hollows.threat.current": next,
-      "flags.hollows.threat.max": data.max
+      "flags.hollows.threat.max": data.max,
     });
   } catch (err) {
     console.warn("Hollows | Region update failed, falling back to setFlag", err);
     await region.setFlag("hollows", "threat", {
       current: next,
-      max: data.max
+      max: data.max,
     });
   }
 
@@ -132,7 +132,7 @@ export async function addThreatToZoneSafe(zoneId, amount = 1, opts = {}) {
   return await runGMQuery("hollows.threatAdjust", {
     zoneId,
     amount: Number(amount || 0),
-    opts
+    opts,
   });
 }
 
@@ -277,7 +277,7 @@ export async function shiftGridResource({ resource = "threat", direction = "towa
           sources: [{ zone: targetZone, count: n }],
           destPerSource: { [targetZone]: dests },
           title: "Shift", amount: n, reason: "Shift",
-          resource: resource === "curse" ? "Curse" : "Threat"
+          resource: resource === "curse" ? "Curse" : "Threat",
         });
         if (pick?.to && pick.to !== targetZone) moves.push({ from: targetZone, to: pick.to, n });
       }
@@ -287,20 +287,6 @@ export async function shiftGridResource({ resource = "threat", direction = "towa
   for (const m of moves) {
     if (resource === "curse") { await addCurseToZone(m.from, -m.n); await addCurseToZone(m.to, m.n); }
     else { await addThreatToZone(m.from, -m.n); await addThreatToZone(m.to, m.n); }
-  }
-}
-
-export async function clearAllCurseTrackers(combat) {
-  const scene = combat?.scene || canvas?.scene;
-  const regions = scene?.regions?.contents?.filter((r) => r.getFlag("hollows", "lairRegion")) || [];
-  for (const region of regions) {
-    await updateRegionCurse(region, 0);
-  }
-  const actors = combat?.combatants?.map((c) => c.actor).filter((a) => !!a) || [];
-  for (const actor of actors) {
-    if (actor.type === "hunter" || actor.type === "entity") {
-      await actor.update({ "system.curse.value": 0 });
-    }
   }
 }
 
@@ -341,7 +327,7 @@ export function refreshThreatOverlays() {
       fontSize: 14,
       fill: 0xf3e7d6,
       fontWeight: "700",
-      align: "center"
+      align: "center",
     });
     text.anchor.set(0.5, 0.5);
 
@@ -355,7 +341,7 @@ export function refreshThreatOverlays() {
       -text.height / 2 - paddingY,
       text.width + paddingX * 2,
       text.height + paddingY * 2,
-      6
+      6,
     );
     bg.endFill();
 
@@ -371,7 +357,7 @@ export function refreshThreatOverlays() {
         -text.width / 2 - paddingX,
         -text.height / 2 - paddingY,
         text.width + paddingX * 2,
-        text.height + paddingY * 2
+        text.height + paddingY * 2,
       );
       container.cursor = "pointer";
       container.on("pointerdown", async (ev) => {
@@ -461,7 +447,7 @@ export function refreshHunterCurseBadges() {
         fontSize: 13,
         fill: 0xf2e8cf,
         fontWeight: "700",
-        align: "center"
+        align: "center",
       });
       text.anchor.set(0.5, 0.5);
 
@@ -475,7 +461,7 @@ export function refreshHunterCurseBadges() {
         -text.height / 2 - paddingY,
         text.width + paddingX * 2,
         text.height + paddingY * 2,
-        6
+        6,
       );
       bg.endFill();
 
@@ -515,7 +501,7 @@ export function refreshHunterCurseBadges() {
         fontSize: 14,
         fill: 0xf2e8cf,
         fontWeight: "700",
-        align: "center"
+        align: "center",
       });
       text.anchor.set(0.5, 0.5);
 
@@ -529,7 +515,7 @@ export function refreshHunterCurseBadges() {
         -text.height / 2 - paddingY,
         text.width + paddingX * 2,
         text.height + paddingY * 2,
-        7
+        7,
       );
       bg.endFill();
 
