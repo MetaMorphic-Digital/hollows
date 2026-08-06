@@ -1,7 +1,7 @@
 import {
-  getTokenZone, getThreatInZone, isThreatZone, getZoneCurseValue, getZoneRegionDoc
+  getTokenZone, getThreatInZone, isThreatZone, getZoneCurseValue, getZoneRegionDoc,
 } from "../../canvas/zone.js";
-import { spendThreatFromZones, updateRegionCurse } from "../../canvas/overlays.js";
+import { spendThreatFromZones } from "../../canvas/overlays.js";
 import { adjustEntityResource } from "../actor/resources.js";
 import { runRelicTriggers } from "../../data/relic/apply-effect.js";
 import { getEntitySelfActionCostDelta } from "../../helpers/entity-dispatchers.js";
@@ -11,7 +11,7 @@ export function getEntityActionCost(action, amountOverride = null) {
   const cost = action?.cost || {};
   return {
     type: cost.enabled ? String(cost.type || "threat") : "threat",
-    amount: Math.max(0, Number(amountOverride ?? (cost.enabled ? cost.amount : 0) ?? 0) || 0)
+    amount: Math.max(0, Number(amountOverride ?? (cost.enabled ? cost.amount : 0) ?? 0) || 0),
   };
 }
 
@@ -23,7 +23,7 @@ export function getEntityInterruptCost(interrupt, entityActor, interruptItem = n
     actionItem: interruptItem,
     actionConfig: interrupt,
     actionKind: "interrupt",
-    actionType: "interrupt"
+    actionType: "interrupt",
   }).threat || 0;
   return Math.max(0, amount + abilityDelta + selfDelta);
 }
@@ -35,7 +35,7 @@ export function getEntityAttackCost(attack, entityActor, attackItem = null) {
     actionItem: attackItem,
     actionConfig: attack,
     actionKind: "attack",
-    actionType: "attack"
+    actionType: "attack",
   }).threat || 0;
   return Math.max(0, amount + selfDelta);
 }
@@ -94,7 +94,7 @@ export async function applyEntityActionCost(action, entityActor, targets, zonesO
     for (const z of targetZones) {
       const region = getZoneRegionDoc(z);
       const cur = getZoneCurseValue(z);
-      if (region) await updateRegionCurse(region, Math.max(0, cur - amount));
+      if (region) await region.updateRegionCurse(Math.max(0, cur - amount));
     }
     return true;
   }
@@ -149,9 +149,9 @@ export async function promptEntityThreatEnhance(entityActor, targets, { attackNa
             await spendThreatFromZones([zoneId], spend, { source: "entityAction" });
           }
         }
-      }}
+      } },
     ],
-    rejectClose: false
+    rejectClose: false,
   });
   return { zoneSpend };
 }

@@ -38,7 +38,7 @@ export default class EntityData extends foundry.abstract.TypeDataModel {
       }),
       curse: new fields.SchemaField({
         enabled: new fields.BooleanField({ initial: false }),
-        value: new fields.NumberField({ initial: 0, integer: true }),
+        value: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 6, nullable: false }),
         targets: new fields.SchemaField({
           hunter: new fields.BooleanField({ initial: false }),
           entity: new fields.BooleanField({ initial: false }),

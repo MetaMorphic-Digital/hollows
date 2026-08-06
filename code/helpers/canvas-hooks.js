@@ -1,22 +1,18 @@
 import {
   applyEntityLair as applyEntityLairCanvas,
-  clearEntityLair as clearEntityLairCanvas
+  clearEntityLair as clearEntityLairCanvas,
 } from "../canvas/lair.js";
-import {
-  getActiveHollowActor,
-  getTokenZone
-} from "../canvas/zone.js";
-import {
-  clampCurse,
-  refreshHunterCurseBadges,
-  refreshTerrainPoolOverlay,
-  refreshThreatOverlays
-} from "../canvas/overlays.js";
+import { getActiveHollowActor, getTokenZone } from "../canvas/zone.js";
+import { refreshHunterCurseBadges, refreshTerrainPoolOverlay, refreshThreatOverlays } from "../canvas/overlays.js";
 import { getFocusCount, setFocusCount } from "../documents/actor/resources.js";
 import { hasEchoRestriction } from "../data/echo/index.js";
 import { getDefaultHollowsAssetImage, isGenericFoundryImage } from "../utils/asset-utils.js";
 import { refreshActiveEntityFromDoomChange } from "../data/entity/actions/entity-doom.js";
-import { getDefaultHunterTokenConfig, shouldConfigureHunterTokenForActor, shouldConfigureHunterTokenForNewActor } from "../data/actor-models.js";
+import {
+  getDefaultHunterTokenConfig,
+  shouldConfigureHunterTokenForActor,
+  shouldConfigureHunterTokenForNewActor,
+} from "../data/actor-models.js";
 import { hasWeaponEquipped } from "./weapon-utils.js";
 import { runOnMove, runTerrainDiscardOnMove } from "./weapon-abilities/dispatchers.js";
 import { triggerUseOnManoeuvre } from "../data/actions/use.js";
@@ -65,7 +61,7 @@ export function registerCanvasHooks() {
       }
       if (defaultImg && isGenericFoundryImage(currentTokenImg)) {
         update.prototypeToken = foundry.utils.mergeObject(data?.prototypeToken || actor.prototypeToken?.toObject?.() || actor.prototypeToken || {}, {
-          texture: { src: defaultImg }
+          texture: { src: defaultImg },
         }, { inplace: false, insertKeys: true, insertValues: true, overwrite: true });
       }
       if (Object.keys(update).length) {
@@ -113,7 +109,7 @@ export function registerCanvasHooks() {
         const defaults = getDefaultHunterTokenConfig();
         tokenDoc.update({
           ...defaults,
-          flags: foundry.utils.mergeObject(tokenDoc.flags || {}, { hollows: { tokenConfigured: true } }, { inplace: false, insertKeys: true, insertValues: true, overwrite: false })
+          flags: foundry.utils.mergeObject(tokenDoc.flags || {}, { hollows: { tokenConfigured: true } }, { inplace: false, insertKeys: true, insertValues: true, overwrite: false }),
         }, { hollowsAutoConfigure: true });
       }
     }
@@ -174,7 +170,7 @@ export function registerCanvasHooks() {
         await setFocusCount(actor, 0);
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor }),
-          content: `<div class="hollows-chat"><strong>${actor.name}</strong> loses all <strong>Focus</strong> (entered Support).</div>`
+          content: `<div class="hollows-chat"><strong>${actor.name}</strong> loses all <strong>Focus</strong> (entered Support).</div>`,
         });
       }
     }
@@ -284,14 +280,5 @@ export function registerCanvasHooks() {
       if (options?.render === false) return;
       actor.render(false);
     }
-  });
-
-  Hooks.on("preUpdateActor", (actor, changed) => {
-    if (!actor || (actor.type !== "hunter" && actor.type !== "entity")) return;
-    const incoming = changed?.system?.curse?.value;
-    if (incoming === undefined) return;
-    changed.system = changed.system || {};
-    changed.system.curse = changed.system.curse || {};
-    changed.system.curse.value = clampCurse(Number(incoming));
   });
 }

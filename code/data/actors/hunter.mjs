@@ -52,7 +52,7 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ initial: 0, integer: true }),
       }),
       curse: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 0, integer: true }),
+        value: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 6, nullable: false }),
       }),
     };
   }

@@ -21,11 +21,6 @@ export function clampThreat(value, max) {
   return Math.max(0, value);
 }
 
-export function clampCurse(value) {
-  if (Number.isNaN(value)) return 0;
-  return Math.max(0, Math.min(6, Number(value) || 0));
-}
-
 // ─── Curse config ──────────────────────────────────────────────────────
 
 export function getActiveCurseConfig() {
@@ -170,31 +165,18 @@ export async function spendThreatFromZones(zoneIds, cost, context = {}) {
 
 // ─── Curse mutations ───────────────────────────────────────────────────
 
-export async function updateRegionCurse(regionDoc, next) {
-  const data = getRegionCurseData(regionDoc);
-  const current = clampCurse(next);
-  await regionDoc.setFlag("hollows", "curse", { current });
-}
-
 export async function addCurseToZone(zoneId, amount = 1) {
   if (!zoneId || !canvas?.scene) return false;
-  const regionObj = (canvas.regions?.placeables || []).find((r) => {
-    const doc = r.document || r;
+  const regionObj = canvas.regions.placeables.find((r) => {
+    const doc = r.document;
     if (!doc.getFlag("hollows", "lairRegion")) return false;
     const rid = doc.getFlag("hollows", "zoneId") || doc.name;
     return rid === zoneId;
   });
-  const region = regionObj?.document || regionObj;
+  const region = regionObj?.document;
   if (!region) return false;
-  const data = getRegionCurseData(region);
-  const delta = Number(amount ?? 0);
-  const next = clampCurse(data.current + (Number.isNaN(delta) ? 0 : delta));
-  try {
-    await region.update({ "flags.hollows.curse.current": next });
-  } catch (err) {
-    console.warn("Hollows | Region curse update failed, falling back to setFlag", err);
-    await region.setFlag("hollows", "curse", { current: next });
-  }
+
+  await region.updateRegionCurse(amount, true);
   refreshThreatOverlays();
   return true;
 }
@@ -365,9 +347,9 @@ export function refreshThreatOverlays() {
         if (isShift && zoneCurseEnabled) {
           const cData = getRegionCurseData(regionDoc);
           if (ev?.data?.button === 2) {
-            await updateRegionCurse(regionDoc, cData.current - 1);
+            await regionDoc.updateRegionCurse(cData.current - 1);
           } else {
-            await updateRegionCurse(regionDoc, cData.current + 1);
+            await regionDoc.updateRegionCurse(cData.current + 1);
           }
         } else {
           const data = getRegionThreatData(regionDoc);
@@ -436,10 +418,10 @@ export function refreshHunterCurseBadges() {
   canvas.controls.hollowsCurse = layer;
 
   if (cfg.targets.hunter) {
-    const hunters = canvas.tokens?.placeables?.filter((t) => t.actor?.type === "hunter") || [];
+    const hunters = canvas.tokens?.placeables.filter((t) => t.actor?.type === "hunter") || [];
     for (const token of hunters) {
       const actor = token.actor;
-      const value = clampCurse(Number(actor?.system?.curse?.value ?? 0));
+      const value = actor.system.curse.value;
       const label = `C${value}`;
 
       const text = new PIXI.Text(label, {
@@ -470,7 +452,7 @@ export function refreshHunterCurseBadges() {
       badge.addChild(bg);
       badge.addChild(text);
 
-      if (game.user?.isGM) {
+      if (game.user.isGM) {
         badge.interactive = true;
         badge.cursor = "pointer";
         badge.on("pointerdown", async (ev) => {
@@ -480,7 +462,7 @@ export function refreshHunterCurseBadges() {
           oe?.preventDefault?.();
           oe?.stopPropagation?.();
           const delta = ev?.data?.button === 2 ? -1 : 1;
-          await actor.update({ "system.curse.value": clampCurse(value + delta) });
+          await actor.update({ "system.curse.value": value + delta });
           refreshHunterCurseBadges();
         });
       }
@@ -490,10 +472,10 @@ export function refreshHunterCurseBadges() {
   }
 
   if (cfg.targets.entity) {
-    const entityTokens = canvas.tokens?.placeables?.filter((t) => t.actor?.type === "entity") || [];
+    const entityTokens = canvas.tokens?.placeables.filter((t) => t.actor?.type === "entity") || [];
     for (const token of entityTokens) {
       const actor = token.actor;
-      const value = clampCurse(Number(actor?.system?.curse?.value ?? 0));
+      const value = actor.system.curse.value;
       const label = `C${value}`;
 
       const text = new PIXI.Text(label, {
@@ -534,7 +516,7 @@ export function refreshHunterCurseBadges() {
           oe?.preventDefault?.();
           oe?.stopPropagation?.();
           const delta = ev?.data?.button === 2 ? -1 : 1;
-          await actor.update({ "system.curse.value": clampCurse(value + delta) });
+          await actor.update({ "system.curse.value": value + delta });
           refreshHunterCurseBadges();
         });
       }

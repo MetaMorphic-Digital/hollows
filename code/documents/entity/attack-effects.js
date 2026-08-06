@@ -1,14 +1,8 @@
 import { HOLLOWS_CONDITIONS } from "../../data/_module.mjs";
-import {
-  getZoneRegionDoc,
-  getActorTokenOnScene,
-  getActiveEntityActor,
-  getRegionCurseData,
-  isCloseZone,
-} from "../../canvas/zone.js";
+import { getZoneRegionDoc, getActorTokenOnScene, getActiveEntityActor, isCloseZone } from "../../canvas/zone.js";
 import { adjustEntityTerrain, getAvailableTerrainTags } from "../../canvas/terrain-pool.js";
 import { isEntityColossal } from "./entity-stats.js";
-import { addThreatToZoneSafe, clampCurse, shiftGridResource, updateRegionCurse } from "../../canvas/overlays.js";
+import { addThreatToZoneSafe, shiftGridResource } from "../../canvas/overlays.js";
 import { dispatchToGM } from "../../helpers/queries.js";
 import { setShotgunsLoaded } from "../../helpers/weapon-utils.js";
 import { getEffectiveWeaponCapacity } from "../../data/weapons/index.js";
@@ -21,12 +15,7 @@ import {
   applySpecialConditionSlot,
   getTerrainTagKeys,
 } from "../actor/conditions.js";
-import {
-  adjustHunterResource,
-  adjustEntityResource,
-  getFocusCount,
-  setFocusCount,
-} from "../actor/resources.js";
+import { adjustHunterResource, adjustEntityResource, getFocusCount, setFocusCount } from "../actor/resources.js";
 import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
 
 /**
@@ -177,21 +166,16 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
 
     // Signed curse / threat: positive places, negative removes.
     if (group.curseEntity && entityActor) {
-      const cur = clampCurse(Number(entityActor.system?.curse?.value ?? 0));
-      await entityActor.update({ "system.curse.value": clampCurse(cur + Number(group.curseEntity || 0)) });
+      await entityActor.update({ "system.curse.value": entityActor.system.curse.value + (group.curseEntity || 0) });
     }
 
     if (target && group.curseTarget) {
-      const cur = clampCurse(Number(target.system?.curse?.value ?? 0));
-      await target.update({ "system.curse.value": clampCurse(cur + Number(group.curseTarget || 0)) });
+      await target.update({ "system.curse.value": target.system.curse.value + (group.curseTarget || 0) });
     }
 
     if (group.curseZone && targetZone) {
       const region = getZoneRegionDoc(targetZone);
-      if (region) {
-        const cur = clampCurse(getRegionCurseData(region).current);
-        await updateRegionCurse(region, clampCurse(cur + Number(group.curseZone || 0)));
-      }
+      if (region) await region.updateRegionCurse(Number(group.curseZone || 0), true);
     }
 
     if (group.threat && targetZone) {
