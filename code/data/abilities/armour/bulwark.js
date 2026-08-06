@@ -11,7 +11,6 @@
 import { Reaction } from "../../mechanics/Reaction.js";
 import { ApplyToZone } from "../../mechanics/ApplyToZone.js";
 import { openGuardDialogForActor } from "../../actions/guard.js";
-import { hasCondition } from "../../../documents/actor/conditions.js";
 import { adjustHunterResource } from "../../../documents/actor/resources.js";
 
 export const GUARD = new Reaction("guard", {
@@ -20,7 +19,7 @@ export const GUARD = new Reaction("guard", {
     const target = game.actors.get(targetId);
     await openGuardDialogForActor(target);
     return { used: true };
-  }
+  },
 });
 
 export const BULWARK = new ApplyToZone({
@@ -33,8 +32,8 @@ export const BULWARK = new ApplyToZone({
   targetSelection: { scope: "ally", zoneScope: "sameZone", count: 1 },
   effects: [
     { type: "chatNotice", message: "<strong>{actor}</strong> expends <strong>Ready</strong> to grant <strong>{target}</strong> an immediate <strong>Guard</strong> (Bulwark)." },
-    { type: "grantReaction", reaction: "guard" }
-  ]
+    { type: "grantReaction", reaction: "guard" },
+  ],
 });
 
 export const BULWARK_GUARD_BONUS = new Reaction("armour.t1.bulwark", {
@@ -44,7 +43,7 @@ export const BULWARK_GUARD_BONUS = new Reaction("armour.t1.bulwark", {
   // confirmed zone + carriership. Auto-applies (no prompt) — the guarder gets +1.
   promptOnPlayer: async ({ carrierId }) => {
     const carrier = game.actors.get(carrierId);
-    if (!hasCondition(carrier, "ready")) return null;
+    if (!carrier.statuses.has("ready")) return null;
     return { apply: true };
   },
   applyOnGM: async ({ actorId }) => {
@@ -53,7 +52,7 @@ export const BULWARK_GUARD_BONUS = new Reaction("armour.t1.bulwark", {
     if (!result.resolve.changed) return;
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: guarder }),
-      content: `<div class="hollows-chat"><strong>${guarder.name}</strong> gains <strong>+1 Resolve</strong> from <strong>Bulwark</strong>.</div>`
+      content: `<div class="hollows-chat"><strong>${guarder.name}</strong> gains <strong>+1 Resolve</strong> from <strong>Bulwark</strong>.</div>`,
     });
-  }
+  },
 });

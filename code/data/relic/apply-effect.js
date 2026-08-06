@@ -7,7 +7,7 @@ import {
   filterZonesByGroup,
   getActiveSceneHunters,
   getThreatInZone,
-  getZoneCurseValue
+  getZoneCurseValue,
 } from "../../canvas/zone.js";
 import { confirmDialog, pickMany, pickOne } from "../../applications/apps/selection-dialogs.mjs";
 import { dispatchToGM } from "../../helpers/queries.js";
@@ -76,13 +76,13 @@ export async function postEffectTextChat(item, { speaker = null, title = "" } = 
   await ChatMessage.create({
     speaker: speaker || ChatMessage.getSpeaker(),
     flavor: item.name || title || "Effect",
-    content: `<div class="hollows-chat"><div class="attack-title">${foundry.utils.escapeHTML(String(title || item.name || "Effect"))}</div>${parts.join("") || "<div>Effect.</div>"}</div>`
+    content: `<div class="hollows-chat"><div class="attack-title">${foundry.utils.escapeHTML(String(title || item.name || "Effect"))}</div>${parts.join("") || "<div>Effect.</div>"}</div>`,
   });
   if (gmText) {
     await ChatMessage.create({
       speaker: speaker || ChatMessage.getSpeaker(),
       whisper: ChatMessage.getWhisperRecipients("GM"),
-      content: `<div class="hollows-chat"><div class="attack-title">${foundry.utils.escapeHTML(String(title || item.name || "Effect"))}: GM Notes</div><div>${foundry.utils.escapeHTML(gmText)}</div></div>`
+      content: `<div class="hollows-chat"><div class="attack-title">${foundry.utils.escapeHTML(String(title || item.name || "Effect"))}: GM Notes</div><div>${foundry.utils.escapeHTML(gmText)}</div></div>`,
     });
   }
 }
@@ -110,7 +110,7 @@ async function runRelicAttack(bearer, group, item) {
     title: `${item?.name || "Relic"} - Attack`,
     forcedProfile: { stat: String(attack.attackStat || "quick"), defence: String(attack.defence || "close") },
     damageOverride: { resolve: num(attack.amount?.resolve), wounds: num(attack.amount?.wounds) },
-    suggestedMode: attack.advantage ? "adv" : "normal"
+    suggestedMode: attack.advantage ? "adv" : "normal",
   });
 }
 
@@ -126,13 +126,13 @@ export async function runRelicTriggers(trigger, { bearer = null } = {}) {
 }
 
 export async function runRelicDeathSave(actor) {
-  if (!actor || actor.type !== "hunter" || !game.user?.isGM) return false;
+  if (!actor || (actor.type !== "hunter") || !game.user.isGM) return false;
   if (!actor.getFlag("hollows", "dyingRevivedOnce")) return false;
   for (const item of heldRelics(actor)) {
     for (const { group } of enabledGroups(item, { trigger: "onDeath", profile: activeRelicProfile(item) })) {
-      if (!group.reaction?.enabled || String(group.reaction.kind || "") !== "deathSave") continue;
+      if (!group.reaction?.enabled || (String(group.reaction.kind || "") !== "deathSave")) continue;
       await applyEffectGroupGM({ group, bearer: actor });
-      if (item.system?.deleteWhenUsed) await item.delete();
+      if (item.system.deleteWhenUsed) await item.delete();
       return true;
     }
   }
@@ -148,12 +148,12 @@ export async function runRelicActionCancel(context = {}) {
         if (!group.reaction?.enabled || String(group.reaction.kind || "") !== "cancelAction") continue;
         const ok = await confirmDialog({
           title: item.name || "Relic",
-          bodyHtml: `Cancel <strong>${foundry.utils.escapeHTML(actionName)}</strong> using <strong>${foundry.utils.escapeHTML(item.name || "Relic")}</strong>?`
+          bodyHtml: `Cancel <strong>${foundry.utils.escapeHTML(actionName)}</strong> using <strong>${foundry.utils.escapeHTML(item.name || "Relic")}</strong>?`,
         });
         if (ok) {
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: hunter }),
-            content: `<div class="hollows-chat"><strong>${foundry.utils.escapeHTML(hunter.name)}</strong> uses <strong>${foundry.utils.escapeHTML(item.name || "Relic")}</strong> to cancel <strong>${foundry.utils.escapeHTML(actionName)}</strong>.</div>`
+            content: `<div class="hollows-chat"><strong>${foundry.utils.escapeHTML(hunter.name)}</strong> uses <strong>${foundry.utils.escapeHTML(item.name || "Relic")}</strong> to cancel <strong>${foundry.utils.escapeHTML(actionName)}</strong>.</div>`,
           });
           return true;
         }
@@ -249,7 +249,7 @@ async function promptAdjacentZones(zones) {
   if (!list.length) return [];
   const picked = await pickMany({
     title: "Select Adjacent Zones",
-    options: list.map((zone) => ({ value: zone, label: zone }))
+    options: list.map((zone) => ({ value: zone, label: zone })),
   });
   return picked || [];
 }

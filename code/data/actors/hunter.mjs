@@ -59,6 +59,19 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
 
   /* -------------------------------------------------- */
 
+  /**
+   * Can this actor be revived?
+   * @type {boolean}
+   */
+  get isRevivable() {
+    const actor = this.parent;
+    return actor.statuses.has("dying")
+      && !actor.statuses.has("dead")
+      && !actor.getFlag(hollows.id, "dyingRevivedOnce");
+  }
+
+  /* -------------------------------------------------- */
+
   /** @inheritdoc */
   prepareDerivedData() {
     super.prepareDerivedData();

@@ -6,20 +6,18 @@ import {
   syncEquipmentSlotsFromItems,
 } from "../documents/actor/hunter-equipment.js";
 import { isShotgunWeapon, setShotgunsLoaded, hasWeaponEquipped } from "./weapon-utils.js";
-import { hasCondition, addCondition, removeCondition } from "../documents/actor/conditions.js";
+import { addCondition, removeCondition } from "../documents/actor/conditions.js";
 import { HOLLOWS_CONDITIONS } from "../data/_module.mjs";
 import { getFocusCount, setFocusCount } from "../documents/actor/resources.js";
 import { applyEchoAcquisition, handleCorruptionIncrease } from "../documents/actor/echo.js";
-import {
-  maybeTriggerEntityCurseThresholdAbilities
-} from "../data/entity/actions/entity-special.js";
+import { maybeTriggerEntityCurseThresholdAbilities } from "../data/entity/actions/entity-special.js";
 import { triggerEntityWhenBrokenAbilities } from "../data/entity/actions/entity-broken.js";
 import { checkCypherUpgrades } from "../documents/item/relic-cypher.js";
 import { runRelicTriggers } from "../data/relic/apply-effect.js";
 import {
   deleteGeneratedEnhancementAbility,
   runEntityWhenBrokenEnhancements,
-  syncGeneratedEnhancementAbility
+  syncGeneratedEnhancementAbility,
 } from "../documents/entity/entity-enhancements.js";
 import { runDeathInterceptors, runOnDeathEffects } from "./weapon-abilities/dispatchers.js";
 import { syncHunterLoadedStatusFromShotguns } from "./weapon-utils.js";
@@ -102,59 +100,53 @@ export function registerActorHooks() {
   });
 
   Hooks.on("updateActor", async (actor, changed) => {
-    if (!game.user?.isGM) return;
-    if (!actor || actor.type !== "hunter") return;
+    if (!game.user.isGM) return;
+    if (actor?.type !== "hunter") return;
     const resolveChanged = foundry.utils.hasProperty(changed, "system.health.resolve.value");
     if (!resolveChanged) return;
     const resolveValue = Number(actor.system?.health?.resolve?.value ?? 0);
     if (resolveValue <= 0) {
-      if (hasWeaponEquipped(actor, "Armour") && hasCondition(actor, "ready")) {
+      if (hasWeaponEquipped(actor, "Armour") && actor.statuses.has("ready")) {
         // Involuntary loss (Resolve hit 0) — not an "expend", so Barbed etc.
         // must not trigger.
         await removeCondition(actor, "ready", { skipReactionDispatch: true });
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor }),
-          content: `<div class="hollows-chat"><strong>${actor.name}</strong> becomes <strong>Unready</strong> (Broken).</div>`
+          content: `<div class="hollows-chat"><strong>${actor.name}</strong> becomes <strong>Unready</strong> (Broken).</div>`,
         });
       }
-      if (hasWeaponEquipped(actor, "Rifle") && getFocusCount(actor) > 0) {
+      if (hasWeaponEquipped(actor, "Rifle") && (getFocusCount(actor) > 0)) {
         await setFocusCount(actor, 0);
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor }),
-          content: `<div class="hollows-chat"><strong>${actor.name}</strong> loses all <strong>Focus</strong> (Broken).</div>`
+          content: `<div class="hollows-chat"><strong>${actor.name}</strong> loses all <strong>Focus</strong> (Broken).</div>`,
         });
       }
     }
   });
 
   Hooks.on("updateActor", async (actor, changed) => {
-    if (!game.user?.isGM) return;
-    if (!actor || actor.type !== "hunter") return;
+    if (!game.user.isGM) return;
+    if (!actor || (actor.type !== "hunter")) return;
     const woundsChanged = foundry.utils.hasProperty(changed, "system.health.wounds.value");
     if (!woundsChanged) return;
     if (actor.getFlag("hollows", "replaceDyingStateProcessing")) return;
     const woundsValue = Number(actor.system?.health?.wounds?.value ?? 0);
     if (woundsValue > 0) return;
-    const deadFlag = !!actor.getFlag("hollows", "dead");
-    const deadCondition = hasCondition(actor, "dead");
-    if (deadFlag && !deadCondition) {
-      await actor.unsetFlag("hollows", "dead");
-    } else if (deadCondition || deadFlag) {
-      return;
-    }
+    if (actor.statuses.has("dead")) return;
+
     if (await runDeathInterceptors(actor)) return;
     if (actor.getFlag("hollows", "dyingRevivedOnce")) {
       await removeCondition(actor, "dying");
       await addCondition(actor, "dead");
-      await actor.setFlag("hollows", "dead", true);
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: `<div class="hollows-chat"><strong>${actor.name}</strong> has died.</div>`
+        content: `<div class="hollows-chat"><strong>${actor.name}</strong> has died.</div>`,
       });
       await runOnDeathEffects(actor);
       return;
     }
-    if (!hasCondition(actor, "dying")) {
+    if (!actor.statuses.has("dying")) {
       await addCondition(actor, "dying");
     }
     const resolveValue = Number(actor.system?.health?.resolve?.value ?? 0);
@@ -164,7 +156,7 @@ export function registerActorHooks() {
   });
 
   Hooks.on("preUpdateActor", (actor, changed) => {
-    if (!actor || actor.type !== "hunter") return;
+    if (!actor || (actor.type !== "hunter")) return;
     const corruptionChanged = foundry.utils.hasProperty(changed, "system.corruption.value");
     if (!corruptionChanged) return;
     const current = Number(actor.system?.corruption?.value ?? 0);
@@ -172,7 +164,7 @@ export function registerActorHooks() {
   });
 
   Hooks.on("updateActor", async (actor, changed) => {
-    if (!actor || actor.type !== "hunter") return;
+    if (!actor || (actor.type !== "hunter")) return;
     const corruptionChanged = foundry.utils.hasProperty(changed, "system.corruption.value");
     if (!corruptionChanged) return;
     const prev = HOLLOWS_HUNTER_CORRUPTION_PRE_UPDATE.get(actor.id);
@@ -205,7 +197,7 @@ export function registerActorHooks() {
     const others = game.actors.filter(a =>
       a.type === "hollow" &&
       a.id !== actor.id &&
-      String(a.system?.status || "") === "active"
+      String(a.system?.status || "") === "active",
     );
     for (const other of others) {
       await other.update({ "system.status": "dormant" }, { hollowsSkipActiveCheck: true });
@@ -228,10 +220,10 @@ export function registerActorHooks() {
     HOLLOWS_ENTITY_RESOLVE_PRE_UPDATE.delete(actor.id);
     if (prev === undefined || prev === null) return;
     const next = Number(actor.system?.health?.resolve?.value ?? 0);
-    if (next > prev && hasCondition(actor, "bleeding")) {
+    if ((next > prev) && actor.statuses.has("bleeding")) {
       await removeCondition(actor, "bleeding");
     }
-    const becameBroken = prev > 0 && next <= 0;
+    const becameBroken = (prev > 0) && (next <= 0);
     if (!becameBroken) return;
     const sourceHunter = options?.hollowsSourceHunterId ? game.actors.get(options.hollowsSourceHunterId) : null;
     await triggerEntityWhenBrokenAbilities(actor, sourceHunter);
@@ -314,7 +306,7 @@ export function registerActorHooks() {
     if (isShotgunWeapon(item)) {
       await syncHunterLoadedStatusFromShotguns(actor);
     }
-    if (!hasWeaponEquipped(actor, "Armour") && hasCondition(actor, "ready")) {
+    if (!hasWeaponEquipped(actor, "Armour") && actor.statuses.has("ready")) {
       // Armour removed — involuntary Ready loss, not an "expend".
       await removeCondition(actor, "ready", { skipReactionDispatch: true });
     }
@@ -329,22 +321,12 @@ export function registerActorHooks() {
 
   Hooks.on("deleteActiveEffect", async (effect) => {
     const actor = effect?.parent;
-    if (!actor || actor.type !== "hunter") return;
+    if (!actor || (actor.type !== "hunter")) return;
     if (!game.user?.isGM && !actor.testUserPermission(game.user, "OWNER")) return;
-    const deadId = HOLLOWS_CONDITIONS?.dead?.id;
-    const focusId = HOLLOWS_CONDITIONS?.focus?.id;
-    const loadedId = HOLLOWS_CONDITIONS?.loaded?.id;
-    const effectKey = effect?.flags?.hollows?.conditionKey;
-    const hasDeadStatus = deadId && (effect.statuses?.has?.(deadId) || effect.statuses?.includes?.(deadId));
-    const hasFocusStatus = focusId && (effect.statuses?.has?.(focusId) || effect.statuses?.includes?.(focusId));
-    const hasLoadedStatus = loadedId && (effect.statuses?.has?.(loadedId) || effect.statuses?.includes?.(loadedId));
-    if (effectKey === "dead" || hasDeadStatus) {
-      await actor.unsetFlag("hollows", "dead");
-    }
-    if (effectKey === "focus" || hasFocusStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.focus.id)) {
       await setFocusCount(actor, 0);
     }
-    if (effectKey === "loaded" || hasLoadedStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.loaded.id)) {
       await setShotgunsLoaded(actor, false);
     }
   });
@@ -355,15 +337,10 @@ export function registerActorHooks() {
     if (!game.user?.isGM && !actor.testUserPermission(game.user, "OWNER")) return;
     if (!Object.prototype.hasOwnProperty.call(changed || {}, "disabled")) return;
     if (!changed.disabled) return;
-    const focusId = HOLLOWS_CONDITIONS?.focus?.id;
-    const loadedId = HOLLOWS_CONDITIONS?.loaded?.id;
-    const effectKey = effect?.flags?.hollows?.conditionKey;
-    const hasFocusStatus = focusId && (effect.statuses?.has?.(focusId) || effect.statuses?.includes?.(focusId));
-    const hasLoadedStatus = loadedId && (effect.statuses?.has?.(loadedId) || effect.statuses?.includes?.(loadedId));
-    if (effectKey === "focus" || hasFocusStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.focus.id)) {
       await setFocusCount(actor, 0);
     }
-    if (effectKey === "loaded" || hasLoadedStatus) {
+    if (effect.statuses.has(HOLLOWS_CONDITIONS.loaded.id)) {
       await setShotgunsLoaded(actor, false);
     }
   });

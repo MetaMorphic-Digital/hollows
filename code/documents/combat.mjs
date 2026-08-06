@@ -11,7 +11,7 @@ import {
 } from "../helpers/combat-first-pick.js";
 import { processEndOfTurn, processStartOfTurn } from "../helpers/combat-lifecycle.js";
 import { getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from "../helpers/combat-runtime.js";
-import { getTerrainTagKeys, hasCondition, removeCondition } from "./actor/conditions.js";
+import { getTerrainTagKeys, removeCondition } from "./actor/conditions.js";
 import { initializeHunterCoreStatesForCombat } from "./actor/hunter-combat.js";
 import { getFocusCount, setFocusCount } from "./actor/resources.js";
 
@@ -91,7 +91,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
     for (const actor of actors) {
       for (const tag of getTerrainTagKeys()) {
         // Refund the pool itself for non-free pooled tags.
-        if (hasCondition(actor, tag)) await removeCondition(actor, tag);
+        if (actor.statuses.has(tag)) await removeCondition(actor, tag);
       }
     }
 
@@ -112,7 +112,6 @@ export default class HollowsCombat extends foundry.documents.Combat {
     const COMBAT_RESET_FLAGS = {
       wardGranted: _del,
       wardSuppressed: _del,
-      dead: _del,
       echoReplaceDyingUsed: _del,
       dyingRevivedOnce: false,
     };
@@ -120,10 +119,10 @@ export default class HollowsCombat extends foundry.documents.Combat {
     const hunters = new Set(this.combatants.map(c => c.actor).filter(a => a?.type === "hunter"));
     for (const actor of hunters) {
       for (const tag of getTerrainTagKeys()) {
-        if (hasCondition(actor, tag)) await removeCondition(actor, tag, { skipPoolRefund: true });
+        if (actor.statuses.has(tag)) await removeCondition(actor, tag, { skipPoolRefund: true });
       }
-      if (hasCondition(actor, "dying")) await removeCondition(actor, "dying");
-      if (hasCondition(actor, "dead")) await removeCondition(actor, "dead");
+      if (actor.statuses.has("dying")) await removeCondition(actor, "dying");
+      if (actor.statuses.has("dead")) await removeCondition(actor, "dead");
       if (getFocusCount(actor) > 0) await setFocusCount(actor, 0);
 
       operations.push({
@@ -186,7 +185,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
       return;
     }
 
-    if ((newCombatant?.actor?.type === "hunter") && hasCondition(newCombatant.actor, "dead")) {
+    if ((newCombatant?.actor?.type === "hunter") && newCombatant.actor.statuses.has("dead")) {
       await this.#advancePastDeadHunter(newCombatantId);
       return;
     }
@@ -252,7 +251,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
       const index = (startIndex + i) % turns.length;
       const candidate = turns[index];
       const actor = candidate?.actor || this.combatants.get(candidate.id)?.actor;
-      if (!actor || (actor.type !== "hunter") || !hasCondition(actor, "dead")) {
+      if (!actor || (actor.type !== "hunter") || !actor.statuses.has("dead")) {
         await this.update({ turn: index }, { hollowsSkipDeadAdvance: true, turnEvents: false });
         return;
       }

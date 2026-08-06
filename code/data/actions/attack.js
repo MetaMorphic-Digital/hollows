@@ -25,7 +25,7 @@ import { addThreatToZone } from "../../canvas/overlays.js";
 import { placeThreatFromHunter } from "../../canvas/threat-ops.js";
 import { getTotalStatForActor } from "../../documents/actor/hunter-combat.js";
 import { getFocusCount, adjustHunterResource, StandardDamage } from "../../documents/actor/resources.js";
-import { hasCondition, getEntityTerrainTotal } from "../../documents/actor/conditions.js";
+import { getEntityTerrainTotal } from "../../documents/actor/conditions.js";
 import { adjustEntityTerrain } from "../../canvas/terrain-pool.js";
 import { getEchoDamageBonus } from "../echo/index.js";
 import {
@@ -49,6 +49,10 @@ import {
   getEffectiveWeaponCapacity,
   getEffectiveWeaponDamage,
 } from "../weapons/index.js";
+
+/**
+ * @import HollowsActor from "../../documents/actor.mjs";
+ */
 
 function getCenteredDialogPosition(width = 420, height = 420) {
   const viewportWidth = Number(window.innerWidth || 0) || width;
@@ -285,7 +289,7 @@ export async function applyHunterAttackDamage(message) {
 
 /**
  * Open the standard Hunter attack dialog for `actor`.
- * @param {Actor} actor
+ * @param {HollowsActor} actor
  * @param {{ title?: string, weaponType?: string, suggestedMode?: string, statBonus?: number }} [options]
  * @returns {Promise<{ dealtWounds: boolean }>}
  */
@@ -341,7 +345,7 @@ export async function openAttackDialog(actor, options = {}) {
   }
   const entity = getEntityActor();
   // Colossal Climbing: Elevated Hunter in Close vs a Colossal Entity.
-  const isHunterClimbing = () => !!entity && isEntityColossal(entity) && hasCondition(actor, "elevated") && isCloseZone(zone);
+  const isHunterClimbing = () => !!entity && isEntityColossal(entity) && actor.statuses.has("elevated") && isCloseZone(zone);
   const thralls = getThrallActorsInScene();
   if (!entity && !thralls.length) {
     ui.notifications.warn("No Entity or Thrall found in the scene.");
@@ -420,7 +424,7 @@ export async function openAttackDialog(actor, options = {}) {
           </label>
         </div>
       `).join("")}
-      ${hasCondition(actor, "focus") ? `
+      ${actor.statuses.has("focus") ? `
         <div class="form-group">
           <label class="checkbox">
             <input type="checkbox" name="useFocus" />
@@ -462,10 +466,10 @@ export async function openAttackDialog(actor, options = {}) {
         getAdvantages: (root) => {
           const weaponId = String(root.querySelector("[name=weaponId]")?.value || "");
           const weapon = actor.items.get(weaponId);
-          const useFocus = !!root.querySelector("[name=useFocus]")?.checked && getFocusCount(actor) > 0;
+          const useFocus = !!root.querySelector("[name=useFocus]")?.checked && (getFocusCount(actor) > 0);
           // Colossal: while Climbing the Elevated tag grants no advantage — it is
           // replaced by +1/+2 damage below.
-          const elevatedActive = hasCondition(actor, "elevated") && !isHunterClimbing();
+          const elevatedActive = actor.statuses.has("elevated") && !isHunterClimbing();
           const abilityRollMode = getAttackRollMode(actor, { weapon, zone });
           return [useFocus, elevatedActive, abilityRollMode === "adv"];
         },
@@ -519,8 +523,7 @@ export async function openAttackDialog(actor, options = {}) {
             (o) => !!dialog.element.querySelector(`[name="statOverride:${o.key}"]`)?.checked,
           );
           const focusCount = getFocusCount(actor);
-          let useFocusAdv = useFocus && focusCount > 0;
-          const elevatedActive = hasCondition(actor, "elevated");
+          let useFocusAdv = useFocus && (focusCount > 0);
           const mode = normalizeRollModeValue(selectedMode);
           const weapon = weaponless ? null : actor.items.get(weaponId);
           let profile;

@@ -14,4 +14,14 @@ export default class HollowsActor extends foundry.documents.Actor {
   get activeEchoes() {
     return this.items.documentsByType.echo.filter(echo => !echo.system.isSuppressed);
   }
+
+  /* -------------------------------------------------- */
+
+  /**
+   * Can this actor be revived?
+   * @type {boolean}
+   */
+  get isRevivable() {
+    return this.system.isRevivable ?? false;
+  }
 }

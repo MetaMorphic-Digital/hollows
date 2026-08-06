@@ -1,5 +1,6 @@
 import { AttackRollModifier } from "../../../mechanics/AttackRollModifier.js";
 import { makeShotgunForm } from "./base.js";
+import { getActorZone, isCloseZone } from "../../../../canvas/zone.js";
 
 export const SHOTGUN_SAWN_OFF_FORM = makeShotgunForm({
   key: "Sawn-Off",
@@ -14,7 +15,7 @@ export const SHOTGUN_SAWN_OFF_FORM = makeShotgunForm({
       name: "Sawn-Off",
       scope: "self",
       rollMode: "adv",
-      triggers: { actorZoneType: "close" }
+      when: ({ actor }) => isCloseZone(getActorZone(actor)),
     })
   ]
 });

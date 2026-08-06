@@ -74,7 +74,7 @@ export class StandardDamage {
         damageValue: 0,
         convertedFromResolve: false,
         mode: modeKey,
-        outcomeLabel: label
+        outcomeLabel: label,
       };
     }
 
@@ -83,7 +83,7 @@ export class StandardDamage {
       damageValue,
       convertedFromResolve,
       mode: modeKey,
-      outcomeLabel: label
+      outcomeLabel: label,
     };
   }
 }
@@ -94,10 +94,10 @@ export async function setFocusCount(actor, value) {
   const limit = getFocusLimit(actor);
   const next = Math.max(0, Math.min(limit, Number(value ?? 0)));
   await actor.update({ "system.focus.value": next });
-  const { hasCondition, addCondition, removeCondition } = await import("./conditions.js");
+  const { addCondition, removeCondition } = await import("./conditions.js");
   if (next > 0) {
-    if (!hasCondition(actor, "focus")) await addCondition(actor, "focus");
-  } else if (hasCondition(actor, "focus")) {
+    if (!actor.statuses.has("focus")) await addCondition(actor, "focus");
+  } else if (actor.statuses.has("focus")) {
     await removeCondition(actor, "focus");
   }
   return { before, after: next, changed: next !== before };
@@ -107,7 +107,7 @@ export async function adjustHunterResource(actor, { resolve = 0, wounds = 0, foc
   const empty = {
     resolve: { before: 0, after: 0, changed: false },
     wounds: { before: 0, after: 0, changed: false },
-    focus: { before: 0, after: 0, changed: false }
+    focus: { before: 0, after: 0, changed: false },
   };
   if (!actor) return empty;
   if (!game.user?.isGM && !actor.testUserPermission(game.user, "OWNER")) {
@@ -115,19 +115,19 @@ export async function adjustHunterResource(actor, { resolve = 0, wounds = 0, foc
     return runGMQuery("hollows.hunterResourceAdjust", {
       actorId: actor.id,
       actorUuid: actor.uuid ?? "",
-      resolve, wounds, focus
+      resolve, wounds, focus,
     });
   }
 
   const deltas = {
     resolve: asDelta(resolve),
     wounds: asDelta(wounds),
-    focus: asDelta(focus)
+    focus: asDelta(focus),
   };
   const result = {
     resolve: resourceState(actor.system?.health?.resolve?.value, actor.system?.health?.resolve?.max, deltas.resolve, { allowTemporary }),
     wounds: resourceState(actor.system?.health?.wounds?.value, actor.system?.health?.wounds?.max, deltas.wounds, { allowTemporary }),
-    focus: { before: getFocusCount(actor), after: getFocusCount(actor), changed: false }
+    focus: { before: getFocusCount(actor), after: getFocusCount(actor), changed: false },
   };
 
   const update = {};

@@ -1,21 +1,17 @@
-import { hasCondition } from "../actor/conditions.js";
 import { adjustHunterResource, StandardDamage } from "../actor/resources.js";
 import { applyDefenceOptionMitigation } from "../../data/actions/defence-options.js";
 import {
   applyIncomingDamageModifiers,
   runOnDefenceResult,
-  runOnIncomingEntityWoundDamage
+  runOnIncomingEntityWoundDamage,
 } from "../../helpers/weapon-abilities/dispatchers.js";
 import { triggerEntityTriggeredAbilities } from "../../data/entity/actions/entity-special.js";
 import {
   maybeTriggerEntityInflictsDamageEnhancements,
   recordEntityAttackOutcome,
-  runEntityAfterHunterDamageEnhancements
+  runEntityAfterHunterDamageEnhancements,
 } from "./entity-enhancements.js";
-import {
-  maybePromptRepetitiveAttack,
-  resolveFollowUpFromMessage
-} from "../../data/entity/action-followups.js";
+import { maybePromptRepetitiveAttack, resolveFollowUpFromMessage } from "../../data/entity/action-followups.js";
 import { resolveEntityActorFromAttackContext } from "../../data/entity/action-flow.js";
 import { requestAfterAttackApply } from "./attack-effects.js";
 
@@ -72,7 +68,7 @@ export async function applyEntityAttackDamage(message) {
       damageValue,
       source: "entity",
       timing: "preMitigation",
-      notes
+      notes,
     });
     damageValue = incoming.damageValue;
   }
@@ -82,16 +78,16 @@ export async function applyEntityAttackDamage(message) {
   const previousResolve = Number(target.system.health.resolve.value ?? 0);
   const previousWounds = Number(target.system.health.wounds.value ?? 0);
 
-  const hasSheltered = hasCondition(target, "sheltered");
+  const hasSheltered = target.statuses.has("sheltered");
   const optionMitigation = await applyDefenceOptionMitigation(target, {
     damageType,
     damageValue,
-    notes
+    notes,
   }, {
     optionData: data.defenceOptions || {},
     hasSheltered,
     source: "entity",
-    targetZone
+    targetZone,
   });
   damageValue = optionMitigation.damageValue;
 
@@ -108,7 +104,7 @@ export async function applyEntityAttackDamage(message) {
       source: "entity",
       timing: "postMitigation",
       notes,
-      shelteredApplied: shelteredReduction > 0
+      shelteredApplied: shelteredReduction > 0,
     });
     damageValue = incoming.damageValue;
   }
@@ -124,7 +120,7 @@ export async function applyEntityAttackDamage(message) {
       damageType,
       damageValue,
       entityActor,
-      threatSpent: attackData.threatSpent
+      threatSpent: attackData.threatSpent,
     });
     damageRedirected = !!result.damageRedirected;
     if (result.damageConverted) {
@@ -156,7 +152,7 @@ export async function applyEntityAttackDamage(message) {
       previousResolve,
       previousWounds,
       nextResolve,
-      nextWounds
+      nextWounds,
     });
     for (const result of enhancementResults) {
       if (result?.nextResolve !== undefined) nextResolve = result.nextResolve;
@@ -167,7 +163,7 @@ export async function applyEntityAttackDamage(message) {
   if (notes.length) {
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: target }),
-      content: `<div class="hollows-chat"><strong>${target.name}</strong> mitigation: <strong>${notes.join("; ")}</strong>. Final damage: <strong>${damageValue}</strong>.</div>`
+      content: `<div class="hollows-chat"><strong>${target.name}</strong> mitigation: <strong>${notes.join("; ")}</strong>. Final damage: <strong>${damageValue}</strong>.</div>`,
     });
   }
 
@@ -187,8 +183,8 @@ export async function applyEntityAttackDamage(message) {
       nextWounds,
       entityActor,
       targetZone,
-      snapshot: attackData.targetSnapshot || {}
-    }
+      snapshot: attackData.targetSnapshot || {},
+    },
   );
 
   if (appliedEntityDamage) {
@@ -204,7 +200,7 @@ export async function applyEntityAttackDamage(message) {
       previousWounds,
       nextResolve,
       nextWounds,
-      requestAfterAttackApply
+      requestAfterAttackApply,
     });
   }
 
@@ -213,18 +209,18 @@ export async function applyEntityAttackDamage(message) {
     if (damageType === "Resolve") {
       await triggerEntityTriggeredAbilities(entityActor, "entityDealsResolveDamage", {
         targetActor: target,
-        targetZone
+        targetZone,
       }, ["special", "doom"]);
       if (previousResolve > 0 && nextResolve <= 0) {
         await triggerEntityTriggeredAbilities(entityActor, "entityBreaksHunter", {
           targetActor: target,
-          targetZone
+          targetZone,
         }, ["special", "doom"]);
       }
     } else if (damageType === "Wounds") {
       await triggerEntityTriggeredAbilities(entityActor, "entityDealsWoundsDamage", {
         targetActor: target,
-        targetZone
+        targetZone,
       }, ["special", "doom"]);
     }
   }
@@ -235,7 +231,7 @@ export async function applyEntityAttackDamage(message) {
       targetTokenUuid: data.targetTokenUuid || defenceResult.targetTokenUuid || "",
       damageType: damageRedirected ? "" : damageType,
       damageValue: damageRedirected ? 0 : damageValue,
-      phase: "finalDamage"
+      phase: "finalDamage",
     });
   }
 
@@ -250,12 +246,12 @@ export async function applyEntityAttackDamage(message) {
     entityActor,
     target,
     targetZone,
-    snapshot: attackData.targetSnapshot || {}
+    snapshot: attackData.targetSnapshot || {},
   });
 
   if (entityActor && attackData.attackGroupId) {
     await recordEntityAttackOutcome(entityActor, String(attackData.attackGroupId), {
-      woundDamage: damageType === "Wounds" && damageValue > 0
+      woundDamage: damageType === "Wounds" && damageValue > 0,
     });
   }
 

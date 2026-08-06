@@ -1,4 +1,5 @@
 import { AttackDamageChange } from "../../mechanics/AttackDamageChange.js";
+import { getActorZone } from "../../../canvas/zone.js";
 
 export const PIERCE = new AttackDamageChange({
   key: "spear.t1.pierce",
@@ -8,7 +9,5 @@ export const PIERCE = new AttackDamageChange({
   weaponType: "Spear",
   mode: "add",
   delta: { resolve: 0, wounds: 1 },
-  triggers: {
-    actorInZones: ["Flank Left", "Flank Right"]
-  }
+  when: ({ actor }) => ["Flank Left", "Flank Right"].includes(getActorZone(actor)),
 });

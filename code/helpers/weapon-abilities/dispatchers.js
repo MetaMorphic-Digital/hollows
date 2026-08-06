@@ -8,7 +8,6 @@ import { MECHANIC_BUCKETS } from "../mechanic-registry.js";
 import { runRelicTriggers, runRelicDeathSave, runRelicActionCancel } from "../../data/relic/apply-effect.js";
 import { relicHunterStatDelta, relicIncomingDamageDelta } from "../../data/relic/passive.js";
 import { hasWeaponAbility } from "../weapon-utils.js";
-import { evalTriggers } from "../../data/mechanics/dsl/triggers.js";
 import { applyEffects } from "../../data/mechanics/dsl/effects.js";
 import { getActorZone, getAdjacentZones, getTokenZone, isRangedZone, getActiveSceneHunters } from "../../canvas/zone.js";
 import { AttackDamageChange } from "../../data/mechanics/AttackDamageChange.js";
@@ -31,14 +30,14 @@ function carries(actor, ability) {
     return (actor.items || []).some((item) =>
       item.type === "weapon"
       && String(item.system?.weaponType || "") === String(ability.weapon)
-      && (!ability.form || sameKey(item.system?.selectedForm, ability.form))
+      && (!ability.form || sameKey(item.system?.selectedForm, ability.form)),
     );
   }
   return hasWeaponAbility(actor, {
     key: ability.key,
     name: ability.name,
     weaponType: ability.weapon,
-    tier: ability.tier
+    tier: ability.tier,
   });
 }
 
@@ -93,7 +92,7 @@ export async function runEntityActionPauses(context = {}) {
   const state = {
     ...context,
     targetTokens: Array.isArray(context.targetTokens) ? Array.from(context.targetTokens) : [],
-    selectedZones: Array.isArray(context.selectedZones) ? Array.from(context.selectedZones) : []
+    selectedZones: Array.isArray(context.selectedZones) ? Array.from(context.selectedZones) : [],
   };
   if (!game.user?.isGM) return state;
   const carriers = getActiveSceneHunters();
@@ -161,7 +160,7 @@ export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = 
 export function applyAttackDamageChanges(actor, damage = {}, context = {}) {
   const out = {
     resolve: Number(damage.resolve || 0),
-    wounds: Number(damage.wounds || 0)
+    wounds: Number(damage.wounds || 0),
   };
   const abilityMatches = MECHANIC_BUCKETS.attackDamage
     .filter((ability) => ability.aura || carries(actor, ability));
@@ -269,7 +268,7 @@ export async function markRateLimit(actor, ability) {
   await actor.setFlag("hollows", `ability.${ability.key}.usedAt`, {
     combatId: combat.id,
     round: Number(combat.round ?? 0),
-    turnId: combat.combatant?.id || null
+    turnId: combat.combatant?.id || null,
   });
 }
 
@@ -286,13 +285,13 @@ export async function runOnAttackResult(actor, result, context = {}) {
   const out = {
     damageType: context.damageType || null,
     damageValue: Math.max(0, Number(context.damageValue || 0)),
-    cardLines: []
+    cardLines: [],
   };
   if (!actor) return out;
   const currentContext = () => ({
     ...context,
     damageType: out.damageType,
-    damageValue: out.damageValue
+    damageValue: out.damageValue,
   });
   const applyMutation = (mutation) => {
     if (!mutation || typeof mutation !== "object") return;
@@ -380,7 +379,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
 
     if (ability.scope === "self") {
       if (!formMechanicSet.has(ability) && !carries(actor, ability)) continue;
-      if (!evalTriggers(ability.triggers, { actor })) continue;
+      if (ability.when && !ability.when({ actor })) continue;
       if (ability.reaction) {
         const reaction = reactionsMod.getReactionByKey(ability.reaction);
         if (!reaction) continue;
@@ -405,7 +404,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
         .filter((a) => a.id !== actor.id)
         .filter((a) => getActorZone(a) === myZone)
         .filter((a) => carries(a, ability))
-        .filter((a) => evalTriggers(ability.triggers, { actor: a }));
+        .filter((a) => ability.when?.({ actor: a }) ?? true);
       if (!candidates.length) continue;
       if (ability.reaction) {
         const reaction = reactionsMod.getReactionByKey(ability.reaction);
@@ -414,7 +413,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
           const choice = await reaction.offer(owner, {
             targetId: actor.id,
             candidateIds: ownerCandidates.map((a) => a.id),
-            damageValue: ctx.damageValue
+            damageValue: ctx.damageValue,
           });
           if (choice) {
             if (ability.redirectsDamage) out.damageRedirected = true;
@@ -523,8 +522,7 @@ async function canAffordCost(actor, ability) {
   const cost = ability?.cost;
   if (!cost) return true;
   if (cost.condition) {
-    const { hasCondition } = await import("../../documents/actor/conditions.js");
-    if (!hasCondition(actor, cost.condition)) {
+    if (!actor.statuses.has(cost.condition)) {
       ui.notifications?.warn?.(`${ability.name} requires ${cost.condition}.`);
       return false;
     }
@@ -667,7 +665,7 @@ export async function runReloadFullCheck(actor, weapon) {
     const choice = await reaction.promptOnPlayer({
       actorId: actor.id,
       weaponId: weapon.id,
-      weaponType: String(weapon.system?.weaponType || "")
+      weaponType: String(weapon.system?.weaponType || ""),
     });
     if (choice?.fullReload) return true;
   }
@@ -713,7 +711,7 @@ export async function runOnDeathEffects(actor) {
 export async function runOnConditionRemoved(actor, key) {
   await offerEventReactions(
     (event) => event.type === "conditionRemoved" && event.key === key,
-    { actor, payload: { conditionKey: key } }
+    { actor, payload: { conditionKey: key } },
   );
 }
 
@@ -733,7 +731,7 @@ export function getThreatLockedZones(kind) {
 export async function runOnThreatPlaced(zone, delta) {
   await offerEventReactions(
     (event) => event.type === "threatPlaced",
-    { payload: { zone, delta } }
+    { payload: { zone, delta } },
   );
 }
 
@@ -742,28 +740,28 @@ export async function runOnThreatPlaced(zone, delta) {
 export async function runOnHunterPlacedThreat(actor, zone, amount, context = {}) {
   await offerEventReactions(
     (event) => event.type === "hunterPlacedThreat",
-    { actor, payload: { ...context, zone, amount } }
+    { actor, payload: { ...context, zone, amount } },
   );
 }
 
 export async function runOnThreatSpent(zone, amount, context = {}) {
   await offerEventReactions(
     (event) => event.type === "threatSpent",
-    { payload: { ...context, zone, amount } }
+    { payload: { ...context, zone, amount } },
   );
 }
 
 export async function runOnTurnEnd(actor) {
   await offerEventReactions(
     (event) => event.type === "turnEnd",
-    { actor }
+    { actor },
   );
 }
 
 export async function runOnFocus(actor) {
   await offerEventReactions(
     (event) => event.type === "focus",
-    { actor }
+    { actor },
   );
 }
 
@@ -776,7 +774,7 @@ export async function runOnFocus(actor) {
 export async function runOnReload(actor, { weapon, phase = "after" } = {}) {
   await offerEventReactions(
     (event) => event.type === "reload" && (event.phase || "after") === phase,
-    { actor, payload: { weaponId: weapon?.id || "", weaponType: String(weapon?.system?.weaponType || "") } }
+    { actor, payload: { weaponId: weapon?.id || "", weaponType: String(weapon?.system?.weaponType || "") } },
   );
 }
 
@@ -785,21 +783,21 @@ export async function runOnReload(actor, { weapon, phase = "after" } = {}) {
 export async function runOnGuard(actor) {
   await offerEventReactions(
     (event) => event.type === "guard",
-    { actor }
+    { actor },
   );
 }
 
 export async function runOnTakeCover(actor) {
   await offerEventReactions(
     (event) => event.type === "takeCover",
-    { actor }
+    { actor },
   );
 }
 
 export async function runOnSwordFeint(actor) {
   await offerEventReactions(
     (event) => event.type === "swordFeint",
-    { actor }
+    { actor },
   );
 }
 
@@ -809,7 +807,7 @@ export async function runOnEntityAttack(entityActor, targetTokens = []) {
   const targetZones = Array.from(new Set(targetTokens.map(t => getTokenZone(t)).filter(Boolean)));
   await offerEventReactions(
     (event) => event.type === "entityAttack",
-    { payload: { entityActorId: entityActor?.id || "", targetActorIds, targetZones } }
+    { payload: { entityActorId: entityActor?.id || "", targetActorIds, targetZones } },
   );
 }
 
@@ -886,7 +884,7 @@ export async function applyIncomingDamageModifiers(target, context = {}) {
   const out = {
     damageType: context.damageType,
     damageValue: Math.max(0, Number(context.damageValue || 0)),
-    notes: Array.isArray(context.notes) ? context.notes : []
+    notes: Array.isArray(context.notes) ? context.notes : [],
   };
   if (!target || !out.damageType || out.damageValue <= 0) return out;
   const source = context.source || "any";
@@ -914,7 +912,7 @@ export async function applyIncomingDamageModifiers(target, context = {}) {
           targetId: target.id,
           candidateIds: ownerCandidates.map((a) => a.id),
           damageType: out.damageType,
-          damageValue: out.damageValue
+          damageValue: out.damageValue,
         });
         if (choice && typeof choice.damageValue === "number") {
           out.damageValue = Math.max(0, choice.damageValue);

@@ -1,7 +1,4 @@
-import {
-  maybePromptRepetitiveAttack,
-  resolveFollowUpFromMessage,
-} from "../data/entity/action-followups.js";
+import { maybePromptRepetitiveAttack, resolveFollowUpFromMessage } from "../data/entity/action-followups.js";
 import { resolveEntityActorFromAttackContext } from "../data/entity/action-flow.js";
 import { requestDoomAdjust } from "../data/entity/actions/entity-doom.js";
 import { recordEntityAttackOutcome } from "../documents/entity/entity-enhancements.js";
@@ -10,39 +7,23 @@ import { requestAfterAttackApply } from "../documents/entity/attack-effects.js";
 import { hasEnabledAfterAttackGroups } from "../data/entity/action-rules.js";
 import { applyHunterAttackDamage } from "../data/actions/attack.js";
 import { STAT_LABELS } from "../data/_module.mjs";
-import {
-  getTokenZone,
-  getActorZone,
-} from "../canvas/zone.js";
-import {
-  hasCondition,
-  addCondition,
-  removeCondition,
-  getSpecialConditionRollMods,
-} from "../documents/actor/conditions.js";
-import {
-  hasGritYourTeethActive,
-} from "../documents/actor/hunter-combat.js";
+import { getTokenZone, getActorZone } from "../canvas/zone.js";
+import { addCondition, removeCondition, getSpecialConditionRollMods } from "../documents/actor/conditions.js";
+import { hasGritYourTeethActive } from "../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, StandardDamage } from "../documents/actor/resources.js";
-import {
-  setupOutcomeData,
-  setupChoiceButtons,
-  setupResultHtml,
-} from "../helpers/combat-runtime.js";
-import {
-  evaluateResult,
-  resolveSuggestedRollMode,
-  HunterStatRollFlow,
-} from "../dice/_module.mjs";
+import { setupOutcomeData, setupChoiceButtons, setupResultHtml } from "../helpers/combat-runtime.js";
+import { evaluateResult, resolveSuggestedRollMode, HunterStatRollFlow } from "../dice/_module.mjs";
 import { buildStandardRollCardHtml } from "../applications/ui/roll-card.js";
 import { buildMoveOutcomeCardHtml } from "../applications/ui/move-card.js";
-import {
-  bindSuggestedRollMode,
-  hasWeaponEquipped,
-} from "../helpers/weapon-utils.js";
+import { bindSuggestedRollMode, hasWeaponEquipped } from "../helpers/weapon-utils.js";
 import { setMessageFlagSafe } from "../utils/flag-utils.js";
 import { getTotalStatForActor } from "../documents/actor/hunter-combat.js";
-import { getStatOverrides, tryActivateStatOverride, evaluateStatOverrideSuccess, runOnDefenceResult } from "./weapon-abilities/dispatchers.js";
+import {
+  getStatOverrides,
+  tryActivateStatOverride,
+  evaluateStatOverrideSuccess,
+  runOnDefenceResult,
+} from "./weapon-abilities/dispatchers.js";
 import {
   applyDefenceOptionBeforeRoll,
   getDefenceOptions,
@@ -87,14 +68,12 @@ export function registerChatMessageHooks() {
     const targetToken = data.targetTokenUuid ? await fromUuid(data.targetTokenUuid) : null;
     const source = sourceToken?.actor;
     const target = targetToken?.actor;
-    if (!source || source.type !== "hunter") return;
-    if (!target || target.type !== "hunter") return;
+    if (!source || (source.type !== "hunter")) return;
+    if (!target || (target.type !== "hunter")) return;
     const sourceZone = getTokenZone(sourceToken);
     const targetZone = getTokenZone(targetToken);
-    if (!sourceZone || sourceZone !== targetZone) return;
-    if (!hasCondition(target, "dying")) return;
-    if (hasCondition(target, "dead")) return;
-    if (target.getFlag("hollows", "dyingRevivedOnce")) return;
+    if (!sourceZone || (sourceZone !== targetZone)) return;
+    if (!target.isRevivable) return;
 
     await removeCondition(target, "dying");
     await adjustHunterResource(target, { resolve: 1, wounds: 1 });
@@ -104,7 +83,7 @@ export function registerChatMessageHooks() {
       content: `<div class="hollows-chat"><strong>${source.name}</strong> Guards and revives <strong>${target.name}</strong> (+1 Resolve, +1 Wound).</div>`,
     });
     if (hasWeaponEquipped(source, "Armour")) await addCondition(source, "ready");
-    try { await message.delete(); } catch (err) {}
+    await message.delete();
   });
 
   Hooks.on("renderChatMessageHTML", (message, html) => {
@@ -561,7 +540,7 @@ export function registerChatMessageHooks() {
             { value: "dis", label: "Disadvantage" },
           ].map((option) => ({ ...option, selected: option.value === selectedMode })),
         },
-        ...(hasCondition(target, "focus")
+        ...(target.statuses.has("focus")
           ? [{ type: "checkbox", name: "useFocus", label: "Spend Focus for Advantage" }]
           : []),
         ...defenceOverrides.map((o) => ({

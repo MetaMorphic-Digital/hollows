@@ -1,21 +1,7 @@
-/**
- * Modifies an attack roll mode (advantage / disadvantage) for the ATTACKER.
- *
- * Important nuance: the carrier of the ability may differ from the attacker.
- * Some abilities grant zone-wide buffs to other hunters (e.g. Blood in the
- * Water — all Hunters in Close get attack advantage while entity bleeds).
- *
- * `scope`:
- *   "self"       — only the carrier benefits (default)
- *   "zoneType"   — any actor with matching zone-type benefits (params.zoneType)
- *
- * `triggers` always evaluated against the CARRIER. Whether to actually apply
- * is computed by the dispatcher using `appliesTo(attacker)`.
- */
 import { Mechanic } from "./Mechanic.js";
-import { evalTriggers } from "./dsl/triggers.js";
 import { getActorZone, isCloseZone, isRangedZone } from "../../canvas/zone.js";
 
+/** Classify a zone as close, ranged or support. */
 function zoneTypeOf(zone) {
   if (!zone) return null;
   if (isCloseZone(zone)) return "close";
@@ -24,20 +10,20 @@ function zoneTypeOf(zone) {
   return null;
 }
 
+/** Shifts an attack roll to advantage or disadvantage. */
 export class AttackRollModifier extends Mechanic {
   constructor(config = {}) {
     super(config);
     this.scope = config.scope || "self";
     this.zoneType = (config.zoneType || "").toLowerCase();
-    this.rollMode = config.rollMode || "adv";       // "adv" | "dis"
-    this.triggers = config.triggers || {};
+    this.rollMode = config.rollMode || "adv";
   }
 
   active(carrier, context = {}) {
-    return evalTriggers(this.triggers, { ...context, actor: carrier });
+    return this.when?.({ ...context, actor: carrier }) ?? true;
   }
 
-  appliesTo(attacker, _context = {}) {
+  appliesTo(attacker) {
     if (this.scope === "self") return false;
     if (this.scope === "zoneType") return zoneTypeOf(getActorZone(attacker)) === this.zoneType;
     return false;

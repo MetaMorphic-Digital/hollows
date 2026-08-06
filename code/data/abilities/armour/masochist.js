@@ -9,7 +9,7 @@
  * promptOnPlayer (owner has OWNER rights on their own actor) — no applyOnGM.
  */
 import { Reaction } from "../../mechanics/Reaction.js";
-import { hasCondition, removeCondition } from "../../../documents/actor/conditions.js";
+import { removeCondition } from "../../../documents/actor/conditions.js";
 import { adjustHunterResource } from "../../../documents/actor/resources.js";
 
 export const MASOCHIST = new Reaction("armour.t1.masochist", {
@@ -17,24 +17,24 @@ export const MASOCHIST = new Reaction("armour.t1.masochist", {
   event: { type: "entityAttack" },
   promptOnPlayer: async ({ actorId, targetActorIds }) => {
     const actor = game.actors.get(actorId);
-    if (!targetActorIds.includes(actor.id)) return null;
-    if (!hasCondition(actor, "ready")) return null;
+    if (!targetActorIds.includes(actor.id) || !actor.statuses.has("ready")) return null;
+
     const confirm = await foundry.applications.api.DialogV2.wait({
       window: { title: "Masochist" },
-      content: `<div class="hollows-roll-dialog"><div>Expend <strong>Ready</strong> to heal <strong>1 Wound</strong>?</div></div>`,
+      content: "<div class=\"hollows-roll-dialog\"><div>Expend <strong>Ready</strong> to heal <strong>1 Wound</strong>?</div></div>",
       rejectClose: false,
       buttons: [
         { action: "yes", label: "Expend Ready", default: true, callback: () => true },
-        { action: "no", label: "Skip", callback: () => false }
-      ]
+        { action: "no", label: "Skip", callback: () => false },
+      ],
     });
     if (confirm !== true) return null;
     await removeCondition(actor, "ready");
     await adjustHunterResource(actor, { wounds: 1 });
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
-      content: `<div class="hollows-chat"><strong>${actor.name}</strong> heals <strong>1 Wound</strong> (Masochist).</div>`
+      content: `<div class="hollows-chat"><strong>${actor.name}</strong> heals <strong>1 Wound</strong> (Masochist).</div>`,
     });
     return { used: true };
-  }
+  },
 });

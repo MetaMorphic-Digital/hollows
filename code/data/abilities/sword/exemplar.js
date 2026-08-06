@@ -1,4 +1,5 @@
 import { ActivatedAbility } from "../../mechanics/ActivatedAbility.js";
+import { getActorZone, getThreatInZone } from "../../../canvas/zone.js";
 
 export const EXEMPLAR = new ActivatedAbility({
   key: "sword.t1.exemplar",
@@ -9,10 +10,7 @@ export const EXEMPLAR = new ActivatedAbility({
   buttonLabel: "Exemplar",
   cost: { resource: "resolve", amount: 1 },
   rateLimit: "oncePerRound",
-  triggers: {
-    actorWeaponEquipped: "Sword",
-    actorZoneHasThreat: true
-  },
+  when: ({ actor }) => getThreatInZone(getActorZone(actor)) > 0,
   effects: [
     {
       type: "confirm",

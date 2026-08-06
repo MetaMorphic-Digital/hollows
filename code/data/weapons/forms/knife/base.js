@@ -14,16 +14,16 @@ export const BASE_KNIFE_BLEEDING = new OnAttackResultAction({
   handler: async (_actor, ctx) => {
     if (!game.user?.isGM) return {};
     const target = ctx?.targetActor;
-    if (!target || ctx?.targetType !== "entity") return {};
-    const { hasCondition, addCondition } = await import("../../../../documents/actor/conditions.js");
-    if (hasCondition(target, "bleeding")) return {};
+    if (!target || (ctx?.targetType !== "entity")) return {};
+    const { addCondition } = await import("../../../../documents/actor/conditions.js");
+    if (target.statuses.has("bleeding")) return {};
     await addCondition(target, "bleeding");
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: target }),
-      content: `<div class="hollows-chat"><strong>${target.name}</strong> begins <strong>Bleeding</strong>.</div>`
+      content: `<div class="hollows-chat"><strong>${target.name}</strong> begins <strong>Bleeding</strong>.</div>`,
     });
     return {};
-  }
+  },
 });
 
 export function makeKnifeForm({ key, name, label, text, damage, attackProfileAdd, mechanics }) {
@@ -41,6 +41,6 @@ export function makeKnifeForm({ key, name, label, text, damage, attackProfileAdd
     healthBonus: { resolve: 3, wounds: 3 },
     modifierChoices: MODIFIER_CHOICES,
     attackProfiles,
-    ...(mechanics?.length ? { mechanics } : {})
+    ...(mechanics?.length ? { mechanics } : {}),
   });
 }

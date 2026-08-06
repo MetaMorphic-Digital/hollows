@@ -7,7 +7,5 @@ export const PRISTINE = new StatModifier({
   text: "Don't let them touch you. While you have your maximum number of Wounds or higher, +1 to all stats.",
   stats: ["strong", "hard", "quick", "sharp", "wise"],
   delta: 1,
-  triggers: {
-    actorWoundsAtLeastMax: true
-  }
+  when: ({ actor }) => actor.system.health.wounds.value >= actor.system.health.wounds.max,
 });
