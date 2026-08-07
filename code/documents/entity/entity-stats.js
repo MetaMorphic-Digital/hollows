@@ -99,6 +99,7 @@ export function resolveEntitySourceValue(source, { entityActor = null, targetTok
   if (s === "zoneCurse") return targetZone ? Math.max(0, Number(getZoneCurseValue(targetZone)) || 0) : 0;
   if (s === "entityCurse" || s === "curseEntity") return Math.max(0, Number(entityActor?.system?.curse?.value ?? 0) || 0);
   if (s === "threat") return targetZone ? Math.max(0, Number(getThreatInZone(targetZone)) || 0) : 0;
+  if (s === "huntersInZone") return targetZone ? getHuntersInZone(targetZone).length : 0;
   if (s === "threatZones") return sumThreatInZones(zoneList);
   if (s === "curseZones") return sumCurseInZones(zoneList);
   if (s === "curseHunters") return sumCurseOnHunters(zoneList);

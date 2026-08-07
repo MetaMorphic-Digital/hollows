@@ -39,7 +39,7 @@ export const ENTITY_ACTION_CHOICES = {
   tnSetSource: { entityDefence: "Entity Defence", entityResolve: "Entity Resolve", entityWounds: "Entity Wounds", targetStat: "Target Stats" },
   damageMode: { fixed: "Fixed", dynamic: "Dynamic" },
   damageDynamicMode: { both: "Resolve & Wounds modified by X", resolve: "Resolve modified by X", wounds: "Wounds modified by X" },
-  damageDynamicSource: { targetCurse: "Curse on Target", entityCurse: "Curse on Entity", zoneCurse: "Curse on Zone", threat: "Threat", entityTerrain: "Terrain on Entity" },
+  damageDynamicSource: { targetCurse: "Curse on Target", entityCurse: "Curse on Entity", zoneCurse: "Curse on Zone", threat: "Threat", entityTerrain: "Terrain on Entity", huntersInZone: "Hunters in Zone" },
   targetMode: { single: "Single", zone: "Zone", multiZone: "Select Zones", adjacentZones: "Adjacent Zones", noTargets: "No Targets" },
   targetAdjacentScope: { any: "Adjacent Any", close: "Adjacent Close", ranged: "Adjacent Ranged" },
   targetAdjacentCount: { one: "One Adjacent", two: "Two Adjacent (If Eligible)", all: "All Adjacent (No Support)" },
