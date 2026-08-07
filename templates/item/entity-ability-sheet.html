@@ -102,32 +102,32 @@
         {{/if}}{{/if}}
         {{/if}}
       {{/if}}
+    {{/unless}}
 
-      <div class="form-group">
-        <label>Targeting</label>
-        <div class="form-fields">
-          <select name="system.profile.targetMode">{{selectOptions targetModeChoices selected=system.profile.targetMode localize=false}}</select>
-        </div>
+    <div class="form-group">
+      <label>Targeting</label>
+      <div class="form-fields">
+        <select name="system.profile.targetMode">{{selectOptions targetModeChoices selected=system.profile.targetMode localize=false}}</select>
       </div>
-      {{#if showProfileAdjacentTargeting}}
-      <div class="form-group sub">
-        <label>Adjacent</label>
-        <div class="form-fields">
-          <select name="system.profile.adjacentScope">{{selectOptions choices.targetAdjacentScope selected=system.profile.adjacentScope localize=false}}</select>
-          <select name="system.profile.adjacentCount">{{selectOptions choices.targetAdjacentCount selected=system.profile.adjacentCount localize=false}}</select>
-        </div>
+    </div>
+    {{#if showProfileAdjacentTargeting}}
+    <div class="form-group sub">
+      <label>Adjacent</label>
+      <div class="form-fields">
+        <select name="system.profile.adjacentScope">{{selectOptions choices.targetAdjacentScope selected=system.profile.adjacentScope localize=false}}</select>
+        <select name="system.profile.adjacentCount">{{selectOptions choices.targetAdjacentCount selected=system.profile.adjacentCount localize=false}}</select>
       </div>
-      {{/if}}
-      {{#unless (eq system.profile.targetMode "noTargets")}}
-      <div class="form-group stacked">
-        <label>Allowed Zones <span class="hint">(none = all)</span></label>
-        <div class="zone-grid">
-          {{#each profileZones as |z|}}
-          <label class="zone-chip {{#if (includes ../system.profile.allowedZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.profile.allowedZones" data-value="{{z}}" {{#if (includes ../system.profile.allowedZones z)}}checked{{/if}} />{{zoneLabel z}}</label>
-          {{/each}}
-        </div>
+    </div>
+    {{/if}}
+    {{#unless (eq system.profile.targetMode "noTargets")}}
+    <div class="form-group stacked">
+      <label>Allowed Zones <span class="hint">(none = all)</span></label>
+      <div class="zone-grid">
+        {{#each profileZones as |z|}}
+        <label class="zone-chip {{#if (includes ../system.profile.allowedZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.profile.allowedZones" data-value="{{z}}" {{#if (includes ../system.profile.allowedZones z)}}checked{{/if}} />{{zoneLabel z}}</label>
+        {{/each}}
       </div>
-      {{/unless}}
+    </div>
     {{/unless}}
 
     <div class="form-group stacked"><label>Description</label><textarea name="system.profile.effectText" rows="2">{{system.profile.effectText}}</textarea></div>
