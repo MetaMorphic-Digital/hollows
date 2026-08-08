@@ -1,0 +1,32 @@
+<div class="group-card">
+  <div class="group-head">
+    <strong>Modifier {{displayIndex}}</strong>
+    <a class="group-remove" data-action="removeGroup" data-group-path="special.passive" data-index="{{index}}">✕</a>
+  </div>
+  <div class="form-group"><label>Passive Type</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.type">{{selectOptions choices.passiveType selected=group.type localize=false}}</select></div></div>
+  <div class="form-group"><label>Condition</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.condition">
+    <option value="always" {{#if isAlways}}selected{{/if}}>Always</option>
+    {{#each conditionGroups as |cg|}}<optgroup label="{{cg.label}}">{{#each cg.options as |opt|}}<option value="{{opt.key}}" {{#if opt.selected}}selected{{/if}}>{{opt.label}}</option>{{/each}}</optgroup>{{/each}}
+  </select></div></div>
+  {{#if (eq group.condition "targetInZones")}}
+  <div class="form-group stacked"><label>Condition Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../group.conditionZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.groups.{{../index}}.conditionZones" data-value="{{z}}" {{#if (includes ../group.conditionZones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
+  {{/if}}
+  <div class="form-group"><label>Amount</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.amountMode">{{selectOptions choices.damageMode selected=group.amountMode localize=false}}</select></div></div>
+  {{#if (eq group.amountMode "dynamic")}}
+  <div class="form-group sub"><label>Source</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.amountSource">{{selectOptions choices.amountSource selected=group.amountSource localize=false}}</select></div></div>
+  {{#unless (eq group.amountSource "curseEntity")}}{{#unless (eq group.amountSource "entityTerrain")}}
+  <div class="form-group sub"><label>Zones</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.amountScope">{{selectOptions choices.zoneScope selected=group.amountScope localize=false}}</select></div></div>
+  {{#if (eq group.amountScope "select")}}
+  <div class="form-group stacked"><label>Select Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../group.amountZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.groups.{{../index}}.amountZones" data-value="{{z}}" {{#if (includes ../group.amountZones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
+  {{/if}}
+  {{/unless}}{{/unless}}
+  {{else}}
+  {{#if isDamage}}
+  <div class="form-group sub"><label>R / W</label><div class="form-fields"><input type="number" class="dmg" data-field-path="system.special.passive.groups.{{index}}.amount" value="{{group.amount}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" data-field-path="system.special.passive.groups.{{index}}.amountWounds" value="{{group.amountWounds}}" /></div></div>
+  {{else}}
+  <div class="form-group sub"><label>Value</label><div class="form-fields"><input type="number" data-field-path="system.special.passive.groups.{{index}}.amount" value="{{group.amount}}" /></div></div>
+  {{/if}}
+  {{/if}}
+  {{#if isThreshold}}<div class="form-group"><label>Threshold</label><div class="form-fields"><input type="number" data-field-path="system.special.passive.groups.{{index}}.curseThreshold" value="{{group.curseThreshold}}" /></div></div>{{/if}}
+  {{#if isDefence}}<div class="form-group"><label>Defence Scope</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.defenceScope">{{selectOptions choices.defenceScope selected=group.defenceScope localize=false}}</select></div></div>{{/if}}
+</div>

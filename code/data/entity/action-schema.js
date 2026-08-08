@@ -356,22 +356,29 @@ const useField = () => {
   });
 };
 
+const passiveGroupField = () => {
+  const fields = foundry.data.fields;
+  return new fields.SchemaField({
+    type: new fields.StringField({ initial: "damageTaken", choices: ENTITY_ACTION_CHOICES.passiveType }),
+    condition: new fields.StringField({ initial: "always", choices: ENTITY_ACTION_CHOICES.passiveCondition }),
+    amount: new fields.NumberField({ initial: 1 }),
+    amountWounds: new fields.NumberField({ initial: 0 }),
+    amountMode: new fields.StringField({ initial: "fixed", choices: ENTITY_ACTION_CHOICES.damageMode }),
+    amountSource: new fields.StringField({ initial: "curseEntity", choices: ENTITY_ACTION_CHOICES.amountSource }),
+    amountScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.zoneScope }),
+    amountZones: zonesField(),
+    curseThreshold: new fields.NumberField({ initial: 3 }),
+    conditionZones: zonesField(),
+    defenceScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.defenceScope }),
+  });
+};
+
 const specialField = () => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     type: new fields.StringField({ initial: "textOnly", choices: ENTITY_ACTION_CHOICES.specialType }),
-    passive: new fields.SchemaField({
-      type: new fields.StringField({ initial: "damageTaken", choices: ENTITY_ACTION_CHOICES.passiveType }),
-      condition: new fields.StringField({ initial: "always", choices: ENTITY_ACTION_CHOICES.passiveCondition }),
-      amount: new fields.NumberField({ initial: 1 }),
-      amountWounds: new fields.NumberField({ initial: 0 }),
-      amountMode: new fields.StringField({ initial: "fixed", choices: ENTITY_ACTION_CHOICES.damageMode }),
-      amountSource: new fields.StringField({ initial: "curseEntity", choices: ENTITY_ACTION_CHOICES.amountSource }),
-      amountScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.zoneScope }),
-      amountZones: zonesField(),
-      curseThreshold: new fields.NumberField({ initial: 3 }),
-      conditionZones: zonesField(),
-      defenceScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.defenceScope }),
+      passive: new fields.SchemaField({
+      groups: new fields.ArrayField(passiveGroupField(), { initial: [fieldDefaults(passiveGroupField())] }),
     }),
     trigger: new fields.SchemaField({
       event: new fields.StringField({ initial: "entityStart", choices: ENTITY_ACTION_CHOICES.triggerEvent }),
@@ -402,7 +409,7 @@ const whenBrokenField = () => {
   return new fields.SchemaField({ mode: new fields.StringField({ initial: "first", choices: ENTITY_ACTION_CHOICES.whenBrokenMode }), returnHalfTerrain: new fields.BooleanField({ initial: false }) });
 };
 
-/** EntityAbilityDataModel schema fields. */
+/** EntityAbilityData schema fields. */
 export function entityAbilityFields() {
   const fields = foundry.data.fields;
   return {
@@ -483,6 +490,11 @@ export function createBeforeAttackGroupConfig() {
 /** Create a conditional-modifier group. */
 export function createModifyIfGroupConfig() {
   return fieldDefaults(modifyGroupField());
+}
+
+/** Create a passive-modifier group. */
+export function createPassiveGroupConfig() {
+  return fieldDefaults(passiveGroupField());
 }
 
 /** Create a follow-up group from source data. */

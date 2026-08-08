@@ -71,11 +71,12 @@ function getActivePassiveSpecials(entityActor, passiveTypes = [], context = {}) 
     if (!isEntityEngineAbilityActive(entityActor, spec)) continue;
     const sys = spec.system || {};
     if (String(sys.special?.type || "textOnly") !== "passiveModifier") continue;
-    const passive = sys.special?.passive || {};
-    const passiveType = String(passive.type || "");
-    if (types.size && !types.has(passiveType)) continue;
-    if (!doesEntitySpecialConditionApply(sys, entityActor, context)) continue;
-    out.push(passive);
+    for (const passive of sys.special?.passive?.groups || []) {
+      const passiveType = String(passive.type || "");
+      if (types.size && !types.has(passiveType)) continue;
+      if (!doesEntitySpecialConditionApply(passive, entityActor, context)) continue;
+      out.push(passive);
+    }
   }
   return out;
 }

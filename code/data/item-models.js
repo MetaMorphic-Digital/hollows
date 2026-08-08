@@ -1,4 +1,3 @@
-import { entityAbilityFields } from "./entity/action-schema.js";
 import { effectGroupsField } from "./relic/effect-schema.js";
 
 // Shared effect-builder schema used by Rumour, Relic and the nested Cypher
@@ -166,14 +165,6 @@ export class EchoDataModel extends foundry.abstract.TypeDataModel {
    */
   get isUsed() {
     return this.state.has("usedThisHollow");
-  }
-}
-
-/* -------------------------------------------------- */
-
-export class EntityAbilityDataModel extends foundry.abstract.TypeDataModel {
-  static defineSchema() {
-    return entityAbilityFields();
   }
 }
 
