@@ -8,6 +8,7 @@ import {
   resolveEntityAbilityTN,
   shouldApplyAfterAttackEffects
 } from "./action-rules.js";
+import { requestAfterAttackApply } from "../../documents/entity/attack-effects.js";
 import { performEntityAttack } from "./actions/entity-attack.js";
 import { createEntityDefenceRequest, createEntityNoticeCard, createEntityTestRequest, getEntityActionWhisper } from "./action-cards.js";
 import { resolveActionTargets, resolveEntityActorFromAttackContext } from "./action-flow.js";
@@ -198,6 +199,7 @@ async function resolveFollowUpGroup(followUp, remainingFollowUp, shared) {
   if (followUpTargetMode === "noTargets") {
     if (followUpType !== "other") return;
     await postFollowUpNotice(shared, profile.text);
+    await requestAfterAttackApply(null, "", buildEntityAfterAttackConfigs(followUp, "always"), entityActor?.id || "", null, { entityActor });
     if (remainingFollowUp.enabled) await resolveFollowUpBranchInPlace(remainingFollowUp.groups, shared);
     return;
   }
@@ -262,6 +264,7 @@ async function resolveFollowUpGroup(followUp, remainingFollowUp, shared) {
       });
     } else if (followUpType === "other") {
       await postFollowUpNotice(shared, profile.text, tgt);
+      await requestAfterAttackApply(tgt, followTargetZone, buildEntityAfterAttackConfigs(followUp, "always"), entityActor?.id || "", null, { entityActor });
     } else {
       const followUpDamage = resolveEntityAbilityDamage(profile, entityActor, tkn);
       const followUpDamageBonus = {

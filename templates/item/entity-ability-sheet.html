@@ -282,7 +282,7 @@
       <div class="form-group"><label class="toggle"><input type="checkbox" data-field-path="system.followUp.groups.{{entry.index}}.afterAttack.enabled" {{#if entry.group.afterAttack.enabled}}checked{{/if}} /> After Attack</label></div>
       {{#if entry.group.afterAttack.enabled}}
       {{#each entry.group.afterAttack.groups as |afterGroup j|}}
-      {{> "systems/hollows/templates/item/parts/entity-after-attack-group.html" group=afterGroup i=j path=../afterAttackPath choices=../../choices applyIfChoices=../../choices.applyIf zoneList=../../zoneList}}
+      {{> "systems/hollows/templates/item/parts/entity-after-attack-group.html" group=afterGroup i=j path=../afterAttackPath choices=../../choices applyIfChoices=../applyIfChoices zoneList=../../zoneList}}
       {{/each}}
       <a class="group-add" data-action="addGroup" data-group-path="{{entry.afterAttackPath}}">+ Add After Attack Group</a>
       {{/if}}

@@ -62,6 +62,7 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
   get followUpGroupContexts() {
     return this.followUp.groups.map((group, index) => {
       const targetMode = String(group?.targetMode || "single");
+      const actionType = String(group?.profile?.actionType || "attack");
       const targetAreas = Array.isArray(group?.targetAreas) ? group.targetAreas : [];
       return {
         group,
@@ -69,10 +70,11 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
         displayIndex: index + 1,
         showTrigger: index > 0,
         afterAttackPath: `followUp.groups.${index}.afterAttack`,
-        targetModeChoices: EntityAbilityData.#followUpTargetModeChoices(group?.profile?.actionType),
+        targetModeChoices: EntityAbilityData.#followUpTargetModeChoices(actionType),
+        applyIfChoices: actionType === "other" ? ENTITY_ACTION_CHOICES.beforeAttackIf : ENTITY_ACTION_CHOICES.applyIf,
         showTargetArea: !["sameTarget", "noTargets"].includes(targetMode),
         showAdjacentMode: targetAreas.includes("adjacentClose") || targetAreas.includes("adjacentRanged"),
-        showAfterAttack: ["attack", "test"].includes(String(group?.profile?.actionType || "attack")),
+        showAfterAttack: ["attack", "test", "other"].includes(actionType),
       };
     });
   }
@@ -124,8 +126,8 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
     if (path === "special.trigger.afterAttack") return createAfterAttackGroupConfig("always");
     const followUpAfterAttack = path.match(/^followUp\.groups\.(\d+)\.afterAttack$/);
     if (followUpAfterAttack) {
-      const group = this.followUp.groups[Number(followUpAfterAttack[1])];
-      return createAfterAttackGroupConfig(String(group?.profile?.actionType || "attack") === "test" ? "successAny" : "anyDamageDealt");
+      const actionType = String(this.followUp.groups[Number(followUpAfterAttack[1])]?.profile?.actionType || "attack");
+      return createAfterAttackGroupConfig({ test: "successAny", other: "always" }[actionType] || "anyDamageDealt");
     }
     if (path.endsWith(".afterAttack")) return createAfterAttackGroupConfig();
     return {};
