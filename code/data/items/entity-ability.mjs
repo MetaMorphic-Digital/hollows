@@ -6,7 +6,6 @@ import {
   createPassiveGroupConfig,
   ENTITY_ACTION_CHOICES,
   entityAbilityFields,
-  PASSIVE_CONDITION_GROUPS,
 } from "../entity/action-schema.js";
 
 export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
@@ -89,11 +88,6 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
         group,
         index,
         displayIndex: index + 1,
-        conditionGroups: Object.entries(PASSIVE_CONDITION_GROUPS).map(([label, keys]) => ({
-          label,
-          options: keys.map((key) => ({ key, label: ENTITY_ACTION_CHOICES.passiveCondition[key], selected: key === condition })),
-        })),
-        isAlways: condition === "always",
         isThreshold: ["entityCurseThreshold", "targetCurseThreshold", "zoneThreatThreshold", "entityTerrainThreshold"].includes(condition),
         isDamage: ["damageTaken", "attackDamage", "interruptDamage"].includes(type),
         isDefence: type === "modifyDefences",

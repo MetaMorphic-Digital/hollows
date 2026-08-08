@@ -263,16 +263,7 @@ async function resolveFollowUpGroup(followUp, remainingFollowUp, shared) {
     } else if (followUpType === "other") {
       await postFollowUpNotice(shared, profile.text, tgt);
     } else {
-      const followUpDamage = resolveEntityAbilityDamage(
-        profile.damage,
-        profile.damageMode,
-        profile.damageDynamicMode,
-        profile.damageDynamicSource,
-        entityActor,
-        tkn,
-        profile.damageDynamicReduce,
-        profile.damageDynamicFloor
-      );
+      const followUpDamage = resolveEntityAbilityDamage(profile, entityActor, tkn);
       const followUpDamageBonus = {
         resolve: Number(followUp.damageBonus?.resolve ?? 0) || 0,
         wounds: Number(followUp.damageBonus?.wounds ?? 0) || 0

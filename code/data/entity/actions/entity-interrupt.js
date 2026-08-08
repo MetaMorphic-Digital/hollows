@@ -244,16 +244,7 @@ async function interruptOutput(ctx) {
       setStat: profile.tnSetStat,
     }, entityActor, targetToken) + modify.tn + getEntityActionTNBonus(entityActor, interruptItem, targetToken, "interrupt");
     const damageBonus = getEntityActionDamageBonus(entityActor, interruptItem, targetToken, "interrupt");
-    const interruptDamage = resolveEntityAbilityDamage(
-      profile.damage,
-      profile.damageMode,
-      profile.damageDynamicMode,
-      profile.damageDynamicSource,
-      entityActor,
-      targetToken,
-      profile.damageDynamicReduce,
-      profile.damageDynamicFloor,
-    );
+    const interruptDamage = resolveEntityAbilityDamage(profile, entityActor, targetToken);
     const damageResolve = Math.max(0, interruptDamage.resolve + damageBonus.resolve + modify.damage.resolve);
     const damageWounds = Math.max(0, interruptDamage.wounds + damageBonus.wounds + modify.damage.wounds);
     const afterAttack = buildEntityAfterAttackConfigs(interrupt, "anyDamageDealt");

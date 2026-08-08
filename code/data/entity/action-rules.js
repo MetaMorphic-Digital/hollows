@@ -131,17 +131,18 @@ function getEntityActionTNBonus(entityActor, actionItem = null, targetToken = nu
 
 // ─── Damage resolution ──────────────────────────────────────────────────────────
 
-function resolveEntityAbilityDamage(baseDamage, mode, dynamicMode, dynamicSource, entityActor, targetToken, reduce = false, floor = 0) {
-  let resolve = Math.max(0, Number(baseDamage?.resolve ?? 0) || 0);
-  let wounds = Math.max(0, Number(baseDamage?.wounds ?? 0) || 0);
-  if (String(mode || "fixed") !== "dynamic") {
+function resolveEntityAbilityDamage(profile, entityActor, targetToken) {
+  let resolve = Math.max(0, Number(profile?.damage?.resolve ?? 0) || 0);
+  let wounds = Math.max(0, Number(profile?.damage?.wounds ?? 0) || 0);
+  if (String(profile?.damageMode || "fixed") !== "dynamic") {
     return { resolve, wounds };
   }
-  const modifier = resolveEntitySourceValue(String(dynamicSource || "targetCurse"), { entityActor, targetToken });
-  // `reduce` subtracts the modifier (down to `floor`); otherwise it adds.
-  const floorValue = Math.max(0, Number(floor ?? 0) || 0);
-  const applySide = (base) => reduce ? Math.max(floorValue, base - modifier) : base + modifier;
-  const normalizedDynamicMode = String(dynamicMode || "both");
+  let modifier = resolveEntitySourceValue(String(profile.damageDynamicSource || "targetCurse"), { entityActor, targetToken });
+  if (String(profile.damageDynamicScale || "full") === "halfUp") modifier = Math.ceil(modifier / 2);
+  // `damageDynamicReduce` subtracts the modifier (down to floor); otherwise it adds.
+  const floorValue = Math.max(0, Number(profile.damageDynamicFloor ?? 0) || 0);
+  const applySide = (base) => profile.damageDynamicReduce ? Math.max(floorValue, base - modifier) : base + modifier;
+  const normalizedDynamicMode = String(profile.damageDynamicMode || "both");
   if (normalizedDynamicMode === "resolve") {
     resolve = applySide(resolve);
   } else if (normalizedDynamicMode === "wounds") {

@@ -90,6 +90,7 @@
           <div class="form-fields">
             <select name="system.profile.damageDynamicMode">{{selectOptions choices.damageDynamicMode selected=system.profile.damageDynamicMode localize=false}}</select>
             <select name="system.profile.damageDynamicSource">{{selectOptions choices.damageDynamicSource selected=system.profile.damageDynamicSource localize=false}}</select>
+            <select name="system.profile.damageDynamicScale">{{selectOptions choices.damageDynamicScale selected=system.profile.damageDynamicScale localize=false}}</select>
           </div>
         </div>
         <div class="form-group sub">
@@ -259,7 +260,7 @@
       {{/if}}
       <div class="form-group"><label>Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" data-field-path="system.followUp.groups.{{entry.index}}.profile.damage.resolve" value="{{entry.group.profile.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" data-field-path="system.followUp.groups.{{entry.index}}.profile.damage.wounds" value="{{entry.group.profile.damage.wounds}}" /><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageMode">{{selectOptions ../choices.damageMode selected=entry.group.profile.damageMode localize=false}}</select></div></div>
       {{#if (eq entry.group.profile.damageMode "dynamic")}}
-      <div class="form-group sub"><label>Source</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicMode">{{selectOptions ../choices.damageDynamicMode selected=entry.group.profile.damageDynamicMode localize=false}}</select><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicSource">{{selectOptions ../choices.damageDynamicSource selected=entry.group.profile.damageDynamicSource localize=false}}</select></div></div>
+      <div class="form-group sub"><label>Source</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicMode">{{selectOptions ../choices.damageDynamicMode selected=entry.group.profile.damageDynamicMode localize=false}}</select><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicSource">{{selectOptions ../choices.damageDynamicSource selected=entry.group.profile.damageDynamicSource localize=false}}</select><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicScale">{{selectOptions ../choices.damageDynamicScale selected=entry.group.profile.damageDynamicScale localize=false}}</select></div></div>
       {{/if}}
       {{/unless}}
       {{#if entry.showTargetArea}}
@@ -301,7 +302,7 @@
     <div class="form-group"><label>Amount</label><div class="form-fields"><input type="number" name="system.restoreResolve.fixed" value="{{system.restoreResolve.fixed}}" /></div></div>
     {{else}}
     <div class="form-group"><label>Source</label><div class="form-fields"><select name="system.restoreResolve.dynamicSource">{{selectOptions choices.restoreSource selected=system.restoreResolve.dynamicSource localize=false}}</select><input type="number" name="system.restoreResolve.dynamicNumber" value="{{system.restoreResolve.dynamicNumber}}" /></div></div>
-    {{#unless (eq system.restoreResolve.dynamicSource "entityTerrain")}}
+    {{#unless (or (eq system.restoreResolve.dynamicSource "entityTerrain") (eq system.restoreResolve.dynamicSource "entityCurse"))}}
     <div class="form-group"><label>Zone Mode</label><div class="form-fields"><select name="system.restoreResolve.zoneMode">{{selectOptions choices.zoneMode selected=system.restoreResolve.zoneMode localize=false}}</select></div></div>
     <div class="form-group stacked">
       <label>Zones <span class="hint">(none = all)</span></label>
@@ -338,7 +339,7 @@
 
     {{#if (eq system.special.type "passiveModifier")}}
     {{#each passiveGroups as |ctx|}}
-    {{> "systems/hollows/templates/item/parts/entity-passive-group.html" group=ctx.group index=ctx.index displayIndex=ctx.displayIndex conditionGroups=ctx.conditionGroups isAlways=ctx.isAlways isDamage=ctx.isDamage isDefence=ctx.isDefence isThreshold=ctx.isThreshold choices=../choices zoneList=../zoneList}}
+    {{> "systems/hollows/templates/item/parts/entity-passive-group.html" group=ctx.group index=ctx.index displayIndex=ctx.displayIndex isDamage=ctx.isDamage isDefence=ctx.isDefence isThreshold=ctx.isThreshold choices=../choices zoneList=../zoneList}}
     {{/each}}
     <a class="group-add" data-action="addGroup" data-group-path="special.passive">+ Add Modifier</a>
     {{/if}}

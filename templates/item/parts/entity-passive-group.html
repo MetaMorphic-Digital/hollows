@@ -4,10 +4,7 @@
     <a class="group-remove" data-action="removeGroup" data-group-path="special.passive" data-index="{{index}}">✕</a>
   </div>
   <div class="form-group"><label>Passive Type</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.type">{{selectOptions choices.passiveType selected=group.type localize=false}}</select></div></div>
-  <div class="form-group"><label>Condition</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.condition">
-    <option value="always" {{#if isAlways}}selected{{/if}}>Always</option>
-    {{#each conditionGroups as |cg|}}<optgroup label="{{cg.label}}">{{#each cg.options as |opt|}}<option value="{{opt.key}}" {{#if opt.selected}}selected{{/if}}>{{opt.label}}</option>{{/each}}</optgroup>{{/each}}
-  </select></div></div>
+  <div class="form-group"><label>Condition</label><div class="form-fields"><select data-field-path="system.special.passive.groups.{{index}}.condition">{{selectOptions choices.passiveCondition selected=group.condition localize=false}}</select></div></div>
   {{#if (eq group.condition "targetInZones")}}
   <div class="form-group stacked"><label>Condition Zones</label><div class="zone-grid">{{#each zoneList as |z|}}<label class="zone-chip {{#if (includes ../group.conditionZones z)}}on{{/if}}"><input type="checkbox" class="array-toggle" data-array-path="system.special.passive.groups.{{../index}}.conditionZones" data-value="{{z}}" {{#if (includes ../group.conditionZones z)}}checked{{/if}} />{{zoneLabel z}}</label>{{/each}}</div></div>
   {{/if}}

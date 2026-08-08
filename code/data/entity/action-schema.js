@@ -39,6 +39,7 @@ export const ENTITY_ACTION_CHOICES = {
   tnSetSource: { entityDefence: "Entity Defence", entityResolve: "Entity Resolve", entityWounds: "Entity Wounds", targetStat: "Target Stats" },
   damageMode: { fixed: "Fixed", dynamic: "Dynamic" },
   damageDynamicMode: { both: "Resolve & Wounds modified by X", resolve: "Resolve modified by X", wounds: "Wounds modified by X" },
+  damageDynamicScale: { full: "By X", halfUp: "By X/2 (Rounded Up)" },
   damageDynamicSource: { targetCurse: "Curse on Target", entityCurse: "Curse on Entity", zoneCurse: "Curse on Zone", threat: "Threat", entityTerrain: "Terrain on Entity", huntersInZone: "Hunters in Zone" },
   targetMode: { single: "Single", zone: "Zone", multiZone: "Select Zones", adjacentZones: "Adjacent Zones", noTargets: "No Targets" },
   targetAdjacentScope: { any: "Adjacent Any", close: "Adjacent Close", ranged: "Adjacent Ranged" },
@@ -54,7 +55,7 @@ export const ENTITY_ACTION_CHOICES = {
   followUpAdjacentMode: { all: "All Marked Adjacent", select: "Select Adjacent at Runtime" },
   followUpTrigger: { afterMain: "After Main Attack", afterPrevious: "After Previous Group" },
   restoreMode: { fixed: "Fixed", dynamic: "Dynamic" },
-  restoreSource: { curseZones: "Curse In Zones", curseHunters: "Curse On Hunters", huntersInZones: "Hunters In Zones", numberMinusHunters: "Number Minus Hunters", entityTerrain: "Terrain on Entity (× Number)" },
+  restoreSource: { curseZones: "Curse In Zones", curseHunters: "Curse On Hunters", huntersInZones: "Hunters In Zones", numberMinusHunters: "Number Minus Hunters", entityCurse: "Curse on Entity", entityTerrain: "Terrain on Entity (× Number)" },
   zoneMode: { single: "Single", multiZone: "Select Zones" },
   specialType: { textOnly: "Text Only", passiveModifier: "Passive Modifier", triggeredEffect: "Triggered Effect" },
   passiveType: { damageTaken: "Damage Taken", attackDamage: "Attack Damage", interruptDamage: "Interrupt Damage", actionsTN: "Actions TN", modifyDefences: "Modify Defences", modifyMaxResolve: "Modify Max Resolve", modifyMaxWounds: "Modify Max Wounds", modifyThreatCap: "Modify Threat Cap", modifyThreatPerRound: "Modify Threat Per Round" },
@@ -103,6 +104,7 @@ const profileField = () => {
     damage: damageField(),
     damageDynamicMode: new fields.StringField({ initial: "both", choices: C.damageDynamicMode }),
     damageDynamicSource: new fields.StringField({ initial: "targetCurse", choices: C.damageDynamicSource }),
+    damageDynamicScale: new fields.StringField({ initial: "full", choices: C.damageDynamicScale }),
     damageDynamicReduce: new fields.BooleanField({ initial: false }),
     damageDynamicFloor: new fields.NumberField({ initial: 0 }),
     targetMode: new fields.StringField({ initial: "single", choices: C.targetMode }),
@@ -134,14 +136,6 @@ const threatSpendField = () => {
     damage: damageField(),
     specialText: new fields.StringField({ initial: "" }),
   });
-};
-
-/** Passive condition groups for the builder. */
-export const PASSIVE_CONDITION_GROUPS = {
-  Curse: ["entityHasCurse", "entityNoCurse", "entityCurseThreshold", "targetHasCurse", "targetNoCurse", "targetCurseThreshold"],
-  Terrain: ["entityHasTerrain", "entityNoTerrain", "entityTerrainThreshold", "targetHasTerrain", "targetNoTerrain"],
-  Threat: ["zoneHasThreat", "zoneNoThreat", "zoneThreatThreshold"],
-  Location: ["targetInZones", "targetAlone", "targetNotAlone"],
 };
 
 const possibleIfField = () => {
