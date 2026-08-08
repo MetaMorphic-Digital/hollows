@@ -157,6 +157,20 @@ function resolveEntityAbilityDamage(profile, entityActor, targetToken) {
   };
 }
 
+/**
+ * The dynamic part of an effect group's Target damage.
+ */
+function resolveTargetDeltaBonus(group, entityActor, targetToken) {
+  if (String(group?.targetDeltaMode || "fixed") !== "dynamic") return { resolve: 0, wounds: 0 };
+  let value = resolveEntitySourceValue(String(group.targetDeltaDynamicSource || "targetCurse"), { entityActor, targetToken });
+  if (String(group.targetDeltaDynamicScale || "full") === "halfUp") value = Math.ceil(value / 2);
+  const mode = String(group.targetDeltaDynamicMode || "both");
+  return {
+    resolve: mode === "wounds" ? 0 : value,
+    wounds: mode === "resolve" ? 0 : value,
+  };
+}
+
 // ─── Interrupt feasibility / cost ─────────────────────────────────────────────
 
 function getHuntersForInterrupt(interrupt) {
@@ -396,6 +410,7 @@ export {
   matchesEntityOutcomeCondition,
   matchesEntityAttackConditions,
   resolveEntityAbilityDamage,
+  resolveTargetDeltaBonus,
   shouldApplyAfterAttackEffects,
   shouldApplyBeforeAttackEffects
 };
