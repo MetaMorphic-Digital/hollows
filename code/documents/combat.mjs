@@ -1,4 +1,3 @@
-import { updateRegionCurse } from "../canvas/overlays.js";
 import { getActiveEntityActor, getActiveHollowActor } from "../canvas/zone.js";
 import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
 import {
@@ -145,7 +144,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
   async #clearAllCurseTrackers() {
     const scene = this.scene ?? canvas.scene;
     const regions = scene.regions.filter(region => region.getFlag(hollows.id, "lairRegion"));
-    for (const region of regions) await updateRegionCurse(region, 0);
+    for (const region of regions) await region.updateRegionCurse(0);
     const actors = new Set(this.combatants.map(c => c.actor).filter(a => ["hunter", "entity"].includes(a?.type)));
     const operations = Array.from(actors).map(actor => {
       return {

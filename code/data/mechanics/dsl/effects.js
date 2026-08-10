@@ -43,12 +43,25 @@
  */
 
 import { addCondition, removeCondition } from "../../../documents/actor/conditions.js";
-import { getActiveEntityActor, getActorZone, getAdjacentZones, getHuntersInZone, getThreatInZone, isCloseZone, isRangedZone } from "../../../canvas/zone.js";
+import {
+  getActiveEntityActor,
+  getActorZone,
+  getAdjacentZones,
+  getHuntersInZone,
+  getThreatInZone,
+  isCloseZone,
+  isRangedZone,
+} from "../../../canvas/zone.js";
 import { pickOne } from "../../../applications/apps/selection-dialogs.mjs";
 import { HOLLOWS_CONDITIONS } from "../../system-constants.js";
 import { getEffectiveWeaponCapacity } from "../../weapons/index.js";
-import { adjustHunterResource, adjustEntityResource, getFocusCount, spendResolve } from "../../../documents/actor/resources.js";
-import { addCurseToZone, addThreatToZone, clampCurse } from "../../../canvas/overlays.js";
+import {
+  adjustHunterResource,
+  adjustEntityResource,
+  getFocusCount,
+  spendResolve,
+} from "../../../documents/actor/resources.js";
+import { addCurseToZone, addThreatToZone } from "../../../canvas/overlays.js";
 import { getZoneCurseValue } from "../../../canvas/zone.js";
 import { adjustEntityTerrain } from "../../../canvas/terrain-pool.js";
 
@@ -514,16 +527,16 @@ async function applyOne(eff, ctx) {
     case "adjustEntityCurse": {
       const entity = ctx.entity || getActiveEntityActor();
       if (!entity) return;
-      const current = Number(entity.system?.curse?.value ?? 0);
-      await entity.update({ "system.curse.value": clampCurse(current + Number(eff.amount || 0)) });
+      const current = entity.system.curse.value;
+      await entity.update({ "system.curse.value": current + (eff.amount || 0) });
       return;
     }
     case "clampEntityCurse": {
       const entity = ctx.entity || getActiveEntityActor();
       if (!entity) return;
-      const current = Number(entity.system?.curse?.value ?? 0);
-      const cap = Number(eff.value || 0);
-      if (current > cap) await entity.update({ "system.curse.value": clampCurse(cap) });
+      const current = entity.system.curse.value;
+      const cap = eff.value || 0;
+      if (current > cap) await entity.update({ "system.curse.value": cap });
       return;
     }
     case "multiAttack": {
