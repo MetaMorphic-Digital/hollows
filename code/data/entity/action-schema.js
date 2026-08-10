@@ -238,6 +238,7 @@ const effectPayloadFields = () => {
     targetDeltaDynamicMode: new fields.StringField({ initial: "both", choices: ENTITY_ACTION_CHOICES.damageDynamicMode }),
     targetDeltaDynamicSource: new fields.StringField({ initial: "targetCurse", choices: ENTITY_ACTION_CHOICES.damageDynamicSource }),
     targetDeltaDynamicScale: new fields.StringField({ initial: "full", choices: ENTITY_ACTION_CHOICES.damageDynamicScale }),
+    targetMaxDelta: damageField(),
     entityDelta: damageField(),
     entityTerrain: new fields.NumberField({ initial: 0 }),
     entityTerrainTag: new fields.StringField({ initial: "any", choices: ENTITY_ACTION_CHOICES.terrainTag }),

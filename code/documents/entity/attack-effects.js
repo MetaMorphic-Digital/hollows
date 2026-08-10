@@ -192,6 +192,14 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
       if (resolve || wounds) await adjustHunterResource(target, { resolve: -resolve, wounds: -wounds });
     }
 
+    if (target && (group.targetMaxDelta?.resolve || group.targetMaxDelta?.wounds)) {
+      const penalty = target.getFlag("hollows", "battleMaxPenalty") || {};
+      await target.setFlag("hollows", "battleMaxPenalty", {
+        resolve: Number(penalty.resolve || 0) + Number(group.targetMaxDelta.resolve || 0),
+        wounds: Number(penalty.wounds || 0) + Number(group.targetMaxDelta.wounds || 0),
+      });
+    }
+
     if ((group.entityDelta?.resolve || group.entityDelta?.wounds) && entityActor) {
       await adjustEntityResource(entityActor, {
         resolve: -Number(group.entityDelta.resolve || 0),
