@@ -187,6 +187,8 @@ export async function resolveRestoreResolve(config, entityActor) {
     const source = String(restore.dynamicSource || "curseZones");
     if (source === "entityTerrain") {
       restoreAmount = Math.max(0, (Number(restore.dynamicNumber ?? 0) || 0) * resolveEntitySourceValue("entityTerrain", { entityActor }));
+    } else if (source === "entityCurse") {
+      restoreAmount = resolveEntitySourceValue("entityCurse", { entityActor });
     } else if (source === "huntersInZones") {
       const zones = await resolveRestoreZones(restore);
       const hunters = sceneHunterTokens();

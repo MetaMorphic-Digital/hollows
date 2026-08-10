@@ -56,7 +56,6 @@ function registerSubtypes() {
   // FIXME: clean this up
   const {
     EchoDataModel,
-    EntityAbilityDataModel,
     RelicDataModel,
     RumourDataModel,
   } = data;
@@ -72,7 +71,7 @@ function registerSubtypes() {
   });
 
   Object.assign(CONFIG.Item.dataModels, {
-    entityAbility: EntityAbilityDataModel,
+    entityAbility: data.items.EntityAbilityData,
     entityEnhancement: data.items.EntityEnhancementData,
     weaponAbility: data.items.WeaponAbilityData,
     echo: EchoDataModel,

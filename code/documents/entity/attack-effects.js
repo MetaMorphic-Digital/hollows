@@ -7,7 +7,7 @@ import { dispatchToGM } from "../../helpers/queries.js";
 import { setShotgunsLoaded } from "../../helpers/weapon-utils.js";
 import { getEffectiveWeaponCapacity } from "../../data/weapons/index.js";
 import { resolveTerrainDiscardOptions } from "../../data/actions/terrain-discard-options.js";
-import { shouldApplyAfterAttackEffects, shouldApplyBeforeAttackEffects } from "../../data/entity/action-rules.js";
+import { resolveTargetDeltaBonus, shouldApplyAfterAttackEffects, shouldApplyBeforeAttackEffects } from "../../data/entity/action-rules.js";
 import {
   addCondition,
   removeCondition,
@@ -185,10 +185,18 @@ async function applyAfterAttackEffectsDirect(target, targetZone, afterAttack, co
     await applyAfterAttackShift(group, targetZone);
 
     // Signed resource delta: positive deals damage, negative restores.
-    if (target && (group.targetDelta?.resolve || group.targetDelta?.wounds)) {
-      await adjustHunterResource(target, {
-        resolve: -Number(group.targetDelta.resolve || 0),
-        wounds: -Number(group.targetDelta.wounds || 0),
+    if (target) {
+      const bonus = resolveTargetDeltaBonus(group, entityActor, getActorTokenOnScene(target));
+      const resolve = Number(group.targetDelta?.resolve || 0) + bonus.resolve;
+      const wounds = Number(group.targetDelta?.wounds || 0) + bonus.wounds;
+      if (resolve || wounds) await adjustHunterResource(target, { resolve: -resolve, wounds: -wounds });
+    }
+
+    if (target && (group.targetMaxDelta?.resolve || group.targetMaxDelta?.wounds)) {
+      const penalty = target.getFlag("hollows", "battleMaxPenalty") || {};
+      await target.setFlag("hollows", "battleMaxPenalty", {
+        resolve: Number(penalty.resolve || 0) + Number(group.targetMaxDelta.resolve || 0),
+        wounds: Number(penalty.wounds || 0) + Number(group.targetMaxDelta.wounds || 0),
       });
     }
 

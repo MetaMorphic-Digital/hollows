@@ -71,11 +71,12 @@ function getActivePassiveSpecials(entityActor, passiveTypes = [], context = {}) 
     if (!isEntityEngineAbilityActive(entityActor, spec)) continue;
     const sys = spec.system || {};
     if (String(sys.special?.type || "textOnly") !== "passiveModifier") continue;
-    const passive = sys.special?.passive || {};
-    const passiveType = String(passive.type || "");
-    if (types.size && !types.has(passiveType)) continue;
-    if (!doesEntitySpecialConditionApply(sys, entityActor, context)) continue;
-    out.push(passive);
+    for (const passive of sys.special?.passive?.groups || []) {
+      const passiveType = String(passive.type || "");
+      if (types.size && !types.has(passiveType)) continue;
+      if (!doesEntitySpecialConditionApply(passive, entityActor, context)) continue;
+      out.push(passive);
+    }
   }
   return out;
 }
@@ -130,17 +131,18 @@ function getEntityActionTNBonus(entityActor, actionItem = null, targetToken = nu
 
 // ─── Damage resolution ──────────────────────────────────────────────────────────
 
-function resolveEntityAbilityDamage(baseDamage, mode, dynamicMode, dynamicSource, entityActor, targetToken, reduce = false, floor = 0) {
-  let resolve = Math.max(0, Number(baseDamage?.resolve ?? 0) || 0);
-  let wounds = Math.max(0, Number(baseDamage?.wounds ?? 0) || 0);
-  if (String(mode || "fixed") !== "dynamic") {
+function resolveEntityAbilityDamage(profile, entityActor, targetToken) {
+  let resolve = Math.max(0, Number(profile?.damage?.resolve ?? 0) || 0);
+  let wounds = Math.max(0, Number(profile?.damage?.wounds ?? 0) || 0);
+  if (String(profile?.damageMode || "fixed") !== "dynamic") {
     return { resolve, wounds };
   }
-  const modifier = resolveEntitySourceValue(String(dynamicSource || "targetCurse"), { entityActor, targetToken });
-  // `reduce` subtracts the modifier (down to `floor`); otherwise it adds.
-  const floorValue = Math.max(0, Number(floor ?? 0) || 0);
-  const applySide = (base) => reduce ? Math.max(floorValue, base - modifier) : base + modifier;
-  const normalizedDynamicMode = String(dynamicMode || "both");
+  let modifier = resolveEntitySourceValue(String(profile.damageDynamicSource || "targetCurse"), { entityActor, targetToken });
+  if (String(profile.damageDynamicScale || "full") === "halfUp") modifier = Math.ceil(modifier / 2);
+  // `damageDynamicReduce` subtracts the modifier (down to floor); otherwise it adds.
+  const floorValue = Math.max(0, Number(profile.damageDynamicFloor ?? 0) || 0);
+  const applySide = (base) => profile.damageDynamicReduce ? Math.max(floorValue, base - modifier) : base + modifier;
+  const normalizedDynamicMode = String(profile.damageDynamicMode || "both");
   if (normalizedDynamicMode === "resolve") {
     resolve = applySide(resolve);
   } else if (normalizedDynamicMode === "wounds") {
@@ -152,6 +154,20 @@ function resolveEntityAbilityDamage(baseDamage, mode, dynamicMode, dynamicSource
   return {
     resolve: Math.max(0, resolve),
     wounds: Math.max(0, wounds)
+  };
+}
+
+/**
+ * The dynamic part of an effect group's Target damage.
+ */
+function resolveTargetDeltaBonus(group, entityActor, targetToken) {
+  if (String(group?.targetDeltaMode || "fixed") !== "dynamic") return { resolve: 0, wounds: 0 };
+  let value = resolveEntitySourceValue(String(group.targetDeltaDynamicSource || "targetCurse"), { entityActor, targetToken });
+  if (String(group.targetDeltaDynamicScale || "full") === "halfUp") value = Math.ceil(value / 2);
+  const mode = String(group.targetDeltaDynamicMode || "both");
+  return {
+    resolve: mode === "wounds" ? 0 : value,
+    wounds: mode === "resolve" ? 0 : value,
   };
 }
 
@@ -394,6 +410,7 @@ export {
   matchesEntityOutcomeCondition,
   matchesEntityAttackConditions,
   resolveEntityAbilityDamage,
+  resolveTargetDeltaBonus,
   shouldApplyAfterAttackEffects,
   shouldApplyBeforeAttackEffects
 };

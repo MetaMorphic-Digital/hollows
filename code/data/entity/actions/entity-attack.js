@@ -265,16 +265,7 @@ async function performAttackOutput(ctx) {
           resolve: Math.max(0, Number(profile.damage?.resolve ?? 0) || 0),
           wounds: Math.max(0, Number(profile.damage?.wounds ?? 0) || 0),
         }
-        : resolveEntityAbilityDamage(
-          profile.damage,
-          profile.damageMode,
-          profile.damageDynamicMode,
-          profile.damageDynamicSource,
-          entityActor,
-          targetToken,
-          profile.damageDynamicReduce,
-          profile.damageDynamicFloor,
-        );
+        : resolveEntityAbilityDamage(profile, entityActor, targetToken);
     let damageResolve = attackDamage.resolve + damageBonus.resolve;
     let damageWounds = attackDamage.wounds + damageBonus.wounds;
     if (builderMode === "advanced" && threatSpend.enabled && threatSpend.modifyDamage && enhancementSpend > 0) {

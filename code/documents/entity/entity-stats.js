@@ -81,10 +81,6 @@ export function entityAllowsTerrainShield(entityActor) {
   return entityHasActiveSpecialFlag(entityActor, "terrainShield");
 }
 
-function getEntitySpecialConditionThreshold(source) {
-  return Math.max(1, Number(source?.special?.passive?.curseThreshold ?? source?.special?.trigger?.thresholdValue ?? 3) || 3);
-}
-
 /**
  * Single source for dynamic value lookups shared by TN modifiers, attack-damage
  * modifiers, passive amounts and Modify-If thresholds. `zones` defaults to the
@@ -109,11 +105,11 @@ export function resolveEntitySourceValue(source, { entityActor = null, targetTok
   return 0;
 }
 
-export function doesEntitySpecialConditionApply(source, entityActor, context = {}) {
-  const passive = source?.special?.passive || {};
-  const cond = String(passive.condition || "always");
+/** `passive` is one `special.passive.groups` entry. */
+export function doesEntitySpecialConditionApply(passive, entityActor, context = {}) {
+  const cond = String(passive?.condition || "always");
   const target = context.targetActor || context.target || null;
-  const threshold = getEntitySpecialConditionThreshold(source);
+  const threshold = Math.max(1, Number(passive?.curseThreshold ?? 3) || 3);
   const targetToken = context.targetToken || null;
   const targetZone = targetToken ? (getTokenZone(targetToken) || "") : "";
   if (cond === "always") return true;
@@ -158,23 +154,24 @@ function getEntitySpecialPassiveStatDelta(entityActor, stat, context = {}) {
     if (!isEntityEngineAbilityActive(entityActor, spec)) continue;
     const sys = spec.system || {};
     if (String(sys.special?.type || "textOnly") !== "passiveModifier") continue;
-    const passive = sys.special.passive;
-    const passiveType = String(passive.type || "");
-    if (passiveType === "modifyDefences") {
-      if (!DEFENCE_STATS.has(key)) continue;
-      const scope = String(passive.defenceScope || "all");
-      if (scope !== "all" && scope !== key) continue;
-    } else {
-      const expectedType = {
-        threatCap: "modifyThreatCap",
-        threatPerRound: "modifyThreatPerRound",
-        resolveMax: "modifyMaxResolve",
-        woundsMax: "modifyMaxWounds",
-      }[key] || "";
-      if (passiveType !== expectedType) continue;
+    for (const passive of sys.special?.passive?.groups || []) {
+      const passiveType = String(passive.type || "");
+      if (passiveType === "modifyDefences") {
+        if (!DEFENCE_STATS.has(key)) continue;
+        const scope = String(passive.defenceScope || "all");
+        if (scope !== "all" && scope !== key) continue;
+      } else {
+        const expectedType = {
+          threatCap: "modifyThreatCap",
+          threatPerRound: "modifyThreatPerRound",
+          resolveMax: "modifyMaxResolve",
+          woundsMax: "modifyMaxWounds",
+        }[key] || "";
+        if (passiveType !== expectedType) continue;
+      }
+      if (!doesEntitySpecialConditionApply(passive, entityActor, context)) continue;
+      total += resolvePassiveAmount(passive, "single", entityActor);
     }
-    if (!doesEntitySpecialConditionApply(sys, entityActor, context)) continue;
-    total += resolvePassiveAmount(passive, "single", entityActor);
   }
   return total;
 }

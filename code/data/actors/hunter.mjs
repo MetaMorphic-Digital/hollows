@@ -88,7 +88,8 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       woundsBonus += healthBonus.wounds || 0;
     }
 
-    this.health.resolve.max = resolveBonus;
-    this.health.wounds.max = woundsBonus;
+    const penalty = this.parent.getFlag("hollows", "battleMaxPenalty") || {};
+    this.health.resolve.max = Math.max(0, resolveBonus - (Number(penalty.resolve) || 0));
+    this.health.wounds.max = Math.max(0, woundsBonus - (Number(penalty.wounds) || 0));
   }
 }

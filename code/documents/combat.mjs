@@ -112,6 +112,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
       wardGranted: _del,
       wardSuppressed: _del,
       echoReplaceDyingUsed: _del,
+      battleMaxPenalty: _del,
       dyingRevivedOnce: false,
     };
 

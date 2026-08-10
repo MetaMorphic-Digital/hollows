@@ -39,12 +39,13 @@ export const ENTITY_ACTION_CHOICES = {
   tnSetSource: { entityDefence: "Entity Defence", entityResolve: "Entity Resolve", entityWounds: "Entity Wounds", targetStat: "Target Stats" },
   damageMode: { fixed: "Fixed", dynamic: "Dynamic" },
   damageDynamicMode: { both: "Resolve & Wounds modified by X", resolve: "Resolve modified by X", wounds: "Wounds modified by X" },
+  damageDynamicScale: { full: "By X", halfUp: "By X/2 (Rounded Up)" },
   damageDynamicSource: { targetCurse: "Curse on Target", entityCurse: "Curse on Entity", zoneCurse: "Curse on Zone", threat: "Threat", entityTerrain: "Terrain on Entity", huntersInZone: "Hunters in Zone" },
   targetMode: { single: "Single", zone: "Zone", multiZone: "Select Zones", adjacentZones: "Adjacent Zones", noTargets: "No Targets" },
   targetAdjacentScope: { any: "Adjacent Any", close: "Adjacent Close", ranged: "Adjacent Ranged" },
   targetAdjacentCount: { one: "One Adjacent", two: "Two Adjacent (If Eligible)", all: "All Adjacent (No Support)" },
   costType: { threat: "Threat", closeDefence: "Close Defence", rangedDefence: "Ranged Defence", wyrdDefence: "Wyrd Defence", entityResolve: "Entity's Resolve", entityWounds: "Entity's Wounds", entityCurse: "Curse on Entity", hunterCurse: "Curse on Hunter", zoneCurse: "Curse on Zone", entityTerrain: "Entity Terrain Tag" },
-  condition: { targetHasTerrain: "Target Has Terrain", targetNoTerrain: "Target Has No Terrain", targetHasFocus: "Target Has Focus", targetNoFocus: "Target Has No Focus", targetHasCapacity: "Target Has Capacity", targetHasCurse: "Target Has Curse", targetNoCurse: "Target Has No Curse", targetZoneHasCurse: "Target Zone Has Curse", targetZoneNoCurse: "Target Zone Has No Curse", targetZoneThreat: "Target Zone Has Threat", targetZoneNoThreat: "Target Zone Has No Threat", entityHasCurse: "Entity Has Curse" },
+  condition: { targetHasTerrain: "Target Has Terrain", targetNoTerrain: "Target Has No Terrain", targetHasFocus: "Target Has Focus", targetNoFocus: "Target Has No Focus", targetHasCapacity: "Target Has Capacity", targetHasCurse: "Target Has Curse", targetNoCurse: "Target Has No Curse", targetBroken: "Target Is Broken", targetNotBroken: "Target Is Not Broken", targetZoneHasCurse: "Target Zone Has Curse", targetZoneNoCurse: "Target Zone Has No Curse", targetZoneThreat: "Target Zone Has Threat", targetZoneNoThreat: "Target Zone Has No Threat", entityHasCurse: "Entity Has Curse" },
   applyIf: { always: "Always", ...ATTACK_OUTCOME_CONDITIONS, targetBrokenBeforeAttack: "Target Broken Before Attack", targetNotBrokenBeforeAttack: "Target Not Broken Before Attack", ...SHARED_STATE_CONDITION_LABELS },
   beforeAttackIf: { always: "Always", targetBroken: "Target Is Broken", targetNotBroken: "Target Is Not Broken", ...SHARED_STATE_CONDITION_LABELS },
   outcomeWhen: { ...ATTACK_OUTCOME_CONDITIONS, always: "Always" },
@@ -54,7 +55,7 @@ export const ENTITY_ACTION_CHOICES = {
   followUpAdjacentMode: { all: "All Marked Adjacent", select: "Select Adjacent at Runtime" },
   followUpTrigger: { afterMain: "After Main Attack", afterPrevious: "After Previous Group" },
   restoreMode: { fixed: "Fixed", dynamic: "Dynamic" },
-  restoreSource: { curseZones: "Curse In Zones", curseHunters: "Curse On Hunters", huntersInZones: "Hunters In Zones", numberMinusHunters: "Number Minus Hunters", entityTerrain: "Terrain on Entity (× Number)" },
+  restoreSource: { curseZones: "Curse In Zones", curseHunters: "Curse On Hunters", huntersInZones: "Hunters In Zones", numberMinusHunters: "Number Minus Hunters", entityCurse: "Curse on Entity", entityTerrain: "Terrain on Entity (× Number)" },
   zoneMode: { single: "Single", multiZone: "Select Zones" },
   specialType: { textOnly: "Text Only", passiveModifier: "Passive Modifier", triggeredEffect: "Triggered Effect" },
   passiveType: { damageTaken: "Damage Taken", attackDamage: "Attack Damage", interruptDamage: "Interrupt Damage", actionsTN: "Actions TN", modifyDefences: "Modify Defences", modifyMaxResolve: "Modify Max Resolve", modifyMaxWounds: "Modify Max Wounds", modifyThreatCap: "Modify Threat Cap", modifyThreatPerRound: "Modify Threat Per Round" },
@@ -103,6 +104,7 @@ const profileField = () => {
     damage: damageField(),
     damageDynamicMode: new fields.StringField({ initial: "both", choices: C.damageDynamicMode }),
     damageDynamicSource: new fields.StringField({ initial: "targetCurse", choices: C.damageDynamicSource }),
+    damageDynamicScale: new fields.StringField({ initial: "full", choices: C.damageDynamicScale }),
     damageDynamicReduce: new fields.BooleanField({ initial: false }),
     damageDynamicFloor: new fields.NumberField({ initial: 0 }),
     targetMode: new fields.StringField({ initial: "single", choices: C.targetMode }),
@@ -134,14 +136,6 @@ const threatSpendField = () => {
     damage: damageField(),
     specialText: new fields.StringField({ initial: "" }),
   });
-};
-
-/** Passive condition groups for the builder. */
-export const PASSIVE_CONDITION_GROUPS = {
-  Curse: ["entityHasCurse", "entityNoCurse", "entityCurseThreshold", "targetHasCurse", "targetNoCurse", "targetCurseThreshold"],
-  Terrain: ["entityHasTerrain", "entityNoTerrain", "entityTerrainThreshold", "targetHasTerrain", "targetNoTerrain"],
-  Threat: ["zoneHasThreat", "zoneNoThreat", "zoneThreatThreshold"],
-  Location: ["targetInZones", "targetAlone", "targetNotAlone"],
 };
 
 const possibleIfField = () => {
@@ -240,6 +234,11 @@ const effectPayloadFields = () => {
     curseEntity: new fields.NumberField({ initial: 0 }),
     threat: new fields.NumberField({ initial: 0 }),
     targetDelta: damageField(),
+    targetDeltaMode: new fields.StringField({ initial: "fixed", choices: ENTITY_ACTION_CHOICES.damageMode }),
+    targetDeltaDynamicMode: new fields.StringField({ initial: "both", choices: ENTITY_ACTION_CHOICES.damageDynamicMode }),
+    targetDeltaDynamicSource: new fields.StringField({ initial: "targetCurse", choices: ENTITY_ACTION_CHOICES.damageDynamicSource }),
+    targetDeltaDynamicScale: new fields.StringField({ initial: "full", choices: ENTITY_ACTION_CHOICES.damageDynamicScale }),
+    targetMaxDelta: damageField(),
     entityDelta: damageField(),
     entityTerrain: new fields.NumberField({ initial: 0 }),
     entityTerrainTag: new fields.StringField({ initial: "any", choices: ENTITY_ACTION_CHOICES.terrainTag }),
@@ -356,22 +355,29 @@ const useField = () => {
   });
 };
 
+const passiveGroupField = () => {
+  const fields = foundry.data.fields;
+  return new fields.SchemaField({
+    type: new fields.StringField({ initial: "damageTaken", choices: ENTITY_ACTION_CHOICES.passiveType }),
+    condition: new fields.StringField({ initial: "always", choices: ENTITY_ACTION_CHOICES.passiveCondition }),
+    amount: new fields.NumberField({ initial: 1 }),
+    amountWounds: new fields.NumberField({ initial: 0 }),
+    amountMode: new fields.StringField({ initial: "fixed", choices: ENTITY_ACTION_CHOICES.damageMode }),
+    amountSource: new fields.StringField({ initial: "curseEntity", choices: ENTITY_ACTION_CHOICES.amountSource }),
+    amountScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.zoneScope }),
+    amountZones: zonesField(),
+    curseThreshold: new fields.NumberField({ initial: 3 }),
+    conditionZones: zonesField(),
+    defenceScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.defenceScope }),
+  });
+};
+
 const specialField = () => {
   const fields = foundry.data.fields;
   return new fields.SchemaField({
     type: new fields.StringField({ initial: "textOnly", choices: ENTITY_ACTION_CHOICES.specialType }),
-    passive: new fields.SchemaField({
-      type: new fields.StringField({ initial: "damageTaken", choices: ENTITY_ACTION_CHOICES.passiveType }),
-      condition: new fields.StringField({ initial: "always", choices: ENTITY_ACTION_CHOICES.passiveCondition }),
-      amount: new fields.NumberField({ initial: 1 }),
-      amountWounds: new fields.NumberField({ initial: 0 }),
-      amountMode: new fields.StringField({ initial: "fixed", choices: ENTITY_ACTION_CHOICES.damageMode }),
-      amountSource: new fields.StringField({ initial: "curseEntity", choices: ENTITY_ACTION_CHOICES.amountSource }),
-      amountScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.zoneScope }),
-      amountZones: zonesField(),
-      curseThreshold: new fields.NumberField({ initial: 3 }),
-      conditionZones: zonesField(),
-      defenceScope: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.defenceScope }),
+      passive: new fields.SchemaField({
+      groups: new fields.ArrayField(passiveGroupField(), { initial: [fieldDefaults(passiveGroupField())] }),
     }),
     trigger: new fields.SchemaField({
       event: new fields.StringField({ initial: "entityStart", choices: ENTITY_ACTION_CHOICES.triggerEvent }),
@@ -402,7 +408,7 @@ const whenBrokenField = () => {
   return new fields.SchemaField({ mode: new fields.StringField({ initial: "first", choices: ENTITY_ACTION_CHOICES.whenBrokenMode }), returnHalfTerrain: new fields.BooleanField({ initial: false }) });
 };
 
-/** EntityAbilityDataModel schema fields. */
+/** EntityAbilityData schema fields. */
 export function entityAbilityFields() {
   const fields = foundry.data.fields;
   return {
@@ -483,6 +489,11 @@ export function createBeforeAttackGroupConfig() {
 /** Create a conditional-modifier group. */
 export function createModifyIfGroupConfig() {
   return fieldDefaults(modifyGroupField());
+}
+
+/** Create a passive-modifier group. */
+export function createPassiveGroupConfig() {
+  return fieldDefaults(passiveGroupField());
 }
 
 /** Create a follow-up group from source data. */
