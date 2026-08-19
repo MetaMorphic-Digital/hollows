@@ -1,0 +1,6 @@
+@use '../typography' as *;
+@use '../variables' as *;
+
+.#{$packageCssClass}-wrapper.journal-sheet .journal-entry-content {
+  @include text;
+}

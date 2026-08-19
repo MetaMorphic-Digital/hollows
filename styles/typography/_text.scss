@@ -1,0 +1,6 @@
+@use "../variables" as *;
+
+@mixin text {
+  font-family: $font-shallot;
+  font-size: 1em;
+}

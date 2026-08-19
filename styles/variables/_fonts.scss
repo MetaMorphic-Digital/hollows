@@ -1,0 +1,85 @@
+@use "generic" as *;
+
+$-font-prefix: "#{$assetsPrefix}/fonts";
+
+/* -------------------- Shallot -------------------- */
+
+$-shallot-prefix: "#{$-font-prefix}/shallot";
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-Italic.otf") format("opentype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-Bold.otf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-BoldItalic.otf") format("opentype");
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-ExtraBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shallot";
+  src: url("#{$-shallot-prefix}/Shallot-ExtraBoldItalic.otf") format("opentype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* ---------------- Shallot Variable --------------- */
+
+$font-shallot: "Shallot", sans-serif;
+
+@font-face {
+  font-family: "Shallot Variable";
+  src: url("#{$-shallot-prefix}/ShallotVariable-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shallot Variable";
+  src: url("#{$-shallot-prefix}/ShallotVariable-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+$font-shallot-variable: "Shallot Variable", "Shallot", sans-serif;
+
+/* ------------------------------------------------- */
