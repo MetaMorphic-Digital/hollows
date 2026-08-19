@@ -83,7 +83,8 @@
       "paths": [
         "lang",
         "styles",
-        "templates"
+        "templates",
+        "public/hollows.css"
       ]
     }
   }
