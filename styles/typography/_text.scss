@@ -3,4 +3,12 @@
 @mixin text {
   font-family: $font-shallot;
   font-size: 1em;
+
+  p {
+    text-indent: 1em;
+
+    &.no-indent {
+      text-indent: 0;
+    }
+  }
 }
