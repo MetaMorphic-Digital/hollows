@@ -1,0 +1,43 @@
+@use "../variables" as *;
+
+@mixin headers {
+  h1, h2 {
+    border-bottom: none;
+  }
+
+  h1 {
+    font-family: $font-mourich;
+
+    &.chapter-title {
+    font-size: 3rem;
+    text-transform: uppercase;
+
+      &::first-letter {
+        font-size: 2em;
+      }
+    }
+  }
+
+  h2 {
+    color: #44556a;
+    font-family: $font-cobblestone-aged;
+    font-size: 2rem;
+    font-variant: small-caps;
+
+    &.book-heading {
+      color: unset;
+      font-family: $font-mourich;
+      font-size: 4rem;
+    }
+  }
+
+  h3 {
+    font-family: $font-cobblestone;
+    font-size: 1.25rem;
+  }
+
+  h4.isles-heading {
+    font-family: $font-feliz-en-vista-alt;
+    font-size: 1rem;
+  }
+}

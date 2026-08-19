@@ -2,5 +2,6 @@
 @use '../variables' as *;
 
 .#{$packageCssClass}-wrapper.journal-sheet .journal-entry-content {
+  @include headers;
   @include text;
 }
