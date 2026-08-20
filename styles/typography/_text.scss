@@ -10,5 +10,26 @@
     &.no-indent {
       text-indent: 0;
     }
+
+    &.chapter-intro {
+      font-family: $font-mourich;
+      font-size: 1.2em;
+      font-weight: bold;
+      font-variant: small-caps;
+
+      text-indent: 0;
+      text-align: center;
+    }
+  }
+
+  strong {
+    &.stat {
+      color: #0c8575;
+      font-weight: 800;
+    }
+  }
+
+  blockquote.chapter-intro-poem {
+    font-family: $font-mourich;
   }
 }

@@ -34,6 +34,11 @@
   h3 {
     font-family: $font-cobblestone;
     font-size: 1.25rem;
+
+    &.chapter-intro-subheading {
+      font-family: $font-mourich;
+      text-transform: uppercase;
+    }
   }
 
   h4.isles-heading {

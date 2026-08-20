@@ -154,3 +154,15 @@ $-feliz-en-vista-prefix: "#{$-font-prefix}/feliz-en-vista";
 
 $font-feliz-en-vista: "Feliz en Vista", sans-serif;
 $font-feliz-en-vista-alt: "Feliz en Vista Alt", "Feliz en Vista", sans-serif;
+
+/* ----------------- Miscellaneous ----------------- */
+
+$-misc-prefix: "#{$-font-prefix}/misc";
+@font-face {
+  font-family: "Bell MT";
+  src: url("#{$-misc-prefix}/BellMTItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+$font-bell: "Bell MT", sans-serif;
