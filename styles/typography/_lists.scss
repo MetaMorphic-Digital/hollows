@@ -1,0 +1,21 @@
+@use "../variables" as *;
+
+@mixin lists {
+  ul {
+
+    ::marker {
+      font-size: 1.2em;
+    }
+
+    &.chapter-intro-bullets {
+      font-family: $font-mourich;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+
+    li {
+      margin-bottom: 0;
+      line-height: 1.1;
+    }
+  }
+}

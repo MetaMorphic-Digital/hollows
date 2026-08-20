@@ -3,5 +3,6 @@
 
 .#{$packageCssClass}-wrapper.journal-sheet .journal-entry-content {
   @include headers;
+  @include lists;
   @include text;
 }
