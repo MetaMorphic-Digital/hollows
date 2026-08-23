@@ -1,0 +1,14 @@
+@use "../variables" as *;
+
+@mixin asides {
+  aside {
+    float: right;
+    width: 240px;
+    margin-left: 1em;
+
+    h4.isles-heading {
+      font-family: $font-feliz-en-vista-alt;
+      font-size: 1rem;
+    }
+  }
+}
