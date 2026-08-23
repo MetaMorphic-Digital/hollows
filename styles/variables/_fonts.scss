@@ -166,3 +166,12 @@ $-misc-prefix: "#{$-font-prefix}/misc";
 }
 
 $font-bell: "Bell MT", sans-serif;
+
+@font-face {
+  font-family: "Go Around The Books";
+  src: url("#{$-misc-prefix}/Go-Around-The-Books.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+$font-go-around-the-books: "Go Around The Books", sans-serif;

@@ -21,8 +21,10 @@ $-non-gutter-aside-classes: ("outcome-table");
 
 @mixin asides {
   aside {
+    color: white;
+
     * {
-      color: white;
+      color: inherit;
       font-weight: 500;
     }
 
@@ -35,6 +37,13 @@ $-non-gutter-aside-classes: ("outcome-table");
       * {
         color: unset;
       }
+    }
+
+    &.malignancy-box {
+      color: black;
+      font-family: $font-go-around-the-books;
+
+      transform: rotate(4deg);
     }
   }
 }
