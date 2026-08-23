@@ -6,6 +6,7 @@
   @include asides;
   @include headers;
   @include lists;
+  @include tables;
   @include text;
 
   background-image: url('#{$assetsPrefix}/art/intro-page-bg-right.webp');
