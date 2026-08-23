@@ -2,9 +2,10 @@
 
 @mixin asides {
   aside {
-    float: right;
-    width: 240px;
-    margin-left: 1em;
+    * {
+      color: white;
+      font-weight: 500;
+    }
 
     h4.isles-heading {
       font-family: $font-feliz-en-vista-alt;
