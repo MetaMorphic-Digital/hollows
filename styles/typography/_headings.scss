@@ -8,9 +8,19 @@
   h1 {
     font-family: $font-mourich;
 
+    &.book-number {
+      width: fit-content;
+
+      text-transform: uppercase;
+      font-size: 2.5rem;
+      line-height: 0.9;
+
+      border-block-end: 3px solid;
+    }
+
     &.chapter-title {
-    font-size: 3rem;
-    text-transform: uppercase;
+      font-size: 3rem;
+      text-transform: uppercase;
 
       &::first-letter {
         font-size: 2em;
