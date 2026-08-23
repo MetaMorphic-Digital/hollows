@@ -2,6 +2,7 @@
 
 @mixin lists {
   ul {
+    margin-block: 0;
 
     ::marker {
       font-size: 1.2em;

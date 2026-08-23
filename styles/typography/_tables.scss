@@ -53,6 +53,12 @@
             background-color: $color;
           }
         }
+
+      }
+
+      // Removes top border from second row, first column.
+      tr:nth-child(2) td:first-child {
+        border-top: none;
       }
     }
   }
