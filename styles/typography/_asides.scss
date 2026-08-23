@@ -1,5 +1,24 @@
 @use "../variables" as *;
 
+/// List of `<aside>` classes that should not live in the gutter.
+$-non-gutter-aside-classes: ("outcome-table");
+
+/// Return a single selector for all non-gutter `<aside>` elements, defined
+/// in the list above.
+/// @requires $-non-gutter-aside-classes
+/// @returns {String} Comma separated CSS selector
+@function non-gutter-aside-selectors() {
+  $selector: "";
+  @each $class in $-non-gutter-aside-classes {
+    @if $selector != "" {
+      $selector: "#{$selector}, .#{$class}";
+    } @else {
+      $selector: ".#{$class}";
+    }
+  }
+  @return $selector;
+}
+
 @mixin asides {
   aside {
     * {
@@ -10,6 +29,12 @@
     h4.isles-heading {
       font-family: $font-feliz-en-vista-alt;
       font-size: 1rem;
+    }
+
+    &.outcome-table {
+      * {
+        color: unset;
+      }
     }
   }
 }
