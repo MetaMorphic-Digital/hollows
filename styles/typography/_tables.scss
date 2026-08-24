@@ -25,7 +25,7 @@
     }
 
     thead th {
-      color: #44556a;
+      color: $color-crit-success;
       font-family: $font-cobblestone;
       font-size: 1.25rem;
       text-align: start;
@@ -36,7 +36,7 @@
     }
 
     tbody {
-      $color-list: (#788990, #788990, #44556a, #493d71, #5b3152);
+      $color-list: ($color-success, $color-success, $color-crit-success, $color-failure, $color-crit-failure);
 
       @for $i from 1 through list.length($color-list) {
         $color: list.nth($color-list, $i);

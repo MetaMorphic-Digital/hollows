@@ -18,13 +18,13 @@
   background-repeat: no-repeat;
 
   .journal-header {
-    background-color: #0B0600;
+    background-color: $color-book-intro;
     margin: 0;
     padding: 16px;
 
     input {
       color: white;
-      background-color: #1d1813b9;
+      background-color: rgba(29, 24, 19, 0.75);
     }
   }
 
