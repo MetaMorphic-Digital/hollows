@@ -1,6 +1,7 @@
 @use '../typography/asides';
 @use '../typography' as *;
 @use '../variables' as *;
+@use '../custom-elements' as *;
 
 .#{$packageCssClass}-wrapper.journal-sheet .journal-entry-content {
   @include asides;
@@ -8,34 +9,60 @@
   @include lists;
   @include tables;
   @include text;
+  @include book-intro;
+
 
   background-image: url('#{$assetsPrefix}/art/intro-page-bg-right.webp');
   background-position: right top;
   background-size: cover;
   background-repeat: no-repeat;
 
+  .journal-header {
+    background-color: #0B0600;
+    margin: 0;
+    padding: 16px;
+
+    input {
+      color: white;
+      background-color: #1d1813b9;
+    }
+  }
+
+  .journal-entry-pages {
+    margin: 0;
+    padding: 0;
+  }
+
   .journal-page-content {
     // Create two columns for the content to inhabit.
     // The lane on the left is the `main` column, used for the main content of the document.
     // The lane on the right is the `gutter` column. By default, `<aside>` elements go here.
     display: grid;
-    grid-template-columns: 1fr 23%;
-    column-gap: 6%;
+    grid-template-columns: 1fr 25%;
+    column-gap: 10%;
 
-    margin-left: 5%;
+    margin-left: 8.5%;
 
     > * { grid-column: 1; }
 
+    $-padding-right: 16px;
     > aside:not(#{non-gutter-aside-selectors()}) {
       grid-column: 2;
       font-size: 0.9em;
+      padding-right: $-padding-right;
     }
 
     // Helper classes which can be manually applied to elements which need to go in a specific lane.
     .column {
       &-main { grid-column: 1; }
-      &-gutter { grid-column: 2; }
-      &-both { grid-column: 1 / -1; }
+      &-gutter {
+        grid-column: 2;
+        padding-right: $-padding-right;
+      }
+      &-both {
+        grid-column: 1 / -1;
+        padding-right: $-padding-right;
+      }
     }
   }
 }
