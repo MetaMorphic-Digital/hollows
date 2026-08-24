@@ -24,8 +24,19 @@
   }
 
   strong {
-    &.stat {
+    &.stat,
+    &.color-stat {
       color: $color-stat;
+      font-weight: 800;
+    }
+
+    &.color-crit-failure {
+      color: $color-crit-failure;
+      font-weight: 800;
+    }
+
+    &.color-failure {
+      color: $color-failure;
       font-weight: 800;
     }
   }
