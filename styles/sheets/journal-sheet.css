@@ -1,0 +1,55 @@
+.hollows.journal-sheet .journal-entry-content {
+  background-image: url("systems/hollows/assets/art/intro-page-bg-right.webp");
+  background-position: right top;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  .journal-header {
+    background-color: var(--hollows-color-book-intro);
+    margin: 0;
+    padding: 16px;
+
+    input {
+      color: white;
+      background-color: rgba(29, 24, 19, 0.75);
+    }
+  }
+
+  .journal-entry-pages {
+    margin: 0;
+    padding: 0;
+  }
+
+  .journal-page-content {
+    /* Create two columns for the content to inhabit. */
+    /* The lane on the left is the `main` column, used for the main content of the document. */
+    /* The lane on the right is the `gutter` column. By default, `<aside>` elements go here. */
+    display: grid;
+    grid-template-columns: 1fr 25%;
+    column-gap: 10%;
+
+    margin-left: 8.5%;
+
+    > * { grid-column: 1; }
+
+    --journal-padding-right: 16px;
+    > aside:not(.outcome-table) {
+      grid-column: 2;
+      font-size: 0.9em;
+      padding-right: var(--journal-padding-right);
+    }
+
+    /* Helper classes which can be manually applied to elements which need to go in a specific lane. */
+    .column {
+      &-main { grid-column: 1; }
+      &-gutter {
+        grid-column: 2;
+        padding-right: var(--journal-padding-right);
+      }
+      &-both {
+        grid-column: 1 / -1;
+        padding-right: var(--journal-padding-right);
+      }
+    }
+  }
+}

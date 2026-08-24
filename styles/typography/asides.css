@@ -1,0 +1,53 @@
+.hollows {
+  aside {
+    color: white;
+
+    * {
+      color: inherit;
+      font-weight: 500;
+    }
+
+    &.inline {
+      background-color: var(--hollows-color-default-aside-bg);
+      mask-size: 100% 100%;
+      mask-repeat: no-repeat;
+
+      &.big {
+        padding: 10px 30px;
+        margin-block: 8px;
+        mask-image: url("systems/hollows/assets/art/big-sidebar.webp");
+      }
+
+      &.small {
+        padding: 10px 30px;
+        margin-block: 8px;
+        mask-image: url("systems/hollows/assets/art/small-sidebar.webp");
+      }
+
+      &.smallest {
+        padding: 10px 30px;
+        margin-block: 8px;
+        mask-image: url("systems/hollows/assets/art/smallest-sidebar.webp");
+      }
+
+    }
+
+    h4.isles-heading {
+      font-family: var(--hollows-font-feliz-en-vista-alt);
+      font-size: 1rem;
+    }
+
+    &.outcome-table {
+      * {
+        color: unset;
+      }
+    }
+
+    &.malignancy-box {
+      color: black;
+      font-family: var(--hollows-font-go-around-the-books);
+
+      transform: rotate(4deg);
+    }
+  }
+}

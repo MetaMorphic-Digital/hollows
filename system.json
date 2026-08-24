@@ -16,8 +16,7 @@
     "main.mjs"
   ],
   "styles": [
-    "main.css",
-    "public/hollows.css"
+    "main.css"
   ],
   "packs": [
     {
@@ -83,8 +82,7 @@
       "paths": [
         "lang",
         "styles",
-        "templates",
-        "public/hollows.css"
+        "templates"
       ]
     }
   }

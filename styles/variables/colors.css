@@ -1,0 +1,14 @@
+:root {
+  --hollows-color-success: #788990;
+  --hollows-color-crit-success: #44556a;
+  --hollows-color-failure: #493d71;
+  --hollows-color-crit-failure: #5b3152;
+
+  --hollows-color-stat: #0c8575;
+
+  --hollows-color-book-intro: #0B0600;
+  --hollows-color-book-intro-text: #f6f1e8;
+
+  --hollows-color-hazard: #044f53;
+  --hollows-color-default-aside-bg: #47362D;
+}

@@ -1,32 +1,29 @@
-@use './variables' as *;
+.hollows {
+  --mask-bottom: linear-gradient(black calc(100% - 18px), transparent 100%);
 
-@mixin mask-bottom {
-  mask-image: linear-gradient(black calc(100% - 18px), transparent 100%);
-}
-
-@mixin book-intro {
-  $negative-margin: 10%;
+  --book-intro-margin: 10%;
+  --book-intro-margin-neg: calc(var(--book-intro-margin) * -1);
 
   img.chapter-header {
     grid-column: 1 / -1 !important;
 
-    margin-left: -$negative-margin;
-    margin-right: -$negative-margin;
-    min-width: calc(100% + $negative-margin);
+    margin-left: var(--book-intro-margin-neg);
+    margin-right: var(--book-intro-margin-neg);
+    min-width: calc(100% + var(--book-intro-margin));
     z-index: 2;
 
-    @include mask-bottom;
+    mask-image: var(--mask-bottom);
   }
 
   .book-intro-container {
     grid-column: 1 / -1 !important;
-    background-color: $color-book-intro;
+    background-color: var(--hollows-color-book-intro);
     margin-top: -20px;
-    margin-left: -$negative-margin;
+    margin-left: var(--book-intro-margin-neg);
 
     padding: 24px;
 
-    @include mask-bottom;
+    mask-image: var(--mask-bottom);
 
     *, h2 {
       color: white;
@@ -44,13 +41,13 @@
 
     h2.book-heading {
       color: white;
-      font-family: $font-mourich;
+      font-family: var(--hollows-font-mourich);
       font-size: 4rem;
       text-transform: uppercase;
     }
 
     h3.chapter-intro-subheading {
-      font-family: $font-mourich;
+      font-family: var(--hollows-font-mourich);
       font-weight: bold;
       text-transform: uppercase;
       font-variant: no-common-ligatures;
@@ -59,7 +56,7 @@
     }
 
     blockquote.chapter-intro-poem {
-      font-family: $font-bell;
+      font-family: var(--hollows-font-bell);
       font-weight: bold;
 
       .stanza {

@@ -5,12 +5,9 @@
     "createSymlinks": "node tools/create-symlinks.mjs",
     "db:unpack": "node tools/pack-level-db.mjs package unpack",
     "db:pack": "node tools/pack-level-db.mjs package pack",
-    "dev": "npm run watch:style",
-    "build": "npm run db:pack && npm run build:code && npm run build:style",
+    "build": "npm run db:pack && npm run build:code",
     "build:code": "rollup --c tools/rollup.config.mjs",
-    "build:style": "sass ./styles/index.scss ./public/hollows.css",
-    "postinstall": "npm run createSymlinks",
-    "watch:style": "sass ./styles/index.scss ./public/hollows.css --watch"
+    "postinstall": "npm run createSymlinks"
   },
   "browserslist": [
     "last 3 versions"
@@ -28,7 +25,6 @@
     "postcss-import": "^16.1.0",
     "rollup": "^4.59.0",
     "rollup-plugin-postcss": "^4.0.2",
-    "sass": "^1.102.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1"
   }
