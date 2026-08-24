@@ -3,6 +3,16 @@
 
 @mixin tables {
   .outcome-table {
+    background-color: rgba(34, 31, 15, 0.1);
+
+    $-negative-margin: 20px;
+    padding: 30px ($-negative-margin * 2 + 10px);
+    margin-left: -$-negative-margin;
+    margin-right: -$-negative-margin;
+    mask-image: url(#{$assetsPrefix}/art/big-sidebar2.webp);
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+
     p.hazard {
       color: $color-hazard;
     }
