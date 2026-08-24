@@ -29,17 +29,4 @@
       font-weight: 800;
     }
   }
-
-  blockquote.chapter-intro-poem {
-    font-family: $font-bell;
-    font-weight: bold;
-
-    .stanza {
-      margin-block: 0.5rem;
-
-      p {
-        margin-block: 0;
-      }
-    }
-  }
 }

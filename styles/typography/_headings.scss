@@ -8,16 +8,6 @@
   h1 {
     font-family: $font-mourich;
 
-    &.book-number {
-      width: fit-content;
-
-      text-transform: uppercase;
-      font-size: 2.5rem;
-      line-height: 0.9;
-
-      border-block-end: 3px solid;
-    }
-
     &.chapter-title {
       font-size: 3rem;
       text-transform: uppercase;
@@ -33,26 +23,10 @@
     font-family: $font-cobblestone-aged;
     font-size: 2rem;
     font-variant: small-caps;
-
-    &.book-heading {
-      color: white;
-      font-family: $font-mourich;
-      font-size: 4rem;
-      text-transform: uppercase;
-    }
   }
 
   h3 {
     font-family: $font-cobblestone;
     font-size: 1.25rem;
-
-    &.chapter-intro-subheading {
-      font-family: $font-mourich;
-      font-weight: bold;
-      text-transform: uppercase;
-      font-variant: no-common-ligatures;
-
-      margin-block-end: 0;
-    }
   }
 }
