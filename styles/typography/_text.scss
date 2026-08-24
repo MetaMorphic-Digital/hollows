@@ -29,4 +29,26 @@
       font-weight: 800;
     }
   }
+
+  a {
+    &.external-link,
+    &[href] {
+      color: $color-crit-success;
+      text-shadow: 0 0 4px white;
+    }
+
+    &.content-link,
+    &.entity-link {
+      text-decoration: underline;
+
+      background: none;
+      border: none;
+      padding: 0;
+
+      i {
+        display: none;
+      }
+    }
+  }
+
 }
