@@ -5,6 +5,7 @@
     "createSymlinks": "node tools/create-symlinks.mjs",
     "db:unpack": "node tools/pack-level-db.mjs package unpack",
     "db:pack": "node tools/pack-level-db.mjs package pack",
+    "dev": "rollup --c tools/rollup.config.mjs --watch",
     "build": "npm run db:pack && npm run build:code",
     "build:code": "rollup --c tools/rollup.config.mjs",
     "postinstall": "npm run createSymlinks"
