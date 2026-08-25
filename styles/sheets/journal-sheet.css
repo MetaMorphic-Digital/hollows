@@ -31,9 +31,15 @@
       /* The lane on the right is the `gutter` column. By default, `<aside>` elements go here. */
       display: grid;
       grid-template-columns: 1fr 25%;
-      column-gap: 10%;
+      column-gap: 4rem;
+      margin-left: 4rem;
 
-      margin-left: 8.5%;
+      /* If inside a slim journal, hide the second column. */
+      .hollows.slim & {
+        grid-template-columns: 1fr;
+
+        > * { grid-column: 1; }
+      }
 
       > * { grid-column: 1; }
 
@@ -42,6 +48,11 @@
         grid-column: 2;
         font-size: 0.9em;
         padding-right: var(--journal-padding-right);
+
+        /* If inside a slim journal, hide the second column. */
+        .hollows.slim & {
+          display: none;
+        }
       }
 
       /* Helper classes which can be manually applied to elements which need to go in a specific lane. */
@@ -49,6 +60,11 @@
       .column-gutter {
         grid-column: 2 !important;
         padding-right: var(--journal-padding-right);
+
+        /* If inside a slim journal, hide the second column. */
+        .hollows.slim & {
+          display: none;
+        }
       }
       .column-both {
         grid-column: 1 / -1 !important;
@@ -57,4 +73,3 @@
     }
   }
 }
-
