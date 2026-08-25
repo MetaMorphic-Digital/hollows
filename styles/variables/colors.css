@@ -1,4 +1,4 @@
-:root {
+@scope (.theme-light) to (.themed) {
   --hollows-color-success: #788990;
   --hollows-color-crit-success: #44556a;
   --hollows-color-failure: #493d71;
