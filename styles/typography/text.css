@@ -37,6 +37,10 @@
       color: var(--hollows-color-failure);
       font-weight: 800;
     }
+
+    &.keyword {
+      font-family: var(--hollows-font-cobblestone-aged);
+    }
   }
 
   a {
@@ -58,5 +62,9 @@
         display: none;
       }
     }
+  }
+
+  .small-caps {
+    font-variant: small-caps;
   }
 }

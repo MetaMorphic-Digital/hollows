@@ -45,13 +45,13 @@
       }
 
       /* Helper classes which can be manually applied to elements which need to go in a specific lane. */
-      .column-main { grid-column: 1; }
+      .column-main { grid-column: 1 !important; }
       .column-gutter {
-        grid-column: 2;
+        grid-column: 2 !important;
         padding-right: var(--journal-padding-right);
       }
       .column-both {
-        grid-column: 1 / -1;
+        grid-column: 1 / -1 !important;
         padding-right: var(--journal-padding-right);
       }
     }
