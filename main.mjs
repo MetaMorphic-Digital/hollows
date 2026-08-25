@@ -93,13 +93,11 @@ function registerSheets() {
   const { Actor, Item, JournalEntry } = foundry.documents;
   const { DocumentSheetConfig } = foundry.applications.apps;
 
-  const register = (documentClass, SheetClass, types = []) => {
-    DocumentSheetConfig.registerSheet(
-      documentClass,
-      hollows.id,
-      SheetClass,
-      { types, makeDefault: true },
-    );
+  const register = (documentClass, SheetClass, types = [], themes = true) => {
+    const options = { types, makeDefault: true };
+    if (!themes) options.themes = null;
+
+    DocumentSheetConfig.registerSheet(documentClass, hollows.id, SheetClass, options);
   };
 
   // Register actor sheets.
@@ -122,7 +120,7 @@ function registerSheets() {
   register(Item, applications.sheets.items.HollowsWeaponSheet, ["weapon"]);
 
   // Register journal entry sheets.
-  register(JournalEntry, applications.sheets.journals.HollowsJournalEntrySheet);
+  register(JournalEntry, applications.sheets.journals.HollowsJournalEntrySheet, [], false);
 }
 
 /* -------------------------------------------------- */
