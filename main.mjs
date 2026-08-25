@@ -90,15 +90,15 @@ function registerSubtypes() {
  * Register document sheets.
  */
 function registerSheets() {
-  const { Actor, Item } = foundry.documents;
+  const { Actor, Item, JournalEntry } = foundry.documents;
   const { DocumentSheetConfig } = foundry.applications.apps;
 
-  const register = (documentClass, SheetClass, types) => {
+  const register = (documentClass, SheetClass, types = []) => {
     DocumentSheetConfig.registerSheet(
       documentClass,
       hollows.id,
       SheetClass,
-      { types },
+      { types, makeDefault: true },
     );
   };
 
@@ -121,13 +121,8 @@ function registerSheets() {
   register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weaponAbility"]);
   register(Item, applications.sheets.items.HollowsWeaponSheet, ["weapon"]);
 
-  // Register Journal Sheet
-  DocumentSheetConfig.registerSheet(
-    foundry.documents.JournalEntry,
-    hollows.id,
-    applications.sheets.HollowsJournalEntrySheet,
-    { makeDefault: true },
-  );
+  // Register journal entry sheets.
+  register(JournalEntry, applications.sheets.journals.HollowsJournalEntrySheet);
 }
 
 /* -------------------------------------------------- */
