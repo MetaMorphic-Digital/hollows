@@ -1,4 +1,4 @@
-.hollows {
+.hollows.journal-sheet {
   --mask-bottom: linear-gradient(black calc(100% - 18px), transparent 100%);
 
   --book-intro-margin: 10%;

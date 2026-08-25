@@ -5,12 +5,12 @@
 
     background-color: rgba(34, 31, 15, 0.1);
 
-    padding: 30px (var(--outcome-table-margin) * 2 + 10px);
+    padding: 30px calc(var(--outcome-table-margin) * 2 + 10px);
 
     margin-left: var(--outcome-table-margin-neg);
     margin-right: var(--outcome-table-margin-neg);
 
-    mask-image: url("systems/hollows/assets/art/big-sidebar.webp");
+    mask-image: url("/systems/hollows/assets/art/big-sidebar.webp");
     mask-size: 100% 100%;
     mask-repeat: no-repeat;
 
@@ -54,15 +54,15 @@
       tbody {
         tr:nth-child(1),
         tr:nth-child(2) {
-          color: var(--color-success);
+          color: var(--hollows-color-success);
 
           td {
-            border-top: var(--color-success) solid 4px;
+            border-top: var(--hollows-color-success) solid 4px;
           }
 
           td:last-child {
             color: white;
-            background-color: var(--color-success);
+            background-color: var(--hollows-color-success);
           }
         }
 
@@ -72,41 +72,41 @@
         }
 
         tr:nth-child(3) {
-          color: var(--color-crit-success);
+          color: var(--hollows-color-crit-success);
 
           td {
-            border-top: var(--color-crit-success) solid 4px;
+            border-top: var(--hollows-color-crit-success) solid 4px;
           }
 
           td:last-child {
             color: white;
-            background-color: var(--color-crit-success);
+            background-color: var(--hollows-color-crit-success);
           }
         }
 
         tr:nth-child(4) {
-          color: var(--color-failure);
+          color: var(--hollows-color-failure);
 
           td {
-            border-top: var(--color-failure) solid 4px;
+            border-top: var(--hollows-color-failure) solid 4px;
           }
 
           td:last-child {
             color: white;
-            background-color: var(--color-failure);
+            background-color: var(--hollows-color-failure);
           }
         }
 
         tr:nth-child(5) {
-          color: var(--color-crit-failure);
+          color: var(--hollows-color-crit-failure);
 
           td {
-            border-top: var(--color-crit-failure) solid 4px;
+            border-top: var(--hollows-color-crit-failure) solid 4px;
           }
 
           td:last-child {
             color: white;
-            background-color: var(--color-crit-failure);
+            background-color: var(--hollows-color-crit-failure);
           }
         }
       }

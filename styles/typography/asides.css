@@ -15,19 +15,19 @@
       &.big {
         padding: 10px 30px;
         margin-block: 8px;
-        mask-image: url("systems/hollows/assets/art/big-sidebar.webp");
+        mask-image: url("/systems/hollows/assets/art/big-sidebar.webp");
       }
 
       &.small {
         padding: 10px 30px;
         margin-block: 8px;
-        mask-image: url("systems/hollows/assets/art/small-sidebar.webp");
+        mask-image: url("/systems/hollows/assets/art/small-sidebar.webp");
       }
 
       &.smallest {
         padding: 10px 30px;
         margin-block: 8px;
-        mask-image: url("systems/hollows/assets/art/smallest-sidebar.webp");
+        mask-image: url("/systems/hollows/assets/art/smallest-sidebar.webp");
       }
 
     }
