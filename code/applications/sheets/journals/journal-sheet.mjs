@@ -30,12 +30,4 @@ export default class HollowsJournalEntrySheet extends JournalEntrySheet {
     options.fixed ??= true;
     return super._createContextMenu(handler, selector, options);
   }
-
-  /* -------------------------------------------------- */
-
-  /** @inheritdoc */
-  _onPosition(position) {
-    super._onPosition(position);
-    if (Number.isFinite(position.width)) this.element.classList.toggle("slim", position.width < 850);
-  }
 }
