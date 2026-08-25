@@ -187,5 +187,7 @@
       "weapon": "Weapon",
       "weaponAbility": "Weapon Ability"
     }
-  }
+  },
+
+  "hollows.HollowsJournalEntrySheet": "Hollows - Journal Entry Sheet"
 }

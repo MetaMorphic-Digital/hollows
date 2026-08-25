@@ -120,6 +120,14 @@ function registerSheets() {
   register(Item, applications.sheets.items.HollowsRumourSheet, ["rumour"]);
   register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weaponAbility"]);
   register(Item, applications.sheets.items.HollowsWeaponSheet, ["weapon"]);
+
+  // Register Journal Sheet
+  DocumentSheetConfig.registerSheet(
+    foundry.documents.JournalEntry,
+    hollows.id,
+    applications.sheets.HollowsJournalEntrySheet,
+    { makeDefault: true },
+  );
 }
 
 /* -------------------------------------------------- */
