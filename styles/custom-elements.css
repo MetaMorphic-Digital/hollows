@@ -1,15 +1,15 @@
-.hollows.journal-sheet {
+.hollows.journal-sheet .journal-entry-content {
   --mask-bottom: linear-gradient(black calc(100% - 18px), transparent 100%);
   --book-intro-margin: 10%;
   --book-intro-margin-neg: calc(var(--book-intro-margin) * -1);
 
   img.chapter-header {
     grid-column: 1 / -1 !important;
-
-    margin-left: var(--book-intro-margin-neg);
-    margin-right: var(--book-intro-margin-neg);
     min-width: calc(100% + var(--book-intro-margin));
     z-index: 2;
+
+    padding: 0;
+    margin-inline: var(--book-intro-margin-neg);
 
     mask-image: var(--mask-bottom);
   }
