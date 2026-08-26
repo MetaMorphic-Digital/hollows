@@ -15,7 +15,7 @@ limitations under the License.
 ## [License Notice](https://github.com/MetaMorphic-Digital/hollows/blob/main/readme.md)
 
 Hollows, all unique characters, creatures, and locations, artwork, logos, and
-the Rowan, Rook and Decard logo are © 2025 Rowan, Rook and Decard Ltd.
+the Rowan, Rook and Decard logo are © 2026 Rowan, Rook and Decard Ltd.
 The Hollows system for Foundry Virtual Tabletop is published by MetaMorphic
 Digital under license from Rowan, Rook and Decard Ltd. The Apache License
 applies to the source code of this system and does not grant any rights to the
