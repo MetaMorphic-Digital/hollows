@@ -5,11 +5,40 @@
 
   .journal-entry-content {
     container: journal / inline-size;
+    position: relative;
+    isolation: isolate;
+    z-index: 0;
 
-    background-image: url("/systems/hollows/assets/art/intro-page-bg-right.webp");
-    background-position: right top;
-    background-size: cover;
-    background-repeat: no-repeat;
+    /* All of this to transition background images depending on size of window */
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+
+      background-repeat: no-repeat;
+    }
+
+    &::before {
+      z-index: -2;
+
+      background-image: url("/systems/hollows/assets/art/intro-page-bg-right.webp");
+      background-position: right top;
+      background-size: cover;
+    }
+
+    &::after {
+      z-index: -1;
+      background-image: url("/systems/hollows/assets/art/page-bg-blank.webp");
+      background-size: 100% 100%;
+
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+
+      @container journal (width < 550px) {
+        opacity: 1;
+      }
+    }
 
     .journal-header {
       background-color: var(--hollows-color-book-intro);
