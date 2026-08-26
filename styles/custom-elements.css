@@ -1,68 +1,67 @@
 .hollows.journal-sheet .journal-entry-content {
-  --mask-bottom: linear-gradient(black calc(100% - 18px), transparent 100%);
-  --book-intro-margin: 12%;
-  --book-intro-margin-neg: calc(var(--book-intro-margin) * -1);
+  .book-intro-container {
+    --mask-fade: linear-gradient(transparent 0%, black 18px, black calc(100% - 18px), transparent 100%);
+    --book-intro-margin: 12%;
+    --book-intro-margin-neg: calc(var(--book-intro-margin) * -1);
 
-  img.chapter-header {
-    grid-column: 1 / -1 !important;
-    min-width: calc(100% + var(--book-intro-margin) * 2);
-    z-index: 2;
-
-    mask-image: var(--mask-bottom);
-
-    padding: 0;
-    margin-inline: var(--book-intro-margin-neg);
-  }
-
-  .book-intro {
     grid-column: 1 / -1 !important;
 
-    background-color: var(--hollows-color-book-intro);
-    mask-image: var(--mask-bottom);
+    img.chapter-header {
+      min-width: calc(100% + var(--book-intro-margin) * 2);
 
-    margin-top: -20px;
-    margin-inline: var(--book-intro-margin-neg);
-    padding: 28px;
-
-    *, h2 {
-      color: white;
+      padding: 0;
+      margin-inline: var(--book-intro-margin-neg);
     }
 
-    h1.book-number {
-      width: fit-content;
+    .book-intro {
+      width: calc(100% + var(--book-intro-margin) * 2);
+      background-color: var(--hollows-color-book-intro);
+      mask-image: var(--mask-fade);
 
-      text-transform: uppercase;
-      font-size: 2.5rem;
-      line-height: 0.9;
+      margin-top: -20px;
+      margin-inline: var(--book-intro-margin-neg);
+      padding: 48px;
 
-      border-block-end: 3px solid;
-    }
+      *, h2 {
+        color: white;
+      }
 
-    h2.book-heading {
-      color: white;
-      font-family: var(--hollows-font-mourich);
-      font-size: 4rem;
-      text-transform: uppercase;
-    }
+      h1.book-number {
+        width: fit-content;
 
-    h3.chapter-intro-subheading {
-      font-family: var(--hollows-font-mourich);
-      font-weight: bold;
-      text-transform: uppercase;
-      font-variant: no-common-ligatures;
+        text-transform: uppercase;
+        font-size: 2.5rem;
+        line-height: 0.9;
 
-      margin-block-end: 0;
-    }
+        border-block-end: 3px solid;
+      }
 
-    blockquote.chapter-intro-poem {
-      font-family: var(--hollows-font-bell);
-      font-weight: bold;
+      h2.book-heading {
+        color: white;
+        font-family: var(--hollows-font-mourich);
+        font-size: 4rem;
+        text-transform: uppercase;
+      }
 
-      .stanza {
-        margin-block: 0.5rem;
+      h3.chapter-intro-subheading {
+        font-family: var(--hollows-font-mourich);
+        font-weight: bold;
+        text-transform: uppercase;
+        font-variant: no-common-ligatures;
 
-        p {
-          margin-block: 0;
+        margin-block-end: 0;
+      }
+
+      blockquote.chapter-intro-poem {
+        font-family: var(--hollows-font-bell);
+        font-weight: bold;
+
+        .stanza {
+          margin-block: 0.5rem;
+
+          p {
+            margin-block: 0;
+          }
         }
       }
     }
