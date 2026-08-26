@@ -70,6 +70,7 @@
   },
   "url": "https://github.com/MetaMorphic-Digital/hollows",
   "manifest": "https://github.com/MetaMorphic-Digital/hollows/releases/latest/download/system.json",
+  "license": "https://github.com/MetaMorphic-Digital/hollows/blob/main/LICENSE.md",
   "download": "",
   "bugs": "https://github.com/MetaMorphic-Digital/hollows/issues",
   "flags": {
