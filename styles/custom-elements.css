@@ -1,28 +1,28 @@
 .hollows.journal-sheet .journal-entry-content {
   --mask-bottom: linear-gradient(black calc(100% - 18px), transparent 100%);
-  --book-intro-margin: 10%;
+  --book-intro-margin: 12%;
   --book-intro-margin-neg: calc(var(--book-intro-margin) * -1);
 
   img.chapter-header {
     grid-column: 1 / -1 !important;
-    min-width: calc(100% + var(--book-intro-margin));
+    min-width: calc(100% + var(--book-intro-margin) * 2);
     z-index: 2;
+
+    mask-image: var(--mask-bottom);
 
     padding: 0;
     margin-inline: var(--book-intro-margin-neg);
-
-    mask-image: var(--mask-bottom);
   }
 
-  .book-intro-container {
+  .book-intro {
     grid-column: 1 / -1 !important;
+
     background-color: var(--hollows-color-book-intro);
-    margin-top: -20px;
-    margin-left: var(--book-intro-margin-neg);
-
-    padding: 24px;
-
     mask-image: var(--mask-bottom);
+
+    margin-top: -20px;
+    margin-inline: var(--book-intro-margin-neg);
+    padding: 28px;
 
     *, h2 {
       color: white;

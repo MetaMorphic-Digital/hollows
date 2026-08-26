@@ -49,5 +49,26 @@
 
       transform: rotate(4deg);
     }
+
+    @container journal (width < 550px) {
+      font-size: 0.9em;
+      background-color: var(--hollows-color-default-aside-bg);
+
+      mask-image: url("/systems/hollows/assets/art/big-sidebar.webp");
+      mask-size: 100% 100%;
+      mask-repeat: no-repeat;
+
+      padding: 24px 48px !important;
+      margin-block: 12px;
+
+      &.malignancy-box {
+        color: white;
+      }
+
+      a {
+        color: white !important;
+        text-shadow: none !important;
+      }
+    }
   }
 }
