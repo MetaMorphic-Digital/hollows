@@ -27,4 +27,9 @@
     font-family: var(--hollows-font-cobblestone);
     font-size: 1.25rem;
   }
+
+  h4 {
+    font-family: var(--hollows-font-cobblestone-aged);
+    text-transform: uppercase;
+  }
 }
