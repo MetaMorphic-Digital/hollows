@@ -28,6 +28,7 @@ Hooks.once("init", () => {
   registerSubtypes();
   registerSheets();
   registerSidebars();
+  registerFonts();
 });
 
 /* -------------------------------------------------- */
@@ -89,16 +90,14 @@ function registerSubtypes() {
  * Register document sheets.
  */
 function registerSheets() {
-  const { Actor, Item } = foundry.documents;
+  const { Actor, Item, JournalEntry } = foundry.documents;
   const { DocumentSheetConfig } = foundry.applications.apps;
 
-  const register = (documentClass, SheetClass, types) => {
-    DocumentSheetConfig.registerSheet(
-      documentClass,
-      hollows.id,
-      SheetClass,
-      { types },
-    );
+  const register = (documentClass, SheetClass, types = [], themes = true) => {
+    const options = { types, makeDefault: true };
+    if (!themes) options.themes = null;
+
+    DocumentSheetConfig.registerSheet(documentClass, hollows.id, SheetClass, options);
   };
 
   // Register actor sheets.
@@ -119,6 +118,9 @@ function registerSheets() {
   register(Item, applications.sheets.items.HollowsRumourSheet, ["rumour"]);
   register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weaponAbility"]);
   register(Item, applications.sheets.items.HollowsWeaponSheet, ["weapon"]);
+
+  // Register journal entry sheets.
+  register(JournalEntry, applications.sheets.journals.HollowsJournalEntrySheet, [], false);
 }
 
 /* -------------------------------------------------- */
@@ -128,4 +130,90 @@ function registerSheets() {
  */
 function registerSidebars() {
   CONFIG.ui.combat = applications.sidebar.HollowsCombatTracker;
+}
+
+/* ------------------------------------------------- */
+
+/**
+ * Register fonts.
+ */
+function registerFonts() {
+  const fontPath = `systems/${hollows.id}/assets/fonts`;
+
+  Object.assign(CONFIG.fontDefinitions, {
+    /* -------------------- Shallot -------------------- */
+    Shallot: {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/shallot/Shallot-Regular.otf`], weight: "normal", style: "normal" },
+        { urls: [`${fontPath}/shallot/Shallot-Italic.otf`], weight: "normal", style: "italic" },
+        { urls: [`${fontPath}/shallot/Shallot-Medium.otf`], weight: 500, style: "normal" },
+        { urls: [`${fontPath}/shallot/Shallot-MediumItalic.otf`], weight: 500, style: "italic" },
+        { urls: [`${fontPath}/shallot/Shallot-Bold.otf`], weight: "bold", style: "normal" },
+        { urls: [`${fontPath}/shallot/Shallot-BoldItalic.otf`], weight: "bold", style: "italic" },
+        { urls: [`${fontPath}/shallot/Shallot-ExtraBold.otf`], weight: 800, style: "normal" },
+        { urls: [`${fontPath}/shallot/Shallot-ExtraBoldItalic.otf`], weight: 800, style: "italic" },
+      ],
+    },
+    "Shallot Variable": {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/shallot/ShallotVariable-Regular.ttf`], weight: "normal", style: "normal" },
+        { urls: [`${fontPath}/shallot/ShallotVariable-Italic.ttf`], weight: "normal", style: "italic" },
+      ],
+    },
+
+    /* -------------------- Mourich -------------------- */
+    Mourich: {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/mourich/Mourich-Regular.otf`], weight: "normal", style: "normal" },
+        { urls: [`${fontPath}/mourich/Mourich-Bold.otf`], weight: "bold", style: "normal" },
+      ],
+    },
+
+    /* ------------------ Cobblestone ------------------ */
+    Cobblestone: {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/cobblestone/Cobblestone.ttf`], weight: "normal", style: "normal" },
+        { urls: [`${fontPath}/cobblestone/Cobblestone-Italic.ttf`], weight: "normal", style: "italic" },
+      ],
+    },
+    "Cobblestone Aged": {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/cobblestone/Cobblestone-Aged.ttf`], weight: "bold", style: "normal" },
+      ],
+    },
+
+    /* ----------------- Feliz en Vista ---------------- */
+    "Feliz en Vista": {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/feliz-en-vista/HVFelizenVista-Regular.ttf`], weight: "normal", style: "normal" },
+        { urls: [`${fontPath}/feliz-en-vista/HVFelizenVista-Bold.ttf`], weight: "bold", style: "normal" },
+      ],
+    },
+    "Feliz en Vista Alt": {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/feliz-en-vista/HVFelizenVista-Alternative.ttf`], weight: "normal", style: "normal" },
+      ],
+    },
+
+    /* ---------------------- Misc --------------------- */
+    "Bell MT": {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/misc/BellMTItalic.ttf`], weight: "normal", style: "italic" },
+      ],
+    },
+    "Go Around The Books": {
+      editor: true,
+      fonts: [
+        { urls: [`${fontPath}/misc/Go-Around-The-Books.ttf`], weight: "normal", style: "normal" },
+      ],
+    },
+  });
 }

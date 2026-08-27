@@ -1,0 +1,35 @@
+.hollows {
+  h1, h2 {
+    border-bottom: none;
+  }
+
+  h1 {
+    font-family: var(--hollows-font-mourich);
+
+    &.chapter-title {
+      font-size: 3rem;
+      text-transform: uppercase;
+
+      &::first-letter {
+        font-size: 2em;
+      }
+    }
+  }
+
+  h2 {
+    color: var(--hollows-color-crit-success);
+    font-family: var(--hollows-font-cobblestone-aged);
+    font-size: 2rem;
+    font-variant: small-caps;
+  }
+
+  h3 {
+    font-family: var(--hollows-font-cobblestone);
+    font-size: 1.25rem;
+  }
+
+  h4 {
+    font-family: var(--hollows-font-cobblestone-aged);
+    text-transform: uppercase;
+  }
+}

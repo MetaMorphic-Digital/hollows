@@ -1,0 +1,84 @@
+.hollows {
+  font-family: var(--hollows-font-shallot);
+  font-size: 1em;
+
+  p {
+    text-indent: 1em;
+    margin-block: 0.25rem;
+
+    &.no-indent {
+      text-indent: 0;
+    }
+
+    &.chapter-intro {
+      font-family: var(--hollows-font-mourich);
+      font-size: 1.2em;
+      font-weight: bold;
+      font-variant: small-caps no-common-ligatures;
+
+      text-indent: 0;
+      text-align: center;
+    }
+  }
+
+  i.choice-marker::before {
+    content: "";
+    display: inline-block;
+    mask-image: url("/systems/hollows/assets/art/choice-marker.svg");
+
+    --choice-marker-height: 1em;
+    width: 3.75em;
+    height: var(--choice-marker-height);
+
+    background-color: currentColor;
+
+    margin-bottom: calc(var(--choice-marker-height) * -0.25)
+  }
+
+  strong {
+    &.stat,
+    &.color-stat {
+      color: var(--hollows-color-stat);
+      font-weight: 800;
+    }
+
+    &.color-crit-failure {
+      color: var(--hollows-color-crit-failure);
+      font-weight: 800;
+    }
+
+    &.color-failure {
+      color: var(--hollows-color-failure);
+      font-weight: 800;
+    }
+
+    &.keyword {
+      font-family: var(--hollows-font-cobblestone-aged);
+    }
+  }
+
+  a {
+    &.external-link,
+    &[href] {
+      color: var(--hollows-color-crit-success);
+      text-shadow: 0 0 4px white;
+    }
+
+    &.content-link,
+    &.entity-link {
+      text-decoration: underline;
+
+      background: none;
+      border: none;
+      padding: 0;
+
+      i {
+        display: none;
+      }
+    }
+  }
+
+  .small-caps {
+    font-variant: small-caps;
+  }
+}

@@ -1,0 +1,110 @@
+.hollows.journal-sheet {
+  --journal-grid-collapse-threshold: 34.375rem;
+
+  .window-content {
+    flex-direction: row !important;
+  }
+
+  .journal-entry-content {
+    container: journal / inline-size;
+    position: relative;
+    isolation: isolate;
+    z-index: 0;
+
+    background-image: url("/systems/hollows/assets/art/journal-bg-blank.webp");
+    background-size: cover;
+
+    /* All of this to transition background images depending on size of window */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+
+      background-image:
+        url("/systems/hollows/assets/art/journal-bg-left.webp"),
+        url("/systems/hollows/assets/art/journal-bg-right.webp");
+      background-position: left, right;
+      background-size: 42rem auto;
+      background-repeat: repeat-y;
+
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+
+      @container journal (width < var(--journal-grid-collapse-threshold)) {
+        opacity: 0;
+      }
+    }
+
+    .journal-header {
+      background-color: var(--hollows-color-book-intro);
+      margin: 0;
+      padding: 16px;
+
+      input {
+        color: white;
+        background-color: rgba(29, 24, 19, 0.75);
+      }
+    }
+
+    .journal-entry-pages {
+      margin: 0;
+      padding: 0;
+    }
+
+    .journal-page-header {
+      margin-block-start: 16px;
+    }
+
+    .journal-page-content,
+    .journal-page-header {
+      margin-inline: 3.25rem 18px;
+    }
+
+    .journal-page-content {
+      /* Create two columns for the content to inhabit. */
+      /* The lane on the left is the `main` column, used for the main content of the document. */
+      /* The lane on the right is the `gutter` column. By default, `<aside>` elements go here. */
+      display: grid;
+      grid-template-columns: 1fr 8.375rem;
+      column-gap: 3rem;
+
+      > * { grid-column: 1; }
+
+      --journal-padding-right: 0;
+      > aside:not(.sidebar, .inline, .outcome-table) {
+        grid-column: 2;
+        font-size: 0.9em;
+      }
+
+      /* Helper classes which can be manually applied to elements which need to go in a specific lane. */
+      .column-main {
+        grid-column: 1 !important;
+      }
+
+      .column-gutter {
+        grid-column: 2 !important;
+      }
+
+      .column-both {
+        grid-column: 1 / -1 !important;
+      }
+    }
+
+    @container journal (width < var(--journal-grid-collapse-threshold)) {
+      .journal-page-content,
+      .journal-page-header {
+        margin-inline: 2.75rem;
+      }
+
+      .journal-page-content {
+        --book-intro-margin: 0;
+        grid-template-columns: 1fr;
+
+        > *, .column-gutter, .column-both {
+          grid-column: 1 !important;
+        }
+      }
+    }
+  }
+}

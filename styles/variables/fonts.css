@@ -1,0 +1,21 @@
+
+:root {
+  /* -------------------- Shallot -------------------- */
+  --hollows-font-shallot: "Shallot", sans-serif;
+  --hollows-font-shallot-variable: "Shallot Variable", "Shallot", sans-serif;
+
+  /* -------------------- Mourich -------------------- */
+  --hollows-font-mourich: "Mourich", sans-serif;
+
+  /* ------------------ Cobblestone ------------------ */
+  --hollows-font-cobblestone: "Cobblestone", sans-serif;
+  --hollows-font-cobblestone-aged: "Cobblestone Aged", "Cobblestone", sans-serif;
+
+  /* ----------------- Feliz en Vista ---------------- */
+  --hollows-font-feliz-en-vista: "Feliz en Vista", sans-serif;
+  --hollows-font-feliz-en-vista-alt: "Feliz en Vista Alt", "Feliz en Vista", sans-serif;
+
+  /* ----------------- Miscellaneous ----------------- */
+  --hollows-font-bell: "Bell MT", sans-serif;
+  --hollows-font-go-around-the-books: "Go Around The Books", sans-serif;
+}
