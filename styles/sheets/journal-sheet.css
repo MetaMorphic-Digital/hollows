@@ -52,6 +52,15 @@
       padding: 0;
     }
 
+    .journal-page-header {
+      margin-block-start: 16px;
+    }
+
+    .journal-page-content,
+    .journal-page-header {
+      margin-inline: 3.25rem 18px;
+    }
+
     .journal-page-content {
       /* Create two columns for the content to inhabit. */
       /* The lane on the left is the `main` column, used for the main content of the document. */
@@ -59,7 +68,6 @@
       display: grid;
       grid-template-columns: 1fr 8.375rem;
       column-gap: 3rem;
-      margin-inline: 3.25rem 18px;
 
       > * { grid-column: 1; }
 
@@ -81,16 +89,21 @@
       .column-both {
         grid-column: 1 / -1 !important;
       }
+    }
 
-      @container journal (width < var(--journal-grid-collapse-threshold)) {
+    @container journal (width < var(--journal-grid-collapse-threshold)) {
+      .journal-page-content,
+      .journal-page-header {
+        margin-inline: 2.75rem;
+      }
+
+      .journal-page-content {
         --book-intro-margin: 0;
         grid-template-columns: 1fr;
-        margin-inline: 2.75rem;
 
         > *, .column-gutter, .column-both {
           grid-column: 1 !important;
         }
-
       }
     }
   }
