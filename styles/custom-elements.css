@@ -1,7 +1,7 @@
 .hollows.journal-sheet .journal-entry-content {
   .book-intro-container {
     --mask-fade: linear-gradient(transparent 0%, black 18px, black calc(100% - 18px), transparent 100%);
-    --book-intro-margin: 12%;
+    --book-intro-margin: 4.375rem;
     --book-intro-margin-neg: calc(var(--book-intro-margin) * -1);
 
     grid-column: 1 / -1 !important;
@@ -20,7 +20,7 @@
 
       margin-top: -20px;
       margin-inline: var(--book-intro-margin-neg);
-      padding: 48px;
+      padding: 48px 72px 48px 64px;
 
       *, h2 {
         color: white;

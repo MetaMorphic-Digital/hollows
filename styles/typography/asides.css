@@ -50,7 +50,7 @@
       transform: rotate(4deg);
     }
 
-    @container journal (width < 550px) {
+    @container journal (width < var(--journal-grid-collapse-threshold)) {
       font-size: 0.9em;
       background-color: var(--hollows-color-default-aside-bg);
 
