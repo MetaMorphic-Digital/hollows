@@ -21,6 +21,20 @@
     }
   }
 
+  i.choice-marker::before {
+    content: "";
+    display: inline-block;
+    mask-image: url("/systems/hollows/assets/art/choice-marker.svg");
+
+    --choice-marker-height: 1em;
+    width: 3.75em;
+    height: var(--choice-marker-height);
+
+    background-color: currentColor;
+
+    margin-bottom: calc(var(--choice-marker-height) * -0.25)
+  }
+
   strong {
     &.stat,
     &.color-stat {
