@@ -40,6 +40,9 @@
     &.color-stat {
       color: var(--hollows-color-stat);
       font-weight: 800;
+      @container inline-aside {
+        color: var(--hollows-color-stat-alt);
+      }
     }
 
     &.color-crit-failure {
