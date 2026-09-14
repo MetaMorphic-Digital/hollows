@@ -11,6 +11,7 @@
       background-color: var(--hollows-color-default-aside-bg);
       mask-size: 100% 100%;
       mask-repeat: no-repeat;
+      container-name: inline-aside;
 
       &.big {
         padding: 48px;
