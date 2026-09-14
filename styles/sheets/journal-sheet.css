@@ -66,7 +66,7 @@
       /* The lane on the left is the `main` column, used for the main content of the document. */
       /* The lane on the right is the `gutter` column. By default, `<aside>` elements go here. */
       display: grid;
-      grid-template-columns: 1fr 8.375rem;
+      grid-template-columns: 1fr 7.375rem;
       column-gap: 3rem;
 
       > * { grid-column: 1; }
