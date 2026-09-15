@@ -1,6 +1,7 @@
 {
   "name": "hollows",
   "version": "1.0.0",
+  "license": "Apache-2.0",
   "scripts": {
     "createSymlinks": "node tools/create-symlinks.mjs",
     "db:unpack": "node tools/pack-level-db.mjs package unpack",
