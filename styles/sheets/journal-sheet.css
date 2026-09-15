@@ -1,5 +1,5 @@
 .hollows.journal-sheet {
-  --journal-grid-collapse-threshold: 34.375rem;
+  /*--journal-grid-collapse-threshold: 34.375rem;*/
 
   .window-content {
     flex-direction: row !important;
@@ -31,7 +31,7 @@
       opacity: 1;
       transition: opacity 0.3s ease-in-out;
 
-      @container journal (width < var(--journal-grid-collapse-threshold)) {
+      @container journal (width < 34.375rem) {
         opacity: 0;
       }
     }
@@ -91,7 +91,7 @@
       }
     }
 
-    @container journal (width < var(--journal-grid-collapse-threshold)) {
+    @container journal (width < 34.375rem) {
       .journal-page-content,
       .journal-page-header {
         margin-inline: 2.75rem;
@@ -104,6 +104,10 @@
         > *, .column-gutter, .column-both {
           grid-column: 1 !important;
         }
+      }
+
+      aside:not(.inline) {
+        color: var(--color-text-primary);
       }
     }
   }
