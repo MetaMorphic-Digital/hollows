@@ -37,6 +37,7 @@
       font-family: var(--hollows-font-feliz-en-vista-alt);
       font-size: 1rem;
       text-transform: none;
+      margin-top: 1em;
     }
 
     &.outcome-table {
