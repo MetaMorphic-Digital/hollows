@@ -51,6 +51,9 @@
       margin: 0;
       padding: 0;
     }
+    .journal-entry-page:last-child {
+      margin-bottom: 2.5em;
+    }
 
     .journal-page-header {
       margin-block-start: 16px;
