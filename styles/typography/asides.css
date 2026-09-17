@@ -31,6 +31,47 @@
         mask-image: url("/systems/hollows/assets/art/smallest-sidebar.webp");
       }
 
+      &.purple {
+        background-color: var(--hollows-color-purple-aside-bg);
+      }
+      &.purple-light {
+        background-color: var(--hollows-color-purple-light-aside-bg);
+      }
+      &.purple-dark {
+        background-color: var(--hollows-color-purple-dark-aside-bg);
+      }
+      &.teal {
+        background-color: var(--hollows-color-teal-aside-bg);
+      }
+      &.teal-light {
+        background-color: var(--hollows-color-teal-light-aside-bg);
+      }
+      &.blue {
+        background-color: var(--hollows-color-blue-aside-bg);
+      }
+      &.blue-dark {
+        background-color: var(--hollows-color-blue-dark-aside-bg);
+      }
+      &.red {
+        background-color: var(--hollows-color-red-aside-bg);
+      }
+      &.orange {
+        background-color: var(--hollows-color-orange-aside-bg);
+      }
+      &.orange-light {
+        background-color: var(--hollows-color-orange-light-aside-bg);
+      }
+      &.mustard {
+        background-color: var(--hollows-color-mustard-aside-bg);
+      }
+      &.green {
+        background-color: var(--hollows-color-green-aside-bg);
+      }
+      &.white {
+        background-color: var(--hollows-color-white-aside-bg);
+        color: var(--color-dark-2);
+      }
+
     }
 
     h4.isles-heading {
