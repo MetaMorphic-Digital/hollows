@@ -1,4 +1,29 @@
 .hollows {
+  table {
+    position: relative;
+    display: block;
+    overflow: auto;
+    overscroll-behavior-y: contain;
+
+    thead {
+      position: sticky;
+      top: 0;
+    }
+  }
+
+  :where(:has(> table, > .outcome-table)) {
+    container-type: inline-size;
+  }
+
+  table {
+    @container (max-width: 350px) {
+      width: 300px;
+      max-height: 600px;
+
+      margin: 0 auto;
+    }
+  }
+
   .outcome-table {
     --outcome-table-margin: 20px;
     --outcome-table-margin-neg: calc(var(--outcome-table-margin) * -1);
@@ -110,6 +135,17 @@
           }
         }
       }
+      @container (max-width: 350px) {
+        thead {
+          /* Hides overflowing tbody that scrolls up */
+          background-color: var(--hollows-color-outcome-table-header);
+        }
+      }
+    }
+
+    @container (max-width: 350px) {
+      mask-image: none;
+      background: transparent;
     }
   }
 }
