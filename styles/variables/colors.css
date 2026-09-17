@@ -11,5 +11,25 @@
   --hollows-color-book-intro-text: #f6f1e8;
 
   --hollows-color-hazard: #044f53;
+
   --hollows-color-default-aside-bg: #47362D;
+
+  --hollows-color-purple-aside-bg: #584e6c;
+  --hollows-color-purple-light-aside-bg: #7b5d73;
+  --hollows-color-purple-dark-aside-bg: #2f274a;
+
+  --hollows-color-teal-aside-bg: #065054;
+  --hollows-color-teal-light-aside-bg: #3b5649;
+
+  --hollows-color-blue-aside-bg: #4c596c;
+  --hollows-color-blue-dark-aside-bg: #2b3745;
+
+  --hollows-color-red-aside-bg: #561c39;
+  --hollows-color-orange-aside-bg: #822519;
+  --hollows-color-orange-light-aside-bg: #85443b;
+
+  --hollows-color-mustard-aside-bg: #785933;
+  --hollows-color-green-aside-bg: #5d5b34;
+
+  --hollows-color-white-aside-bg: #e2d3bc;
 }
