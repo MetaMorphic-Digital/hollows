@@ -128,4 +128,9 @@
     &.book-4 .journal-entry-content::before {
       filter: hue-rotate(217deg) saturate(2);
     }
+
+  .center {
+    margin: 0 auto;
+    text-align: center;
+  }
 }
