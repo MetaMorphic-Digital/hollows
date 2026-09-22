@@ -34,7 +34,7 @@
 
       background-color: currentColor;
 
-      margin-bottom: calc(var(--choice-marker-height) * -0.25)
+      margin-bottom: calc(var(--choice-marker-height) * -0.25);
     }
   }
 
@@ -43,7 +43,7 @@
     &.color-stat {
       color: var(--hollows-color-stat);
       font-weight: 800;
-      @container inline-aside {
+      @container inline-aside, weapon-section {
         color: var(--hollows-color-stat-alt);
       }
     }
@@ -86,5 +86,35 @@
 
   .small-caps {
     font-variant: small-caps;
+  }
+
+  .dropcap {
+    text-indent: 0;
+    &::first-letter {
+      /* margin-right: 10px; */
+      margin-right: 6px;
+      initial-letter: 2;
+
+      /* Firefox doesn't support initial-letter yet */
+      @supports not (initial-letter: 2) {
+        font-size: calc(2 * 1.9em);
+        line-height: 0.7;
+        float: left;
+        clear: both;
+      }
+    }
+  }
+  h1 + p:not(.dropcap),
+  h2 + p:not(.dropcap),
+  h3 + p:not(.dropcap),
+  h4 + p:not(.dropcap),
+  h5 + p:not(.dropcap),
+  h6 + p:not(.dropcap) {
+    padding-left: 2ch;
+    text-indent: -2ch;
+  }
+  p {
+    padding-left: 2ch;
+    text-indent: 0;
   }
 }
