@@ -226,10 +226,6 @@
       }
     }
   }
-  .weapon-intro {
-  }
-  .weapon-dropcap {
-  }
   .weapon-stat-changes {
     display: flex;
     flex-direction: row;
@@ -344,8 +340,5 @@
         color: var(--hollows-color-default-aside-bg);
       }
     }
-  }
-
-  .weapon-abilities {
   }
 }
