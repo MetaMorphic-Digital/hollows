@@ -31,11 +31,10 @@
       opacity: 1;
       transition: opacity 0.3s ease-in-out;
 
-      @container journal (width < 34.375rem) {
+      @container journal (width < 820px) {
         opacity: 0;
       }
     }
-
 
     .journal-header {
       background-color: var(--hollows-color-book-intro);
@@ -73,7 +72,9 @@
       grid-template-columns: 1fr 7.375rem;
       column-gap: 3rem;
 
-      > * { grid-column: 1; }
+      > * {
+        grid-column: 1;
+      }
 
       --journal-padding-right: 0;
       > aside:not(.sidebar, .inline, .outcome-table) {
@@ -95,7 +96,7 @@
       }
     }
 
-    @container journal (width < 34.375rem) {
+    @container journal (width < 820px) {
       .journal-page-content,
       .journal-page-header {
         margin-inline: 2.75rem;
@@ -105,7 +106,9 @@
         --book-intro-margin: 0;
         grid-template-columns: 1fr;
 
-        > *, .column-gutter, .column-both {
+        > *,
+        .column-gutter,
+        .column-both {
           grid-column: 1 !important;
         }
       }
@@ -116,21 +119,233 @@
     }
   }
   &.book-1 .journal-entry-content::before {
-      /*Book 1 is the default color*/
-    }
-    &.book-2 .journal-entry-content::before {
-      filter: hue-rotate(272deg) brightness(0.9) saturate(1.3);
-    }
-    &.book-3 .journal-entry-content::before {
-      filter: hue-rotate(217deg) brightness(0.9) saturate(1.3);
-
-    }
-    &.book-4 .journal-entry-content::before {
-      filter: hue-rotate(217deg) saturate(2);
-    }
+    /*Book 1 is the default color*/
+  }
+  &.book-2 .journal-entry-content::before {
+    filter: hue-rotate(272deg) brightness(0.9) saturate(1.3);
+  }
+  &.book-3 .journal-entry-content::before {
+    filter: hue-rotate(217deg) brightness(0.9) saturate(1.3);
+  }
+  &.book-4 .journal-entry-content::before {
+    filter: hue-rotate(217deg) saturate(2);
+  }
 
   .center {
     margin: 0 auto;
     text-align: center;
+  }
+
+  .weapon-section {
+    container-name: weapon-section;
+    background: var(--hollows-color-weapon-choice-bg);
+    margin: 0 -18px 0 -52px;
+    padding: 0 2em;
+
+    /* Groups of .weapon-section don't need margin between each other */
+    :not(.weapon-section) + & {
+      margin-top: 2em;
+      padding-top: 2em;
+    }
+    &:not(:has(+ .weapon-section)) {
+      margin-bottom: 2em;
+      padding-bottom: 2em;
+    }
+
+    h2 {
+      color: var(--hollows-color-weapon-choice-header);
+      font-size: 4em;
+    }
+    h4 {
+      color: var(--hollows-color-weapon-choice);
+    }
+    p,
+    li {
+      color: var(--color-light-1);
+    }
+  }
+
+  .weapon-abilities {
+    thead {
+      border: none;
+      background: transparent;
+    }
+    th {
+      color: var(--hollows-color-weapon-choice);
+      font-size: 1.1em;
+    }
+
+    td {
+      vertical-align: top;
+    }
+    ul {
+      padding: 0;
+    }
+    li {
+      a {
+        color: var(--hollows-color-weapon-choice);
+      }
+      &::marker {
+        content: "";
+      }
+      &::after {
+        content: ".";
+      }
+    }
+  }
+
+  .weapon-title {
+    h2 {
+      position: relative;
+      margin-bottom: 0.5em;
+      &::first-letter {
+        /* margin-right: 10px;
+        initial-letter: 2;
+
+        @supports not (initial-letter: 2) {
+          font-size: calc(2 * 1.9em);
+          line-height: 0.7;
+          float: left;
+          clear: both;
+        } */
+        font-size: 2em;
+      }
+      &::after {
+        content: "THE";
+        inset: 0;
+        position: absolute;
+        top: 1.3em;
+        left: 2.5em;
+        color: inherit;
+        border: solid currentColor;
+        border-width: 3px 0;
+        font-size: 0.5em;
+        height: fit-content;
+        width: fit-content;
+        padding-bottom: 7px;
+      }
+    }
+  }
+  .weapon-intro {
+  }
+  .weapon-dropcap {
+  }
+  .weapon-stat-changes {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .weapon-stat-block {
+    padding: 1em 3em;
+    /* This doesn't work in firefox and safari, but does in electron. */
+    corner-shape: scoop;
+    border-radius: 1em;
+    color: var(--color-light-1);
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    p {
+      text-indent: 0;
+    }
+
+    &.choice {
+      background: linear-gradient(90deg, var(--hollows-color-weapon-choice-bg), var(--hollows-color-weapon-stat-block));
+    }
+    &.fixed {
+      background: linear-gradient(
+        270deg,
+        var(--hollows-color-weapon-choice-bg),
+        var(--hollows-color-weapon-stat-block)
+      );
+    }
+  }
+  .weapon-stat-or {
+    content: "OR";
+    background: var(--hollows-color-weapon-choice);
+    color: var(--hollows-color-weapon-choice-bg) !important;
+    padding: 5px 1.5em 0;
+    font-weight: bold;
+    corner-shape: bevel;
+    border-radius: 12px;
+  }
+  .weapon-stat-and {
+    content: "AND";
+    text-indent: 0;
+    padding: 0;
+    align-self: center;
+
+    color: var(--hollows-color-weapon-choice) !important;
+    font-weight: bold;
+
+    margin: 1em;
+    padding-top: 5px;
+
+    border: solid var(--hollows-color-weapon-choice);
+    border-width: 3px 0;
+
+    clip-path: polygon(0 2px, 50% 0, 100% 2px, 100% calc(100% - 2px), 50% 100%, 0 calc(100% - 2px));
+  }
+  .weapon-forms {
+    aside.inline {
+      display: grid;
+      grid-template-columns: 4fr 100px;
+      /* grid-template-rows: 1fr; */
+      grid-template-areas:
+        "header counter"
+        "content counter";
+      padding: 30px 80px;
+    }
+    h4 {
+      grid-area: header;
+      /* color: var(--hollows-color-weapon-choice); */
+    }
+    .weapon-form-content {
+      grid-area: content;
+    }
+
+    .weapon-form-counter {
+      grid-area: counter;
+      position: relative;
+      background: var(--hollows-color-weapon-choice);
+
+      mask-image: url("/systems/hollows/assets/art/weapon-form-counter-mask.webp");
+      mask-repeat: no-repeat;
+      mask-size: auto 100%;
+      height: 100px;
+
+      .weapon-form-counter-resolve {
+        position: absolute;
+        top: 5px;
+        left: 25px;
+        width: fit-content;
+        height: fit-content;
+        font-size: 2.5em;
+        color: var(--hollows-color-default-aside-bg);
+      }
+      .weapon-form-counter-wounds {
+        position: absolute;
+        bottom: 5px;
+        right: 23px;
+        width: fit-content;
+        height: fit-content;
+        font-size: 2.5em;
+        color: var(--hollows-color-default-aside-bg);
+      }
+      &::after {
+        content: "/";
+        position: absolute;
+        top: 22%;
+        right: 36%;
+        font-size: 3em;
+        color: var(--hollows-color-default-aside-bg);
+      }
+    }
+  }
+
+  .weapon-abilities {
   }
 }
