@@ -7,6 +7,10 @@
       font-weight: 500;
     }
 
+    &:not(.sidebar, .inline) {
+      height: 0;
+    }
+
     &.inline {
       background-color: var(--hollows-color-default-aside-bg);
       mask-size: 100% 100%;
@@ -94,7 +98,8 @@
       transform: rotate(4deg);
     }
 
-    @container journal (width < var(--journal-grid-collapse-threshold)) {
+    @container journal (width < 820px) {
+      height: auto !important;
       font-size: 0.9em;
       background-color: var(--hollows-color-default-aside-bg);
 
@@ -105,8 +110,10 @@
       padding: 24px 48px !important;
       margin-block: 12px;
 
-      &.malignancy-box {
-        color: white;
+      color: var(--color-light-1) !important;
+
+      &.fade-inline {
+        display: none;
       }
 
       a {
