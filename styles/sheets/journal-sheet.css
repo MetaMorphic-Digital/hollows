@@ -341,4 +341,72 @@
       }
     }
   }
+
+  :where(:has(> .float-left, > .float-right, > .grid)) {
+    container-type: inline-size;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    width: 100%;
+    &.col-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    &.col-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    &.col-5 {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    &.col-6 {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    span {
+      display: block;
+      max-width: 100%;
+      padding: 20px;
+    }
+    img {
+      width: 100%;
+      height: auto;
+    }
+    @container (min-width: 550px) {
+      display: grid;
+    }
+  }
+
+  .float-right {
+    max-width: 350px;
+    margin: 0 auto;
+    @container (min-width: 550px) {
+      margin-right: 0;
+      margin-left: 0.5em;
+      float: right;
+      clear: both;
+      &:is(img) {
+        width: 300px;
+      }
+    }
+  }
+  .float-left {
+    max-width: 350px;
+    margin: 0 auto;
+    @container (min-width: 550px) {
+      margin-left: 0;
+      margin-right: 0.5em;
+      float: left;
+      clear: both;
+      &:is(img) {
+        width: 300px;
+      }
+    }
+  }
+
+  figure > img {
+    border: none;
+    box-shadow: none;
+    filter: drop-shadow(2px 2px 4px black);
+  }
 }
