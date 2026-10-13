@@ -101,38 +101,7 @@ function resolveAttackWeapon(attacker, weaponId = "") {
   return weapon?.type === "weapon" ? weapon : null;
 }
 
-function getActorByIdFromScene(id) {
-  if (!id) return null;
-  const scene = canvas?.scene;
-  if (scene?.tokens?.size) {
-    const tokenDoc = scene.tokens.contents.find((token) => token.actor?.id === id);
-    if (tokenDoc?.actor) return tokenDoc.actor;
-  }
-  return game.actors.get(id) || null;
-}
-
-function resolveAttackDamageTarget({ targetType = "", targetId = "" } = {}) {
-  const resolved = getActorByIdFromScene(targetId);
-  let entity = null;
-  let targetActor = null;
-  let isEntityTarget = true;
-
-  if (targetType === "thrall" || resolved?.type === "thrall") {
-    isEntityTarget = false;
-    targetActor = resolved;
-  } else if (targetType === "entity" || resolved?.type === "entity") {
-    entity = resolved || getEntityActor();
-    targetActor = entity;
-  }
-
-  if (isEntityTarget && !entity) {
-    entity = getEntityActor();
-    targetActor = entity;
-  }
-
-  return { entity, targetActor, isEntityTarget };
-}
-
+/** Apply recorded damage and resolve the Entity reaction before Threat and rewards. */
 export async function applyHunterAttackDamage(message) {
   if (message?.getFlag("hollows", "applyDamage")?.applied) return false;
   const data = message?.getFlag("hollows", "entityDamage");
@@ -142,17 +111,20 @@ export async function applyHunterAttackDamage(message) {
   const damageValue = Number(data.damageValue ?? 0);
   if ((damageType !== "Resolve" && damageType !== "Wounds") || damageValue <= 0) return false;
 
-  const attackerId = message?.speaker?.actor || "";
-  const attacker = attackerId ? game.actors.get(attackerId) : null;
+  const attack = message.getFlag("hollows", "hunterAttack");
+  if (!attack?.actorUuid || !attack.attackTargetUuid) {
+    ui.notifications.warn("This attack card has no target context. Roll the attack again.");
+    return false;
+  }
+  const attacker = await fromUuid(attack.actorUuid);
+  const targetActor = await fromUuid(attack.attackTargetUuid);
+  const isEntityTarget = targetActor?.type === "entity";
+  let entity = null;
+  if (attack.entityUuid) entity = await fromUuid(attack.entityUuid);
   const weaponId = String(data.weaponId || "");
   const weapon = resolveAttackWeapon(attacker, weaponId);
   const weaponType = String(weapon?.system?.weaponType || data.weaponType || "");
-  const { entity, targetActor, isEntityTarget } = resolveAttackDamageTarget({
-    targetType: String(data.targetType || ""),
-    targetId: String(data.targetId || ""),
-  });
-
-  if (!targetActor) {
+  if (!attacker || !targetActor) {
     ui.notifications.warn("No valid target found to apply damage.");
     return false;
   }
@@ -163,15 +135,10 @@ export async function applyHunterAttackDamage(message) {
   }
 
   let effectiveDamage = damageValue;
+  let replacedDamage = false;
   if (isEntityTarget) {
     const reduction = getEntityPassiveSpecialDamageReduction(entity, damageType);
     effectiveDamage = Math.max(0, effectiveDamage - reduction);
-    if (effectiveDamage <= 0 && attacker?.type === "hunter") {
-      await triggerEntityTriggeredAbilities(entity, "hunterInflictsNoDamage", {
-        targetActor: attacker,
-        targetZone: threatZone,
-      }, ["special", "doom"]);
-    }
   }
 
   // Improvised Defences: the Entity may destroy one of its terrain tags instead
@@ -189,21 +156,42 @@ export async function applyHunterAttackDamage(message) {
           speaker: ChatMessage.getSpeaker({ actor: entity }),
           content: `<div class="hollows-chat"><strong>${entity.name}</strong> destroys a terrain tag instead of taking ${effectiveDamage} Wound${effectiveDamage === 1 ? "" : "s"}.</div>`,
         });
-        await message?.setFlag("hollows", "applyDamage", { applied: true });
-        return true;
+        effectiveDamage = 0;
+        replacedDamage = true;
       }
     }
   }
 
   const resourceKey = damageType === "Wounds" ? "wounds" : "resolve";
   const resourcePath = `system.health.${resourceKey}.value`;
+  const previousResolve = targetActor.system.health.resolve.value;
+  const previousWounds = targetActor.system.health.wounds.value;
   const current = Number(targetActor.system.health[resourceKey].value ?? 0);
   const next = Math.max(0, current - effectiveDamage);
-  await targetActor.update({ [resourcePath]: next }, {
-    hollowsSourceHunterId: attacker?.type === "hunter" ? attacker.id : "",
-    hollowsDamageType: damageType,
-    hollowsDamageValue: effectiveDamage,
-  });
+  const attackContext = {
+    targetActor: attacker,
+    targetZone: attack.targetZone,
+    attackTarget: targetActor,
+    outcomeLabel: attack.outcomeLabel,
+    damageType,
+    damageValue: current - next,
+    previousResolve,
+    previousWounds,
+    nextResolve: resourceKey === "resolve" ? next : previousResolve,
+    nextWounds: resourceKey === "wounds" ? next : previousWounds,
+  };
+  if (!replacedDamage) {
+    await targetActor.update({ [resourcePath]: next }, {
+      hollowsSourceHunterId: attacker.type === "hunter" ? attacker.id : "",
+      hollowsDamageType: damageType,
+      hollowsDamageValue: effectiveDamage,
+    });
+  }
+  await message.setFlag("hollows", "applyDamage", { applied: true });
+  if (attacker.type === "hunter") {
+    await triggerEntityTriggeredAbilities(entity, "hunterMakesAttack", attackContext);
+  }
+  if (replacedDamage) return true;
 
   if (damageType === "Resolve") {
     if (isEntityTarget && attacker?.type === "hunter" && effectiveDamage > 0) {
@@ -237,22 +225,9 @@ export async function applyHunterAttackDamage(message) {
         nextWounds: next,
         attackerZone: threatZone,
       });
-      await triggerEntityTriggeredAbilities(entity, "hunterInflictsWoundsDamage", {
-        targetActor: attacker,
-        targetZone: threatZone,
-      }, ["special", "doom"]);
       await maybeTriggerEntitySuffersWoundEnhancements(targetActor);
     }
   }
-
-  if (isEntityTarget && damageType === "Resolve" && effectiveDamage > 0) {
-    await triggerEntityTriggeredAbilities(entity, "hunterInflictsResolveDamage", {
-      targetActor: attacker,
-      targetZone: threatZone,
-    }, ["special", "doom"]);
-  }
-
-  await message?.setFlag("hollows", "applyDamage", { applied: true });
 
   if (threatZone && isEntityTarget) {
     if (attacker?.type === "hunter") {
@@ -768,15 +743,16 @@ export async function openAttackDialog(actor, options = {}) {
             flags: {
               hollows: {
                 entityDamage,
+                hunterAttack: {
+                  entityUuid: entity?.uuid || "",
+                  actorUuid: actor.uuid,
+                  targetZone: zone || "",
+                  attackTargetUuid: targetActor.uuid,
+                  outcomeLabel,
+                },
               },
             },
           });
-          if (!dealtDamage && !rollOnly && targetType === "entity" && entity) {
-            await triggerEntityTriggeredAbilities(entity, "hunterInflictsNoDamage", {
-              targetActor: actor,
-              targetZone: zone || "",
-            }, ["special", "doom"]);
-          }
           result.dealtWounds = damageType === "Wounds" && Number(damageValue) > 0;
           result.rolled = true;
           result.hit = !isMiss;

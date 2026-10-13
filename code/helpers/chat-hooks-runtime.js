@@ -1,6 +1,7 @@
 import { maybePromptRepetitiveAttack, resolveFollowUpFromMessage } from "../data/entity/action-followups.js";
 import { resolveEntityActorFromAttackContext } from "../data/entity/action-flow.js";
 import { requestDoomAdjust } from "../data/entity/actions/entity-doom.js";
+import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
 import { recordEntityAttackOutcome } from "../documents/entity/entity-enhancements.js";
 import { applyEntityAttackDamage } from "../documents/entity/attack-damage.js";
 import { requestAfterAttackApply } from "../documents/entity/attack-effects.js";
@@ -35,6 +36,24 @@ import { applyInterceptors } from "./extensions.js";
 import { promptForm } from "../applications/apps/selection-dialogs.mjs";
 
 export function registerChatMessageHooks() {
+
+  Hooks.on("createChatMessage", async (message) => {
+    if (game.user.id !== game.users.activeGM?.id) return;
+    const attack = message.getFlag("hollows", "hunterAttack");
+    if (!attack?.entityUuid) return;
+    if (Number(message.getFlag("hollows", "entityDamage")?.damageValue ?? 0) > 0) return;
+    const entity = await fromUuid(attack.entityUuid);
+    const hunter = await fromUuid(attack.actorUuid);
+    const attackTarget = await fromUuid(attack.attackTargetUuid);
+    await triggerEntityTriggeredAbilities(entity, "hunterMakesAttack", {
+      targetActor: hunter,
+      targetZone: attack.targetZone,
+      attackTarget,
+      outcomeLabel: attack.outcomeLabel,
+      damageType: "",
+      damageValue: 0,
+    });
+  });
 
   Hooks.on("createChatMessage", async (message) => {
     if (!game.user?.isGM) return;

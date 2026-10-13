@@ -8,6 +8,12 @@ import {
   entityAbilityFields,
 } from "../entity/action-schema.js";
 
+const LEGACY_ATTACK_RESULTS = {
+  hunterInflictsResolveDamage: "resolveDamageDealt",
+  hunterInflictsWoundsDamage: "woundsDamageDealt",
+  hunterInflictsNoDamage: "noDamageDealt",
+};
+
 export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
   static defineSchema() {
@@ -16,10 +22,16 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
 
   /* -------------------------------------------------- */
 
-  /** `special.passive` was a single modifier before it became a group list. */
+  /** Migrate legacy passive modifiers and Hunter attack trigger events. */
   static migrateData(source, options) {
     const passive = source.special?.passive;
     if (passive && !Array.isArray(passive.groups)) source.special.passive = { groups: [passive] };
+    const trigger = source.special?.trigger;
+    const attackResult = LEGACY_ATTACK_RESULTS[trigger?.event];
+    if (attackResult) {
+      trigger.event = "hunterMakesAttack";
+      trigger.attackResult = attackResult;
+    }
     return super.migrateData(source, options);
   }
 

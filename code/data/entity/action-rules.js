@@ -131,6 +131,13 @@ function getEntityActionTNBonus(entityActor, actionItem = null, targetToken = nu
 
 // ─── Damage resolution ──────────────────────────────────────────────────────────
 
+/** Scale a dynamic value consistently across damage, effects and recovery. */
+export function scaleDynamicValue(value, scale) {
+  if (scale === "halfUp") return Math.ceil(value / 2);
+  if (scale === "double") return value * 2;
+  return value;
+}
+
 function resolveEntityAbilityDamage(profile, entityActor, targetToken) {
   let resolve = Math.max(0, Number(profile?.damage?.resolve ?? 0) || 0);
   let wounds = Math.max(0, Number(profile?.damage?.wounds ?? 0) || 0);
@@ -138,7 +145,7 @@ function resolveEntityAbilityDamage(profile, entityActor, targetToken) {
     return { resolve, wounds };
   }
   let modifier = resolveEntitySourceValue(String(profile.damageDynamicSource || "targetCurse"), { entityActor, targetToken });
-  if (String(profile.damageDynamicScale || "full") === "halfUp") modifier = Math.ceil(modifier / 2);
+  modifier = scaleDynamicValue(modifier, profile.damageDynamicScale);
   // `damageDynamicReduce` subtracts the modifier (down to floor); otherwise it adds.
   const floorValue = Math.max(0, Number(profile.damageDynamicFloor ?? 0) || 0);
   const applySide = (base) => profile.damageDynamicReduce ? Math.max(floorValue, base - modifier) : base + modifier;
@@ -163,7 +170,7 @@ function resolveEntityAbilityDamage(profile, entityActor, targetToken) {
 function resolveTargetDeltaBonus(group, entityActor, targetToken) {
   if (String(group?.targetDeltaMode || "fixed") !== "dynamic") return { resolve: 0, wounds: 0 };
   let value = resolveEntitySourceValue(String(group.targetDeltaDynamicSource || "targetCurse"), { entityActor, targetToken });
-  if (String(group.targetDeltaDynamicScale || "full") === "halfUp") value = Math.ceil(value / 2);
+  value = scaleDynamicValue(value, group.targetDeltaDynamicScale);
   const mode = String(group.targetDeltaDynamicMode || "both");
   return {
     resolve: mode === "wounds" ? 0 : value,
@@ -263,7 +270,7 @@ function matchesEntityOutcomeCondition(key, context = {}) {
   const outcomeLabel = String(context.outcomeLabel || "");
   const damageType = String(context.damageType || "");
   const damageValue = Math.max(0, Number(context.damageValue ?? 0) || 0);
-  const target = context.target || null;
+  const target = context.attackTarget || context.target || null;
   const previousResolve = Number(context.previousResolve ?? target?.system?.health?.resolve?.value ?? 0);
   const previousWounds = Number(context.previousWounds ?? target?.system?.health?.wounds?.value ?? 0);
   const nextResolve = Number(context.nextResolve ?? previousResolve);

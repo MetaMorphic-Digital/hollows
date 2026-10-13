@@ -25,7 +25,6 @@ import { applyFirstPickSelection } from "./combat-first-pick.js";
 import { promptIncursionRollQuery } from "../documents/actor/incursion.js";
 import { addCondition, removeCondition } from "../documents/actor/conditions.js";
 import { adjustHunterResource, adjustEntityResource } from "../documents/actor/resources.js";
-import { applyHazardRoll } from "../documents/actor/hazard-damage.js";
 import { applyAfterAttackPayload } from "../documents/entity/attack-effects.js";
 import { applyRefugeActionPayload } from "../documents/actor/refuge.js";
 import { applyRelicEffectPayload } from "../data/relic/apply-effect.js";
@@ -218,7 +217,7 @@ function registerCategoryBHandlers() {
     if (!hazardMessage) throw new QueryPermissionError(`Hazard message ${messageId} not found`, { code: "no-message" });
     const actor = actorUuid ? await fromUuid(String(actorUuid)) : null;
     if (!actor) throw new QueryPermissionError(`Actor ${actorUuid} not found`, { code: "no-actor" });
-    await applyHazardRoll(hazardMessage, actor, Number(rollValue ?? 0));
+    return hazardMessage.applyHazardRoll(actor, Number(rollValue ?? 0));
   });
 }
 

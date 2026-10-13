@@ -79,6 +79,7 @@ export default class HollowsEntityAbilitySheet extends HandlebarsApplicationMixi
     const system = this.item.system;
     const isAttackAction = system.profile?.actionType === "attack";
     const isWhenBrokenKind = system.kind === "whenBroken";
+    const triggersAbility = system.special.trigger.effectType === "triggerAbility";
     const specialTriggerTargetMode = String(system.special?.trigger?.targetMode || "eventTarget");
     return {
       ...context,
@@ -96,6 +97,8 @@ export default class HollowsEntityAbilitySheet extends HandlebarsApplicationMixi
       specialSectionTitle: isWhenBrokenKind ? "When Broken" : system.kind === "doom" ? "Doom" : "Special",
       showSpecialRuntimeConfig: !isWhenBrokenKind,
       showTriggeredEffectConfig: isWhenBrokenKind || system.special?.type === "triggeredEffect",
+      specialAfterAttack: triggersAbility ? system.afterAttack : system.special.trigger.afterAttack,
+      specialAfterAttackPath: triggersAbility ? "afterAttack" : "special.trigger.afterAttack",
       showSpecialTriggerGate: !isWhenBrokenKind,
       showSpecialTriggerZones: ["multiZone", "allInSelectedZones"].includes(specialTriggerTargetMode),
       passiveGroups: system.passiveGroupContexts,
