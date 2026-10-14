@@ -1,6 +1,10 @@
 {
   "HOLLOWS": {
     "SCRIPT": {
+      "modes": {
+        "single": "Single handler",
+        "multiple": "Multiple handlers"
+      },
       "hooks": {
         "activated": {
           "label": "Activated — button on the Hunter sheet"
@@ -85,6 +89,11 @@
       "active": "Active",
       "label": "Label",
       "labelPlaceholder": "Shown on buttons and in chat",
+      "mode": "Script format",
+      "multipleHint": "Return an object of named handlers. Each needs hook and run(H, actor, ctx); label, on, eventType and rateLimit are optional. Keep handler names stable: they identify buttons and usage limits. Define shared helpers before return; put actions inside run. statModifier and attackDamage must return synchronously and receive only synchronous helpers.",
+      "invalidDefinitions": "Return an object of named handlers.",
+      "invalidHandler": "Handler \"{id}\" needs a non-empty name, a valid hook and a run function.",
+      "invalidHandlerOption": "Handler \"{id}\" has an invalid {field} value.",
       "runs": "Runs",
       "event": "Event",
       "whoseTurn": "Whose turn",

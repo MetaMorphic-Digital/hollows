@@ -16,6 +16,10 @@
       <input type="text" name="label" value="{{block.label}}" placeholder="{{localize 'HOLLOWS.SCRIPT.labelPlaceholder'}}" />
     </div>
     <div class="hollows-form-row">
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.mode"}}</div>
+      <select name="mode">{{selectOptions modeChoices selected=block.mode localize=true}}</select>
+    </div>
+    <div class="hollows-form-row" {{#if multiple}}hidden{{/if}}>
       <div class="stat-label">{{localize "HOLLOWS.SCRIPT.runs"}}</div>
       <select name="hook">{{selectOptions hookChoices selected=block.hook localize=true}}</select>
     </div>
@@ -27,7 +31,7 @@
       <div class="stat-label">{{localize "HOLLOWS.SCRIPT.whoseTurn"}}</div>
       <select name="on">{{selectOptions turnScopes selected=block.on localize=true}}</select>
     </div>
-    <div class="hollows-form-row" {{#if selectedHook.sync}}hidden{{/if}}>
+    <div class="hollows-form-row" {{#if hideLimit}}hidden{{/if}}>
       <div class="stat-label">{{localize "HOLLOWS.SCRIPT.limit"}}</div>
       <select name="rateLimit">{{selectOptions rateLimits selected=block.rateLimit localize=true}}</select>
     </div>
@@ -35,17 +39,32 @@
 
   <section class="sheet-section">
     <h2>{{localize "HOLLOWS.SCRIPT.source"}}</h2>
-    <div class="script-context muted">
-      {{localize "HOLLOWS.SCRIPT.available"}} {{#each selectedHook.ctx as |key|}}<code>ctx.{{key}}</code> {{/each}}
-    </div>
-    <div class="script-context muted">
-      {{localize "HOLLOWS.SCRIPT.runsOn"}} <strong>{{runsOn}}</strong>
-    </div>
-    {{#if selectedHook.sync}}
-      <div class="script-context muted">{{localize "HOLLOWS.SCRIPT.syncHint"}}</div>
-    {{/if}}
-    {{#if selectedHook.returns}}
-      <div class="script-context muted">{{localize "HOLLOWS.SCRIPT.returns"}} {{selectedHook.returns}}</div>
+    {{#if multiple}}
+      <p class="muted">{{localize "HOLLOWS.SCRIPT.multipleHint"}}</p>
+      <pre><code>return {
+  bonus: {
+    hook: "attackDamage",
+    run: (H, actor, ctx) =&gt; ({ resolve: 1, wounds: 0 }),
+  },
+  recover: {
+    hook: "startOfTurn",
+    rateLimit: "oncePerRound",
+    run: async (H, actor, ctx) =&gt; H.resource.adjust(actor, { resolve: 1 }),
+  },
+};</code></pre>
+    {{else}}
+      <div class="script-context muted">
+        {{localize "HOLLOWS.SCRIPT.available"}} {{#each selectedHook.ctx as |key|}}<code>ctx.{{key}}</code> {{/each}}
+      </div>
+      <div class="script-context muted">
+        {{localize "HOLLOWS.SCRIPT.runsOn"}} <strong>{{runsOn}}</strong>
+      </div>
+      {{#if selectedHook.sync}}
+        <div class="script-context muted">{{localize "HOLLOWS.SCRIPT.syncHint"}}</div>
+      {{/if}}
+      {{#if selectedHook.returns}}
+        <div class="script-context muted">{{localize "HOLLOWS.SCRIPT.returns"}} {{selectedHook.returns}}</div>
+      {{/if}}
     {{/if}}
     <textarea name="source" rows="18" spellcheck="false">{{block.source}}</textarea>
   </section>

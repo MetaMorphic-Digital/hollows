@@ -1,5 +1,11 @@
 /** A stored mechanic script shared by weapons and weapon abilities. */
 export default class ScriptField extends foundry.data.fields.SchemaField {
+  /** @type {Record<string, string>} */
+  static modes = {
+    single: "HOLLOWS.SCRIPT.modes.single",
+    multiple: "HOLLOWS.SCRIPT.modes.multiple",
+  };
+
   /**
    * @type {Record<string, {
    *   label: string, ctx: string[], returns?: string, sync?: boolean, hasOn?: boolean, hasEvent?: boolean
@@ -162,6 +168,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
     super({
       enabled: new fields.BooleanField({ initial: false }),
       label: new fields.StringField({ initial: "" }),
+      mode: new fields.StringField({ initial: "single", choices: Object.keys(ScriptField.modes) }),
       hook: new fields.StringField({ initial: "activated", choices: Object.keys(ScriptField.hooks) }),
       on: new fields.StringField({ initial: "actor", choices: Object.keys(ScriptField.turnScopes) }),
       eventType: new fields.StringField({ initial: "guard", choices: Object.keys(ScriptField.events) }),

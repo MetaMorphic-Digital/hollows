@@ -22,7 +22,7 @@ export class ScriptedEvent extends Mechanic {
 
 /** Compile item scripts into the existing mechanic classes. */
 export default class ScriptCompiler {
-  /** @type {WeakMap<Item, Map<string, object>>} Cached results per document instance. */
+  /** @type {WeakMap<Item, {stamp: string, mechanics: Mechanic[]}>} Cached results per document instance. */
   static #cache = new WeakMap();
 
   /** @type {WeakMap<Item, Set<string>>} Errors already shown for each item. */
@@ -163,7 +163,7 @@ ${source}
           if ((result?.damageValueDelta != null) && !Number.isFinite(result.damageValueDelta)) {
             return { cancelled: true };
           }
-          return result || {};
+          return result;
         };
         return mechanic;
       }
@@ -211,7 +211,7 @@ ${source}
           const carrier = ctx.carrier ?? ctx.target;
           const result = await this.#limited(carrier, mechanic, () => invoke(carrier, ctx));
           if (!Number.isFinite(result)) return null;
-          return { damageValue: Math.max(0, result), note: config.name };
+          return { damageValue: result, note: config.name };
         };
         return mechanic;
       }
@@ -224,39 +224,61 @@ ${source}
    * Cache per document instance so synthetic actors do not share compiled scripts.
    * @param {Item} item
    * @param {string} path Script field path.
-   * @returns {Mechanic|null} Compiled mechanic, or null for disabled/invalid scripts.
+   * @returns {Mechanic[]} Compiled mechanics; empty for disabled or invalid scripts.
    */
   static #compile(item, path) {
     const block = foundry.utils.getProperty(item, path);
     const source = String(block?.source ?? "");
-    if (!block?.enabled || !source.trim()) return null;
+    if (!block?.enabled || !source.trim()) return [];
+    const multiple = block.mode === "multiple";
     const hook = block.hook || "activated";
-    if (!Object.hasOwn(ScriptField.hooks, hook)) return null;
-    const sync = !!ScriptField.hooks[hook].sync;
-    const rateLimit = sync || !block.rateLimit || (block.rateLimit === "none") ? "" : block.rateLimit;
+    if (!multiple && !Object.hasOwn(ScriptField.hooks, hook)) return [];
     const key = `script.${item.id}.${path}`;
     const name = block.label || item.name || game.i18n.localize("HOLLOWS.SCRIPT.defaultName");
     const text = path === "system.renown.script" ? item.system.renown.text : item.system?.text;
     const stamp = JSON.stringify([
-      hook, rateLimit, block.on, block.eventType, name, text, item.system?.weaponType, source,
+      multiple, hook, block.rateLimit, block.on, block.eventType, name, text, item.system?.weaponType, source,
     ]);
-    let cache = this.#cache.get(item);
-    if (!cache) this.#cache.set(item, cache = new Map());
-    const cached = cache.get(path);
-    if (cached?.stamp === stamp) return cached.mechanic;
-    let mechanic = null;
+    const cached = this.#cache.get(item);
+    if (cached?.stamp === stamp) return cached.mechanics;
+    let mechanics = [];
     try {
-      const fn = this.#compileBody(source, sync);
-      mechanic = this.#buildMechanic(hook, {
-        key, name, text: text || "", weapon: item.system?.weaponType || "", rateLimit,
-        on: block.on || "actor", eventType: block.eventType || "guard",
-      }, this.#makeInvoker(fn, key, sync, item));
-      if (mechanic) mechanic.rateLimit = rateLimit;
+      const definitions = multiple ? this.#compileBody(source, true)() : {
+        "": { ...block, hook, run: this.#compileBody(source, !!ScriptField.hooks[hook].sync) },
+      };
+      if (multiple && !foundry.utils.isPlainObject(definitions)) {
+        throw new TypeError(game.i18n.localize("HOLLOWS.SCRIPT.invalidDefinitions"));
+      }
+      mechanics = Object.entries(definitions).map(([id, definition]) => {
+        if (multiple) {
+          if (!id || !Object.hasOwn(ScriptField.hooks, definition?.hook) || (typeof definition?.run !== "function")) {
+            throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandler", { id }));
+          }
+          for (const [field, choices] of Object.entries({
+            rateLimit: ScriptField.rateLimits, on: ScriptField.turnScopes, eventType: ScriptField.events,
+          })) {
+            if ((definition[field] !== undefined) && !Object.hasOwn(choices, definition[field])) {
+              throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field }));
+            }
+          }
+        }
+        const sync = !!ScriptField.hooks[definition.hook].sync;
+        const rateLimit = sync || !definition.rateLimit || (definition.rateLimit === "none")
+          ? "" : definition.rateLimit;
+        const handlerKey = multiple ? `${key}.${id}` : key;
+        const mechanic = this.#buildMechanic(definition.hook, {
+          key: handlerKey, name: definition.label || name, text: text || "",
+          weapon: item.system?.weaponType || "", rateLimit,
+          on: definition.on || "actor", eventType: definition.eventType || "guard",
+        }, this.#makeInvoker(definition.run, handlerKey, sync, item));
+        mechanic.rateLimit = rateLimit;
+        return mechanic;
+      });
     } catch (error) {
       this.#report(item, key, error, "compile");
     }
-    cache.set(path, { stamp, mechanic });
-    return mechanic;
+    this.#cache.set(item, { stamp, mechanics });
+    return mechanics;
   }
 
   /**
@@ -271,8 +293,9 @@ ${source}
     for (const item of actor?.items ?? []) {
       const path = item.scriptPath;
       if (!path || ((item.type === "weapon") && !item.system.renown.enabled)) continue;
-      const mechanic = this.#compile(item, path);
-      if (mechanic && (!type || (mechanic instanceof type))) mechanics.push(mechanic);
+      for (const mechanic of this.#compile(item, path)) {
+        if (!type || (mechanic instanceof type)) mechanics.push(mechanic);
+      }
     }
     return mechanics;
   }

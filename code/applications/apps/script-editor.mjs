@@ -87,6 +87,7 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
     return {
       enabled: root.querySelector("[name=\"enabled\"]").checked,
       label: value("label"),
+      mode: value("mode"),
       hook,
       eventType: value("eventType"),
       on: value("on"),
@@ -117,19 +118,25 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
     const stored = foundry.utils.getProperty(this.doc, this.path) || {};
     const block = this.draft ?? stored;
     const hook = String(block.hook || "activated");
-    const selected = ScriptField.hooks[hook] || ScriptField.hooks.activated;
+    const multiple = block.mode === "multiple";
+    const selected = multiple ? {} : ScriptField.hooks[hook] || ScriptField.hooks.activated;
     const { HOLLOWS_API, HOLLOWS_API_NOTES, HOLLOWS_SYNC_API } = await import("../../api.mjs");
     const api = selected.sync ? HOLLOWS_SYNC_API : HOLLOWS_API;
     const notes = selected.sync ? {} : HOLLOWS_API_NOTES;
     return {
       ...context,
       documentName: this.doc.name,
-      block: { ...block, hook, rateLimit: selected.sync ? "none" : block.rateLimit || "none" },
+      block: {
+        ...block, hook, mode: block.mode || "single", rateLimit: selected.sync ? "none" : block.rateLimit || "none",
+      },
+      multiple,
+      hideLimit: multiple || selected.sync,
       selectedHook: {
         ...selected,
         returns: selected.returns ? game.i18n.localize(selected.returns) : "",
       },
       canEdit: HollowsScriptEditor.canEdit(this.doc, this.path),
+      modeChoices: ScriptField.modes,
       hookChoices: ScriptField.hooks,
       eventChoices: ScriptField.events,
       turnScopes: ScriptField.turnScopes,
@@ -147,9 +154,11 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
   async _onRender(context, options) {
     await super._onRender(context, options);
     this.element.querySelector(".window-content")?.classList.add("hollows-sheet");
-    this.element.querySelector("[name=\"hook\"]").addEventListener("change", () => {
-      this.draft = this.#readForm();
-      this.render();
-    });
+    for (const name of ["mode", "hook"]) {
+      this.element.querySelector(`[name="${name}"]`).addEventListener("change", () => {
+        this.draft = this.#readForm();
+        this.render();
+      });
+    }
   }
 }
