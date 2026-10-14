@@ -18,13 +18,13 @@
       container-name: inline-aside;
 
       &.big {
-        padding: 48px;
+        padding: 48px 60px;
         margin-block: 8px;
         mask-image: url("/systems/hollows/assets/art/big-sidebar.webp");
       }
 
       &.small {
-        padding: 30px;
+        padding: 30px 60px;
         margin-block: 8px;
         mask-image: url("/systems/hollows/assets/art/small-sidebar.webp");
       }
@@ -82,7 +82,6 @@
       font-family: var(--hollows-font-feliz-en-vista);
       font-size: 1rem;
       text-transform: none;
-      margin-top: 1em;
     }
 
     &.outcome-table {
@@ -107,7 +106,7 @@
       mask-size: 100% 100%;
       mask-repeat: no-repeat;
 
-      padding: 24px 48px !important;
+      padding: 24px 60px !important;
       margin-block: 12px;
 
       color: var(--color-light-1) !important;

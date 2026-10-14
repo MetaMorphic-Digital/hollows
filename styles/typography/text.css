@@ -10,6 +10,11 @@
       text-indent: 0;
     }
 
+    &.hanging-indent {
+      padding-left: 2ch;
+      text-indent: -2ch
+    }
+
     &.chapter-intro {
       font-family: var(--hollows-font-mourich);
       font-size: 1.2em;
@@ -90,8 +95,8 @@
 
   .dropcap {
     text-indent: 0;
+
     &::first-letter {
-      /* margin-right: 10px; */
       margin-right: 6px;
       initial-letter: 2;
 
@@ -103,18 +108,5 @@
         clear: both;
       }
     }
-  }
-  h1 + p:not(.dropcap),
-  h2 + p:not(.dropcap),
-  h3 + p:not(.dropcap),
-  h4 + p:not(.dropcap),
-  h5 + p:not(.dropcap),
-  h6 + p:not(.dropcap) {
-    padding-left: 2ch;
-    text-indent: -2ch;
-  }
-  p {
-    padding-left: 2ch;
-    text-indent: 0;
   }
 }
