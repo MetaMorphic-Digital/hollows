@@ -128,22 +128,22 @@
   </section>
 
   <section class="sheet-section">
-    <h2>Weapon of Renown</h2>
+    <h2>{{localize "HOLLOWS.SCRIPT.renown.title"}}</h2>
     <div class="hollows-form-row">
-      <div class="stat-label">Renowned</div>
-      <input type="checkbox" name="system.renown.enabled" {{#if system.renown.enabled}}checked{{/if}} />
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.renown.enabled"}}</div>
+      <input type="checkbox" name="system.renown.enabled" {{checked system.renown.enabled}} />
     </div>
     {{#if system.renown.enabled}}
       <div class="hollows-form-row">
-        <div class="stat-label">Ability</div>
-        <input type="text" name="system.renown.name" value="{{system.renown.name}}" placeholder="Unique ability name" />
+        <div class="stat-label">{{localize "HOLLOWS.SCRIPT.renown.ability"}}</div>
+        <input type="text" name="system.renown.name" value="{{system.renown.name}}" placeholder="{{localize 'HOLLOWS.SCRIPT.renown.namePlaceholder'}}" />
       </div>
       <div class="hollows-form-section">
-        <textarea name="system.renown.text" rows="4" placeholder="Describe the unique ability.">{{system.renown.text}}</textarea>
+        <textarea name="system.renown.text" rows="4" placeholder="{{localize 'HOLLOWS.SCRIPT.renown.textPlaceholder'}}">{{system.renown.text}}</textarea>
       </div>
       {{> "systems/hollows/templates/item/parts/script-controls.html"
-          label="Automation" action="editRenownScript"
-          block=system.renown.script scriptsAllowed=scriptsAllowed}}
+          label=(localize "HOLLOWS.SCRIPT.automation") action="editRenownScript"
+          block=system.renown.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
     {{/if}}
   </section>
 

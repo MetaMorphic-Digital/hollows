@@ -22,7 +22,7 @@ import { StartOfTurnAction } from "../../data/mechanics/StartOfTurnAction.js";
 import { ActivatedAbility } from "../../data/mechanics/ActivatedAbility.js";
 import { StatModifier } from "../../data/mechanics/StatModifier.js";
 import { getSelectedWeaponFormMechanics, getAllRegisteredWeaponFormMechanics } from "../../data/weapons/index.js";
-import { getScriptedMechanics, ScriptedEvent } from "../../documents/item/script-compiler.js";
+import ScriptCompiler from "../../documents/item/script-compiler.mjs";
 
 function sameKey(a, b) {
   return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
@@ -56,19 +56,6 @@ function selectedActorFormMechanics(actor, ctor = null) {
   return ctor ? mechanics.filter((mechanic) => mechanic instanceof ctor) : mechanics;
 }
 
-// Item-borne mechanics: gated by holding the item, not by carries().
-// Use scriptedMechanics where forms already arrive by another path (otherwise
-// they run twice), itemMechanics where they do not.
-function scriptedMechanics(actor, ctor = null) {
-  const mechanics = getScriptedMechanics(actor);
-  return ctor ? mechanics.filter((mechanic) => mechanic instanceof ctor) : mechanics;
-}
-
-function itemMechanics(actor, ctor = null) {
-  const mechanics = [...selectedActorFormMechanics(actor), ...getScriptedMechanics(actor)];
-  return ctor ? mechanics.filter((mechanic) => mechanic instanceof ctor) : mechanics;
-}
-
 // Group reaction candidates by owning user (GM-fallback for ownerless), so a
 // reaction is offered once per owner with that owner's candidate ids.
 function groupByOwner(candidates, primaryOwnerOf) {
@@ -99,7 +86,7 @@ export async function runEndOfTurnAbilities(actor) {
   if (!actor || !game.user?.isGM) return;
   const formActions = getAllRegisteredWeaponFormMechanics()
     .filter((mechanic) => mechanic instanceof EndOfTurnAction);
-  const scripted = scriptedMechanics(actor, EndOfTurnAction);
+  const scripted = ScriptCompiler.getMechanics(actor, EndOfTurnAction);
   const borne = new Set(scripted);
   for (const ability of [...scripted, ...MECHANIC_BUCKETS.endOfTurn, ...formActions]) {
     if (!borne.has(ability) && !carries(actor, ability)) continue;
@@ -144,7 +131,7 @@ export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = 
   if (on === "entity") {
     const carriers = getActiveSceneHunters();
     for (const carrier of carriers) {
-      const scripted = scriptedMechanics(carrier, StartOfTurnAction);
+      const scripted = ScriptCompiler.getMechanics(carrier, StartOfTurnAction);
       const borne = new Set(scripted);
       for (const ability of [...scripted, ...MECHANIC_BUCKETS.startOfTurn]) {
         if (ability.on !== "entity") continue;
@@ -170,7 +157,7 @@ export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = 
     return;
   }
   if (!actor) return;
-  const scripted = scriptedMechanics(actor, StartOfTurnAction);
+  const scripted = ScriptCompiler.getMechanics(actor, StartOfTurnAction);
   const borne = new Set(scripted);
   for (const ability of [...scripted, ...MECHANIC_BUCKETS.startOfTurn]) {
     if (ability.on !== on) continue;
@@ -188,7 +175,7 @@ export function applyAttackDamageChanges(actor, damage = {}, context = {}) {
   const abilityMatches = MECHANIC_BUCKETS.attackDamage
     .filter((ability) => ability.aura || carries(actor, ability));
   const formMatches = selectedFormMechanics(context, AttackDamageChange);
-  const scriptMatches = scriptedMechanics(actor, AttackDamageChange);
+  const scriptMatches = ScriptCompiler.getMechanics(actor, AttackDamageChange);
   const matching = [...abilityMatches, ...formMatches, ...scriptMatches]
     .filter((ability) => ability.match(actor, context));
   for (const ability of matching.filter((a) => a.mode === "set")) {
@@ -206,7 +193,7 @@ export function applyAttackDamageChanges(actor, damage = {}, context = {}) {
 // Passive actor stat modifiers used by displayed totals and rolls.
 export function getStatModifier(actor, statKey) {
   let total = 0;
-  const scripted = scriptedMechanics(actor, StatModifier);
+  const scripted = ScriptCompiler.getMechanics(actor, StatModifier);
   const borne = new Set(scripted);
   for (const ability of [...scripted, ...MECHANIC_BUCKETS.statModifier]) {
     if (!borne.has(ability) && !carries(actor, ability)) continue;
@@ -269,6 +256,12 @@ export function evaluateStatOverrideSuccess(override, ctx = {}) {
   return false;
 }
 
+/**
+ * Check a mechanic's persisted combat usage limit.
+ * @param {Actor} actor Carrier actor.
+ * @param {Mechanic} ability Mechanic with a rate limit.
+ * @returns {boolean} Whether it has already been used in this period.
+ */
 export function isRateLimited(actor, ability) {
   const flag = actor.getFlag("hollows", `ability.${ability.key}.usedAt`);
   if (!flag) return false;
@@ -329,7 +322,7 @@ export async function runOnAttackResult(actor, result, context = {}) {
   };
   const borneMechanics = [
     ...selectedFormMechanics(context, OnAttackResultAction),
-    ...scriptedMechanics(actor, OnAttackResultAction),
+    ...ScriptCompiler.getMechanics(actor, OnAttackResultAction),
   ];
   const formMechanicSet = new Set(borneMechanics);
   for (const ability of [...borneMechanics, ...MECHANIC_BUCKETS.onAttackResult]) {
@@ -401,7 +394,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
   const out = { damageRedirected: false };
   if (!actor) return out;
   const reactionsMod = await import("../reactions.js");
-  const borneMechanics = itemMechanics(actor, OnDefenceResultAction);
+  const borneMechanics = [...selectedActorFormMechanics(actor, OnDefenceResultAction), ...ScriptCompiler.getMechanics(actor, OnDefenceResultAction)];
   const formMechanicSet = new Set(borneMechanics);
   for (const ability of [...borneMechanics, ...MECHANIC_BUCKETS.onDefenceResult]) {
     if (!ability.matches(ctx)) continue;
@@ -421,7 +414,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
           out.damageValue = Number(choice.convertTo.damageValue ?? 0);
         }
       } else {
-        await ability.run({ actor, entity: ctx.entityActor });
+        await ability.run({ ...ctx, actor, entity: ctx.entityActor });
       }
       continue;
     }
@@ -461,7 +454,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
 // ─── On move ─────────────────────────────────────────────────────────────
 export async function runOnMove(actor, { fromZone, toZone, phase, byOwner } = {}) {
   if (!actor || !game.user?.isGM) return;
-  const borneMechanics = itemMechanics(actor, OnMoveAction);
+  const borneMechanics = [...selectedActorFormMechanics(actor, OnMoveAction), ...ScriptCompiler.getMechanics(actor, OnMoveAction)];
   const formMechanicSet = new Set(borneMechanics);
   for (const ability of [...borneMechanics, ...MECHANIC_BUCKETS.onMove]) {
     if (!ability.aura && !formMechanicSet.has(ability) && !carries(actor, ability)) continue;
@@ -513,7 +506,7 @@ export function getTakeCoverModifier(actor) {
 // ─── Activated abilities (sheet buttons) ─────────────────────────────────
 export function getActivatedAbilities(actor) {
   const out = [];
-  const scripted = scriptedMechanics(actor, ActivatedAbility);
+  const scripted = ScriptCompiler.getMechanics(actor, ActivatedAbility);
   const borne = new Set(scripted);
   for (const ability of [...scripted, ...MECHANIC_BUCKETS.activated]) {
     // Aura abilities (e.g. Hollow-Way) surface on every Hunter; available() is
@@ -539,7 +532,9 @@ export async function activateAbility(actor, ability, extraCtx = {}) {
   // refunds them.
   await payConditionCost(actor, ability);
   const ctx = { actor, ...extraCtx };
-  if (ability.run) await ability.run(actor, ctx);
+  if (ability.run) {
+    if (await ability.run(actor, ctx) === false) return false;
+  }
   else await applyEffects(ability.effects, ctx);
   if (ctx._cancelled) return false;
   await payResourceCost(actor, ability);
@@ -681,20 +676,7 @@ async function offerEventReactions(eventMatcher, { actor = null, payload = {} } 
       }
     }
   }
-  await runScriptedEvents(eventMatcher, { actor, payload });
-}
-
-// Runs on whichever client fired the event, so self-scoped events only —
-// zoneMate cases still need a Reaction.
-async function runScriptedEvents(eventMatcher, { actor = null, payload = {} } = {}) {
-  const carriers = actor ? [actor] : (game.user?.isGM ? getActiveSceneHunters() : []);
-  for (const carrier of carriers) {
-    for (const mechanic of scriptedMechanics(carrier, ScriptedEvent)) {
-      if (!eventMatcher({ type: mechanic.eventType })) continue;
-      try { await mechanic.run(carrier, payload); }
-      catch (err) { console.warn(`Hollows | scripted event ${mechanic.key} failed:`, err); }
-    }
-  }
+  await ScriptCompiler.runEvents(eventMatcher, { actor, payload });
 }
 
 // Reload full-refill check. Reload is initiated by the carrier's own client, so
@@ -721,6 +703,9 @@ export async function runReloadFullCheck(actor, weapon) {
 // Bleeding instead of the normal damage. Returns true when consumed.
 export async function runEntityBleedingStartCheck(entity) {
   if (!game.user?.isGM) return false;
+  await ScriptCompiler.runEvents(event => event.type === "entityBleedingStart", {
+    payload: { entityId: entity.id },
+  });
   const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
   const carriers = getActiveSceneHunters();
   for (const reaction of getAllReactions()) {
@@ -879,6 +864,9 @@ export async function runOnIncomingEntityWoundDamage(actor, { damageValue } = {}
   if (!actor || !game.user?.isGM) return { damageValue: Number(damageValue || 0) };
   const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
   let remaining = Number(damageValue || 0);
+  await ScriptCompiler.runEvents(event => event.type === "incomingEntityWoundDamage", {
+    actor, payload: { damageValue: remaining },
+  });
   for (const reaction of getAllReactions()) {
     if (!reaction.event || reaction.event.type !== "incomingEntityWoundDamage") continue;
     if (!carries(actor, reaction)) continue;
@@ -935,7 +923,7 @@ export async function applyIncomingDamageModifiers(target, context = {}) {
   const source = context.source || "any";
   const timing = context.timing || "preMitigation";
   const carriers = getActiveSceneHunters();
-  const formMechanics = itemMechanics(target, IncomingDamageModifier);
+  const formMechanics = [...selectedActorFormMechanics(target, IncomingDamageModifier), ...ScriptCompiler.getMechanics(target, IncomingDamageModifier)];
   for (const ability of MECHANIC_BUCKETS.incomingDamageModifier) {
     if (ability.timing !== timing) continue;
     // sceneRanged: a Ready carrier anywhere on the scene may react to ranged

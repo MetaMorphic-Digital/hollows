@@ -1,5 +1,4 @@
 import { getHollowsWeaponIndex } from "../../../helpers/runtime-state.js";
-import { customScriptsAllowed } from "../../../helpers/settings.js";
 import {
   STAT_LABELS,
 } from "../../../data/_module.mjs";
@@ -58,11 +57,12 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
         if (!this.isEditable) return;
         return this._onDeleteAbility(event, target);
       },
+      /** @this {HollowsWeaponSheet} */
       editRenownScript: async function() {
         if (!this.isEditable) return;
-        const { openScriptEditor } = await import("../../apps/script-editor.mjs");
-        openScriptEditor(this.item, "system.renown.script", {
-          title: `${this.item.name} — Renown Script`,
+        const { default: HollowsScriptEditor } = await import("../../apps/script-editor.mjs");
+        HollowsScriptEditor.open(this.item, "system.renown.script", {
+          title: game.i18n.format("HOLLOWS.SCRIPT.renownTitle", { name: this.item.name }),
         });
       },
     },
@@ -110,7 +110,8 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     data.attackProfileStatChoices = ATTACK_PROFILE_STATS;
     data.attackProfileDefenceChoices = ATTACK_PROFILE_DEFENCES;
     data.formsForDisplay = getAvailableWeaponForms(this.item);
-    data.scriptsAllowed = customScriptsAllowed();
+    data.scriptsAllowed = hollows.settings.allowCustomScripts;
+    data.canEditScripts = game.user.isGM && this.isEditable;
     data.effectiveDamage = getEffectiveWeaponDamage(this.item);
     data.effectiveCapacity = getEffectiveWeaponCapacity(this.item);
     data.effectiveHealthBonus = this.item.system.getEffectiveWeaponHealthBonus();

@@ -1,5 +1,5 @@
 import { getSelectedWeaponForm } from "../weapons/resolvers.js";
-import { scriptField } from "./script-schema.js";
+import ScriptField from "../fields/script-field.mjs";
 
 export default class WeaponData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
@@ -46,7 +46,7 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
         enabled: new fields.BooleanField({ initial: false }),
         name: new fields.StringField({ initial: "" }),
         text: new fields.StringField({ initial: "" }),
-        script: scriptField(),
+        script: new ScriptField(),
       }),
       loaded: new fields.BooleanField({ initial: true }),
       coreAbility: new fields.StringField({ initial: "" }),

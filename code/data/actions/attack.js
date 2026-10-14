@@ -622,6 +622,7 @@ export async function openAttackDialog(actor, options = {}) {
             // General damage modifiers (Backstab, Seeing Red) always apply.
             const changed = applyAttackDamageChanges(actor, { resolve: damageResolve, wounds: damageWounds }, {
               attackerZone: zone,
+              targetType,
               weapon,
               weaponType: weapon?.system?.weaponType || "",
               suppressItemBonuses,

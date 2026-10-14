@@ -33,9 +33,9 @@
   </section>
 
   <section class="sheet-section">
-    <h2>Automation</h2>
+    <h2>{{localize "HOLLOWS.SCRIPT.automation"}}</h2>
     {{> "systems/hollows/templates/item/parts/script-controls.html"
-        label="Script" action="editAbilityScript"
-        block=system.script scriptsAllowed=scriptsAllowed}}
+        label=(localize "HOLLOWS.SCRIPT.source") action="editAbilityScript"
+        block=system.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
   </section>
 </form>

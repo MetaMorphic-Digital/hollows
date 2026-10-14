@@ -4,53 +4,26 @@ import { HOLLOWS_CONDITIONS } from "../data/_module.mjs";
 import { registerHollowsHandlebarsHelpers } from "./handlebars.js";
 import { preloadHollowsTemplates } from "./templates.js";
 import { registerQueries } from "./queries.js";
-import { registerHollowsSettings } from "./settings.js";
 
 export function runHollowsInit() {
   console.log("Hollows | System init (Blackjack Engine)");
 
-  try {
-    registerHollowsSettings();
-  } catch (err) {
-    console.error("Hollows | Failed to register settings", err);
-  }
+  registerActorDataModelHooks({
+    getEffectiveEntityStat,
+  });
 
-  try {
-    registerActorDataModelHooks({
-      getEffectiveEntityStat,
-    });
-  } catch (err) {
-    console.error("Hollows | Failed to register actor data model hooks", err);
-  }
+  registerHollowsHandlebarsHelpers();
 
-  try {
-    registerHollowsHandlebarsHelpers();
-  } catch (err) {
-    console.error("Hollows | Failed to register Handlebars helpers", err);
-  }
+  CONFIG.statusEffects = Object.values(HOLLOWS_CONDITIONS).map(cfg => ({
+    id: cfg.id,
+    name: cfg.label,
+    icon: cfg.icon,
+    img: cfg.icon,
+  }));
 
-  try {
-    CONFIG.statusEffects = Object.values(HOLLOWS_CONDITIONS).map(cfg => ({
-      id: cfg.id,
-      name: cfg.label,
-      icon: cfg.icon,
-      img: cfg.icon,
-    }));
-  } catch (err) {
-    console.error("Hollows | Failed to register status effects", err);
-  }
+  preloadHollowsTemplates();
 
-  try {
-    preloadHollowsTemplates();
-  } catch (err) {
-    console.error("Hollows | Failed to preload templates", err);
-  }
-
-  try {
-    registerQueries();
-  } catch (err) {
-    console.error("Hollows | Failed to register queries", err);
-  }
+  registerQueries();
 
   if (!game.hollows) game.hollows = {};
   if (!game.hollows._rollInitiativePatched) {

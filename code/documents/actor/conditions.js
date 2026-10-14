@@ -140,6 +140,7 @@ export async function setConditionSafe(actor, key, active) {
   try {
     await runGMQuery("hollows.actorMutation", {
       actorId: actor.id,
+      actorUuid: actor.uuid,
       type: "condition",
       payload: { key, active: !!active },
     });

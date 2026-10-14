@@ -52,6 +52,7 @@ export default {
   output: {
     file: "./public/main.mjs",
     format: "esm",
+    inlineDynamicImports: true,
   },
   plugins: [
     resolve(),
