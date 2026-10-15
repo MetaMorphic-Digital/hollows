@@ -27,7 +27,11 @@ import { EntityStatModifier } from "../../data/mechanics/EntityStatModifier.js";
 import { EntityAbilityModifier } from "../../data/mechanics/EntityAbilityModifier.js";
 import { TakeCoverModifier } from "../../data/mechanics/TakeCoverModifier.js";
 import { getSelectedWeaponFormMechanics, getAllRegisteredWeaponFormMechanics } from "../../data/weapons/index.js";
-import ScriptCompiler from "../../documents/item/script-compiler.mjs";
+import { EntityActionPause } from "../../data/mechanics/EntityActionPause.js";
+import { ThreatLock } from "../../data/mechanics/ThreatLock.js";
+import { OnDeath } from "../../data/mechanics/OnDeath.js";
+import { WeaponModifier } from "../../data/mechanics/WeaponModifier.js";
+import ScriptCompiler, { ScriptedEvent } from "../../documents/item/script-compiler.mjs";
 
 function sameKey(a, b) {
   return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
@@ -138,11 +142,14 @@ export async function runEntityActionPauses(context = {}) {
   };
   if (!game.user?.isGM) return state;
   const carriers = getActiveSceneHunters();
+  const seen = new Set();
 
-  for (const ability of MECHANIC_BUCKETS.entityActionPause) {
+  for (const ability of [...MECHANIC_BUCKETS.entityActionPause, ...ScriptCompiler.getSceneMechanics(EntityActionPause)]) {
+    if (ability.group && seen.has(ability.group)) continue;
     for (const carrier of carriers) {
       if (!carries(carrier, ability)) continue;
       if (!ability.match(carrier, state)) continue;
+      if (ability.group) seen.add(ability.group);
       const result = await ability.run(carrier, state);
       if (Array.isArray(result.targetTokens)) state.targetTokens = result.targetTokens;
       if (Array.isArray(result.selectedZones)) state.selectedZones = result.selectedZones;
@@ -162,7 +169,8 @@ export async function runEntityActionPauses(context = {}) {
 }
 
 // ─── Start-of-turn handshakes ────────────────────────────────────────────
-export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = {}) {
+/** Run start-of-turn abilities on the GM for the selected turn scope and cleanup/effects stage. */
+export async function runStartOfTurnAbilities({ actor, entity, on = "actor", stage = "effects" } = {}) {
   if (!game.user?.isGM) return;
   if (on === "entity") {
     const carriers = getActiveSceneHunters();
@@ -170,7 +178,7 @@ export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = 
       const scripted = ScriptCompiler.getMechanics(carrier, StartOfTurnAction);
       const borne = new Set(scripted);
       for (const ability of [...scripted, ...MECHANIC_BUCKETS.startOfTurn]) {
-        if (ability.on !== "entity") continue;
+        if ((ability.on !== "entity") || ((ability.stage || "effects") !== stage)) continue;
         if (!borne.has(ability) && !carries(carrier, ability)) continue;
         await ability.run({ actor: carrier, entity });
       }
@@ -184,7 +192,7 @@ export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = 
     if (!actor) return;
     const carriers = getActiveSceneHunters();
     for (const ability of [...MECHANIC_BUCKETS.startOfTurn, ...ScriptCompiler.getSceneMechanics(StartOfTurnAction)]) {
-      if (ability.on !== "actorAll") continue;
+      if ((ability.on !== "actorAll") || ((ability.stage || "effects") !== stage)) continue;
       for (const carrier of carriers) {
         if (!carries(carrier, ability)) continue;
         await ability.run({ actor, carrier });
@@ -196,7 +204,7 @@ export async function runStartOfTurnAbilities({ actor, entity, on = "actor" } = 
   const scripted = ScriptCompiler.getMechanics(actor, StartOfTurnAction);
   const borne = new Set(scripted);
   for (const ability of [...scripted, ...MECHANIC_BUCKETS.startOfTurn]) {
-    if (ability.on !== on) continue;
+    if ((ability.on !== on) || ((ability.stage || "effects") !== stage)) continue;
     if (!borne.has(ability) && !carries(actor, ability)) continue;
     await ability.run({ actor, entity });
   }
@@ -248,7 +256,7 @@ export function getWeaponModifier(weapon, statKey) {
   const actor = weapon?.actor;
   if (!actor) return 0;
   let total = 0;
-  for (const ability of MECHANIC_BUCKETS.weaponModifier) {
+  for (const ability of [...MECHANIC_BUCKETS.weaponModifier, ...ScriptCompiler.getMechanics(actor, WeaponModifier)]) {
     if (!carries(actor, ability)) continue;
     total += ability.value(weapon, statKey);
   }
@@ -726,6 +734,11 @@ export async function runReloadFullCheck(actor, weapon) {
     });
     if (choice?.fullReload) return true;
   }
+  for (const reaction of ScriptCompiler.getMechanics(actor, ScriptedEvent)) {
+    if (reaction.event.type !== "reloadFullCheck") continue;
+    const result = await reaction.run(actor, { weaponId: weapon.id, weaponType: weapon.system.weaponType });
+    if (result?.fullReload) return true;
+  }
   return false;
 }
 
@@ -741,7 +754,7 @@ export async function runEntityBleedingStartCheck(entity) {
 
 export async function runDeathInterceptors(actor) {
   if (!actor || !game.user?.isGM) return false;
-  const interceptors = MECHANIC_BUCKETS.onDeath
+  const interceptors = [...MECHANIC_BUCKETS.onDeath, ...ScriptCompiler.getMechanics(actor, OnDeath)]
     .filter((m) => m.matches(actor))
     .sort((a, b) => b.priority - a.priority);
   for (const ic of interceptors) {
@@ -769,7 +782,7 @@ export async function runOnConditionRemoved(actor, key) {
 // ThreatLock mechanics are global (state-checked), so no carriership gate.
 export function getThreatLockedZones(kind) {
   const out = new Set();
-  for (const lock of MECHANIC_BUCKETS.threatLock) {
+  for (const lock of [...MECHANIC_BUCKETS.threatLock, ...ScriptCompiler.getSceneMechanics(ThreatLock), ...ScriptCompiler.getAuras(ThreatLock)]) {
     for (const z of (lock.lockedZones({ kind }) || [])) {
       if (z) out.add(z);
     }

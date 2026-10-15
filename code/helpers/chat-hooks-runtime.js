@@ -12,7 +12,7 @@ import { addCondition, removeCondition, getSpecialConditionRollMods } from "../d
 import { hasGritYourTeethActive } from "../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, StandardDamage } from "../documents/actor/resources.js";
 import { setupOutcomeData, setupChoiceButtons, setupResultHtml } from "../helpers/combat-runtime.js";
-import { evaluateResult, resolveSuggestedRollMode, HunterStatRollFlow } from "../dice/_module.mjs";
+import { evaluateResult, resolveSuggestedRollMode, HunterStatRollFlow, normalizeRollModeValue } from "../dice/_module.mjs";
 import { buildStandardRollCardHtml } from "../applications/ui/roll-card.js";
 import { buildMoveOutcomeCardHtml } from "../applications/ui/move-card.js";
 import { bindSuggestedRollMode, hasWeaponEquipped } from "../helpers/weapon-utils.js";
@@ -27,6 +27,7 @@ import {
 import {
   applyDefenceOptionBeforeRoll,
   getDefenceOptions,
+  prepareDefenceOptions,
   renderDefenceOptionHtml,
 } from "../data/actions/defence-options.js";
 import { applyEffects } from "../data/mechanics/dsl/effects.js";
@@ -396,6 +397,7 @@ export function registerChatMessageHooks() {
         targetZone,
         threatSpent,
       });
+      if (defenceState.rollMode) mode = normalizeRollModeValue(defenceState.rollMode);
       const gritActive = hasGritYourTeethActive(target);
       const flow = new HunterStatRollFlow(target, {
         title: `Defend (${attackName})`,
@@ -468,7 +470,7 @@ export function registerChatMessageHooks() {
         },
       });
 
-      await applyInterceptors("defence-resolved", { target, targetTokenUuid }, null);
+      await applyInterceptors("defence-resolved", { actor: target, target, targetTokenUuid }, null);
 
       for (const override of activeOverrides) {
         if (evaluateStatOverrideSuccess(override, { roll: r, statValue, damageType, damageValue })) {
@@ -517,10 +519,6 @@ export function registerChatMessageHooks() {
       const forceAdvantage = !!flagData.forceAdvantage;
       const basicDefenceMode = String(flagData.basicDefenceMode || "normal");
       const gritActive = hasGritYourTeethActive(target);
-      const selectedMode = resolveSuggestedRollMode({
-        advantages: [forceAdvantage, gritActive],
-        fallback: basicDefenceMode,
-      });
       const statLabel = STAT_LABELS[defenceStat] || defenceStat;
       const statValue = getTotalStatForActor(target, defenceStat);
       const defenceOverrides = getStatOverrides(target, "defence");
@@ -528,6 +526,10 @@ export function registerChatMessageHooks() {
         attackName,
         defenceStat,
         tn,
+      });
+      const selectedMode = resolveSuggestedRollMode({
+        advantages: [forceAdvantage, gritActive],
+        fallback: basicDefenceMode,
       });
       const fields = [
         {
@@ -561,14 +563,18 @@ export function registerChatMessageHooks() {
         fields,
         footerHtml: renderDefenceOptionHtml(defenceOptions, { attackName, defenceStat, tn }),
         render: (_e, dialog) => {
+          const rollModeSources = {
+            advantages: [forceAdvantage, gritActive],
+            disadvantages: [],
+          };
+          prepareDefenceOptions(defenceOptions, dialog.element, { attackName, defenceStat, tn, rollModeSources });
           bindSuggestedRollMode(dialog.element, {
             fallback: basicDefenceMode,
             getAdvantages: (root) => [
-              forceAdvantage,
-              gritActive,
+              ...rollModeSources.advantages,
               !!root.querySelector("[name=useFocus]")?.checked && getFocusCount(target) > 0,
             ],
-            getDisadvantages: () => [getSpecialConditionRollMods(target).disadvDefence],
+            getDisadvantages: () => [getSpecialConditionRollMods(target).disadvDefence, ...rollModeSources.disadvantages],
             watch: ["useFocus"],
           });
         },

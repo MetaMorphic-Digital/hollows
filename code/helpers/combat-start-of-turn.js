@@ -13,6 +13,7 @@ export async function runStartOfTurnEffects(combat, newCombatant) {
   if (!combat || !newCombatant) return;
   const actor = newCombatant.actor;
   if (actor?.type === "hunter") {
+    await runStartOfTurnAbilities({ actor, stage: "cleanup" });
     await clearGritYourTeeth(actor);
     await clearSkirmisherBonus(actor);
     await applySupportStartOfTurn(actor);

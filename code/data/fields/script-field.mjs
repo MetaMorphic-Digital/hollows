@@ -9,10 +9,21 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
   /**
    * @type {Record<string, {
    *   label?: string, ctx?: string[], returns?: string, sync?: boolean,
-   *   hasOn?: boolean, hasEvent?: boolean, multipleOnly?: boolean
+   *   hasOn?: boolean, hasEvent?: boolean, multipleOnly?: boolean, fallback?: *, options?: boolean, optionalRun?: boolean
    * }>}
    */
   static hooks = {
+    reloadFullCheck: { multipleOnly: true },
+    entityActionPause: { multipleOnly: true },
+    onDeath: { multipleOnly: true },
+    threatLock: { multipleOnly: true, sync: true, fallback: [] },
+    weaponModifier: { multipleOnly: true, sync: true },
+    attackOptions: { multipleOnly: true, sync: true, fallback: null, options: true },
+    defenceOptions: { multipleOnly: true, sync: true, fallback: null, options: true },
+    terrainDiscard: { multipleOnly: true, fallback: null },
+    manoeuvreAvailability: { multipleOnly: true, sync: true, fallback: null },
+    threatEnhancement: { multipleOnly: true, sync: true, fallback: null },
+    interceptor: { multipleOnly: true, fallback: null },
     statOverride: { multipleOnly: true },
     attackRoll: { multipleOnly: true, sync: true },
     entityStat: { multipleOnly: true, sync: true },
@@ -120,6 +131,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
       sync: true,
     },
     incomingDamage: {
+      optionalRun: true,
       label: "HOLLOWS.SCRIPT.hooks.incomingDamage.label",
       ctx: [
         "actor",

@@ -14,6 +14,10 @@ import { EntityStatModifier } from "../../data/mechanics/EntityStatModifier.js";
 import { EntityAbilityModifier } from "../../data/mechanics/EntityAbilityModifier.js";
 import { TakeCoverModifier } from "../../data/mechanics/TakeCoverModifier.js";
 import { getActiveSceneHunters, getActorZone } from "../../canvas/zone.js";
+import { EntityActionPause } from "../../data/mechanics/EntityActionPause.js";
+import { ThreatLock } from "../../data/mechanics/ThreatLock.js";
+import { OnDeath } from "../../data/mechanics/OnDeath.js";
+import { WeaponModifier } from "../../data/mechanics/WeaponModifier.js";
 import { Mechanic } from "../../data/mechanics/Mechanic.js";
 import ScriptField from "../../data/fields/script-field.mjs";
 import { HOLLOWS_API as API, HOLLOWS_SYNC_API as SYNC_API } from "../../api.mjs";
@@ -24,6 +28,16 @@ export class ScriptedEvent extends Mechanic {
     super(config);
     this.event = config.event;
     this.rateLimit = config.rateLimit;
+  }
+}
+
+/** A script called by an action provider or interceptor. */
+export class ScriptedProvider extends Mechanic {
+  constructor(config = {}) {
+    super(config);
+    this.hook = config.hook;
+    this.event = config.event;
+    this.priority = config.priority || 0;
   }
 }
 
@@ -79,14 +93,14 @@ ${source}
    * @param {Function} fn
    * @param {string} key
    * @param {Item} item
-   * @param {{sync?: boolean, routeToGM?: boolean, carrierIds?: string[], fallback?: *}} [options]
+   * @param {{sync?: boolean, routeToGM?: boolean, runOnGM?: boolean, carrierIds?: string[], fallback?: *, api?: object}} [options]
    * @returns {Function} Returns the fallback on failure; void remains a successful result.
    */
-  static #makeInvoker(fn, key, item, { sync = false, routeToGM = false, carrierIds, fallback = this.#failed } = {}) {
+  static #makeInvoker(fn, key, item, { sync = false, routeToGM = false, runOnGM = false, carrierIds, fallback = this.#failed, api = sync ? SYNC_API : API } = {}) {
     const context = (actor, ctx) => ({ carrier: item.parent, carrierIds, ...ctx, actor, item });
     if (sync) return (actor, ctx = {}) => {
       try {
-        const result = fn(SYNC_API, actor, context(actor, ctx));
+        const result = fn(api, actor, context(actor, ctx));
         if (result && (typeof result.then === "function")) {
           Promise.resolve(result).catch(error => this.#report(item, key, error, "runtime"));
           throw new TypeError(game.i18n.localize("HOLLOWS.SCRIPT.syncPromise"));
@@ -100,13 +114,10 @@ ${source}
     return async (actor, ctx = {}, choice) => {
       try {
         ctx = context(actor, ctx);
-        if (routeToGM && !ctx.carrier.isOwner) {
-          const { runGMQuery } = await import("../../helpers/queries.js");
-          return await runGMQuery("hollows.scriptReaction", {
-            itemUuid: item.uuid, key, phase: "execute", context: this.#serializeContext(ctx),
-          }, { timeout: 300_000 });
+        if ((runOnGM && !game.user.isGM) || (routeToGM && !ctx.carrier.isOwner)) {
+          return await this.#runOnGM(item, key, "execute", ctx);
         }
-        return await fn(API, actor, ctx, choice);
+        return await fn(api, actor, ctx, choice);
       } catch (error) {
         this.#report(item, key, error, "runtime");
         return fallback;
@@ -114,43 +125,61 @@ ${source}
     };
   }
 
-  /** Send top-level documents by UUID; event payloads already contain serializable data. */
+  /** Send documents and scene tokens by UUID, including target lists. */
   static #serializeContext(ctx) {
-    return Object.fromEntries(Object.entries(ctx).map(([key, value]) => [
-      key, value instanceof foundry.abstract.Document ? { $scriptDocument: value.uuid } : value,
-    ]));
+    if (!foundry.utils.isPlainObject(ctx)) return ctx;
+    const serialize = value => {
+      if (value?.document instanceof foundry.abstract.Document) {
+        return { $scriptDocument: value.document.uuid, $scriptToken: true };
+      }
+      return value instanceof foundry.abstract.Document ? { $scriptDocument: value.uuid } : value;
+    };
+    return Object.fromEntries(Object.entries(ctx).map(([key, value]) =>
+      [key, Array.isArray(value) ? value.map(serialize) : serialize(value)]));
   }
 
-  /** Resolve document references on the receiving client. */
+  /** Restore document and token references on the receiving client. */
   static async #resolveContext(ctx) {
-    return Object.fromEntries(await Promise.all(
-      Object.entries(ctx).map(async ([key, value]) => [
-        key, value?.$scriptDocument ? await fromUuid(value.$scriptDocument) : value,
-      ]),
-    ));
+    if (!foundry.utils.isPlainObject(ctx)) return ctx;
+    const resolve = async value => {
+      if (!value?.$scriptDocument) return value;
+      const document = await fromUuid(value.$scriptDocument);
+      return value.$scriptToken ? document.object : document;
+    };
+    return Object.fromEntries(await Promise.all(Object.entries(ctx).map(async ([key, value]) =>
+      [key, await (Array.isArray(value) ? Promise.all(value.map(resolve)) : resolve(value))])));
+  }
+
+  /** Run a callback on the GM and restore document references in its result. */
+  static async #runOnGM(item, key, phase, ctx, choice) {
+    const { runGMQuery } = await import("../../helpers/queries.js");
+    const result = await runGMQuery("hollows.scriptReaction", {
+      itemUuid: item.uuid, key, phase, context: this.#serializeContext(ctx),
+      choice: this.#serializeContext(choice),
+    }, { timeout: 300_000 });
+    return this.#resolveContext(result);
   }
 
   /**
-   * Run the choice on the owner, then apply its result on the GM.
+   * Ask the recipient, then optionally apply the choice on the GM.
    * @param {Item} item
    * @param {string} key
    * @param {object} ctx
    * @param {boolean} apply Whether the handler has an applyOnGM callback.
-   * @returns {Promise<*>} False when the owner declines.
+   * @param {User} [recipient] Defaults to the carrier's owner.
+   * @returns {Promise<*>} False when the recipient declines.
    */
-  static async #offerReaction(item, key, ctx, apply) {
+  static async #offerReaction(item, key, ctx, apply, recipient) {
     const { primaryOwnerOf } = await import("../../helpers/reactions.js");
-    const { runUserQuery, runGMQuery } = await import("../../helpers/queries.js");
+    const { runUserQuery } = await import("../../helpers/queries.js");
     const request = { itemUuid: item.uuid, key, context: this.#serializeContext(ctx) };
-    const owner = primaryOwnerOf(ctx.carrier) || game.user;
+    const owner = recipient || primaryOwnerOf(ctx.carrier) || game.user;
     const choice = await runUserQuery(owner, "hollows.scriptReaction", {
       ...request, phase: "promptOnPlayer",
     }, { timeout: 300_000 });
     if ((choice == null) || (choice === false)) return false;
-    if (!apply) return choice;
-    return runGMQuery("hollows.scriptReaction", {
-      ...request, phase: "applyOnGM", choice,
-    }, { timeout: 300_000 });
+    if (!apply) return this.#resolveContext(choice);
+    return this.#runOnGM(item, key, "applyOnGM", ctx, choice);
   }
 
   /**
@@ -163,8 +192,10 @@ ${source}
     const mechanic = this.getMechanics(item.parent).find(entry => entry.key === key);
     const callback = mechanic[phase];
     const ctx = await this.#resolveContext(context);
+    choice = await this.#resolveContext(choice);
     const result = await callback(ctx.actor, ctx, choice);
-    return result === this.#failed ? false : result;
+    if (result === this.#failed) return false;
+    return this.#serializeContext(result);
   }
 
   /**
@@ -216,6 +247,7 @@ ${source}
       }
       case "startOfTurn": {
         const mechanic = new StartOfTurnAction(config);
+        mechanic.stage = config.stage || "effects";
         mechanic.run = async (ctx = {}) =>
           this.#limited(ctx.carrier || ctx.actor, mechanic, () => invoke(ctx.actor, ctx));
         return mechanic;
@@ -255,8 +287,9 @@ ${source}
         };
         return mechanic;
       }
+      case "reloadFullCheck":
       case "onEvent": {
-        const mechanic = new ScriptedEvent(config);
+        const mechanic = new ScriptedEvent({ ...config, event: hook === "reloadFullCheck" ? { type: hook } : config.event });
         mechanic.run = async (actor, payload = {}) => {
           return this.#limited(mechanic.carrier, mechanic, () => invoke(actor, {
             event: mechanic.event.type, payload,
@@ -295,6 +328,38 @@ ${source}
         };
         return mechanic;
       }
+      case "entityActionPause": {
+        const mechanic = new EntityActionPause(config);
+        mechanic.handler = async (actor, ctx) => {
+          const result = await this.#limited(actor, mechanic, () => invoke(actor, ctx));
+          return result === this.#failed ? {} : result;
+        };
+        return mechanic;
+      }
+      case "onDeath": {
+        const mechanic = new OnDeath(config);
+        mechanic.handler = actor => this.#limited(actor, mechanic, async () => {
+          const result = await invoke(actor);
+          return result?.handled ? result : false;
+        });
+        return mechanic;
+      }
+      case "threatLock": {
+        const mechanic = new ThreatLock(config);
+        mechanic.lockedZones = ctx => invoke(mechanic.carrier, ctx);
+        return mechanic;
+      }
+      case "weaponModifier": return new WeaponModifier(config);
+      case "attackOptions":
+      case "defenceOptions":
+      case "terrainDiscard":
+      case "manoeuvreAvailability":
+      case "threatEnhancement":
+      case "interceptor": {
+        const mechanic = new ScriptedProvider(config);
+        mechanic.run = invoke;
+        return mechanic;
+      }
       case "statOverride": return new StatOverride(config);
       case "attackRoll": return new AttackRollModifier(config);
       case "entityStat": return new EntityStatModifier(config);
@@ -311,11 +376,23 @@ ${source}
     const sync = !!ScriptField.hooks[hook].sync;
     const reaction = callbacks.promptOnPlayer !== undefined;
     const invoker = (fn, options = {}) => this.#makeInvoker(fn, key, item, { carrierIds, ...options });
-    const run = reaction
-      ? (_H, _actor, ctx) => this.#offerReaction(item, key, ctx, !!callbacks.applyOnGM)
-      : callbacks.run;
-    const invoke = (hook === "incomingDamage") && (run === undefined)
-      ? null : invoker(run, { sync, routeToGM: !reaction });
+    const recipient = callbacks.recipient && invoker(callbacks.recipient, { sync: true, fallback: false });
+    const run = reaction ? (_H, actor, ctx) => {
+      const user = recipient && recipient(actor, ctx);
+      if (recipient && !user) return false;
+      return this.#offerReaction(item, key, ctx, !!callbacks.applyOnGM, user);
+    } : callbacks.run;
+    let invoke = ScriptField.hooks[hook].optionalRun && (run === undefined) ? null : invoker(run, {
+      sync, routeToGM: !reaction, runOnGM: config.runOnGM, fallback: ScriptField.hooks[hook].fallback,
+    });
+    if (ScriptField.hooks[hook].options) {
+      const buildOptions = invoker(run, { sync: true, api: API, fallback: null });
+      invoke = (actor, ctx = {}) => buildOptions(actor, {
+        ...ctx, applyOnGM: choice => this.#runOnGM(item, key, "applyOnGM", {
+          ...ctx, actor, carrier: item.parent,
+        }, choice),
+      });
+    }
     const mechanic = this.#buildMechanic(hook, config, invoke);
     mechanic.rateLimit = config.rateLimit;
     mechanic.carrier = item.parent;
@@ -333,10 +410,10 @@ ${source}
     }
     if (reaction) {
       mechanic.promptOnPlayer = invoker(callbacks.promptOnPlayer);
-      if (callbacks.applyOnGM) mechanic.applyOnGM = invoker(callbacks.applyOnGM);
     } else if (!sync) {
       mechanic.execute = invoker(run);
     }
+    if (callbacks.applyOnGM) mechanic.applyOnGM = invoker(callbacks.applyOnGM);
     if (mechanic.aura) mechanic.withCarriers = ids => this.#createMechanic(item, config, callbacks, ids);
     return mechanic;
   }
@@ -383,7 +460,7 @@ ${source}
           if (reaction && (definition.run !== undefined)) {
             throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "run" }));
           }
-          if (!reaction && (definition.applyOnGM !== undefined)) {
+          if (!reaction && !ScriptField.hooks[definition.hook].options && (definition.applyOnGM !== undefined)) {
             throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "applyOnGM" }));
           }
           for (const [field, choices] of Object.entries({
@@ -406,13 +483,13 @@ ${source}
         const rateLimit = sync || !definition.rateLimit || (definition.rateLimit === "none")
           ? "" : definition.rateLimit;
         const handlerKey = multiple ? `${key}.${id}` : key;
-        const { run, promptOnPlayer, applyOnGM, active, matchCarrier, when, available, getLabel, ...config } = definition;
+        const { run, promptOnPlayer, applyOnGM, active, matchCarrier, when, available, getLabel, recipient, ...config } = definition;
         return this.#createMechanic(item, {
           ...config,
           key: handlerKey, name: definition.label || name, text: text || "",
           weapon: item.system?.weaponType || "", rateLimit,
           on: definition.on || "actor", event,
-        }, { run, promptOnPlayer, applyOnGM, active, matchCarrier, when, available, getLabel });
+        }, { run, promptOnPlayer, applyOnGM, active, matchCarrier, when, available, getLabel, recipient });
       });
     } catch (error) {
       this.#report(item, key, error, "compile");
@@ -462,6 +539,13 @@ ${source}
       }
     }
     return [...groups.values()].map(({ mechanic, carrierIds }) => mechanic.withCarriers(carrierIds));
+  }
+
+  /** Collect current item providers in priority order. */
+  static getProviders(hook, actor = null) {
+    const local = actor ? this.getMechanics(actor, ScriptedProvider) : this.getSceneMechanics(ScriptedProvider);
+    return [...local.filter(m => !m.aura), ...this.getAuras(ScriptedProvider)]
+      .filter(m => m.hook === hook).sort((a, b) => b.priority - a.priority);
   }
 
   /**

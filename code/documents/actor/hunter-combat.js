@@ -66,7 +66,7 @@ export async function initializeHunterCoreStatesForCombat(combat) {
     if (hasWeaponEquipped(hunter, "Rifle") && (getFocusCount(hunter) > 0)) {
       await setFocusCount(hunter, 0);
     }
-    await applyInterceptors("combat-start-hunter", { hunter }, null);
+    await applyInterceptors("combat-start-hunter", { actor: hunter, hunter }, null);
   }
   await combat.setFlag("hollows", "coreStatesInitialized", true);
 }
