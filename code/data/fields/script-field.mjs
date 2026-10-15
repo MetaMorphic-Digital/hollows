@@ -19,6 +19,10 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
         "item",
       ],
     },
+    applyToZone: {
+      label: "HOLLOWS.SCRIPT.hooks.applyToZone.label",
+      ctx: ["actor", "item", "target", "payload"],
+    },
     startOfTurn: {
       label: "HOLLOWS.SCRIPT.hooks.startOfTurn.label",
       ctx: [
@@ -71,7 +75,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
         "actor",
         "fromZone",
         "toZone",
-        "phase",
+        "byOwner",
         "item",
       ],
     },
@@ -123,6 +127,10 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
 
   /** @type {Record<string, string>} */
   static events = {
+    conditionRemoved: "HOLLOWS.SCRIPT.events.conditionRemoved",
+    threatPlaced: "HOLLOWS.SCRIPT.events.threatPlaced",
+    hunterPlacedThreat: "HOLLOWS.SCRIPT.events.hunterPlacedThreat",
+    focus: "HOLLOWS.SCRIPT.events.focus",
     guard: "HOLLOWS.SCRIPT.events.guard",
     takeCover: "HOLLOWS.SCRIPT.events.takeCover",
     reload: "HOLLOWS.SCRIPT.events.reload",
@@ -136,6 +144,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
 
   /** @type {Record<string, string>} */
   static clients = {
+    applyToZone: "HOLLOWS.SCRIPT.clients.activated",
     activated: "HOLLOWS.SCRIPT.clients.activated",
     startOfTurn: "HOLLOWS.SCRIPT.clients.startOfTurn",
     endOfTurn: "HOLLOWS.SCRIPT.clients.endOfTurn",

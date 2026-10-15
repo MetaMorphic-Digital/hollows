@@ -25,6 +25,8 @@ import {
 } from "./documents/actor/resources.js";
 import {
   setConditionSafe,
+  getActorTerrainTags,
+  getEntityTerrainCounts,
 } from "./documents/actor/conditions.js";
 import {
   pickOne,
@@ -109,6 +111,8 @@ export const HOLLOWS_API = Object.freeze({
     set: setConditionSafe,
   }),
 
+  terrain: Object.freeze({ tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts }),
+
   threat: Object.freeze({
     place: placeThreatFromHunter,
     remove: removeThreatViaDialog,
@@ -159,4 +163,5 @@ export const HOLLOWS_SYNC_API = Object.freeze({
   weapon: HOLLOWS_API.weapon,
   resource: Object.freeze({ focusCount: getFocusCount }),
   condition: Object.freeze({ has: HOLLOWS_API.condition.has }),
+  terrain: HOLLOWS_API.terrain,
 });

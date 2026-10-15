@@ -125,6 +125,9 @@
   <section class="sheet-section">
     <h2>Core Ability</h2>
     <textarea name="system.coreAbility" rows="4">{{system.coreAbility}}</textarea>
+    {{> "systems/hollows/templates/item/parts/script-controls.html"
+    label=(localize "HOLLOWS.SCRIPT.automation") action="editScript" path="system.script" titleKey="HOLLOWS.SCRIPT.abilityTitle"
+    block=system.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
   </section>
 
   <section class="sheet-section">
@@ -142,7 +145,7 @@
         <textarea name="system.renown.text" rows="4" placeholder="{{localize 'HOLLOWS.SCRIPT.renown.textPlaceholder'}}">{{system.renown.text}}</textarea>
       </div>
       {{> "systems/hollows/templates/item/parts/script-controls.html"
-          label=(localize "HOLLOWS.SCRIPT.automation") action="editRenownScript"
+          label=(localize "HOLLOWS.SCRIPT.automation") action="editScript" path="system.renown.script" titleKey="HOLLOWS.SCRIPT.renownTitle"
           block=system.renown.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
     {{/if}}
   </section>

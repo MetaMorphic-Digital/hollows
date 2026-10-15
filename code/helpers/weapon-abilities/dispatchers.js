@@ -20,6 +20,7 @@ import { OnMoveAction } from "../../data/mechanics/OnMoveAction.js";
 import { EndOfTurnAction } from "../../data/mechanics/EndOfTurnAction.js";
 import { StartOfTurnAction } from "../../data/mechanics/StartOfTurnAction.js";
 import { ActivatedAbility } from "../../data/mechanics/ActivatedAbility.js";
+import { ApplyToZone } from "../../data/mechanics/ApplyToZone.js";
 import { StatModifier } from "../../data/mechanics/StatModifier.js";
 import { getSelectedWeaponFormMechanics, getAllRegisteredWeaponFormMechanics } from "../../data/weapons/index.js";
 import ScriptCompiler from "../../documents/item/script-compiler.mjs";
@@ -591,8 +592,10 @@ async function payResourceCost(actor, ability) {
 // ─── ApplyToZone abilities (activate + pick zone-mate + run effects) ────
 export function getApplyToZoneAbilities(actor) {
   const out = [];
-  for (const ability of MECHANIC_BUCKETS.applyToZone) {
-    if (!carries(actor, ability)) continue;
+  const scripted = ScriptCompiler.getMechanics(actor, ApplyToZone);
+  const borne = new Set(scripted);
+  for (const ability of [...scripted, ...MECHANIC_BUCKETS.applyToZone]) {
+    if (!borne.has(ability) && !carries(actor, ability)) continue;
     if (!ability.available(actor)) continue;
     if (ability.rateLimit && isRateLimited(actor, ability)) continue;
     out.push(ability);
@@ -729,7 +732,7 @@ export async function runOnDeathEffects(actor) {
 
 export async function runOnConditionRemoved(actor, key) {
   await offerEventReactions(
-    (event) => event.type === "conditionRemoved" && event.key === key,
+    (event) => (event.type === "conditionRemoved") && (!event.key || (event.key === key)),
     { actor, payload: { conditionKey: key } },
   );
 }

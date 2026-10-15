@@ -58,11 +58,11 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
         return this._onDeleteAbility(event, target);
       },
       /** @this {HollowsWeaponSheet} */
-      editRenownScript: async function() {
+      editScript: async function(event, target) {
         if (!this.isEditable) return;
         const { default: HollowsScriptEditor } = await import("../../apps/script-editor.mjs");
-        HollowsScriptEditor.open(this.item, "system.renown.script", {
-          title: game.i18n.format("HOLLOWS.SCRIPT.renownTitle", { name: this.item.name }),
+        HollowsScriptEditor.open(this.item, target.dataset.path, {
+          title: game.i18n.format(target.dataset.titleKey, { name: this.item.name }),
         });
       },
     },

@@ -50,6 +50,7 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
       }),
       loaded: new fields.BooleanField({ initial: true }),
       coreAbility: new fields.StringField({ initial: "" }),
+      script: new ScriptField(),
       outlook: new fields.StringField({ initial: "" }),
       lies: new fields.StringField({ initial: "" }),
       fears: new fields.StringField({ initial: "" }),

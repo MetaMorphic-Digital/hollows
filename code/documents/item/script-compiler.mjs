@@ -1,4 +1,5 @@
 import { ActivatedAbility } from "../../data/mechanics/ActivatedAbility.js";
+import { ApplyToZone } from "../../data/mechanics/ApplyToZone.js";
 import { StartOfTurnAction } from "../../data/mechanics/StartOfTurnAction.js";
 import { EndOfTurnAction } from "../../data/mechanics/EndOfTurnAction.js";
 import { OnAttackResultAction } from "../../data/mechanics/OnAttackResultAction.js";
@@ -15,14 +16,14 @@ import { HOLLOWS_API as API, HOLLOWS_SYNC_API as SYNC_API } from "../../api.mjs"
 export class ScriptedEvent extends Mechanic {
   constructor(config = {}) {
     super(config);
-    this.eventType = config.eventType;
+    this.event = config.event;
     this.rateLimit = config.rateLimit;
   }
 }
 
 /** Compile item scripts into the existing mechanic classes. */
 export default class ScriptCompiler {
-  /** @type {WeakMap<Item, {stamp: string, mechanics: Mechanic[]}>} Cached results per document instance. */
+  /** @type {WeakMap<Item, Map<string, {stamp: string, mechanics: Mechanic[]}>>} Cached results per script field. */
   static #cache = new WeakMap();
 
   /** @type {WeakMap<Item, Set<string>>} Errors already shown for each item. */
@@ -185,9 +186,12 @@ ${source}
    */
   static #buildMechanic(hook, config, invoke) {
     switch (hook) {
-      case "activated": {
-        const mechanic = new ActivatedAbility({
+      case "activated":
+      case "applyToZone": {
+        const Ability = hook === "activated" ? ActivatedAbility : ApplyToZone;
+        const mechanic = new Ability({
           ...config, buttonAction: `script-${config.key}`, buttonLabel: config.name,
+          cost: config.cost || (hook === "applyToZone" ? { condition: "ready" } : null),
         });
         mechanic.run = async (actor, ctx = {}) => {
           const result = await invoke(actor, ctx);
@@ -208,7 +212,7 @@ ${source}
         return mechanic;
       }
       case "onAttackResult": {
-        const mechanic = new OnAttackResultAction({ ...config, result: "any" });
+        const mechanic = new OnAttackResultAction(config);
         mechanic.handler = async (actor, ctx) => {
           const result = await invoke(actor, ctx);
           if ((result === this.#failed) || (result === false)) return { cancelled: true };
@@ -226,9 +230,9 @@ ${source}
         return mechanic;
       }
       case "onMove": {
-        const mechanic = new OnMoveAction({ ...config, phase: "after" });
+        const mechanic = new OnMoveAction(config);
         mechanic.run = async (ctx = {}) => {
-          if (ctx.phase !== mechanic.phase) return;
+          if (mechanic.ownerMoveOnly && !ctx.byOwner) return;
           return this.#limited(ctx.actor, mechanic, () => invoke(ctx.actor, ctx));
         };
         return mechanic;
@@ -236,7 +240,7 @@ ${source}
       case "onEvent": {
         const mechanic = new ScriptedEvent(config);
         mechanic.run = async (actor, payload = {}) =>
-          this.#limited(actor, mechanic, () => invoke(actor, { event: mechanic.eventType, payload }));
+          this.#limited(actor, mechanic, () => invoke(actor, { event: mechanic.event.type, payload }));
         return mechanic;
       }
       case "statModifier": {
@@ -276,10 +280,10 @@ ${source}
   /**
    * Cache per document instance so synthetic actors do not share compiled scripts.
    * @param {Item} item
-   * @param {string} path Script field path.
+   * @param {{path: string, text: string}} slot
    * @returns {Mechanic[]} Compiled mechanics; empty for disabled or invalid scripts.
    */
-  static #compile(item, path) {
+  static #compile(item, { path, text }) {
     const block = foundry.utils.getProperty(item, path);
     const source = String(block?.source ?? "");
     if (!block?.enabled || !source.trim()) return [];
@@ -288,11 +292,11 @@ ${source}
     if (!multiple && !Object.hasOwn(ScriptField.hooks, hook)) return [];
     const key = `script.${item.id}.${path}`;
     const name = block.label || item.name || game.i18n.localize("HOLLOWS.SCRIPT.defaultName");
-    const text = path === "system.renown.script" ? item.system.renown.text : item.system?.text;
     const stamp = JSON.stringify([
       multiple, hook, block.rateLimit, block.on, block.eventType, name, text, item.system?.weaponType, source,
     ]);
-    const cached = this.#cache.get(item);
+    let cache = this.#cache.get(item);
+    const cached = cache?.get(path);
     if (cached?.stamp === stamp) return cached.mechanics;
     let mechanics = [];
     try {
@@ -304,6 +308,7 @@ ${source}
       }
       mechanics = Object.entries(definitions).map(([id, definition]) => {
         const reaction = definition.promptOnPlayer !== undefined;
+        const event = definition.event || { type: definition.eventType };
         if (multiple) {
           if (!Object.hasOwn(ScriptField.hooks, definition.hook)) {
             throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "hook" }));
@@ -324,6 +329,14 @@ ${source}
               throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field }));
             }
           }
+          if (definition.hook === "onEvent") {
+            if ((definition.event !== undefined) && (definition.eventType !== undefined)) {
+              throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.ambiguousEvent", { id }));
+            }
+            if (!Object.hasOwn(ScriptField.events, event.type)) {
+              throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "event.type" }));
+            }
+          }
         }
         const sync = !!ScriptField.hooks[definition.hook].sync;
         const rateLimit = sync || !definition.rateLimit || (definition.rateLimit === "none")
@@ -335,9 +348,26 @@ ${source}
         const mechanic = this.#buildMechanic(definition.hook, {
           key: handlerKey, name: definition.label || name, text: text || "",
           weapon: item.system?.weaponType || "", rateLimit,
-          on: definition.on || "actor", eventType: definition.eventType || "guard",
+          on: definition.on || "actor", event,
+          timing: definition.timing, result: definition.result, weaponType: definition.weaponType,
+          ownerMoveOnly: definition.ownerMoveOnly,
+          cost: definition.cost, targetSelection: definition.targetSelection, subSelect: definition.subSelect,
         }, this.#makeInvoker(run, handlerKey, sync, item));
         mechanic.rateLimit = rateLimit;
+        if (definition.available) {
+          const available = this.#makeInvoker(definition.available, handlerKey, true, item);
+          mechanic.available = actor => {
+            const result = available(actor);
+            return (result !== this.#failed) && result;
+          };
+        }
+        if (definition.getLabel) {
+          const getLabel = this.#makeInvoker(definition.getLabel, handlerKey, true, item);
+          mechanic.getLabel = actor => {
+            const result = getLabel(actor);
+            return result === this.#failed ? mechanic.name : result;
+          };
+        }
         if (reaction) {
           mechanic.promptOnPlayer = this.#makeInvoker(definition.promptOnPlayer, handlerKey, false, item);
           if (definition.applyOnGM) {
@@ -349,12 +379,13 @@ ${source}
     } catch (error) {
       this.#report(item, key, error, "compile");
     }
-    this.#cache.set(item, { stamp, mechanics });
+    if (!cache) this.#cache.set(item, cache = new Map());
+    cache.set(path, { stamp, mechanics });
     return mechanics;
   }
 
   /**
-   * Disabled Renown weapons are excluded along with disabled scripts.
+   * Renown scripts require enabled Renown; base scripts do not.
    * @param {Actor|null} actor Carrier actor.
    * @param {Function|null} [type] Mechanic constructor to select.
    * @returns {Mechanic[]} Actor's compiled mechanics.
@@ -363,10 +394,11 @@ ${source}
     if (!globalThis.hollows?.settings?.allowCustomScripts) return [];
     const mechanics = [];
     for (const item of actor?.items ?? []) {
-      const path = item.scriptPath;
-      if (!path || ((item.type === "weapon") && !item.system.renown.enabled)) continue;
-      for (const mechanic of this.#compile(item, path)) {
-        if (!type || (mechanic instanceof type)) mechanics.push(mechanic);
+      for (const slot of item.scriptSlots) {
+        if (!slot.enabled) continue;
+        for (const mechanic of this.#compile(item, slot)) {
+          if (!type || (mechanic instanceof type)) mechanics.push(mechanic);
+        }
       }
     }
     return mechanics;
@@ -388,7 +420,7 @@ ${source}
     }
     for (const carrier of carriers) {
       for (const mechanic of this.getMechanics(carrier, ScriptedEvent)) {
-        if (matches({ type: mechanic.eventType })) await mechanic.run(carrier, payload);
+        if (matches(mechanic.event)) await mechanic.run(carrier, payload);
       }
     }
   }

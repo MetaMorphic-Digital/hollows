@@ -9,6 +9,9 @@
         "activated": {
           "label": "Activated — button on the Hunter sheet"
         },
+        "applyToZone": {
+          "label": "Expend Ready — choose an ally in your area"
+        },
         "startOfTurn": {
           "label": "Start of turn"
         },
@@ -23,7 +26,7 @@
           "label": "After you are attacked"
         },
         "onMove": {
-          "label": "When you Move"
+          "label": "After you Move"
         },
         "onEvent": {
           "label": "On a game event (Guard, Reload, Feint…)"
@@ -42,6 +45,10 @@
         }
       },
       "events": {
+        "conditionRemoved": "When you lose a condition",
+        "threatPlaced": "When Threat is placed on the grid",
+        "hunterPlacedThreat": "When you place Threat",
+        "focus": "When you Focus",
         "guard": "When you Guard",
         "takeCover": "When you Take Cover",
         "reload": "When you Reload",
@@ -94,6 +101,7 @@
       "reactionHint": "For asynchronous hooks, use promptOnPlayer(H, actor, ctx) for the owner's choice and optional applyOnGM(H, actor, ctx, choice) for its effect. Return a JSON-serializable choice, or null/false to skip without spending the limit.",
       "invalidDefinitions": "Return an object of named handlers.",
       "invalidHandlerOption": "Handler \"{id}\" has an invalid {field} value.",
+      "ambiguousEvent": "Handler \"{id}\" must use either event or eventType, not both.",
       "runs": "Runs",
       "event": "Event",
       "whoseTurn": "Whose turn",
@@ -127,7 +135,7 @@
       },
       "settings": {
         "name": "Allow Custom Mechanic Scripts",
-        "hint": "Weapons of Renown and Weapon Abilities may carry GM-written JavaScript. These scripts run on connected clients, including players. Enable only for trusted content."
+        "hint": "Weapons and Weapon Abilities may carry GM-written JavaScript. These scripts run on connected clients, including players. Enable only for trusted content."
       },
       "error": "Script \"{key}\" {phase}: {message}. Further repeats are logged in the console.",
       "phases": {

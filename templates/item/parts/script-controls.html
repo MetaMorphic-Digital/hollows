@@ -2,7 +2,7 @@
   <div class="stat-label">{{label}}</div>
   <div class="script-controls">
     {{#if canEditScripts}}
-      <button type="button" class="stat-roll" data-action="{{action}}">{{localize "HOLLOWS.SCRIPT.edit"}}</button>
+      <button type="button" class="stat-roll" data-action="{{action}}" data-path="{{path}}" data-title-key="{{titleKey}}">{{localize "HOLLOWS.SCRIPT.edit"}}</button>
     {{/if}}
     <span class="muted">
       {{#unless scriptsAllowed}}

@@ -52,7 +52,7 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
    * @returns {boolean}
    */
   static canEdit(document, path) {
-    const validPath = document.scriptPath && (path === document.scriptPath);
+    const validPath = document.scriptSlots.some(slot => slot.path === path);
     return !!(validPath && game.user.isGM && hollows.settings.allowCustomScripts
       && (!document.pack || !game.packs.get(document.pack)?.locked));
   }
