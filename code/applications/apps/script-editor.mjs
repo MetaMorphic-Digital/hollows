@@ -86,6 +86,7 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
     const hook = value("hook");
     return {
       enabled: root.querySelector("[name=\"enabled\"]").checked,
+      trusted: root.querySelector("[name=\"trusted\"]").checked,
       label: value("label"),
       mode: value("mode"),
       hook,
@@ -154,10 +155,13 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
   async _onRender(context, options) {
     await super._onRender(context, options);
     this.element.querySelector(".window-content")?.classList.add("hollows-sheet");
-    for (const name of ["mode", "hook"]) {
-      this.element.querySelector(`[name="${name}"]`).addEventListener("change", () => {
-        this.draft = this.#readForm();
-        this.render();
+    for (const name of ["source", "mode", "hook", "on", "eventType", "rateLimit"]) {
+      this.element.querySelector(`[name="${name}"]`).addEventListener(name === "source" ? "input" : "change", () => {
+        this.element.querySelector("[name=\"trusted\"]").checked = false;
+        if ((name === "mode") || (name === "hook")) {
+          this.draft = this.#readForm();
+          this.render();
+        }
       });
     }
   }

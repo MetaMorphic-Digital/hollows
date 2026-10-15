@@ -5,10 +5,10 @@ import {
   getHunterEquipmentItemsForSlot,
   syncEquipmentSlotsFromItems,
 } from "../documents/actor/hunter-equipment.js";
-import { isShotgunWeapon, setShotgunsLoaded, hasWeaponEquipped } from "./weapon-utils.js";
+import { isShotgunWeapon, setShotgunsLoaded } from "./weapon-utils.js";
 import { addCondition, removeCondition } from "../documents/actor/conditions.js";
 import { HOLLOWS_CONDITIONS } from "../data/_module.mjs";
-import { getFocusCount, setFocusCount } from "../documents/actor/resources.js";
+import { setFocusCount } from "../documents/actor/resources.js";
 import { applyEchoAcquisition, handleCorruptionIncrease } from "../documents/actor/echo.js";
 import { maybeTriggerEntityCurseThresholdAbilities } from "../data/entity/actions/entity-special.js";
 import { triggerEntityWhenBrokenAbilities } from "../data/entity/actions/entity-broken.js";
@@ -21,7 +21,7 @@ import {
 } from "../documents/entity/entity-enhancements.js";
 import { runDeathInterceptors, runOnDeathEffects } from "./weapon-abilities/dispatchers.js";
 import { syncHunterLoadedStatusFromShotguns } from "./weapon-utils.js";
-import { applyInterceptorsSync } from "./extensions.js";
+import { applyInterceptors, applyInterceptorsSync } from "./extensions.js";
 
 const HOLLOWS_ENTITY_RESOLVE_PRE_UPDATE = new Map();
 const HOLLOWS_HUNTER_CORRUPTION_PRE_UPDATE = new Map();
@@ -105,24 +105,7 @@ export function registerActorHooks() {
     const resolveChanged = foundry.utils.hasProperty(changed, "system.health.resolve.value");
     if (!resolveChanged) return;
     const resolveValue = Number(actor.system?.health?.resolve?.value ?? 0);
-    if (resolveValue <= 0) {
-      if (hasWeaponEquipped(actor, "Armour") && actor.statuses.has("ready")) {
-        // Involuntary loss (Resolve hit 0) — not an "expend", so Barbed etc.
-        // must not trigger.
-        await removeCondition(actor, "ready", { skipReactionDispatch: true });
-        await ChatMessage.create({
-          speaker: ChatMessage.getSpeaker({ actor }),
-          content: `<div class="hollows-chat"><strong>${actor.name}</strong> becomes <strong>Unready</strong> (Broken).</div>`,
-        });
-      }
-      if (hasWeaponEquipped(actor, "Rifle") && (getFocusCount(actor) > 0)) {
-        await setFocusCount(actor, 0);
-        await ChatMessage.create({
-          speaker: ChatMessage.getSpeaker({ actor }),
-          content: `<div class="hollows-chat"><strong>${actor.name}</strong> loses all <strong>Focus</strong> (Broken).</div>`,
-        });
-      }
-    }
+    if (resolveValue <= 0) await applyInterceptors("hunter-broken", { actor }, null);
   });
 
   Hooks.on("updateActor", async (actor, changed) => {
@@ -306,10 +289,7 @@ export function registerActorHooks() {
     if (isShotgunWeapon(item)) {
       await syncHunterLoadedStatusFromShotguns(actor);
     }
-    if (!hasWeaponEquipped(actor, "Armour") && actor.statuses.has("ready")) {
-      // Armour removed — involuntary Ready loss, not an "expend".
-      await removeCondition(actor, "ready", { skipReactionDispatch: true });
-    }
+    await applyInterceptors("weapon-removed", { actor, item }, null);
   });
 
   Hooks.on("deleteItem", async (item) => {

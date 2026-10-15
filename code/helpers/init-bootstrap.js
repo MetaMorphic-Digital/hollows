@@ -10,6 +10,7 @@ import { registerDefenceOptionProvider } from "../data/actions/defence-options.j
 import { registerTerrainDiscardProvider } from "../data/actions/terrain-discard-options.js";
 import { registerManoeuvreAvailabilityProvider } from "../data/actions/manoeuvre-availability.js";
 import { registerThreatEnhancementModifier } from "../documents/entity/entity-threat.js";
+import { registerResourceLimitModifier } from "../documents/actor/resources.js";
 import { registerService } from "./extensions.js";
 
 export function runHollowsInit() {
@@ -68,6 +69,12 @@ function registerScriptProviders() {
     }
     return null;
   });
+  registerResourceLimitModifier((actor, resource, value) => {
+    for (const mechanic of ScriptCompiler.getProviders("resourceLimit", actor)) {
+      value = mechanic.run(actor, { resource, value }) ?? value;
+    }
+    return value;
+  });
   registerThreatEnhancementModifier((actor, value) => {
     for (const mechanic of ScriptCompiler.getProviders("threatEnhancement", actor)) {
       value = mechanic.run(actor, { value }) ?? value;
@@ -75,7 +82,7 @@ function registerScriptProviders() {
     return value;
   });
   registerService("scriptInterceptors", async (event, ctx, value) => {
-    for (const mechanic of ScriptCompiler.getProviders("interceptor")) {
+    for (const mechanic of ScriptCompiler.getProviders("interceptor", ctx.actor, ctx.item)) {
       if (mechanic.event !== event) continue;
       const actor = ctx.actor ?? mechanic.carrier;
       const carrier = mechanic.matchCarrier ? mechanic.matchCarrier(actor, { ...ctx, value }) : mechanic.carrier;

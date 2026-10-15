@@ -4,6 +4,13 @@
   "type": "weapon",
   "img": "icons/svg/combat.svg",
   "system": {
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Flourish",
+      "mode": "multiple",
+      "source": "return {\n  feint: {\n    hook: \"activated\", label: \"Feint\", rateLimit: \"oncePerTurn\",\n    async run(H, actor, ctx) {\n      const zone = H.zone.of(actor);\n      if (!zone) {\n        ui.notifications.warn(\"Your token is not inside a zone region.\");\n        return false;\n      }\n      if (!(await H.threat.place(actor, zone, 2, { source: \"ability\", reason: \"Feint\" }))) {\n        ui.notifications.warn(\"Unable to place Threat in this zone.\");\n        return false;\n      }\n      await H.chat.post(actor.name + \" Feints with \" + ctx.item.name + \" in \" + zone + \". Threat: +2.\", actor);\n      const { runOnSwordFeint } = await import(\"/systems/hollows/code/helpers/weapon-abilities/dispatchers.js\");\n      await runOnSwordFeint(actor);\n    },\n  },\n};"
+    },
     "coreAbility": "Flourish. Show the beast that you mean business. Once\nduring your turn you may place 2 Threat on your area to\nFeint as an immediate action. Feint is a special action only\navailable to Sword-wielders.",
     "capacity": {
       "value": 0,

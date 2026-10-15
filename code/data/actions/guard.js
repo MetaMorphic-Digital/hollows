@@ -7,9 +7,8 @@
  * architecture (orchestration lives in data/).
  */
 import { getActorZone, getTokenZone, getActorTokenOnScene } from "../../canvas/zone.js";
-import { addCondition, removeCondition } from "../../documents/actor/conditions.js";
+import { removeCondition } from "../../documents/actor/conditions.js";
 import { adjustHunterResource } from "../../documents/actor/resources.js";
-import { hasWeaponEquipped } from "../../helpers/weapon-utils.js";
 import { runOnGuard } from "../../helpers/weapon-abilities/dispatchers.js";
 
 export async function openGuardDialogForActor(actor, sourceActor = null) {
@@ -98,7 +97,6 @@ export async function openGuardDialogForActor(actor, sourceActor = null) {
               speaker: ChatMessage.getSpeaker({ actor: sourceActor || self }),
               content: `<div class="hollows-chat"><strong>${self.name}</strong> Guards and revives <strong>${target.name}</strong> (+1 Resolve, +1 Wound).</div>`,
             });
-            if (hasWeaponEquipped(self, "Armour")) await addCondition(self, "ready");
             return true;
           }
 
@@ -107,7 +105,6 @@ export async function openGuardDialogForActor(actor, sourceActor = null) {
             speaker: ChatMessage.getSpeaker({ actor: sourceActor || self }),
             content: `<div class="hollows-chat"><strong>${self.name}</strong> Guards and restores <strong>2 Resolve</strong>.</div>`,
           });
-          if (hasWeaponEquipped(self, "Armour")) await addCondition(self, "ready");
           return true;
         },
       },

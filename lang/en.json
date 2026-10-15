@@ -96,6 +96,8 @@
       "activeScript": "Script active",
       "edit": "Edit Script",
       "active": "Active",
+      "trusted": "Trusted",
+      "trustedHint": "Runs even when Allow Custom Scripts is disabled. Editing the code or execution settings clears this checkbox.",
       "label": "Label",
       "labelPlaceholder": "Shown on buttons and in chat",
       "mode": "Script format",

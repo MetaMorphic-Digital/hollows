@@ -27,6 +27,7 @@ import {
   setConditionSafe,
   getActorTerrainTags,
   getEntityTerrainCounts,
+  discardTerrainCondition,
 } from "./documents/actor/conditions.js";
 import {
   pickOne,
@@ -52,6 +53,18 @@ export class HollowsScriptAPI {
   static async statTotal(actor, statKey) {
     const { getTotalStatForActor } = await import("./documents/actor/hunter-combat.js");
     return getTotalStatForActor(actor, statKey);
+  }
+
+  /** Open Take Cover with the same targeting and roll options as the action. */
+  static async takeCover(actor, options) {
+    const { openTakeCoverForActor } = await import("./data/actions/take-cover.js");
+    return openTakeCoverForActor(actor, options);
+  }
+
+  /** Notify abilities that react to the actor's Feint. */
+  static async swordFeint(actor) {
+    const { runOnSwordFeint } = await import("./helpers/weapon-abilities/dispatchers.js");
+    return runOnSwordFeint(actor);
   }
 
   /**
@@ -111,7 +124,9 @@ export const HOLLOWS_API = Object.freeze({
     set: setConditionSafe,
   }),
 
-  terrain: Object.freeze({ tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts }),
+  terrain: Object.freeze({
+    tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts, discard: discardTerrainCondition,
+  }),
 
   threat: Object.freeze({
     place: placeThreatFromHunter,
@@ -140,6 +155,10 @@ export const HOLLOWS_API = Object.freeze({
     total: HollowsScriptAPI.statTotal,
   }),
 
+  actions: Object.freeze({ takeCover: HollowsScriptAPI.takeCover }),
+
+  events: Object.freeze({ swordFeint: HollowsScriptAPI.swordFeint }),
+
   effects: Object.freeze({ apply: applyEffects }),
 
   chat: Object.freeze({ post: HollowsScriptAPI.post, postHtml: HollowsScriptAPI.postHtml }),
@@ -163,5 +182,5 @@ export const HOLLOWS_SYNC_API = Object.freeze({
   weapon: HOLLOWS_API.weapon,
   resource: Object.freeze({ focusCount: getFocusCount }),
   condition: Object.freeze({ has: HOLLOWS_API.condition.has }),
-  terrain: HOLLOWS_API.terrain,
+  terrain: Object.freeze({ tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts }),
 });

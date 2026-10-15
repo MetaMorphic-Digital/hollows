@@ -22,6 +22,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
     defenceOptions: { multipleOnly: true, sync: true, fallback: null, options: true },
     terrainDiscard: { multipleOnly: true, fallback: null },
     manoeuvreAvailability: { multipleOnly: true, sync: true, fallback: null },
+    resourceLimit: { multipleOnly: true, sync: true, fallback: null },
     threatEnhancement: { multipleOnly: true, sync: true, fallback: null },
     interceptor: { multipleOnly: true, fallback: null },
     statOverride: { multipleOnly: true },
@@ -196,6 +197,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
     const fields = foundry.data.fields;
     super({
       enabled: new fields.BooleanField({ initial: false }),
+      trusted: new fields.BooleanField({ initial: false }),
       label: new fields.StringField({ initial: "" }),
       mode: new fields.StringField({ initial: "single", choices: Object.keys(ScriptField.modes) }),
       hook: new fields.StringField({ initial: "activated", choices: Object.keys(ScriptField.hooks) }),

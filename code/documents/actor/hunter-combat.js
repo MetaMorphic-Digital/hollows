@@ -1,14 +1,9 @@
 import { getActorZone } from "../../canvas/zone.js";
-import { addCondition, removeCondition, getSpecialConditionStatDelta } from "../actor/conditions.js";
-import { adjustHunterResource, getFocusCount, setFocusCount } from "./resources.js";
+import { getSpecialConditionStatDelta } from "../actor/conditions.js";
+import { adjustHunterResource } from "./resources.js";
 import { getEchoStatMods } from "../../data/echo/index.js";
 import { getWeaponStatModsForActor } from "../../data/actor-models.js";
-import {
-  getShotgunWeapons,
-  restoreWeaponsCapacity,
-  setShotgunsLoaded,
-  hasWeaponEquipped,
-} from "../../helpers/weapon-utils.js";
+import { restoreWeaponsCapacity } from "../../helpers/weapon-utils.js";
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { getStatModifier } from "../../helpers/weapon-abilities/dispatchers.js";
 
@@ -57,15 +52,6 @@ export async function initializeHunterCoreStatesForCombat(combat) {
     .map((c) => c.actor)
     .filter((a) => a?.type === "hunter");
   for (const hunter of hunters) {
-    if (hasWeaponEquipped(hunter, "Armour")) {
-      await addCondition(hunter, "ready");
-    } else if (hunter.statuses.has("ready")) {
-      await removeCondition(hunter, "ready");
-    }
-    await setShotgunsLoaded(hunter, true);
-    if (hasWeaponEquipped(hunter, "Rifle") && (getFocusCount(hunter) > 0)) {
-      await setFocusCount(hunter, 0);
-    }
     await applyInterceptors("combat-start-hunter", { actor: hunter, hunter }, null);
   }
   await combat.setFlag("hollows", "coreStatesInitialized", true);
@@ -77,10 +63,5 @@ export async function applySupportStartOfTurn(actor) {
   if (zone !== "Support") return;
   await adjustHunterResource(actor, { resolve: 2 });
   await restoreWeaponsCapacity(actor);
-  if (hasWeaponEquipped(actor, "Armour") && !actor.statuses.has("ready")) {
-    await addCondition(actor, "ready");
-  }
-  if (getShotgunWeapons(actor).length) {
-    await setShotgunsLoaded(actor, true);
-  }
+  await applyInterceptors("support-recovery", { actor }, null);
 }

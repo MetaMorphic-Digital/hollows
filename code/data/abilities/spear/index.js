@@ -1,4 +1,3 @@
-export { ARMS_REACH } from "./arms-reach.js";
 export { BRISTLE, BRISTLE_ZONE_PICK } from "./bristle.js";
 export { DECOY } from "./decoy.js";
 export { GOAD } from "./goad.js";

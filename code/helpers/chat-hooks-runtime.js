@@ -8,14 +8,14 @@ import { hasEnabledAfterAttackGroups } from "../data/entity/action-rules.js";
 import { applyHunterAttackDamage } from "../data/actions/attack.js";
 import { STAT_LABELS } from "../data/_module.mjs";
 import { getTokenZone, getActorZone } from "../canvas/zone.js";
-import { addCondition, removeCondition, getSpecialConditionRollMods } from "../documents/actor/conditions.js";
+import { removeCondition, getSpecialConditionRollMods } from "../documents/actor/conditions.js";
 import { hasGritYourTeethActive } from "../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, StandardDamage } from "../documents/actor/resources.js";
 import { setupOutcomeData, setupChoiceButtons, setupResultHtml } from "../helpers/combat-runtime.js";
 import { evaluateResult, resolveSuggestedRollMode, HunterStatRollFlow, normalizeRollModeValue } from "../dice/_module.mjs";
 import { buildStandardRollCardHtml } from "../applications/ui/roll-card.js";
 import { buildMoveOutcomeCardHtml } from "../applications/ui/move-card.js";
-import { bindSuggestedRollMode, hasWeaponEquipped } from "../helpers/weapon-utils.js";
+import { bindSuggestedRollMode } from "../helpers/weapon-utils.js";
 import { setMessageFlagSafe } from "../utils/flag-utils.js";
 import { getTotalStatForActor } from "../documents/actor/hunter-combat.js";
 import {
@@ -83,7 +83,6 @@ export function registerChatMessageHooks() {
       speaker: ChatMessage.getSpeaker({ actor: source }),
       content: `<div class="hollows-chat"><strong>${source.name}</strong> Guards and revives <strong>${target.name}</strong> (+1 Resolve, +1 Wound).</div>`,
     });
-    if (hasWeaponEquipped(source, "Armour")) await addCondition(source, "ready");
     await message.delete();
   });
 

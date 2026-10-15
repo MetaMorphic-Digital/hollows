@@ -1,4 +1,3 @@
-export { FEINT } from "./feint.js";
 export { GOT_YOUR_BACK_DAMAGE } from "./got-your-back.js";
 export { CHARGE } from "./charge.js";
 export { EXEMPLAR } from "./exemplar.js";

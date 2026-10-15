@@ -12,6 +12,10 @@
       <input type="checkbox" name="enabled" {{checked block.enabled}} />
     </div>
     <div class="hollows-form-row">
+      <div class="stat-label" title="{{localize 'HOLLOWS.SCRIPT.trustedHint'}}">{{localize "HOLLOWS.SCRIPT.trusted"}}</div>
+      <input type="checkbox" name="trusted" {{checked block.trusted}}>
+    </div>
+    <div class="hollows-form-row">
       <div class="stat-label">{{localize "HOLLOWS.SCRIPT.label"}}</div>
       <input type="text" name="label" value="{{block.label}}" placeholder="{{localize 'HOLLOWS.SCRIPT.labelPlaceholder'}}" />
     </div>

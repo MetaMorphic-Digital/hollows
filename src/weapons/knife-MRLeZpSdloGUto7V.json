@@ -4,6 +4,13 @@
   "type": "weapon",
   "img": "icons/svg/combat.svg",
   "system": {
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Bleeding",
+      "mode": "multiple",
+      "source": "return {\n  bleeding: {\n    hook: \"onAttackResult\", timing: \"afterDamageApplied\", damageType: \"Wounds\", weaponType: \"Knife\",\n    async run(H, actor, ctx) {\n      if (ctx.targetType !== \"entity\" || H.condition.has(ctx.targetActor, \"bleeding\")) return;\n      await H.condition.set(ctx.targetActor, \"bleeding\", true);\n      await H.chat.post(ctx.targetActor.name + \" begins Bleeding.\", ctx.targetActor);\n    },\n  },\n};"
+    },
     "coreAbility": "Bleeding. Let the life drain from its veins. When you inflict\na Wound with the Knife, the Entity begins Bleeding.\nPlace the Bleeding token next to the Entity as a reminder.\nBleeding is treated as a separate damage source, so can't\nbe boosted by abilities that affect a Hunter's damage, and\ndoes not trigger Threat placement.\nAt the start of the Entity's turn, a Bleeding Entity\nsuffers 2 Resolve damage or, if it is Broken, 1 Wound\ndamage. Then, toss the Bleeding token like a coin. If it\nshows Bleeding, the Entity retains the Bleeding status.\nIf it shows Whole, the Bleeding status is removed.\nWhen the Entity restores Resolve, it also removes\nBleeding.\nAn Entity is either Bleeding or not. Bleeding cannot\nbe applied twice at the same time, and Bleeding damage\ndoes not stack and is only inflicted once per round.\nBleeding persists if the Knife-wielding Hunter dies,\nalong with any passive abilities which apply while the\nEntity is Bleeding, until it is removed.",
     "capacity": {
       "value": 0,

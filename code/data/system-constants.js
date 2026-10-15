@@ -47,6 +47,12 @@ export const HOLLOWS_CONDITIONS = {
     terrain: true,
     pooled: true,
   },
+  briar: {
+    id: "briar",
+    label: "Briar",
+    icon: "systems/hollows/assets/status/briar.webp",
+    terrain: true,
+  },
   dying: {
     id: "dying",
     label: "Dying",

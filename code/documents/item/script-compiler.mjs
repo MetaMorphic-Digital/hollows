@@ -354,6 +354,7 @@ ${source}
       case "defenceOptions":
       case "terrainDiscard":
       case "manoeuvreAvailability":
+      case "resourceLimit":
       case "threatEnhancement":
       case "interceptor": {
         const mechanic = new ScriptedProvider(config);
@@ -428,6 +429,7 @@ ${source}
     const block = foundry.utils.getProperty(item, path);
     const source = String(block?.source ?? "");
     if (!block?.enabled || !source.trim()) return [];
+    if (!block.trusted && !globalThis.hollows?.settings?.allowCustomScripts) return [];
     const multiple = block.mode === "multiple";
     const hook = block.hook || "activated";
     if (!multiple && !Object.hasOwn(ScriptField.hooks, hook)) return [];
@@ -506,17 +508,14 @@ ${source}
    * @returns {Mechanic[]} Actor's compiled mechanics.
    */
   static getMechanics(actor, type = null) {
-    if (!globalThis.hollows?.settings?.allowCustomScripts) return [];
-    const mechanics = [];
-    for (const item of actor?.items ?? []) {
-      for (const slot of item.scriptSlots) {
-        if (!slot.enabled) continue;
-        for (const mechanic of this.#compile(item, slot)) {
-          if (!type || (mechanic instanceof type)) mechanics.push(mechanic);
-        }
-      }
-    }
-    return mechanics;
+    return Array.from(actor?.items ?? []).flatMap(item => this.getItemMechanics(item, type));
+  }
+
+  /** Compile mechanics from one item, including a weapon that has just been removed. */
+  static getItemMechanics(item, type = null) {
+    return item.scriptSlots.filter(slot => slot.enabled)
+      .flatMap(slot => this.#compile(item, slot))
+      .filter(mechanic => !type || (mechanic instanceof type));
   }
 
   /** Collect non-aura mechanics from Hunters on the current scene. */
@@ -542,7 +541,9 @@ ${source}
   }
 
   /** Collect current item providers in priority order. */
-  static getProviders(hook, actor = null) {
+  static getProviders(hook, actor = null, item = null) {
+    if (item) return this.getItemMechanics(item, ScriptedProvider)
+      .filter(m => m.hook === hook).sort((a, b) => b.priority - a.priority);
     const local = actor ? this.getMechanics(actor, ScriptedProvider) : this.getSceneMechanics(ScriptedProvider);
     return [...local.filter(m => !m.aura), ...this.getAuras(ScriptedProvider)]
       .filter(m => m.hook === hook).sort((a, b) => b.priority - a.priority);

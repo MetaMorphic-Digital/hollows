@@ -18,13 +18,19 @@ export default class HollowsItem extends foundry.documents.Item {
   /** @inheritdoc */
   async _preCreate(data, options, user) {
     if (await super._preCreate(data, options, user) === false) return false;
-    const hasScript = this.scriptSlots.some(({ path }) => {
-      const script = foundry.utils.getProperty(data, path);
-      return script?.source || script?.enabled;
-    });
-    if (!user.isGM && hasScript) {
-      ui.notifications.warn(game.i18n.localize("HOLLOWS.SCRIPT.gmCreateOnly"));
-      return false;
+    const scripts = this.scriptSlots.map(({ path }) => ({
+      path, script: foundry.utils.getProperty(this, path),
+    })).filter(({ script }) => script?.source || script?.enabled || script?.trusted);
+    if (!user.isGM && scripts.length) {
+      const source = data._stats?.compendiumSource && await fromUuid(data._stats.compendiumSource);
+      const trustedImport = source && scripts.every(({ path, script }) => {
+        const original = foundry.utils.getProperty(source, path);
+        return original?.trusted && foundry.utils.equals(script, original);
+      });
+      if (!trustedImport) {
+        ui.notifications.warn(game.i18n.localize("HOLLOWS.SCRIPT.gmCreateOnly"));
+        return false;
+      }
     }
   }
 
