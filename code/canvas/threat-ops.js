@@ -6,10 +6,6 @@
  * the actor's primary owner (via CONFIG.queries) when invoked on GM with a
  * player-owned actor; otherwise they fall back to a local dialog on the
  * caller's client.
- *
- * Consumers wire these in via DSL effects (`removeThreat`,
- * `controlShiftThreat`) and direct calls from weapon-ability reactions
- * (Goad, Misdirection, future).
  */
 import { addThreatToZoneSafe } from "./overlays.js";
 import { getActorZone, getAdjacentZones, getThreatInZone, getZoneList } from "./zone.js";
@@ -290,7 +286,7 @@ export async function localShiftDialog(actor, { sources, destPerSource, title, a
  * @param destConstraint       — "self" | "adjacentToSource" | "sameOrAdjacent" | "anyZone"
  * @param excludeSupport       — drop Support from candidate zones (default true)
  * @param label                — dialog title
- * @param reason               — chat-card reason (e.g. "Control", "Goad", "Misdirection")
+ * @param reason               — source name shown on the chat card
  */
 export async function shiftThreatViaDialog(actor, {
   amount = 1,

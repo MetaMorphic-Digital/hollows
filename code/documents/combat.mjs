@@ -13,6 +13,7 @@ import { getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from 
 import { getTerrainTagKeys, removeCondition } from "./actor/conditions.js";
 import { initializeHunterCoreStatesForCombat } from "./actor/hunter-combat.js";
 import { getFocusCount, setFocusCount } from "./actor/resources.js";
+import { applyInterceptors } from "../helpers/extensions.js";
 
 /**
  * System implementation of the Combat class.
@@ -109,8 +110,6 @@ export default class HollowsCombat extends foundry.documents.Combat {
 
     /** Hunter flags cleared when a combat ends. */
     const COMBAT_RESET_FLAGS = {
-      wardGranted: _del,
-      wardSuppressed: _del,
       echoReplaceDyingUsed: _del,
       battleMaxPenalty: _del,
       dyingRevivedOnce: false,
@@ -118,6 +117,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
 
     const hunters = new Set(this.combatants.map(c => c.actor).filter(a => a?.type === "hunter"));
     for (const actor of hunters) {
+      await applyInterceptors("combat-reset-hunter", { actor }, null);
       for (const tag of getTerrainTagKeys()) {
         if (actor.statuses.has(tag)) await removeCondition(actor, tag, { skipPoolRefund: true });
       }

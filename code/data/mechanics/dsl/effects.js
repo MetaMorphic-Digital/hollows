@@ -12,29 +12,16 @@
  *   addCondition:    { key }
  *   removeThreat:    { amount|"all", zone? } — zone "self" = carrier's zone; omitted
  *                    = picked via a dialog routed to the owner
- *   choice:          { title?, message?, options:[{label, effects}], skipLabel? }
- *                    — prompt the actor; run the chosen option's effects
  *   chatNotice:      { message }       — supports {actor} placeholder
  *   setFlag:         { key, value? }   — set actor flag (default value {active:true})
- *   controlShiftThreat: { } — open the Control shift-Threat dialog on actor
- *   grantReaction:   { reaction: "guard"|"control"|..., payload? } — offer the
- *                    named reaction to the target's primary owner; uses
- *                    ctx.target as the recipient.
  *   grantManoeuvre:  { manoeuvre?, scope?, options? } — grant an immediate
  *                    manoeuvre. `scope` ("self"|"zoneMate"|"allyInZone"|"ally"
  *                    |"allyNotSupport") picks the recipient; omit `manoeuvre`
  *                    to let the recipient choose (from `options` if given).
  *   claimTerrainTag: { label? } — prompt the actor to claim an Elevated /
  *                    Sheltered terrain tag (no test); spends a pool tag.
- *   skirmisherStatBonus: {} — accumulate the Skirmisher +2 stat flag from the
- *                    move's destination zone (close → Quick, ranged → Sharp);
- *                    each stat once per round, no toggling on re-entry.
  *   damageEntity:    { resolve?, wounds?, label? } — deal damage to the active
  *                    Entity (routed to the GM; resolves kill rewards on kill).
- *   damageSelf:      { resolve?, wounds? } — the carrier suffers damage.
- *   multiAttack:     { weaponType?, title? } — repeated attack loop (Unload):
- *                    attack until the weapon Capacity is empty; each attack
- *                    after the first spends 1 Resolve (resources.js spendResolve).
  *
  * Context: { actor, entity, target?, payload?, fromZone?, toZone? }
  *
@@ -54,7 +41,6 @@ import {
 } from "../../../canvas/zone.js";
 import { pickOne } from "../../../applications/apps/selection-dialogs.mjs";
 import { HOLLOWS_CONDITIONS } from "../../system-constants.js";
-import { getEffectiveWeaponCapacity } from "../../weapons/index.js";
 import {
   adjustHunterResource,
   adjustEntityResource,
@@ -275,27 +261,6 @@ async function applyOne(eff, ctx) {
       if (ok !== true) ctx._cancelled = true;
       return;
     }
-    case "choice": {
-      const opts = Array.isArray(eff.options) ? eff.options.filter((o) => o && o.label) : [];
-      if (!opts.length) return;
-      const buttons = opts.map((o, i) => ({
-        action: `opt${i}`,
-        label: o.label,
-        default: i === 0,
-        callback: () => i,
-      }));
-      buttons.push({ action: "skip", label: eff.skipLabel || "Skip", callback: () => -1 });
-      const picked = await foundry.applications.api.DialogV2.wait({
-        window: { title: eff.title || "Choose" },
-        content: `<div class="hollows-roll-dialog"><div>${eff.message || "Choose one:"}</div></div>`,
-        rejectClose: false,
-        buttons,
-      });
-      const idx = Number.isInteger(picked) ? picked : -1;
-      if (idx < 0 || !opts[idx]) return;
-      if (Array.isArray(opts[idx].effects)) await applyEffects(opts[idx].effects, ctx);
-      return;
-    }
     case "addCondition": {
       if (!actor || !eff.key) return;
       await addCondition(actor, String(eff.key));
@@ -342,44 +307,14 @@ async function applyOne(eff, ctx) {
       await actor.unsetFlag("hollows", String(eff.key));
       return;
     }
-    case "controlShiftThreat": {
-      if (!actor) return;
-      const { shiftThreatViaDialog } = await import("../../../canvas/threat-ops.js");
-      await shiftThreatViaDialog(actor, {
-        amount: 1,
-        sourceConstraint: "sameOrAdjacent",
-        destConstraint: "adjacentToSource",
-        excludeSupport: true,
-        label: "Control: Shift Threat",
-        reason: "Control",
-      });
-      return;
-    }
-    case "grantReaction": {
-      const target = ctx.target;
-      if (!target || !eff.reaction) return;
-      const reactions = await import("../../../helpers/reactions.js");
-      const reaction = reactions.getReactionByKey(eff.reaction);
-      if (!reaction) {
-        console.warn(`Hollows | grantReaction: no reaction with key ${eff.reaction}`);
-        return;
-      }
-      const owner = reactions.primaryOwnerOf(target) || game.user;
-      await reaction.offer(owner, { targetId: target.id, ...(ctx.payload || {}) });
-      return;
-    }
     case "grantManoeuvre": {
+      const { grantManoeuvre } = await import("../../actions/index.js");
       const scope = eff.scope || "self";
-      // Self scope runs inline — this effect already executes on the
-      // carrier's client, so no cross-client hop is needed.
       if (scope === "self") {
         if (!actor) return;
-        const { runManoeuvre } = await import("../../actions/index.js");
-        await runManoeuvre(eff.manoeuvre || "", actor, { options: eff.options || null });
+        await grantManoeuvre(actor, eff.manoeuvre, eff.options);
         return;
       }
-      // Non-self scope: pick a recipient on this client, then route the
-      // manoeuvre to that Hunter's owner.
       const recipients = resolveManoeuvreRecipients(actor, scope);
       if (!recipients.length) {
         ui.notifications?.info?.("No eligible Hunter for the granted manoeuvre.");
@@ -394,13 +329,7 @@ async function applyOne(eff, ctx) {
         recipient = pickedId ? recipients.find((a) => a.id === pickedId) : null;
         if (!recipient) { ctx._cancelled = true; return; }
       }
-      const reactions = await import("../../../helpers/reactions.js");
-      const owner = reactions.primaryOwnerOf(recipient) || game.user;
-      await reactions.GRANT_MANOEUVRE.offer(owner, {
-        targetId: recipient.id,
-        manoeuvre: eff.manoeuvre || null,
-        options: eff.options || null,
-      });
+      await grantManoeuvre(recipient, eff.manoeuvre, eff.options);
       return;
     }
     case "claimTerrainTag": {
@@ -444,27 +373,6 @@ async function applyOne(eff, ctx) {
       });
       return;
     }
-    case "skirmisherStatBonus": {
-      if (!actor) return;
-      let stat = "";
-      if (isCloseZone(ctx.toZone)) stat = "quick";
-      else if (isRangedZone(ctx.toZone)) stat = "sharp";
-      if (!stat) return;
-      // Accumulate: each stat is granted once per round. Re-entering the same
-      // zone type does nothing; moving Close↔Ranged keeps the earlier bonus.
-      const existing = actor.getFlag("hollows", "skirmisherBonus") || {};
-      if (existing[stat]) return;
-      const next = {};
-      if (existing.quick) next.quick = existing.quick;
-      if (existing.sharp) next.sharp = existing.sharp;
-      next[stat] = 2;
-      await actor.setFlag("hollows", "skirmisherBonus", next);
-      await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({ actor }),
-        content: `<div class="hollows-chat"><strong>${actor.name}</strong> gains <strong>+2 ${stat === "sharp" ? "Sharp" : "Quick"}</strong> until the start of their next turn (Skirmisher).</div>`,
-      });
-      return;
-    }
     case "damageEntity": {
       const { dispatchToGM } = await import("../../../helpers/queries.js");
       await dispatchToGM("entityDamage", {
@@ -473,13 +381,6 @@ async function applyOne(eff, ctx) {
         wounds: Number(eff.wounds || 0),
         label: eff.label || "",
       });
-      return;
-    }
-    case "damageSelf": {
-      if (!actor) return;
-      const r = Number(eff.resolve || 0);
-      const w = Number(eff.wounds || 0);
-      await adjustHunterResource(actor, { resolve: -r, wounds: -w });
       return;
     }
     // Signed primitives below run in GM context (relic groups execute GM-side);
@@ -539,30 +440,6 @@ async function applyOne(eff, ctx) {
       if (current > cap) await entity.update({ "system.curse.value": cap });
       return;
     }
-    case "multiAttack": {
-      if (!actor) return;
-      const weaponType = eff.weaponType || "Pistol";
-      // Total ammo across the actor's weapons of this type — any attack with
-      // such a weapon depletes it; the loop runs until all are empty.
-      const capacity = () => (actor.items || [])
-        .filter((i) => i.type === "weapon"
-          && String(i.system?.weaponType || "") === weaponType
-          && Number(getEffectiveWeaponCapacity(i).max ?? 0) > 0)
-        .reduce((sum, w) => sum + Math.max(0, Number(w.system?.capacity?.value ?? 0)), 0);
-      if (capacity() <= 0) return;
-      const { openAttackDialog } = await import("../../actions/attack.js");
-      let attacks = 0;
-      while (capacity() > 0) {
-        const before = capacity();
-        await openAttackDialog(actor, { weaponType, title: eff.title || "Multi-Attack" });
-        // A cancelled attack leaves Capacity unchanged — re-prompt (no early exit).
-        if (capacity() >= before) continue;
-        attacks += 1;
-        if (attacks > 1) await spendResolve(actor, 1);
-      }
-      return;
-    }
-
     default:
       console.warn(`Hollows | Unknown effect type: ${eff?.type}`);
   }

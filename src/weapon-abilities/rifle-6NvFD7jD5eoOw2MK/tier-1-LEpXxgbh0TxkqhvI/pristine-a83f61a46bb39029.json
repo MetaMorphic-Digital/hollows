@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Don't let them touch you. While you have your maximum number of Wounds or higher, +1 to all stats.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "statModifier",
+      "rateLimit": "none",
+      "source": "if (actor.system.health.wounds.value < actor.system.health.wounds.max) return 0;\nif (![\"strong\", \"hard\", \"quick\", \"sharp\", \"wise\"].includes(ctx.stat)) return 0;\nreturn 1;"
+    }
   },
   "flags": {
     "hollows": {

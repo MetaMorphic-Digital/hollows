@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Thumb-sized slugs that tear and tumble. When you attack with the Shotgun, inflict +0/+1 damage.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "attackDamage",
+      "rateLimit": "none",
+      "source": "if (ctx.weaponType !== \"Shotgun\") return null;\nreturn { resolve: 0, wounds: 1 };"
+    }
   },
   "flags": {
     "hollows": {

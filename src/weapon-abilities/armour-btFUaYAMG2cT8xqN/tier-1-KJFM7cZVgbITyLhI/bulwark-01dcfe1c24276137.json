@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Everyone cowers while you alone weather the storm. While you are Ready, allies in your area restore +1 Resolve when they Guard. Expend Ready to grant an immediate Guard manoeuvre to an ally in your area.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  guard: {\n    hook: \"applyToZone\", label: \"Bulwark: Grant Guard\",\n    async run(H, actor, ctx) {\n      await H.chat.post(`${actor.name} expends Ready to grant ${ctx.target.name} an immediate Guard (Bulwark).`, actor);\n      await H.actions.grantManoeuvre(ctx.target, \"guard\");\n    },\n  },\n  bonus: {\n    hook: \"onEvent\", event: { type: \"guard\", scope: \"zoneMate\" }, group: \"armour.t1.bulwark\",\n    promptOnPlayer(H, actor, ctx) {\n      return H.condition.has(ctx.carrier, \"ready\");\n    },\n    async applyOnGM(H, actor) {\n      const result = await H.resource.adjust(actor, { resolve: 1 });\n      if (result.resolve.changed) await H.chat.post(`${actor.name} gains +1 Resolve from Bulwark.`, actor);\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

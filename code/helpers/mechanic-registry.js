@@ -21,14 +21,6 @@ import { ThreatLock } from "../data/mechanics/ThreatLock.js";
 import { OnDeath } from "../data/mechanics/OnDeath.js";
 import { WeaponModifier } from "../data/mechanics/WeaponModifier.js";
 
-import * as knife from "../data/abilities/knife/index.js";
-import * as armour from "../data/abilities/armour/index.js";
-import * as pistol from "../data/abilities/pistol/index.js";
-import * as rifle from "../data/abilities/rifle/index.js";
-import * as shotgun from "../data/abilities/shotgun/index.js";
-import * as sword from "../data/abilities/sword/index.js";
-import * as spear from "../data/abilities/spear/index.js";
-import * as book from "../data/abilities/book/index.js";
 import * as echo from "../data/echo/mechanics.js";
 import * as refugeData from "../data/refuge/index.js";
 import * as entityData from "../data/entity/index.js";
@@ -104,14 +96,6 @@ export function registerMechanicModule(mod) {
   }
 }
 
-registerMechanicModule(knife);
-registerMechanicModule(armour);
-registerMechanicModule(pistol);
-registerMechanicModule(rifle);
-registerMechanicModule(shotgun);
-registerMechanicModule(sword);
-registerMechanicModule(spear);
-registerMechanicModule(book);
 registerMechanicModule(echo);
 registerMechanicModule(refugeData);
 registerMechanicModule(entityData);

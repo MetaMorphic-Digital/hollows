@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Kill it! Kill it now! The first time each turn you miss with an attack, you suffer 1 Resolve damage and inflict 2 Resolve damage on the Entity.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "oncePerTurn",
+      "source": "if (ctx.result !== \"miss\") return false;\nawait H.resource.adjust(actor, { resolve: -1 });\nawait H.chat.post(`${actor.name} suffers 1 Resolve (Frantic).`, actor);\nawait H.effects.apply([{ type: \"damageEntity\", resolve: 2, label: \"Frantic\" }], ctx);"
+    }
   },
   "flags": {
     "hollows": {

@@ -66,7 +66,7 @@ function selectedActorFormMechanics(actor, ctor = null) {
   return ctor ? mechanics.filter((mechanic) => mechanic instanceof ctor) : mechanics;
 }
 
-/** Only explicit groups combine reactions from separate items. */
+/** Group reactions that share a scope and group key. */
 function groupReactions(mechanics, scope) {
   const groups = new Map();
   for (const ability of mechanics) {
@@ -350,9 +350,8 @@ export async function markRateLimit(actor, ability) {
 //
 // `scope: "self"` abilities belong to the attacker and run on their client.
 // `scope: "zoneMate"` abilities belong to a Hunter sharing the attacker's
-// area (Keep Up the Pressure — react to an ally's miss); they run on each
-// carrier's own client. `context` carries `damageType`/`damageValue` so
-// damage-typed abilities (Momentum, Hotfoot, …) can self-filter.
+// area; they run on each carrier's own client. `context` carries
+// `damageType`/`damageValue` for reactions that depend on the damage dealt.
 export async function runOnAttackResult(actor, result, context = {}) {
   const out = {
     damageType: context.damageType || null,
@@ -434,7 +433,7 @@ export async function runOnAttackResult(actor, result, context = {}) {
 
 // ─── On defence result (entity attack resolved against a hunter) ─────────
 // Returns { damageRedirected } so the damage-intake flow can skip its own
-// apply when a redirect ability (Martyr) consumed the hit.
+// application when a reaction redirected the hit.
 //
 // Called from two points, mutually exclusive per attack: the GM-side damage
 // application (with damage values) and the player-side defend flow (with
@@ -482,7 +481,8 @@ export async function runOnDefenceResult(actor, ctx = {}) {
 }
 
 // ─── On move ─────────────────────────────────────────────────────────────
-export async function runOnMove(actor, { fromZone, toZone, phase, byOwner } = {}) {
+/** Dispatch movement effects on the GM after a token changes zones. */
+export async function runOnMove(actor, { fromZone, toZone, byOwner } = {}) {
   if (!actor || !game.user?.isGM) return;
   const borneMechanics = [
     ...selectedActorFormMechanics(actor, OnMoveAction),
@@ -491,9 +491,9 @@ export async function runOnMove(actor, { fromZone, toZone, phase, byOwner } = {}
   const formMechanicSet = new Set(borneMechanics);
   for (const ability of [...borneMechanics, ...MECHANIC_BUCKETS.onMove]) {
     if (!ability.aura && !formMechanicSet.has(ability) && !carries(actor, ability)) continue;
-    await ability.run({ actor, fromZone, toZone, phase, byOwner });
+    await ability.run({ actor, fromZone, toZone, byOwner });
   }
-  if (phase === "after") await runRelicTriggers("onEnterZone", { bearer: actor });
+  await runRelicTriggers("onEnterZone", { bearer: actor });
 }
 
 // ─── Entity action cost delta (sums across all carriers on canvas) ───────
@@ -561,11 +561,8 @@ export async function activateAbility(actor, ability, extraCtx = {}) {
     return false;
   }
   if (!(await canAffordCost(actor, ability))) return false;
-  // Condition costs are spent BEFORE effects: the granted effect resolves
-  // while the carrier no longer holds the condition (Bulwark — the ally's
-  // Guard happens while you are no longer Ready, so it gets no zone bonus).
-  // Resource costs are spent AFTER effects so a cancelled dialog
-  // refunds them.
+  // Spend conditions before effects so they cannot grant bonuses during
+  // the granted action. Charge resources only after the action succeeds.
   await payConditionCost(actor, ability);
   const ctx = { actor, ...extraCtx };
   if (ability.run) {
@@ -684,21 +681,6 @@ async function offerEventReactions(eventMatcher, { actor = null, payload = {} } 
     if (!reaction.event) continue;
     if (!eventMatcher(reaction.event)) continue;
     if (actor) {
-      // zoneMate-scoped: the reaction belongs to a hunter SHARING the acting
-      // hunter's zone, not the actor itself (Bulwark — a Ready ally grants the
-      // guarder +1). Offer to the first eligible carrier only — the bonus is a
-      // flat +1 regardless of how many carriers are present.
-      if (reaction.event.scope === "zoneMate") {
-        const zone = getActorZone(actor);
-        if (!zone) continue;
-        const mate = getActiveSceneHunters()
-          .find((a) => a.id !== actor.id && getActorZone(a) === zone && carries(a, reaction));
-        if (!mate) continue;
-        const owner = primaryOwnerOf(mate) || game.user;
-        try { await reaction.offer(owner, { actorId: actor.id, carrierId: mate.id, ...payload }); }
-        catch (err) { console.warn(`Hollows | event-reaction ${reaction.key} failed:`, err); }
-        continue;
-      }
       if (!carries(actor, reaction)) continue;
       const owner = primaryOwnerOf(actor) || game.user;
       try { await reaction.offer(owner, { actorId: actor.id, ...payload }); }

@@ -39,7 +39,7 @@ import {
   chooseOneTarget,
 } from "./applications/apps/selection-dialogs.mjs";
 import { applyEffects } from "./data/mechanics/dsl/effects.js";
-import { hasWeaponEquipped, hasWeaponAbility } from "./helpers/weapon-utils.js";
+import { hasWeaponEquipped, hasWeaponAbility, isWeaponOfType } from "./helpers/weapon-utils.js";
 import { getEffectiveWeaponDamage, getSelectedWeaponForm } from "./data/weapons/index.js";
 
 /** Chat and stat helpers for mechanic scripts. */
@@ -55,10 +55,52 @@ export class HollowsScriptAPI {
     return getTotalStatForActor(actor, statKey);
   }
 
+  /** Other hunters sharing the actor's zone. */
+  static allies(actor) {
+    const zone = getActorZone(actor);
+    return zone ? getHuntersInZone(zone).filter(hunter => hunter.id !== actor.id) : [];
+  }
+
   /** Open Take Cover with the same targeting and roll options as the action. */
   static async takeCover(actor, options) {
     const { openTakeCoverForActor } = await import("./data/actions/take-cover.js");
     return openTakeCoverForActor(actor, options);
+  }
+
+  /** Roll a hunter stat with the action's dialog and Focus options. */
+  static async statRoll(actor, options, rollOptions) {
+    const { HunterStatRollFlow } = await import("./dice/flow.js");
+    return new HunterStatRollFlow(actor, options).roll(rollOptions);
+  }
+
+  /** Run a granted manoeuvre on the recipient's client. */
+  static async grantManoeuvre(actor, manoeuvre, options) {
+    const { grantManoeuvre } = await import("./data/actions/index.js");
+    return grantManoeuvre(actor, manoeuvre, options);
+  }
+
+  /** Perform Focus, attributing the chat message to its source. */
+  static async focus(actor, sourceActor) {
+    const { applyFocusToActor } = await import("./data/actions/focus.js");
+    return applyFocusToActor(actor, sourceActor);
+  }
+
+  /** Open an attack, including weaponless attacks and damage overrides. */
+  static async attack(actor, options) {
+    const { openAttackDialog } = await import("./data/actions/attack.js");
+    return openAttackDialog(actor, options);
+  }
+
+  /** Open the Reload action and dispatch its weapon events. */
+  static async reload(actor) {
+    const { openReloadForActor } = await import("./data/actions/reload.js");
+    return openReloadForActor(actor);
+  }
+
+  /** Open the Guard action and dispatch its events. */
+  static async guard(actor) {
+    const { openGuardDialogForActor } = await import("./data/actions/guard.js");
+    return openGuardDialogForActor(actor);
   }
 
   /** Notify abilities that react to the actor's Feint. */
@@ -99,6 +141,7 @@ export const HOLLOWS_API = Object.freeze({
     ofToken: getTokenZone,
     adjacent: getAdjacentZones,
     huntersIn: getHuntersInZone,
+    allies: HollowsScriptAPI.allies,
     threatIn: getThreatInZone,
     curseIn: getZoneCurseValue,
     isClose: isCloseZone,
@@ -146,6 +189,7 @@ export const HOLLOWS_API = Object.freeze({
 
   weapon: Object.freeze({
     equipped: hasWeaponEquipped,
+    isType: isWeaponOfType,
     hasAbility: hasWeaponAbility,
     damage: getEffectiveWeaponDamage,
     form: getSelectedWeaponForm,
@@ -153,9 +197,17 @@ export const HOLLOWS_API = Object.freeze({
 
   stat: Object.freeze({
     total: HollowsScriptAPI.statTotal,
+    roll: HollowsScriptAPI.statRoll,
   }),
 
-  actions: Object.freeze({ takeCover: HollowsScriptAPI.takeCover }),
+  actions: Object.freeze({
+    takeCover: HollowsScriptAPI.takeCover,
+    grantManoeuvre: HollowsScriptAPI.grantManoeuvre,
+    focus: HollowsScriptAPI.focus,
+    attack: HollowsScriptAPI.attack,
+    reload: HollowsScriptAPI.reload,
+    guard: HollowsScriptAPI.guard,
+  }),
 
   events: Object.freeze({ swordFeint: HollowsScriptAPI.swordFeint }),
 

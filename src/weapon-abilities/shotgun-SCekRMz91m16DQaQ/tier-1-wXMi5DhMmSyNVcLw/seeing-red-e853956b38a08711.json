@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Time to die. While you are Broken, you inflict +1/+1 damage.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "attackDamage",
+      "rateLimit": "none",
+      "source": "if (actor.system.health.resolve.value !== 0) return null;\nreturn { resolve: 1, wounds: 1 };"
+    }
   },
   "flags": {
     "hollows": {

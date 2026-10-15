@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "The decor isn't up to much, but at least it's sturdy. As an immediate action on your turn, you may spend Focus to claim a terrain tag.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  terrain: {\n    hook: \"activated\", label: \"Walk In\",\n    available: (H, actor) => H.resource.focusCount(actor) > 0,\n    async run(H, actor, ctx) {\n      await H.effects.apply([{ type: \"claimTerrainTag\", label: \"Walk In Like You Own the Place\" }], ctx);\n      if (ctx._cancelled) return false;\n      await H.resource.adjust(actor, { focus: -1 });\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

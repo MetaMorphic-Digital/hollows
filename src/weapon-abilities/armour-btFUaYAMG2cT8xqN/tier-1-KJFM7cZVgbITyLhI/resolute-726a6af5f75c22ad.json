@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Your anger is yours and yours alone; use it. Once per round, when you miss with an attack, you may become Ready as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "oncePerRound",
+      "source": "if (ctx.result !== \"miss\" || H.condition.has(actor, \"ready\")) return false;\nif (!(await H.ask.confirm({\n  title: \"Resolute\", bodyHtml: \"Become <strong>Ready</strong> (Resolute)?\",\n  yesLabel: \"Become Ready\", noLabel: \"Skip\",\n}))) return false;\nawait H.condition.set(actor, \"ready\", true);\nawait H.chat.post(`${actor.name} becomes Ready (Resolute).`, actor);"
+    }
   },
   "flags": {
     "hollows": {

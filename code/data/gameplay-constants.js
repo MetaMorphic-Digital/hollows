@@ -1,3 +1,12 @@
+export const MANOEUVRE_LABELS = {
+  "take-cover": "Take Cover",
+  reload: "Reload",
+  guard: "Guard",
+  focus: "Focus",
+  move: "Move",
+  use: "Use",
+};
+
 export const WEAPON_TYPE_ORDER = [
   "Armour",
   "Book",

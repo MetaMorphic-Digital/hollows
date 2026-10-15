@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Serves you right for showing off; at least you landed somewhere safe. Once per round, when you miss with an attack, you may claim a terrain tag.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "oncePerRound",
+      "source": "if (ctx.result !== \"miss\") return false;\nawait H.effects.apply([{ type: \"claimTerrainTag\", label: \"Dive Shot\" }], ctx);\nreturn !ctx._cancelled;"
+    }
   },
   "flags": {
     "hollows": {

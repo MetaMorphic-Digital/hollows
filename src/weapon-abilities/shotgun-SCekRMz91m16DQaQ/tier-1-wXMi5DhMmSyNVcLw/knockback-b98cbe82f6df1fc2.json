@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Send it stumbling. When you inflict Resolve damage with the Shotgun, you may Reposition one Hunter in Close or remove 1 Threat from your area.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "none",
+      "source": "if (ctx.weaponType !== \"Shotgun\" || ctx.damageType !== \"Resolve\" || ctx.damageValue <= 0) return false;\nconst choice = await H.ask.one({\n  title: \"Knockback\", hint: \"Reposition one Hunter in Close, or remove 1 Threat from your area?\",\n  options: [\n    { value: \"move\", label: \"Reposition a Hunter in Close\" },\n    { value: \"threat\", label: \"Remove 1 Threat from your area\" },\n  ],\n  buttonChoices: true, cancelLabel: \"Skip\",\n});\nif (!choice) return false;\nif (choice === \"move\") await H.chat.post(`${actor.name} — Knockback: reposition one Hunter in Close.`, actor);\nelse await H.threat.remove(actor, 1, H.zone.of(actor));"
+    }
   },
   "flags": {
     "hollows": {

@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "A sacrifice worth making. When an ally makes a ranged attack through your area, that attack gains +1/+1.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  bonus: {\n    hook: \"attackDamage\", aura: true, group: \"spear.t1.decoy\",\n    run(H, actor, ctx) {\n      const lane = { \"Ranged Left\": \"Flank Left\", \"Ranged Front\": \"Front\", \"Ranged Right\": \"Flank Right\" };\n      const zone = lane[ctx.attackerZone];\n      if (!zone) return;\n      const carrier = H.zone.huntersIn(zone).some(h => h.id !== actor.id\n        && ctx.carrierIds.includes(h.id));\n      return carrier ? { resolve: 1, wounds: 1 } : null;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

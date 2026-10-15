@@ -159,13 +159,24 @@
           {{#if (eq group.trigger "onDeath")}}
             <option value="deathSave" {{#if (eq group.reaction.kind "deathSave")}}selected{{/if}}>Prevent Death</option>
           {{else}}
-            <option value="grantReaction" {{#if (eq group.reaction.kind "grantReaction")}}selected{{/if}}>Grant Reaction</option>
             <option value="grantManoeuvre" {{#if (eq group.reaction.kind "grantManoeuvre")}}selected{{/if}}>Grant Manoeuvre</option>
             <option value="immediateMove" {{#if (eq group.reaction.kind "immediateMove")}}selected{{/if}}>Immediate Move (chat reminder)</option>
           {{/if}}
         {{/if}}
       </select></div></div>
-      {{#if (eq group.reaction.kind "grantReaction")}}<div class="form-group sub"><label>Reaction</label><div class="form-fields"><select name="system.{{groupsPath}}.{{i}}.reaction.reactionKey">{{#each choices.grantableReaction as |label key|}}<option value="{{key}}" {{#if (eq ../group.reaction.reactionKey key)}}selected{{/if}}>{{label}}</option>{{/each}}</select></div></div>{{/if}}
+    {{#if (eq group.reaction.kind "grantManoeuvre")}}
+    <div class="form-group sub stacked">
+      <label>Allowed manoeuvres (empty: any)</label>
+      <div class="cond-grid">
+        {{#each choices.manoeuvre as |label key|}}
+        <label class="zone-chip {{#if (includes ../group.reaction.manoeuvres key)}}on{{/if}}">
+          <input type="checkbox" class="array-toggle" data-array-path="system.{{../groupsPath}}.{{../i}}.reaction.manoeuvres" data-value="{{key}}" {{#if (includes ../group.reaction.manoeuvres key)}}checked{{/if}} />
+          {{label}}
+        </label>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
     {{/if}}
   {{/if}}
 

@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "The stupid creature is two steps behind you. When you Guard, you may also place 1 Threat on your area or an adjacent area, or Shift 1 Threat in your area or an adjacent area.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  threat: {\n    hook: \"onEvent\",\n    eventType: \"guard\",\n    promptOnPlayer: async (H, actor) => {\n      const zone = H.zone.of(actor);\n      if (!zone) return false;\n      const zones = [zone, ...H.zone.adjacent(zone)].filter(value => value !== \"Support\");\n      const action = await H.ask.one({\n        title: \"Goad\", hint: \"Place or Shift 1 Threat in your area or an adjacent area.\",\n        options: [{ value: \"place\", label: \"Place\" }, { value: \"shift\", label: \"Shift\" }],\n        buttonChoices: true, cancelLabel: \"Skip\",\n      });\n      if (!action) return false;\n      if (action === \"shift\") return H.threat.shift(actor, { label: \"Goad: Shift\", reason: \"Goad\" });\n      const target = await H.ask.one({\n        title: \"Goad: Place\",\n        label: \"Place Threat\",\n        options: zones.map(value => ({ value, label: value })),\n        applyLabel: \"Place\",\n      });\n      if (!target) return false;\n      await H.threat.place(actor, target, 1, { source: \"ability\", reason: \"Goad\" });\n      return true;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

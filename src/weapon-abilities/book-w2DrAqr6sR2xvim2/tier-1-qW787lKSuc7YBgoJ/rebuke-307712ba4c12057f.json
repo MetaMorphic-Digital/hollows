@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Chastise it for daring to stand against you. When you inflict damage with a Book attack, you may activate this ability. If you inflict Resolve damage, remove 2 Threat from your or an adjacent area. If you inflict Wound damage, remove 4 Threat from your or an adjacent area.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "none",
+      "source": "if (ctx.result !== \"hit\") return false;\nawait H.effects.apply(\n  [\n    {\n      type: \"removeThreat\",\n      amount: { fromDamageType: { Wounds: 4, default: 2 } },\n      zone: \"selfOrAdjacent\",\n    },\n  ],\n  ctx,\n);"
+    }
   },
   "flags": {
     "hollows": {

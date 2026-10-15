@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Draw strength from adversity. Once per round, when Threat is spent from your area to trigger or enhance an Entity action, you may Guard as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  guard: {\n    hook: \"onEvent\", rateLimit: \"oncePerRound\",\n    eventType: \"threatSpent\",\n    promptOnPlayer: async (H, actor, ctx) => {\n      const { zone, amount } = ctx.payload;\n      if (H.zone.of(actor) !== zone) return false;\n      if (!(await H.ask.confirm({\n        title: \"War of Attrition\",\n        bodyHtml: `The Entity spent <strong>${amount}</strong> Threat from <strong>${zone}</strong>. Guard as an immediate action?`,\n        yesLabel: \"Guard\",\n        noLabel: \"Skip\",\n      }))) return false;\n      await H.actions.guard(actor);\n      return true;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

@@ -9,7 +9,6 @@ import { applyHunterAttackDamage } from "../data/actions/attack.js";
 import { STAT_LABELS } from "../data/_module.mjs";
 import { getTokenZone, getActorZone } from "../canvas/zone.js";
 import { removeCondition, getSpecialConditionRollMods } from "../documents/actor/conditions.js";
-import { hasGritYourTeethActive } from "../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, StandardDamage } from "../documents/actor/resources.js";
 import { setupOutcomeData, setupChoiceButtons, setupResultHtml } from "../helpers/combat-runtime.js";
 import { evaluateResult, resolveSuggestedRollMode, HunterStatRollFlow, normalizeRollModeValue } from "../dice/_module.mjs";
@@ -397,7 +396,6 @@ export function registerChatMessageHooks() {
         threatSpent,
       });
       if (defenceState.rollMode) mode = normalizeRollModeValue(defenceState.rollMode);
-      const gritActive = hasGritYourTeethActive(target);
       const flow = new HunterStatRollFlow(target, {
         title: `Defend (${attackName})`,
         cardTitle: "defends",
@@ -437,7 +435,7 @@ export function registerChatMessageHooks() {
         ...rollOutcome.card,
         chosen: { value: r, outcome },
         extraLines: [
-          gritActive ? "Grit Your Teeth: Advantage on defence" : "",
+          ...defenceState.cardLines,
           rollMod ? `Threat Pressure: +${rollMod} to roll (base ${baseRoll})` : "",
           defenceMitigationNote,
         ],
@@ -517,7 +515,6 @@ export function registerChatMessageHooks() {
       const tn = Number(flagData.tn ?? 0);
       const forceAdvantage = !!flagData.forceAdvantage;
       const basicDefenceMode = String(flagData.basicDefenceMode || "normal");
-      const gritActive = hasGritYourTeethActive(target);
       const statLabel = STAT_LABELS[defenceStat] || defenceStat;
       const statValue = getTotalStatForActor(target, defenceStat);
       const defenceOverrides = getStatOverrides(target, "defence");
@@ -527,7 +524,7 @@ export function registerChatMessageHooks() {
         tn,
       });
       const selectedMode = resolveSuggestedRollMode({
-        advantages: [forceAdvantage, gritActive],
+        advantages: [forceAdvantage],
         fallback: basicDefenceMode,
       });
       const fields = [
@@ -563,7 +560,7 @@ export function registerChatMessageHooks() {
         footerHtml: renderDefenceOptionHtml(defenceOptions, { attackName, defenceStat, tn }),
         render: (_e, dialog) => {
           const rollModeSources = {
-            advantages: [forceAdvantage, gritActive],
+            advantages: [forceAdvantage],
             disadvantages: [],
           };
           prepareDefenceOptions(defenceOptions, dialog.element, { attackName, defenceStat, tn, rollModeSources });

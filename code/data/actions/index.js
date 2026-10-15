@@ -1,7 +1,7 @@
 /**
  * Manoeuvre registry — the action layer's hub. Maps a manoeuvre name to its
  * orchestration entry point so abilities can grant manoeuvres declaratively
- * (`grantManoeuvre` effect, Control reaction) without hard-coding the call.
+ * (`grantManoeuvre` effect) without hard-coding the call.
  *
  *   runManoeuvre(name, actor)  — run a manoeuvre on the actor's own client.
  *                                When `name` is empty, the actor is prompted.
@@ -9,6 +9,7 @@
  *                                granted to a Hunter owned by another player,
  *                                this reaction runs it on that player's client.
  */
+import { MANOEUVRE_LABELS } from "../gameplay-constants.js";
 import { Reaction } from "../mechanics/Reaction.js";
 import { openTakeCoverForActor } from "./take-cover.js";
 import { openReloadForActor } from "./reload.js";
@@ -29,15 +30,6 @@ export const MANOEUVRES = {
   "focus":      applyFocusToActor,
   "move":       grantMoveNotice,
   "use":        openUseForActor
-};
-
-export const MANOEUVRE_LABELS = {
-  "take-cover": "Take Cover",
-  "reload":     "Reload",
-  "guard":      "Guard",
-  "focus":      "Focus",
-  "move":       "Move",
-  "use":        "Use"
 };
 
 export function getManoeuvreAvailability(actor, manoeuvre, context = {}) {
@@ -102,6 +94,14 @@ export async function runManoeuvre(name, actor, opts = {}) {
     return;
   }
   return await fn(actor);
+}
+
+/** Run a granted manoeuvre on its recipient's client. */
+export async function grantManoeuvre(actor, manoeuvre, options) {
+  const { primaryOwnerOf } = await import("../../helpers/reactions.js");
+  const owner = primaryOwnerOf(actor) || game.user;
+  if (owner.id === game.user.id) return runManoeuvre(manoeuvre, actor, { options });
+  return GRANT_MANOEUVRE.offer(owner, { targetId: actor.id, manoeuvre, options });
 }
 
 /**

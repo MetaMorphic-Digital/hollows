@@ -170,7 +170,7 @@ export function registerCanvasHooks() {
     if (prevZone && nextZone && prevZone !== nextZone) {
       const movedByOwner = !!mover && !mover.isGM && !!actor?.testUserPermission?.(mover, "OWNER");
       await runTerrainDiscardOnMove(actor, { fromZone: prevZone, byOwner: movedByOwner });
-      await runOnMove(actor, { fromZone: prevZone, toZone: nextZone, phase: "after", byOwner: movedByOwner });
+      await runOnMove(actor, { fromZone: prevZone, toZone: nextZone, byOwner: movedByOwner });
       if (movedByOwner && game.user?.id === mover?.id) await triggerUseOnManoeuvre(actor, "move");
     }
   });

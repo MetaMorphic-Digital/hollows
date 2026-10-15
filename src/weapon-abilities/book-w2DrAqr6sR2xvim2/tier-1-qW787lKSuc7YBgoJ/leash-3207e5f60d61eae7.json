@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Down, wretch. While you are in Close, when the Entity Repositions an ally or uses an Interrupt ability, it suffers 1 Resolve damage.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  drain: {\n    hook: \"entityActionPause\", actionType: [\"interrupt\", \"prowl\", \"turnAround\"],\n    stage: \"beforeResolve\", group: \"book.t1.leash\",\n    active: (H, actor) => H.zone.isClose(H.zone.of(actor)),\n    async run(H, actor, ctx) {\n      await H.resource.adjustEntity(ctx.entityActor, { resolve: -1 });\n      await H.chat.post(ctx.entityActor.name + \" suffers 1 Resolve (Leash).\", actor);\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

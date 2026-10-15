@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Violence makes the heart grow stronger. When an Entity targets you with any attack, you may expend Ready as an immediate action to heal 1 Wound.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  heal: {\n    hook: \"onEvent\",\n    eventType: \"entityAttack\",\n    promptOnPlayer: async (H, actor, ctx) => {\n      if (!ctx.payload.targetActorIds.includes(actor.id) || !H.condition.has(actor, \"ready\")) return false;\n      if (!(await H.ask.confirm({\n        title: \"Masochist\",\n        bodyHtml: \"Expend <strong>Ready</strong> to heal <strong>1 Wound</strong>?\",\n        yesLabel: \"Expend Ready\",\n        noLabel: \"Skip\",\n      }))) return false;\n      await H.condition.set(actor, \"ready\", false);\n      await H.resource.adjust(actor, { wounds: 1 });\n      await H.chat.post(`${actor.name} heals 1 Wound (Masochist).`, actor);\n      return true;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

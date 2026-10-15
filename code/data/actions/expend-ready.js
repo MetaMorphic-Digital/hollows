@@ -1,12 +1,8 @@
 /**
  * Expend Ready action orchestration. A single generic dialog that lists
  * "Become Unready" plus every ApplyToZone / ActivatedAbility the carrier
- * holds with `cost.condition === "ready"` (Bulwark, Control, Grit Your Teeth,
- * and any future Ready-spending ability — no per-ability dialog branches).
- *
- * Ready removal is performed by the cost system (payCost → removeCondition),
- * which in turn fires the conditionRemoved event — so Barbed and other
- * Ready-discharge reactions trigger uniformly here too.
+ * holds with `cost.condition === "ready"`.
+ * Spending Ready also dispatches the conditionRemoved event.
  */
 import { removeCondition } from "../../documents/actor/conditions.js";
 import {

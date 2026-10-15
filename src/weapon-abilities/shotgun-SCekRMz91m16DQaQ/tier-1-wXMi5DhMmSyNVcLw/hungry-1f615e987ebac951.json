@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "More! MORE! While your Shotgun is Empty, when your turn ends, you must spend either 1 Resolve or 1 Wound to make an immediate Reload action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  reload: {\n    hook: \"onEvent\",\n    eventType: \"turnEnd\",\n    promptOnPlayer: async (H, actor) => {\n      const shotguns = actor.items.filter(item => item.type === \"weapon\" && H.weapon.isType(item, \"Shotgun\"));\n      if (!shotguns.length || shotguns.some(weapon => weapon.system.loaded !== false)) return false;\n      const resolve = actor.system.health.resolve.value;\n      const wounds = actor.system.health.wounds.value;\n      if (resolve <= 0 && wounds <= 0) {\n        ui.notifications.warn(\"Hungry: no Resolve or Wounds to spend.\");\n        return false;\n      }\n      const options = [];\n      if (resolve > 0) options.push({ value: \"resolve\", label: \"Spend Resolve\" });\n      if (wounds > 0) options.push({ value: \"wound\", label: \"Spend Wound\" });\n      const choice = await H.ask.one({\n        title: \"Hungry\", hint: \"Shotgun is Empty. Spend 1 Resolve or 1 Wound to Reload.\",\n        options, buttonChoices: true, cancelLabel: null,\n      }) ?? options[0].value;\n      await H.resource.adjust(actor, choice === \"resolve\" ? { resolve: -1 } : { wounds: -1 });\n      await H.chat.post(`${actor.name} pays the price and reloads (Hungry).`, actor);\n      await H.actions.reload(actor);\n      return true;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

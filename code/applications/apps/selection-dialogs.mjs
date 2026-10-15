@@ -12,17 +12,24 @@ function selectGroup(name, label, options, selectedValue = null) {
   return `<div class="form-group">${lbl}<select name="${esc(name)}">${opts}</select></div>`;
 }
 
-export async function pickOne({ title = "Choose", label = "", options = [], hint = "", applyLabel = "Apply" } = {}) {
+/** Choose one value from a list or a row of buttons; closing returns null. */
+export async function pickOne({
+  title = "Choose", label = "", options = [], hint = "", applyLabel = "Apply",
+  buttonChoices = false, cancelLabel = "Cancel",
+} = {}) {
   if (!options.length) return null;
   const hintHtml = hint ? `<div class="muted">${esc(hint)}</div>` : "";
+  const buttons = buttonChoices
+    ? options.map((option, index) => ({
+      action: String(option.value), label: option.label, default: index === 0, callback: () => option.value,
+    }))
+    : [{ action: "ok", label: applyLabel, default: true, callback: (_e, _b, d) => String(d.element.querySelector("[name=value]")?.value || "") }];
+  if (cancelLabel) buttons.push({ action: "cancel", label: cancelLabel, callback: () => null });
   const value = await DialogV2.wait({
     window: { title },
-    content: `<form class="hollows-roll-dialog">${hintHtml}${selectGroup("value", label, options)}</form>`,
+    content: `<form class="hollows-roll-dialog">${hintHtml}${buttonChoices ? "" : selectGroup("value", label, options)}</form>`,
     rejectClose: false,
-    buttons: [
-      { action: "ok", label: applyLabel, default: true, callback: (_e, _b, d) => String(d.element.querySelector("[name=value]")?.value || "") },
-      { action: "cancel", label: "Cancel", callback: () => null },
-    ],
+    buttons,
   });
   return value || null;
 }

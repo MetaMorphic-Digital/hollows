@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "They're going to wish they'd killed you sooner. Once per round, when an Entity attacks you, you may spend 1 Resolve to defend with Quick instead of any other stat. If you roll under your Quick on this defence roll, you may Move to any adjacent area as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  dodge: {\n    hook: \"statOverride\", scope: \"defence\", newStat: \"quick\",\n    label: \"Spend 1 Resolve to Dodge (defend with Quick)\",\n    cost: { resource: \"resolve\", amount: 1 }, rateLimit: \"oncePerRound\",\n    successCondition: { type: \"rolledUnder\", stat: \"quick\" },\n    onSuccessEffects: [\n      { type: \"chatNotice\", message: \"<strong>{actor}</strong> may Move to an adjacent area as an immediate action (Dodge).\" },\n    ],\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

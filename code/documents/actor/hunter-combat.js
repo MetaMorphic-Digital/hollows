@@ -7,40 +7,12 @@ import { restoreWeaponsCapacity } from "../../helpers/weapon-utils.js";
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { getStatModifier } from "../../helpers/weapon-abilities/dispatchers.js";
 
-function getSkirmisherBonusForActor(actor, statKey) {
-  if (!actor || !statKey) return 0;
-  const bonus = actor.getFlag("hollows", "skirmisherBonus");
-  if (!bonus) return 0;
-  // Flag accumulates per stat: { quick?: 2, sharp?: 2 }.
-  return Number(bonus[String(statKey).toLowerCase()] ?? 0) || 0;
-}
-
 export function getTotalStatForActor(actor, statKey) {
   const base = Number(actor.system?.stats?.[statKey] ?? 0);
   const mods = getWeaponStatModsForActor(actor);
-  const skirmisherBonus = getSkirmisherBonusForActor(actor, statKey);
   const echoMods = getEchoStatMods(actor);
-  const total = base + Number(mods[statKey] ?? 0) + Number(echoMods[statKey] ?? 0) + skirmisherBonus + getStatModifier(actor, statKey) + getSpecialConditionStatDelta(actor, statKey);
+  const total = base + Number(mods[statKey] ?? 0) + Number(echoMods[statKey] ?? 0) + getStatModifier(actor, statKey) + getSpecialConditionStatDelta(actor, statKey);
   return Math.max(1, Math.min(19, total));
-}
-
-export function hasGritYourTeethActive(actor) {
-  if (!actor) return false;
-  return !!actor.getFlag("hollows", "gritYourTeeth");
-}
-
-export async function clearGritYourTeeth(actor) {
-  if (!actor) return;
-  if (hasGritYourTeethActive(actor)) {
-    await actor.unsetFlag("hollows", "gritYourTeeth");
-  }
-}
-
-export async function clearSkirmisherBonus(actor) {
-  if (!actor) return;
-  if (actor.getFlag("hollows", "skirmisherBonus")) {
-    await actor.unsetFlag("hollows", "skirmisherBonus");
-  }
 }
 
 export async function initializeHunterCoreStatesForCombat(combat) {

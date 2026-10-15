@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Your body bears a litany of scars. When an ally in your area would suffer Wound damage, you may expend Ready as an immediate action; they take no damage, and you take the inflicted Wound damage -1 instead.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  protect: {\n    hook: \"onDefenceResult\", result: \"damaged\", damageType: \"Wounds\",\n    scope: \"zoneMate\", group: \"armour.t1.martyr\",\n    when: (H, actor) => H.condition.has(actor, \"ready\"),\n    async promptOnPlayer(H, actor, ctx) {\n      const candidates = ctx.candidateIds.map(id => game.actors.get(id));\n      const incoming = Math.max(0, ctx.damageValue - 1);\n      const hint = `${actor.name} is about to take ${ctx.damageValue} Wounds. The martyr takes ${incoming} instead and expends Ready.`;\n      if (candidates.length === 1) {\n        return await H.ask.confirm({\n          title: \"Martyr\", bodyHtml: foundry.utils.escapeHTML(`${hint} Have ${candidates[0].name} take the hit?`),\n          yesLabel: \"Take the hit\", noLabel: \"Skip\",\n        }) ? { martyrId: candidates[0].id } : false;\n      }\n      const martyrId = await H.ask.one({\n        title: \"Martyr\", label: \"Martyr (takes the hit)\", hint, applyLabel: \"Take the hit\",\n        options: candidates.map(h => ({ value: h.id, label: h.name })),\n      });\n      return martyrId ? { martyrId } : false;\n    },\n    async applyOnGM(H, actor, ctx, choice) {\n      const martyr = game.actors.get(choice.martyrId);\n      await H.condition.set(martyr, \"ready\", false);\n      const incoming = Math.max(0, ctx.damageValue - 1);\n      await H.resource.adjust(martyr, { wounds: -incoming });\n      await H.chat.post(`${martyr.name} uses Martyr to protect ${actor.name}, suffering ${incoming} Wound damage.`, martyr);\n      return { damageRedirected: true };\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {
