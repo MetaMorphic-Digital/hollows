@@ -137,7 +137,7 @@ export default class HollowsScriptEditor extends HandlebarsApplicationMixin(Appl
       },
       canEdit: HollowsScriptEditor.canEdit(this.doc, this.path),
       modeChoices: ScriptField.modes,
-      hookChoices: ScriptField.hooks,
+      hookChoices: Object.fromEntries(Object.entries(ScriptField.hooks).filter(([, hook]) => !hook.multipleOnly)),
       eventChoices: ScriptField.events,
       turnScopes: ScriptField.turnScopes,
       rateLimits: ScriptField.rateLimits,

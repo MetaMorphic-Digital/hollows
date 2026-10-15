@@ -8,10 +8,16 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
 
   /**
    * @type {Record<string, {
-   *   label: string, ctx: string[], returns?: string, sync?: boolean, hasOn?: boolean, hasEvent?: boolean
+   *   label?: string, ctx?: string[], returns?: string, sync?: boolean,
+   *   hasOn?: boolean, hasEvent?: boolean, multipleOnly?: boolean
    * }>}
    */
   static hooks = {
+    statOverride: { multipleOnly: true },
+    attackRoll: { multipleOnly: true, sync: true },
+    entityStat: { multipleOnly: true, sync: true },
+    entityCost: { multipleOnly: true, sync: true },
+    takeCover: { multipleOnly: true, sync: true },
     activated: {
       label: "HOLLOWS.SCRIPT.hooks.activated.label",
       ctx: [
@@ -59,6 +65,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
     },
     onDefenceResult: {
       label: "HOLLOWS.SCRIPT.hooks.onDefenceResult.label",
+      returns: "HOLLOWS.SCRIPT.hooks.onDefenceResult.returns",
       ctx: [
         "actor",
         "entity",
@@ -169,6 +176,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
   static turnScopes = {
     actor: "HOLLOWS.SCRIPT.turnScopes.actor",
     entity: "HOLLOWS.SCRIPT.turnScopes.entity",
+    actorAll: "HOLLOWS.SCRIPT.turnScopes.actorAll",
   };
 
   /** @param {object} [options] SchemaField options. */

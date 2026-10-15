@@ -23,7 +23,8 @@
           "returns": "optionally { damageValue, cardLine } to change the attack before damage lands"
         },
         "onDefenceResult": {
-          "label": "After you are attacked"
+          "label": "After you are attacked",
+          "returns": "optionally { damageRedirected: true } or { convertTo: { damageType, damageValue } }"
         },
         "onMove": {
           "label": "After you Move"
@@ -40,8 +41,8 @@
           "returns": "{ resolve, wounds } added to the attack's damage"
         },
         "incomingDamage": {
-          "label": "Modify damage you take (return a number)",
-          "returns": "a finite number to replace the damage value; null leaves it unchanged"
+          "label": "Modify damage you take",
+          "returns": "a finite number or { damageValue, note }; null leaves damage unchanged"
         }
       },
       "events": {
@@ -79,7 +80,8 @@
       },
       "turnScopes": {
         "actor": "Your own turn",
-        "entity": "The Entity's turn"
+        "entity": "The Entity's turn",
+        "actorAll": "Any Hunter's turn"
       },
       "title": "Mechanic Script",
       "abilityTitle": "{name} — Ability Script",
@@ -97,7 +99,7 @@
       "label": "Label",
       "labelPlaceholder": "Shown on buttons and in chat",
       "mode": "Script format",
-      "multipleHint": "Return named handlers with hook and run(H, actor, ctx); handler names identify buttons and usage limits. statModifier and attackDamage must return synchronously.",
+      "multipleHint": "Return named handlers with hook and run(H, actor, ctx); configuration-only modifiers need no run. actor is the affected Hunter; ctx.carrier owns the ability.",
       "reactionHint": "For asynchronous hooks, use promptOnPlayer(H, actor, ctx) for the owner's choice and optional applyOnGM(H, actor, ctx, choice) for its effect. Return a JSON-serializable choice, or null/false to skip without spending the limit.",
       "invalidDefinitions": "Return an object of named handlers.",
       "invalidHandlerOption": "Handler \"{id}\" has an invalid {field} value.",

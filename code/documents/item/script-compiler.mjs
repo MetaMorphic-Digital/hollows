@@ -8,6 +8,12 @@ import { OnMoveAction } from "../../data/mechanics/OnMoveAction.js";
 import { AttackDamageChange } from "../../data/mechanics/AttackDamageChange.js";
 import { IncomingDamageModifier } from "../../data/mechanics/IncomingDamageModifier.js";
 import { StatModifier } from "../../data/mechanics/StatModifier.js";
+import { StatOverride } from "../../data/mechanics/StatOverride.js";
+import { AttackRollModifier } from "../../data/mechanics/AttackRollModifier.js";
+import { EntityStatModifier } from "../../data/mechanics/EntityStatModifier.js";
+import { EntityAbilityModifier } from "../../data/mechanics/EntityAbilityModifier.js";
+import { TakeCoverModifier } from "../../data/mechanics/TakeCoverModifier.js";
+import { getActiveSceneHunters, getActorZone } from "../../canvas/zone.js";
 import { Mechanic } from "../../data/mechanics/Mechanic.js";
 import ScriptField from "../../data/fields/script-field.mjs";
 import { HOLLOWS_API as API, HOLLOWS_SYNC_API as SYNC_API } from "../../api.mjs";
@@ -69,17 +75,18 @@ ${source}
   }
 
   /**
-   * Return #failed on exceptions; a void return remains a successful result.
-   * @param {Function} fn Compiled function.
+   * Supply script context and report callback errors.
+   * @param {Function} fn
    * @param {string} key
-   * @param {boolean} sync
    * @param {Item} item
-   * @returns {Function}
+   * @param {{sync?: boolean, routeToGM?: boolean, carrierIds?: string[], fallback?: *}} [options]
+   * @returns {Function} Returns the fallback on failure; void remains a successful result.
    */
-  static #makeInvoker(fn, key, sync, item) {
+  static #makeInvoker(fn, key, item, { sync = false, routeToGM = false, carrierIds, fallback = this.#failed } = {}) {
+    const context = (actor, ctx) => ({ carrier: item.parent, carrierIds, ...ctx, actor, item });
     if (sync) return (actor, ctx = {}) => {
       try {
-        const result = fn(SYNC_API, actor, { ...ctx, actor, item });
+        const result = fn(SYNC_API, actor, context(actor, ctx));
         if (result && (typeof result.then === "function")) {
           Promise.resolve(result).catch(error => this.#report(item, key, error, "runtime"));
           throw new TypeError(game.i18n.localize("HOLLOWS.SCRIPT.syncPromise"));
@@ -87,15 +94,22 @@ ${source}
         return result;
       } catch (error) {
         this.#report(item, key, error, "runtime");
-        return this.#failed;
+        return fallback;
       }
     };
     return async (actor, ctx = {}, choice) => {
       try {
-        return await fn(API, actor, { ...ctx, actor, item }, choice);
+        ctx = context(actor, ctx);
+        if (routeToGM && !ctx.carrier.isOwner) {
+          const { runGMQuery } = await import("../../helpers/queries.js");
+          return await runGMQuery("hollows.scriptReaction", {
+            itemUuid: item.uuid, key, phase: "execute", context: this.#serializeContext(ctx),
+          }, { timeout: 300_000 });
+        }
+        return await fn(API, actor, ctx, choice);
       } catch (error) {
         this.#report(item, key, error, "runtime");
-        return this.#failed;
+        return fallback;
       }
     };
   }
@@ -120,16 +134,15 @@ ${source}
    * Run the choice on the owner, then apply its result on the GM.
    * @param {Item} item
    * @param {string} key
-   * @param {Actor} actor
    * @param {object} ctx
    * @param {boolean} apply Whether the handler has an applyOnGM callback.
    * @returns {Promise<*>} False when the owner declines.
    */
-  static async #offerReaction(item, key, actor, ctx, apply) {
+  static async #offerReaction(item, key, ctx, apply) {
     const { primaryOwnerOf } = await import("../../helpers/reactions.js");
     const { runUserQuery, runGMQuery } = await import("../../helpers/queries.js");
     const request = { itemUuid: item.uuid, key, context: this.#serializeContext(ctx) };
-    const owner = primaryOwnerOf(actor) || game.user;
+    const owner = primaryOwnerOf(ctx.carrier) || game.user;
     const choice = await runUserQuery(owner, "hollows.scriptReaction", {
       ...request, phase: "promptOnPlayer",
     }, { timeout: 300_000 });
@@ -141,7 +154,7 @@ ${source}
   }
 
   /**
-   * Resolve the current item and handler for either side of a script reaction.
+   * Resolve the current item and callback for a script query.
    * @param {object} request Serialized query data.
    * @returns {Promise<*>} Callback result.
    */
@@ -149,7 +162,8 @@ ${source}
     const item = await fromUuid(itemUuid);
     const mechanic = this.getMechanics(item.parent).find(entry => entry.key === key);
     const callback = mechanic[phase];
-    const result = await callback(item.parent, await this.#resolveContext(context), choice);
+    const ctx = await this.#resolveContext(context);
+    const result = await callback(ctx.actor, ctx, choice);
     return result === this.#failed ? false : result;
   }
 
@@ -202,8 +216,8 @@ ${source}
       }
       case "startOfTurn": {
         const mechanic = new StartOfTurnAction(config);
-        mechanic.run = async ({ actor, entity } = {}) =>
-          this.#limited(actor, mechanic, () => invoke(actor, { entity }));
+        mechanic.run = async (ctx = {}) =>
+          this.#limited(ctx.carrier || ctx.actor, mechanic, () => invoke(ctx.actor, ctx));
         return mechanic;
       }
       case "endOfTurn": {
@@ -225,22 +239,29 @@ ${source}
         return mechanic;
       }
       case "onDefenceResult": {
-        const mechanic = new OnDefenceResultAction({ ...config, result: "any" });
-        mechanic.run = async (ctx = {}) => this.#limited(ctx.actor, mechanic, () => invoke(ctx.actor, ctx));
+        const mechanic = new OnDefenceResultAction(config);
+        mechanic.run = async (ctx = {}) => {
+          const result = await this.#limited(ctx.carrier || ctx.actor, mechanic, () => invoke(ctx.actor, ctx));
+          return result === this.#failed ? false : result;
+        };
         return mechanic;
       }
       case "onMove": {
         const mechanic = new OnMoveAction(config);
         mechanic.run = async (ctx = {}) => {
           if (mechanic.ownerMoveOnly && !ctx.byOwner) return;
-          return this.#limited(ctx.actor, mechanic, () => invoke(ctx.actor, ctx));
+          return this.#limited(mechanic.carrier, mechanic,
+            () => invoke(ctx.actor, ctx));
         };
         return mechanic;
       }
       case "onEvent": {
         const mechanic = new ScriptedEvent(config);
-        mechanic.run = async (actor, payload = {}) =>
-          this.#limited(actor, mechanic, () => invoke(actor, { event: mechanic.event.type, payload }));
+        mechanic.run = async (actor, payload = {}) => {
+          return this.#limited(mechanic.carrier, mechanic, () => invoke(actor, {
+            event: mechanic.event.type, payload,
+          }));
+        };
         return mechanic;
       }
       case "statModifier": {
@@ -264,17 +285,60 @@ ${source}
       }
       case "incomingDamage": {
         const mechanic = new IncomingDamageModifier(config);
+        if (!invoke) return mechanic;
         mechanic.apply = async (ctx = {}) => {
           const carrier = ctx.carrier ?? ctx.target;
-          const result = await this.#limited(carrier, mechanic, () => invoke(carrier, ctx));
-          if (!Number.isFinite(result)) return null;
-          return { damageValue: result, note: config.name };
+          const result = await this.#limited(carrier, mechanic,
+            () => invoke(ctx.target, ctx));
+          if (Number.isFinite(result)) return { damageValue: result, note: config.name };
+          return Number.isFinite(result?.damageValue) ? result : null;
         };
         return mechanic;
       }
+      case "statOverride": return new StatOverride(config);
+      case "attackRoll": return new AttackRollModifier(config);
+      case "entityStat": return new EntityStatModifier(config);
+      case "entityCost": return new EntityAbilityModifier(config);
+      case "takeCover": return new TakeCoverModifier(config);
       default:
         return null;
     }
+  }
+
+  /** Bind callbacks to a mechanic and its aura carriers. */
+  static #createMechanic(item, config, callbacks, carrierIds) {
+    const { key, hook } = config;
+    const sync = !!ScriptField.hooks[hook].sync;
+    const reaction = callbacks.promptOnPlayer !== undefined;
+    const invoker = (fn, options = {}) => this.#makeInvoker(fn, key, item, { carrierIds, ...options });
+    const run = reaction
+      ? (_H, _actor, ctx) => this.#offerReaction(item, key, ctx, !!callbacks.applyOnGM)
+      : callbacks.run;
+    const invoke = (hook === "incomingDamage") && (run === undefined)
+      ? null : invoker(run, { sync, routeToGM: !reaction });
+    const mechanic = this.#buildMechanic(hook, config, invoke);
+    mechanic.rateLimit = config.rateLimit;
+    mechanic.carrier = item.parent;
+    mechanic.group = config.group;
+    mechanic.aura = !!config.aura;
+    for (const method of ["active", "matchCarrier", "available", "getLabel"]) {
+      if (!callbacks[method]) continue;
+      mechanic[method] = invoker(callbacks[method], {
+        sync: true, fallback: method === "getLabel" ? mechanic.name : false,
+      });
+    }
+    if (callbacks.when) {
+      const when = invoker(callbacks.when, { sync: true, fallback: false });
+      mechanic.when = ctx => when(ctx.actor, ctx);
+    }
+    if (reaction) {
+      mechanic.promptOnPlayer = invoker(callbacks.promptOnPlayer);
+      if (callbacks.applyOnGM) mechanic.applyOnGM = invoker(callbacks.applyOnGM);
+    } else if (!sync) {
+      mechanic.execute = invoker(run);
+    }
+    if (mechanic.aura) mechanic.withCarriers = ids => this.#createMechanic(item, config, callbacks, ids);
+    return mechanic;
   }
 
   /**
@@ -342,39 +406,13 @@ ${source}
         const rateLimit = sync || !definition.rateLimit || (definition.rateLimit === "none")
           ? "" : definition.rateLimit;
         const handlerKey = multiple ? `${key}.${id}` : key;
-        const run = reaction
-          ? (_H, actor, ctx) => this.#offerReaction(item, handlerKey, actor, ctx, !!definition.applyOnGM)
-          : definition.run;
-        const mechanic = this.#buildMechanic(definition.hook, {
+        const { run, promptOnPlayer, applyOnGM, active, matchCarrier, when, available, getLabel, ...config } = definition;
+        return this.#createMechanic(item, {
+          ...config,
           key: handlerKey, name: definition.label || name, text: text || "",
           weapon: item.system?.weaponType || "", rateLimit,
           on: definition.on || "actor", event,
-          timing: definition.timing, result: definition.result, weaponType: definition.weaponType,
-          ownerMoveOnly: definition.ownerMoveOnly,
-          cost: definition.cost, targetSelection: definition.targetSelection, subSelect: definition.subSelect,
-        }, this.#makeInvoker(run, handlerKey, sync, item));
-        mechanic.rateLimit = rateLimit;
-        if (definition.available) {
-          const available = this.#makeInvoker(definition.available, handlerKey, true, item);
-          mechanic.available = actor => {
-            const result = available(actor);
-            return (result !== this.#failed) && result;
-          };
-        }
-        if (definition.getLabel) {
-          const getLabel = this.#makeInvoker(definition.getLabel, handlerKey, true, item);
-          mechanic.getLabel = actor => {
-            const result = getLabel(actor);
-            return result === this.#failed ? mechanic.name : result;
-          };
-        }
-        if (reaction) {
-          mechanic.promptOnPlayer = this.#makeInvoker(definition.promptOnPlayer, handlerKey, false, item);
-          if (definition.applyOnGM) {
-            mechanic.applyOnGM = this.#makeInvoker(definition.applyOnGM, handlerKey, false, item);
-          }
-        }
-        return mechanic;
+        }, { run, promptOnPlayer, applyOnGM, active, matchCarrier, when, available, getLabel });
       });
     } catch (error) {
       this.#report(item, key, error, "compile");
@@ -404,6 +442,28 @@ ${source}
     return mechanics;
   }
 
+  /** Collect non-aura mechanics from Hunters on the current scene. */
+  static getSceneMechanics(type) {
+    return getActiveSceneHunters().flatMap(actor => this.getMechanics(actor, type))
+      .filter(mechanic => !mechanic.aura);
+  }
+
+  /** Collect scene auras with the carrier IDs for each group. */
+  static getAuras(type) {
+    const groups = new Map();
+    for (const actor of getActiveSceneHunters()) {
+      for (const mechanic of this.getMechanics(actor, type)) {
+        if (!mechanic.aura) continue;
+        const key = mechanic.group || mechanic;
+        if (!groups.has(key)) {
+          groups.set(key, { mechanic, carrierIds: [] });
+        }
+        groups.get(key).carrierIds.push(actor.id);
+      }
+    }
+    return [...groups.values()].map(({ mechanic, carrierIds }) => mechanic.withCarriers(carrierIds));
+  }
+
   /**
    * Dispatch locally; the caller determines which client handles the event.
    * @param {Function} matches Predicate receiving an event descriptor.
@@ -413,15 +473,20 @@ ${source}
    * @returns {Promise<void>}
    */
   static async runEvents(matches, { actor = null, payload = {} } = {}) {
-    let carriers = actor ? [actor] : [];
-    if (!actor && game.user.isGM) {
-      const { getActiveSceneHunters } = await import("../../canvas/zone.js");
-      carriers = getActiveSceneHunters();
-    }
-    for (const carrier of carriers) {
-      for (const mechanic of this.getMechanics(carrier, ScriptedEvent)) {
-        if (matches(mechanic.event)) await mechanic.run(carrier, payload);
-      }
+    if (!actor && !game.user.isGM) return;
+    const local = actor ? this.getMechanics(actor, ScriptedEvent) : this.getSceneMechanics(ScriptedEvent);
+    const zone = actor && getActorZone(actor);
+    const foreign = zone ? this.getSceneMechanics(ScriptedEvent).filter(mechanic =>
+      (mechanic.event.scope === "zoneMate") && (mechanic.carrier.id !== actor.id)
+      && (getActorZone(mechanic.carrier) === zone)) : [];
+    const seen = new Set();
+    for (const mechanic of [
+      ...local.filter(m => !m.aura && (m.event.scope !== "zoneMate")), ...foreign, ...this.getAuras(ScriptedEvent),
+    ]) {
+      if (!matches(mechanic.event)) continue;
+      if (mechanic.group && seen.has(mechanic.group)) continue;
+      if (mechanic.group) seen.add(mechanic.group);
+      await mechanic.run(actor || mechanic.carrier, payload);
     }
   }
 }
