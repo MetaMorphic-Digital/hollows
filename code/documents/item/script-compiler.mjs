@@ -11,7 +11,7 @@ import { Mechanic } from "../../data/mechanics/Mechanic.js";
 import ScriptField from "../../data/fields/script-field.mjs";
 import { HOLLOWS_API as API, HOLLOWS_SYNC_API as SYNC_API } from "../../api.mjs";
 
-/** A locally executed observer for a system game event. */
+/** A script triggered by a system game event. */
 export class ScriptedEvent extends Mechanic {
   constructor(config = {}) {
     super(config);
@@ -89,14 +89,67 @@ ${source}
         return this.#failed;
       }
     };
-    return async (actor, ctx = {}) => {
+    return async (actor, ctx = {}, choice) => {
       try {
-        return await fn(API, actor, { ...ctx, actor, item });
+        return await fn(API, actor, { ...ctx, actor, item }, choice);
       } catch (error) {
         this.#report(item, key, error, "runtime");
         return this.#failed;
       }
     };
+  }
+
+  /** Send top-level documents by UUID; event payloads already contain serializable data. */
+  static #serializeContext(ctx) {
+    return Object.fromEntries(Object.entries(ctx).map(([key, value]) => [
+      key, value instanceof foundry.abstract.Document ? { $scriptDocument: value.uuid } : value,
+    ]));
+  }
+
+  /** Resolve document references on the receiving client. */
+  static async #resolveContext(ctx) {
+    return Object.fromEntries(await Promise.all(
+      Object.entries(ctx).map(async ([key, value]) => [
+        key, value?.$scriptDocument ? await fromUuid(value.$scriptDocument) : value,
+      ]),
+    ));
+  }
+
+  /**
+   * Run the choice on the owner, then apply its result on the GM.
+   * @param {Item} item
+   * @param {string} key
+   * @param {Actor} actor
+   * @param {object} ctx
+   * @param {boolean} apply Whether the handler has an applyOnGM callback.
+   * @returns {Promise<*>} False when the owner declines.
+   */
+  static async #offerReaction(item, key, actor, ctx, apply) {
+    const { primaryOwnerOf } = await import("../../helpers/reactions.js");
+    const { runUserQuery, runGMQuery } = await import("../../helpers/queries.js");
+    const request = { itemUuid: item.uuid, key, context: this.#serializeContext(ctx) };
+    const owner = primaryOwnerOf(actor) || game.user;
+    const choice = await runUserQuery(owner, "hollows.scriptReaction", {
+      ...request, phase: "promptOnPlayer",
+    }, { timeout: 300_000 });
+    if ((choice == null) || (choice === false)) return false;
+    if (!apply) return choice;
+    return runGMQuery("hollows.scriptReaction", {
+      ...request, phase: "applyOnGM", choice,
+    }, { timeout: 300_000 });
+  }
+
+  /**
+   * Resolve the current item and handler for either side of a script reaction.
+   * @param {object} request Serialized query data.
+   * @returns {Promise<*>} Callback result.
+   */
+  static async runReaction({ itemUuid, key, phase, context, choice }) {
+    const item = await fromUuid(itemUuid);
+    const mechanic = this.getMechanics(item.parent).find(entry => entry.key === key);
+    const callback = mechanic[phase];
+    const result = await callback(item.parent, await this.#resolveContext(context), choice);
+    return result === this.#failed ? false : result;
   }
 
   /**
@@ -250,9 +303,19 @@ ${source}
         throw new TypeError(game.i18n.localize("HOLLOWS.SCRIPT.invalidDefinitions"));
       }
       mechanics = Object.entries(definitions).map(([id, definition]) => {
+        const reaction = definition.promptOnPlayer !== undefined;
         if (multiple) {
-          if (!id || !Object.hasOwn(ScriptField.hooks, definition?.hook) || (typeof definition?.run !== "function")) {
-            throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandler", { id }));
+          if (!Object.hasOwn(ScriptField.hooks, definition.hook)) {
+            throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "hook" }));
+          }
+          if (reaction && ScriptField.hooks[definition.hook].sync) {
+            throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "promptOnPlayer" }));
+          }
+          if (reaction && (definition.run !== undefined)) {
+            throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "run" }));
+          }
+          if (!reaction && (definition.applyOnGM !== undefined)) {
+            throw new TypeError(game.i18n.format("HOLLOWS.SCRIPT.invalidHandlerOption", { id, field: "applyOnGM" }));
           }
           for (const [field, choices] of Object.entries({
             rateLimit: ScriptField.rateLimits, on: ScriptField.turnScopes, eventType: ScriptField.events,
@@ -266,12 +329,21 @@ ${source}
         const rateLimit = sync || !definition.rateLimit || (definition.rateLimit === "none")
           ? "" : definition.rateLimit;
         const handlerKey = multiple ? `${key}.${id}` : key;
+        const run = reaction
+          ? (_H, actor, ctx) => this.#offerReaction(item, handlerKey, actor, ctx, !!definition.applyOnGM)
+          : definition.run;
         const mechanic = this.#buildMechanic(definition.hook, {
           key: handlerKey, name: definition.label || name, text: text || "",
           weapon: item.system?.weaponType || "", rateLimit,
           on: definition.on || "actor", eventType: definition.eventType || "guard",
-        }, this.#makeInvoker(definition.run, handlerKey, sync, item));
+        }, this.#makeInvoker(run, handlerKey, sync, item));
         mechanic.rateLimit = rateLimit;
+        if (reaction) {
+          mechanic.promptOnPlayer = this.#makeInvoker(definition.promptOnPlayer, handlerKey, false, item);
+          if (definition.applyOnGM) {
+            mechanic.applyOnGM = this.#makeInvoker(definition.applyOnGM, handlerKey, false, item);
+          }
+        }
         return mechanic;
       });
     } catch (error) {

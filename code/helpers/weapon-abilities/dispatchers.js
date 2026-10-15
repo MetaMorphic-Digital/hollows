@@ -706,18 +706,7 @@ export async function runEntityBleedingStartCheck(entity) {
   await ScriptCompiler.runEvents(event => event.type === "entityBleedingStart", {
     payload: { entityId: entity.id },
   });
-  const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
-  const carriers = getActiveSceneHunters();
-  for (const reaction of getAllReactions()) {
-    if (reaction.event?.type !== "entityBleedingStart") continue;
-    for (const carrier of carriers.filter((c) => carries(c, reaction))) {
-      const owner = primaryOwnerOf(carrier);
-      if (!owner?.active) continue;
-      const choice = await reaction.offer(owner, { entityId: entity.id, carrierId: carrier.id });
-      if (choice?.applied) return true;
-    }
-  }
-  return false;
+  return !entity.statuses.has("bleeding");
 }
 
 export async function runDeathInterceptors(actor) {

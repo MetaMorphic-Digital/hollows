@@ -41,6 +41,7 @@
     <h2>{{localize "HOLLOWS.SCRIPT.source"}}</h2>
     {{#if multiple}}
       <p class="muted">{{localize "HOLLOWS.SCRIPT.multipleHint"}}</p>
+      <p class="muted">{{localize "HOLLOWS.SCRIPT.reactionHint"}}</p>
       <pre><code>return {
   bonus: {
     hook: "attackDamage",
@@ -49,7 +50,11 @@
   recover: {
     hook: "startOfTurn",
     rateLimit: "oncePerRound",
-    run: async (H, actor, ctx) =&gt; H.resource.adjust(actor, { resolve: 1 }),
+    promptOnPlayer: H =&gt; H.ask.one({
+      title: "Recover",
+      options: [{ value: "resolve", label: "Resolve" }, { value: "focus", label: "Focus" }],
+    }),
+    applyOnGM: (H, actor, ctx, choice) =&gt; H.resource.adjust(actor, { [choice]: 1 }),
   },
 };</code></pre>
     {{else}}

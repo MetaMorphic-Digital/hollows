@@ -93,6 +93,10 @@ export function registerQueries() {
   registerCategoryBHandlers();
   registerCategoryDHandlers();
   registerCategoryEHandlers();
+  registerHandler("hollows.scriptReaction", async request => {
+    const { default: ScriptCompiler } = await import("../documents/item/script-compiler.mjs");
+    return ScriptCompiler.runReaction(request);
+  });
   registerReactions(registerHandler);
   registerEchoQueries(registerHandler);
   for (const [name, fn] of HANDLERS) {
