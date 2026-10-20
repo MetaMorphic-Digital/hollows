@@ -60,6 +60,18 @@ const documentStructure = {
     ActiveEffect: "effects",
     Item: "items",
   },
+  Adventure: {
+    Actor: "actors",
+    Cards: "cards",
+    Combat: "combats",
+    Folder: "folders",
+    Item: "items",
+    JournalEntry: "journal",
+    Macro: "macros",
+    Playlist: "playlists",
+    RollTable: "tables",
+    Scene: "scenes",
+  },
   Cards: {
     Card: "cards",
   },
@@ -97,7 +109,7 @@ const documentStructure = {
 /* -------------------------------------------------- */
 
 /**
- * Recursively clean data of an entry and embedded documents before extracting or compiling.
+ * Recursively clean data of an entry and embedded documents before extracting.
  * @param {object} data                   Data for a single entry to clean.
  * @param {object} options
  * @param {string} options.documentName   The document name.
@@ -113,6 +125,7 @@ function cleanPackEntry(data, { documentName, isEmbedded }) {
 
   // Remove mystery-man.svg from Actors
   if (documentName === "Actor") cleanActorArtwork(data);
+  if (documentName === "Scene") data.thumb = null;
 
   // Clean embedded data.
   const embedded = documentStructure[documentName] ?? {};

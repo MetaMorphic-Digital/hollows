@@ -61,27 +61,46 @@
           <label>TN</label>
           <div class="form-fields">
             <input type="number" name="system.profile.tn" value="{{system.profile.tn}}" />
-            {{#if (eq system.builderMode "advanced")}}<select name="system.profile.tnMode">{{selectOptions choices.tnMode selected=system.profile.tnMode localize=false}}</select>{{/if}}
+            {{#if (eq system.builderMode "advanced")}}
+            <select name="system.profile.tnMode">
+              {{selectOptions choices.tnMode selected=system.profile.tnMode localize=false}}
+            </select>
+            {{/if}}
           </div>
         </div>
-        {{#if (eq system.builderMode "advanced")}}{{#if (eq system.profile.tnMode "dynamic")}}
+        {{#if profileTN.showDynamic}}
         <div class="form-group sub">
           <label>Source</label>
           <div class="form-fields">
-            <select name="system.profile.tnDynamicType">{{selectOptions choices.tnDynamicType selected=system.profile.tnDynamicType localize=false}}</select>
-            {{#if (eq system.profile.tnDynamicType "set")}}<select name="system.profile.tnSetSource">{{selectOptions choices.tnSetSource selected=system.profile.tnSetSource localize=false}}</select>
-            {{else}}<select name="system.profile.tnDynamicSource">{{selectOptions choices.tnDynamicSource selected=system.profile.tnDynamicSource localize=false}}</select>{{/if}}
+            <select name="system.profile.tnDynamicType">
+              {{selectOptions choices.tnDynamicType selected=system.profile.tnDynamicType localize=false}}
+            </select>
+            <select name="{{profileTN.sourcePath}}">
+              {{selectOptions profileTN.sourceChoices selected=profileTN.sourceValue localize=false}}
+            </select>
           </div>
         </div>
-        {{#if (eq system.profile.tnDynamicType "set")}}
-        {{#if (eq system.profile.tnSetSource "targetStat")}}
-        <div class="form-group sub"><label>Stat</label><div class="form-fields"><select name="system.profile.tnSetStat">{{selectOptions choices.stat selected=system.profile.tnSetStat localize=false}}</select></div></div>
+        {{#if profileTN.showStat}}
+        <div class="form-group sub">
+          <label>Stat</label>
+          <div class="form-fields">
+            <select name="system.profile.tnSetStat">
+              {{selectOptions choices.stat selected=system.profile.tnSetStat localize=false}}
+            </select>
+          </div>
+        </div>
         {{/if}}
-        {{#if (eq system.profile.tnSetSource "entityDefence")}}
-        <div class="form-group sub"><label>Entity Defence</label><div class="form-fields"><select name="system.profile.tnSetDefence">{{selectOptions choices.entityDefence selected=system.profile.tnSetDefence localize=false}}</select></div></div>
+        {{#if profileTN.showDefence}}
+        <div class="form-group sub">
+          <label>Entity Defence</label>
+          <div class="form-fields">
+            <select name="system.profile.tnSetDefence">
+              {{selectOptions choices.entityDefence selected=system.profile.tnSetDefence localize=false}}
+            </select>
+          </div>
+        </div>
         {{/if}}
         {{/if}}
-        {{/if}}{{/if}}
         {{#if (eq system.profile.actionType "attack")}}
         <div class="form-group">
           <label>Damage (R/W)</label>
@@ -250,35 +269,130 @@
         <a class="group-remove" data-action="removeGroup" data-group-path="followUp" data-index="{{entry.index}}">✕</a>
       </div>
       {{#if entry.showTrigger}}
-      <div class="form-group"><label>Trigger</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.trigger">{{selectOptions ../choices.followUpTrigger selected=entry.group.trigger localize=false}}</select></div></div>
+      <div class="form-group">
+        <label>Trigger</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.trigger">
+            {{selectOptions ../choices.followUpTrigger selected=entry.group.trigger localize=false}}
+          </select>
+        </div>
+      </div>
       {{/if}}
-      <div class="form-group"><label>When</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.when">{{selectOptions ../choices.outcomeWhen selected=entry.group.when localize=false}}</select></div></div>
-      <div class="form-group"><label>Type</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.actionType">{{selectOptions ../choices.actionType selected=entry.group.profile.actionType localize=false}}</select></div></div>
-      <div class="form-group"><label>Target Mode</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.targetMode">{{selectOptions entry.targetModeChoices selected=entry.group.targetMode localize=false}}</select></div></div>
-      {{#if (eq entry.group.profile.actionType "attack")}}
-      <div class="form-group"><label>Defence</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.defenceStat">{{selectOptions ../choices.stat selected=entry.group.profile.defenceStat localize=false}}</select></div></div>
+      <div class="form-group">
+        <label>When</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.when">
+            {{selectOptions ../choices.outcomeWhen selected=entry.group.when localize=false}}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.actionType">
+            {{selectOptions ../choices.actionType selected=entry.group.profile.actionType localize=false}}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Target Mode</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.targetMode">
+            {{selectOptions entry.targetModeChoices selected=entry.group.targetMode localize=false}}
+          </select>
+        </div>
+      </div>
+      {{#if entry.isAttack}}
+      <div class="form-group">
+        <label>Defence</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.defenceStat">
+            {{selectOptions ../choices.stat selected=entry.group.profile.defenceStat localize=false}}
+          </select>
+        </div>
+      </div>
       {{/if}}
-      {{#if (eq entry.group.profile.actionType "test")}}
-      <div class="form-group"><label>Test</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.testStat">{{selectOptions ../choices.stat selected=entry.group.profile.testStat localize=false}}</select></div></div>
+      {{#if entry.isTest}}
+      <div class="form-group">
+        <label>Test</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.testStat">
+            {{selectOptions ../choices.stat selected=entry.group.profile.testStat localize=false}}
+          </select>
+        </div>
+      </div>
       {{/if}}
-      {{#unless (eq entry.group.profile.actionType "other")}}
-      <div class="form-group"><label>TN</label><div class="form-fields"><input type="number" data-field-path="system.followUp.groups.{{entry.index}}.profile.tn" value="{{entry.group.profile.tn}}" /><select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnMode">{{selectOptions ../choices.tnMode selected=entry.group.profile.tnMode localize=false}}</select></div></div>
-      {{#if (eq entry.group.profile.tnMode "dynamic")}}
-      <div class="form-group sub"><label>Source</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnDynamicType">{{selectOptions ../choices.tnDynamicType selected=entry.group.profile.tnDynamicType localize=false}}</select>{{#if (eq entry.group.profile.tnDynamicType "set")}}<select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnSetSource">{{selectOptions ../choices.followUpTNSetSource selected=entry.group.profile.tnSetSource localize=false}}</select>{{else}}<select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnDynamicSource">{{selectOptions ../choices.tnDynamicSource selected=entry.group.profile.tnDynamicSource localize=false}}</select>{{/if}}</div></div>
-      {{#if (eq entry.group.profile.tnDynamicType "set")}}
-      {{#if (or (eq entry.group.profile.tnSetSource "targetStat") (eq entry.group.profile.tnSetSource "originalTargetStat"))}}
-      <div class="form-group sub"><label>Stat</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnSetStat">{{selectOptions ../choices.stat selected=entry.group.profile.tnSetStat localize=false}}</select></div></div>
+      {{#if entry.showTNAndDamage}}
+      <div class="form-group">
+        <label>TN</label>
+        <div class="form-fields">
+          <input type="number" data-field-path="system.followUp.groups.{{entry.index}}.profile.tn" value="{{entry.group.profile.tn}}" />
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnMode">
+            {{selectOptions ../choices.tnMode selected=entry.group.profile.tnMode localize=false}}
+          </select>
+        </div>
+      </div>
+      {{#if entry.tn.showDynamic}}
+      <div class="form-group sub">
+        <label>Source</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnDynamicType">
+            {{selectOptions ../choices.tnDynamicType selected=entry.group.profile.tnDynamicType localize=false}}
+          </select>
+          <select data-field-path="{{entry.tn.sourcePath}}">
+            {{selectOptions entry.tn.sourceChoices selected=entry.tn.sourceValue localize=false}}
+          </select>
+        </div>
+      </div>
+      {{#if entry.tn.showStat}}
+      <div class="form-group sub">
+        <label>Stat</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnSetStat">
+            {{selectOptions ../choices.stat selected=entry.group.profile.tnSetStat localize=false}}
+          </select>
+        </div>
+      </div>
       {{/if}}
-      {{#if (eq entry.group.profile.tnSetSource "entityDefence")}}
-      <div class="form-group sub"><label>Entity Defence</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnSetDefence">{{selectOptions ../choices.entityDefence selected=entry.group.profile.tnSetDefence localize=false}}</select></div></div>
+      {{#if entry.tn.showDefence}}
+      <div class="form-group sub">
+        <label>Entity Defence</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.tnSetDefence">
+            {{selectOptions ../choices.entityDefence selected=entry.group.profile.tnSetDefence localize=false}}
+          </select>
+        </div>
+      </div>
       {{/if}}
       {{/if}}
+      <div class="form-group">
+        <label>Damage (R/W)</label>
+        <div class="form-fields">
+          <input type="number" class="dmg" data-field-path="system.followUp.groups.{{entry.index}}.profile.damage.resolve" value="{{entry.group.profile.damage.resolve}}" />
+          <span class="dmg-sep">/</span>
+          <input type="number" class="dmg" data-field-path="system.followUp.groups.{{entry.index}}.profile.damage.wounds" value="{{entry.group.profile.damage.wounds}}" />
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageMode">
+            {{selectOptions ../choices.damageMode selected=entry.group.profile.damageMode localize=false}}
+          </select>
+        </div>
+      </div>
+      {{#if entry.showDynamicDamage}}
+      <div class="form-group sub">
+        <label>Source</label>
+        <div class="form-fields">
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicMode">
+            {{selectOptions ../choices.damageDynamicMode selected=entry.group.profile.damageDynamicMode localize=false}}
+          </select>
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicSource">
+            {{selectOptions ../choices.damageDynamicSource selected=entry.group.profile.damageDynamicSource localize=false}}
+          </select>
+          <select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicScale">
+            {{selectOptions ../choices.damageDynamicScale selected=entry.group.profile.damageDynamicScale localize=false}}
+          </select>
+        </div>
+      </div>
       {{/if}}
-      <div class="form-group"><label>Damage (R/W)</label><div class="form-fields"><input type="number" class="dmg" data-field-path="system.followUp.groups.{{entry.index}}.profile.damage.resolve" value="{{entry.group.profile.damage.resolve}}" /><span class="dmg-sep">/</span><input type="number" class="dmg" data-field-path="system.followUp.groups.{{entry.index}}.profile.damage.wounds" value="{{entry.group.profile.damage.wounds}}" /><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageMode">{{selectOptions ../choices.damageMode selected=entry.group.profile.damageMode localize=false}}</select></div></div>
-      {{#if (eq entry.group.profile.damageMode "dynamic")}}
-      <div class="form-group sub"><label>Source</label><div class="form-fields"><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicMode">{{selectOptions ../choices.damageDynamicMode selected=entry.group.profile.damageDynamicMode localize=false}}</select><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicSource">{{selectOptions ../choices.damageDynamicSource selected=entry.group.profile.damageDynamicSource localize=false}}</select><select data-field-path="system.followUp.groups.{{entry.index}}.profile.damageDynamicScale">{{selectOptions ../choices.damageDynamicScale selected=entry.group.profile.damageDynamicScale localize=false}}</select></div></div>
       {{/if}}
-      {{/unless}}
       {{#if entry.showTargetArea}}
       <div class="form-group stacked">
         <label>Target Area <span class="hint">(none = all zones)</span></label>

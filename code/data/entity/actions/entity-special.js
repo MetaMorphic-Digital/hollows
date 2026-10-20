@@ -148,7 +148,7 @@ export async function triggerEntityTriggeredAbilities(entityActor, eventName, co
     if (String(sys.special?.trigger?.event || "") !== String(eventName || "")) continue;
     if (eventName === "hunterMakesAttack") {
       const result = sys.special.trigger.attackResult;
-      if (result !== "always" && context.attackTarget?.type !== "entity") continue;
+      if ((result !== "always") && (context.attackTarget?.type !== "entity")) continue;
       if (!matchesEntityOutcomeCondition(result, context)) continue;
     }
     await applyEntityTriggeredAbilityEffects(ability, entityActor, context);

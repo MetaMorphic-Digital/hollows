@@ -5,7 +5,7 @@ export function createHazardChatUiHandlers(deps) {
   const { getActiveHunterForUser } = deps;
   const pendingRolls = new Set();
 
-  /** Determine roll availability without consulting the rendered button. */
+  /** Determine the current Hunter's roll availability and button label. */
   function getRollState(message) {
     const hazard = message.getFlag("hollows", "hazard");
     const actor = getActiveHunterForUser();
@@ -28,8 +28,8 @@ export function createHazardChatUiHandlers(deps) {
   function refreshHazardButtons(messageId) {
     const selector = messageId ? `[data-message-id="${messageId}"] .hollows-hazard-roll` : ".hollows-hazard-roll";
     for (const button of document.querySelectorAll(selector)) {
-      const messageId = button.closest("[data-message-id]")?.dataset.messageId;
-      const message = game.messages?.get(messageId);
+      const id = button.closest("[data-message-id]")?.dataset.messageId;
+      const message = game.messages.get(id);
       if (message) updateButton(message, button);
     }
   }
@@ -54,7 +54,7 @@ export function createHazardChatUiHandlers(deps) {
       refreshHazardButtons(message.id);
       try {
         const roll = await (new Roll("1d20")).evaluate();
-        const rollValue = Number(roll.terms?.[0]?.results?.[0]?.result ?? roll.total ?? 20);
+        const rollValue = roll.total;
         if (game.user?.isGM) {
           await message.applyHazardRoll(actor, rollValue);
         } else {

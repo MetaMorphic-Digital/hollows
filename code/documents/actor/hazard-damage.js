@@ -69,7 +69,7 @@ function hazardDamageDelta(resolvedDamage) {
 
 /** Resolve a queued Hazard roll, persisting it before its effects. */
 export async function applyHazardRoll(message, actor, rollValue) {
-  if (!game.user.isGM || !message || (actor?.type !== "hunter")) return false;
+  if (!game.user.isGM || (actor.type !== "hunter")) return false;
   const current = message.getFlag("hollows", "hazard");
   if (!current || current.completed) return false;
   const actorUuid = actor.uuid;
