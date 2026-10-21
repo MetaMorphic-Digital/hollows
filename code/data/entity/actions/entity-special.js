@@ -14,7 +14,7 @@ import {
   createDefaultEntityInterrupt,
   createEntityActionProfile,
 } from "../action-schema.js";
-import { buildEntityAfterAttackConfigs } from "../action-rules.js";
+import { buildEntityAfterAttackConfigs, matchesEntityOutcomeCondition } from "../action-rules.js";
 import { getEntityEngineAbilities } from "../resolvers.js";
 import { isEntityEngineAbilityActive } from "../../../documents/entity/entity-stats.js";
 import { requestAfterAttackApply } from "../../../documents/entity/attack-effects.js";
@@ -35,18 +35,18 @@ export async function applyEntityTriggeredAbilityEffects(abilityItem, entityActo
   const resolved = await resolveEntitySpecialTargets(entityActor, sys.special?.trigger || {}, context);
   if (!resolved.targets.length && !resolved.zones.length && !resolved.entityOnly) return false;
   if (resolved.entityOnly) {
-    await requestAfterAttackApply(null, "", groups, entityActor.id, null, { entityActor });
+    await requestAfterAttackApply(null, "", groups, entityActor.id, null, { ...context, entityActor });
     return true;
   }
   if (resolved.zones.length && !resolved.targets.length) {
     for (const zoneId of resolved.zones) {
-      await requestAfterAttackApply(null, zoneId, groups, entityActor.id, null, { entityActor });
+      await requestAfterAttackApply(null, zoneId, groups, entityActor.id, null, { ...context, entityActor });
     }
     return true;
   }
   for (const target of resolved.targets) {
     const targetZone = getActorZone(target) || "";
-    await requestAfterAttackApply(target, targetZone, groups, entityActor.id, null, { entityActor });
+    await requestAfterAttackApply(target, targetZone, groups, entityActor.id, null, { ...context, entityActor });
   }
   return !!resolved.targets.length;
 }
@@ -89,8 +89,9 @@ async function resolveEntitySpecialTargets(entityActor, source, context = {}) {
   return { entityOnly: false, targets: [], zones: [] };
 }
 
+/** Build a triggered action with its own configured After Effects. */
 function buildSpecialTriggeredCustomAbility(source) {
-  const trigger = source?.special?.trigger || {};
+  const trigger = source.special.trigger;
   const kind = String(trigger.abilityKind || "attack");
   const name = String(trigger.abilityName || "Triggered Ability").trim() || "Triggered Ability";
   const base = kind === "interrupt" ? createDefaultEntityInterrupt() : createDefaultEntityAttack();
@@ -105,6 +106,7 @@ function buildSpecialTriggeredCustomAbility(source) {
     system: {
       ...base,
       profile,
+      afterAttack: source.afterAttack,
       kind: kind === "interrupt" ? "interrupt" : "attack",
     },
   };
@@ -144,6 +146,11 @@ export async function triggerEntityTriggeredAbilities(entityActor, eventName, co
     const sys = ability.system || {};
     if (String(sys.special?.type || "textOnly") !== "triggeredEffect") continue;
     if (String(sys.special?.trigger?.event || "") !== String(eventName || "")) continue;
+    if (eventName === "hunterMakesAttack") {
+      const result = sys.special.trigger.attackResult;
+      if ((result !== "always") && (context.attackTarget?.type !== "entity")) continue;
+      if (!matchesEntityOutcomeCondition(result, context)) continue;
+    }
     await applyEntityTriggeredAbilityEffects(ability, entityActor, context);
     triggered = true;
   }

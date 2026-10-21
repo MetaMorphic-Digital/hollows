@@ -168,7 +168,7 @@
                       {{h.name}}
                       {{#if @root.canManageVisibility}}
                         <button type="button" class="chip-button" data-action="sceneRollHazard" data-id="{{h.ref}}">Roll</button>
-                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="hazard" data-id="{{h.ref}}">x</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{scene.index}}" data-kind="hazard" data-id="{{h.ref}}">x</button>
                       {{/if}}
                     </div>
                   {{/each}}
@@ -185,7 +185,7 @@
                       <img class="token-icon" src="{{e.img}}" alt="{{e.name}}" />
                       {{e.name}}
                       {{#if @root.canManageVisibility}}
-                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="entity" data-id="{{e.ref}}">x</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{scene.index}}" data-kind="entity" data-id="{{e.ref}}">x</button>
                       {{/if}}
                     </div>
                   {{/each}}
@@ -202,7 +202,7 @@
                       <img class="token-icon" src="{{t.img}}" alt="{{t.name}}" />
                       {{t.name}}
                       {{#if @root.canManageVisibility}}
-                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="thrall" data-id="{{t.ref}}">x</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{scene.index}}" data-kind="thrall" data-id="{{t.ref}}">x</button>
                       {{/if}}
                     </div>
                   {{/each}}
@@ -220,7 +220,7 @@
                       {{r.name}}
                       {{#if @root.canManageVisibility}}
                         <button type="button" class="chip-button" data-action="useRumour" data-id="{{r.ref}}">Use</button>
-                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="rumour" data-id="{{r.ref}}">x</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{scene.index}}" data-kind="rumour" data-id="{{r.ref}}">x</button>
                       {{/if}}
                     </div>
                   {{/each}}
@@ -237,7 +237,7 @@
                       <img class="token-icon" src="{{r.img}}" alt="{{r.name}}" />
                       {{r.name}}
                       {{#if @root.canManageVisibility}}
-                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{../scene.index}}" data-kind="relic" data-id="{{r.ref}}">x</button>
+                        <button type="button" class="chip-remove" data-action="sceneRemoveDoc" data-scene-index="{{scene.index}}" data-kind="relic" data-id="{{r.ref}}">x</button>
                       {{/if}}
                     </div>
                   {{/each}}

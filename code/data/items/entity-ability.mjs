@@ -16,15 +16,6 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
 
   /* -------------------------------------------------- */
 
-  /** `special.passive` was a single modifier before it became a group list. */
-  static migrateData(source, options) {
-    const passive = source.special?.passive;
-    if (passive && !Array.isArray(passive.groups)) source.special.passive = { groups: [passive] };
-    return super.migrateData(source, options);
-  }
-
-  /* -------------------------------------------------- */
-
   /** Only "other" actions may skip targets. */
   static _cleanData(data, options, _state) {
     const targeted = (profile) => profile?.actionType && (profile.actionType !== "other");
@@ -44,57 +35,6 @@ export default class EntityAbilityData extends foundry.abstract.TypeDataModel {
     const C = ENTITY_ACTION_CHOICES.targetMode;
     if (String(this.profile.actionType || "attack") === "other") return C;
     return { single: C.single, zone: C.zone, multiZone: C.multiZone, adjacentZones: C.adjacentZones };
-  }
-
-  /* -------------------------------------------------- */
-
-  /** Choices for a follow-up group's Targeting select. */
-  static #followUpTargetModeChoices(actionType) {
-    const C = ENTITY_ACTION_CHOICES.followUpTargetMode;
-    const choices = { sameTarget: C.sameTarget, single: C.single, multiZone: C.multiZone };
-    if (String(actionType || "attack") === "other") choices.noTargets = C.noTargets;
-    return choices;
-  }
-
-  /* -------------------------------------------------- */
-
-  /** Render data for the builder's follow-up section. */
-  get followUpGroupContexts() {
-    return this.followUp.groups.map((group, index) => {
-      const targetMode = String(group?.targetMode || "single");
-      const actionType = String(group?.profile?.actionType || "attack");
-      const targetAreas = Array.isArray(group?.targetAreas) ? group.targetAreas : [];
-      return {
-        group,
-        index,
-        displayIndex: index + 1,
-        showTrigger: index > 0,
-        afterAttackPath: `followUp.groups.${index}.afterAttack`,
-        targetModeChoices: EntityAbilityData.#followUpTargetModeChoices(actionType),
-        applyIfChoices: actionType === "other" ? ENTITY_ACTION_CHOICES.beforeAttackIf : ENTITY_ACTION_CHOICES.applyIf,
-        showTargetArea: !["sameTarget", "noTargets"].includes(targetMode),
-        showAdjacentMode: targetAreas.includes("adjacentClose") || targetAreas.includes("adjacentRanged"),
-        showAfterAttack: ["attack", "test", "other"].includes(actionType),
-      };
-    });
-  }
-
-  /* -------------------------------------------------- */
-
-  /** Render data for the builder's passive-modifier section. */
-  get passiveGroupContexts() {
-    return this.special.passive.groups.map((group, index) => {
-      const type = String(group?.type || "");
-      const condition = String(group?.condition || "always");
-      return {
-        group,
-        index,
-        displayIndex: index + 1,
-        isThreshold: ["entityCurseThreshold", "targetCurseThreshold", "zoneThreatThreshold", "entityTerrainThreshold"].includes(condition),
-        isDamage: ["damageTaken", "attackDamage", "interruptDamage"].includes(type),
-        isDefence: type === "modifyDefences",
-      };
-    });
   }
 
   /* -------------------------------------------------- */

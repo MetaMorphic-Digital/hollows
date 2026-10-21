@@ -28,6 +28,13 @@
       "name": "weapon-abilities",
       "label": "HOLLOWS.PACKS.WEAPON_ABILITIES",
       "type": "Item"
+    },
+    {
+      "name": "hollows-grisham-priory",
+      "label": "The Sins of Grisham Priory",
+      "path": "packs/hollows-grisham-priory",
+      "type": "Adventure",
+      "system": "hollows"
     }
   ],
   "packFolders": [
@@ -36,7 +43,8 @@
       "sorting": "a",
       "packs": [
         "weapons",
-        "weapon-abilities"
+        "weapon-abilities",
+        "hollows-grisham-priory"
       ]
     }
   ],

@@ -79,7 +79,10 @@ export default class HollowsEntityAbilitySheet extends HandlebarsApplicationMixi
     const system = this.item.system;
     const isAttackAction = system.profile?.actionType === "attack";
     const isWhenBrokenKind = system.kind === "whenBroken";
+    const triggersAbility = system.special.trigger.effectType === "triggerAbility";
     const specialTriggerTargetMode = String(system.special?.trigger?.targetMode || "eventTarget");
+    const profileTN = this.#prepareTNContext(system.profile, "system.profile", ENTITY_ACTION_CHOICES.tnSetSource);
+    profileTN.showDynamic &&= system.builderMode === "advanced";
     return {
       ...context,
       item: this.item,
@@ -88,19 +91,73 @@ export default class HollowsEntityAbilitySheet extends HandlebarsApplicationMixi
       triggeredAbilityChoices: system.triggeredAbilityChoices,
       zoneList: ENTITY_ZONES,
       profileZones: isAttackAction ? ENTITY_ZONES.filter((z) => z !== "Support") : ENTITY_ZONES,
+      profileTN,
       targetModeChoices: system.targetModeChoices,
       showProfileAdjacentTargeting: String(system.profile?.targetMode || "") === "adjacentZones",
-      followUpGroups: system.followUpGroupContexts,
+      followUpGroups: system.followUp.groups.map((group, index) => this.#prepareFollowUpGroup(group, index)),
       isActionKind: ["attack", "interrupt", "manoeuvre"].includes(system.kind),
       isSpecialKind: ["special", "doom", "whenBroken"].includes(system.kind),
       specialSectionTitle: isWhenBrokenKind ? "When Broken" : system.kind === "doom" ? "Doom" : "Special",
       showSpecialRuntimeConfig: !isWhenBrokenKind,
       showTriggeredEffectConfig: isWhenBrokenKind || system.special?.type === "triggeredEffect",
+      specialAfterAttack: triggersAbility ? system.afterAttack : system.special.trigger.afterAttack,
+      specialAfterAttackPath: triggersAbility ? "afterAttack" : "special.trigger.afterAttack",
       showSpecialTriggerGate: !isWhenBrokenKind,
       showSpecialTriggerZones: ["multiZone", "allInSelectedZones"].includes(specialTriggerTargetMode),
-      passiveGroups: system.passiveGroupContexts,
+      passiveGroups: system.special.passive.groups.map((group, index) => ({
+        group,
+        index,
+        displayIndex: index + 1,
+        isThreshold: ["entityCurseThreshold", "targetCurseThreshold", "zoneThreatThreshold", "entityTerrainThreshold"].includes(group.condition),
+        isDamage: ["damageTaken", "attackDamage", "interruptDamage"].includes(group.type),
+        isDefence: group.type === "modifyDefences",
+      })),
       isThresholdEvent: ["entityCurseThreshold", "hunterCurseThreshold"].includes(system.special?.trigger?.event),
       editable: this.isEditable,
+    };
+  }
+
+  /** Prepare the dynamic TN fields for a main or follow-up profile. */
+  #prepareTNContext(profile, path, setSourceChoices) {
+    const isSet = profile.tnDynamicType === "set";
+    const sourceField = isSet ? "tnSetSource" : "tnDynamicSource";
+    return {
+      showDynamic: profile.tnMode === "dynamic",
+      sourcePath: `${path}.${sourceField}`,
+      sourceChoices: isSet ? setSourceChoices : ENTITY_ACTION_CHOICES.tnDynamicSource,
+      sourceValue: profile[sourceField],
+      showStat: isSet && ["targetStat", "originalTargetStat"].includes(profile.tnSetSource),
+      showDefence: isSet && (profile.tnSetSource === "entityDefence"),
+    };
+  }
+
+  /** Prepare display fields and choices for one follow-up group. */
+  #prepareFollowUpGroup(group, index) {
+    const C = ENTITY_ACTION_CHOICES;
+    const { targetMode, targetAreas } = group;
+    const { actionType } = group.profile;
+    const targetModeChoices = {
+      sameTarget: C.followUpTargetMode.sameTarget,
+      single: C.followUpTargetMode.single,
+      multiZone: C.followUpTargetMode.multiZone,
+    };
+    if (actionType === "other") targetModeChoices.noTargets = C.followUpTargetMode.noTargets;
+    return {
+      group,
+      index,
+      displayIndex: index + 1,
+      showTrigger: index > 0,
+      afterAttackPath: `followUp.groups.${index}.afterAttack`,
+      targetModeChoices,
+      applyIfChoices: actionType === "other" ? C.beforeAttackIf : C.applyIf,
+      isAttack: actionType === "attack",
+      isTest: actionType === "test",
+      showTNAndDamage: actionType !== "other",
+      tn: this.#prepareTNContext(group.profile, `system.followUp.groups.${index}.profile`, C.followUpTNSetSource),
+      showDynamicDamage: group.profile.damageMode === "dynamic",
+      showTargetArea: !["sameTarget", "noTargets"].includes(targetMode),
+      showAdjacentMode: targetAreas.includes("adjacentClose") || targetAreas.includes("adjacentRanged"),
+      showAfterAttack: ["attack", "test", "other"].includes(actionType),
     };
   }
 

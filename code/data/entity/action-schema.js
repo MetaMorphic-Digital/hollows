@@ -16,6 +16,7 @@ const zonesField = () => {
 
 const ATTACK_OUTCOME_CONDITIONS = { successAny: "On Success (Any)", failureAny: "On Failure (Any)", anyDamageDealt: "On Any Damage Dealt", noDamageDealt: "On No Damage Dealt", resolveDamageDealt: "On Resolve Damage Dealt", woundsDamageDealt: "On Wounds Damage Dealt", onBreak: "On Break", onKill: "On Kill", onMakingDying: "On Making Dying" };
 const SHARED_STATE_CONDITION_LABELS = { targetAlone: "Target Is Alone", targetNotAlone: "Target Is Not Alone", targetHasCurse: "Target Has Curse", targetHasNoCurse: "Target Has No Curse", targetZoneHasCurse: "Target Zone Has Curse", targetZoneHasNoCurse: "Target Zone Has No Curse", targetZoneHasThreat: "Target Zone Has Threat", targetZoneHasNoThreat: "Target Zone Has No Threat", entityHasCurse: "Entity Has Curse", entityHasNoCurse: "Entity Has No Curse", entityIsBroken: "Entity Is Broken", entityIsNotBroken: "Entity Is Not Broken", entityHasTerrain: "Entity Has Terrain", entityHasNoTerrain: "Entity Has No Terrain", targetHasTerrain: "Target Has Terrain", targetHasNoTerrain: "Target Has No Terrain", targetHasFocus: "Target Has Focus", targetHasNoFocus: "Target Has No Focus", targetHasCapacity: "Target Has Capacity", targetHasNoCapacity: "Target Has No Capacity" };
+const TN_SET_SOURCES = { entityDefence: "Entity Defence", entityResolve: "Entity Resolve", entityWounds: "Entity Wounds", targetStat: "Target Stats" };
 
 const conditionListField = (choices, initial = []) => {
   const fields = foundry.data.fields;
@@ -24,6 +25,8 @@ const conditionListField = (choices, initial = []) => {
     condition: new fields.StringField({ initial: list[0] || "", choices }),
   }), { initial: list.map((condition) => ({ condition })) });
 };
+
+const DYNAMIC_SCALE_CHOICES = { full: "Full", halfUp: "Half (Rounded Up)", double: "Double" };
 
 /** Choices shared by schema fields and builder selects. */
 export const ENTITY_ACTION_CHOICES = {
@@ -36,10 +39,11 @@ export const ENTITY_ACTION_CHOICES = {
   tnMode: { fixed: "Fixed", dynamic: "Dynamic" },
   tnDynamicType: { modify: "TN modified by X", set: "TN set to X" },
   tnDynamicSource: { targetCurse: "Curse on Target", entityCurse: "Curse on Entity", zoneCurse: "Curse on Target Zone", threat: "Threat in Target Zone", targetCapacity: "Capacity on Target", entityTerrain: "Terrain on Entity" },
-  tnSetSource: { entityDefence: "Entity Defence", entityResolve: "Entity Resolve", entityWounds: "Entity Wounds", targetStat: "Target Stats" },
+  tnSetSource: TN_SET_SOURCES,
+  followUpTNSetSource: { ...TN_SET_SOURCES, originalTargetStat: "Original Target Stats" },
   damageMode: { fixed: "Fixed", dynamic: "Dynamic" },
   damageDynamicMode: { both: "Resolve & Wounds modified by X", resolve: "Resolve modified by X", wounds: "Wounds modified by X" },
-  damageDynamicScale: { full: "By X", halfUp: "By X/2 (Rounded Up)" },
+  damageDynamicScale: DYNAMIC_SCALE_CHOICES,
   damageDynamicSource: { targetCurse: "Curse on Target", entityCurse: "Curse on Entity", zoneCurse: "Curse on Zone", threat: "Threat", entityTerrain: "Terrain on Entity", huntersInZone: "Hunters in Zone" },
   targetMode: { single: "Single", zone: "Zone", multiZone: "Select Zones", adjacentZones: "Adjacent Zones", noTargets: "No Targets" },
   targetAdjacentScope: { any: "Adjacent Any", close: "Adjacent Close", ranged: "Adjacent Ranged" },
@@ -56,6 +60,7 @@ export const ENTITY_ACTION_CHOICES = {
   followUpTrigger: { afterMain: "After Main Attack", afterPrevious: "After Previous Group" },
   restoreMode: { fixed: "Fixed", dynamic: "Dynamic" },
   restoreSource: { curseZones: "Curse In Zones", curseHunters: "Curse On Hunters", huntersInZones: "Hunters In Zones", numberMinusHunters: "Number Minus Hunters", entityCurse: "Curse on Entity", entityTerrain: "Terrain on Entity (× Number)" },
+  hunterCountScale: DYNAMIC_SCALE_CHOICES,
   zoneMode: { single: "Single", multiZone: "Select Zones" },
   specialType: { textOnly: "Text Only", passiveModifier: "Passive Modifier", triggeredEffect: "Triggered Effect" },
   passiveType: { damageTaken: "Damage Taken", attackDamage: "Attack Damage", interruptDamage: "Interrupt Damage", actionsTN: "Actions TN", modifyDefences: "Modify Defences", modifyMaxResolve: "Modify Max Resolve", modifyMaxWounds: "Modify Max Wounds", modifyThreatCap: "Modify Threat Cap", modifyThreatPerRound: "Modify Threat Per Round" },
@@ -76,7 +81,8 @@ export const ENTITY_ACTION_CHOICES = {
   transferEnd: { zone: "Zone", hunter: "Hunter" },
   useManoeuvre: { use: "Use", move: "Move", takeCover: "Take Cover", focus: "Focus" },
   specialConditionSlot: { special1: "Special 1", special2: "Special 2", special3: "Special 3" },
-  triggerEvent: { entityStart: "Entity Turn Start", entityEnd: "Entity Turn End", hunterStart: "Hunter Turn Start", hunterEnd: "Hunter Turn End", battleStart: "Battle Start", entityBreaksHunter: "Entity Breaks Hunter", entityDealsResolveDamage: "Entity Deals Resolve Damage", entityDealsWoundsDamage: "Entity Deals Wounds Damage", hunterInflictsResolveDamage: "Hunter Inflicts Resolve Damage", hunterInflictsWoundsDamage: "Hunter Inflicts Wounds Damage", hunterInflictsNoDamage: "Hunter Inflicts No Damage", entityCurseThreshold: "Entity Curse Threshold Reached", hunterCurseThreshold: "Hunter Curse Threshold Reached", entityTerrainDestroyed: "Entity Terrain Destroyed (by Hunter)" },
+  triggerEvent: { entityStart: "Entity Turn Start", entityEnd: "Entity Turn End", hunterStart: "Hunter Turn Start", hunterEnd: "Hunter Turn End", battleStart: "Battle Start", entityBreaksHunter: "Entity Breaks Hunter", entityDealsResolveDamage: "Entity Deals Resolve Damage", entityDealsWoundsDamage: "Entity Deals Wounds Damage", hunterMakesAttack: "Hunter makes an Attack", entityCurseThreshold: "Entity Curse Threshold Reached", hunterCurseThreshold: "Hunter Curse Threshold Reached", entityTerrainDestroyed: "Entity Terrain Destroyed (by Hunter)" },
+  hunterAttackResult: { always: "Any Attack", anyDamageDealt: "Any Damage to Entity", resolveDamageDealt: "Resolve Damage to Entity", woundsDamageDealt: "Wounds Damage to Entity", noDamageDealt: "No Damage to Entity" },
   effectType: { afterEffects: "After Effects", triggerAbility: "Trigger Ability" },
   triggerTargetMode: { entity: "Entity", eventTarget: "Event Target", eventZone: "Event Target Zone", allInEventZone: "All Hunters In Event Zone", allInSelectedZones: "All Hunters In Selected Zones", single: "Single", multiZone: "Select Zones" },
   abilitySource: { existing: "Existing", custom: "Custom" },
@@ -84,7 +90,7 @@ export const ENTITY_ACTION_CHOICES = {
   whenBrokenMode: { first: "First Time Only", every: "Every Time" },
 };
 
-const profileField = () => {
+const profileField = (tnSetSources = ENTITY_ACTION_CHOICES.tnSetSource) => {
   const fields = foundry.data.fields;
   const C = ENTITY_ACTION_CHOICES;
   return new fields.SchemaField({
@@ -97,7 +103,7 @@ const profileField = () => {
     tnMode: new fields.StringField({ initial: "fixed", choices: C.tnMode }),
     tnDynamicType: new fields.StringField({ initial: "modify", choices: C.tnDynamicType }),
     tnDynamicSource: new fields.StringField({ initial: "targetCurse", choices: C.tnDynamicSource }),
-    tnSetSource: new fields.StringField({ initial: "entityDefence", choices: C.tnSetSource }),
+    tnSetSource: new fields.StringField({ initial: "entityDefence", choices: tnSetSources }),
     tnSetDefence: new fields.StringField({ initial: "close", choices: C.entityDefence }),
     tnSetStat: new fields.StringField({ initial: "hard", choices: C.stat }),
     damageMode: new fields.StringField({ initial: "fixed", choices: C.damageMode }),
@@ -296,7 +302,7 @@ const followUpGroupField = () => {
     // previous group's outcome (afterPrevious = chained). See followUpBranches.
     trigger: new fields.StringField({ initial: "afterPrevious", choices: ENTITY_ACTION_CHOICES.followUpTrigger }),
     when: new fields.StringField({ initial: "successAny", choices: ENTITY_ACTION_CHOICES.outcomeWhen }),
-    profile: profileField(),
+    profile: profileField(ENTITY_ACTION_CHOICES.followUpTNSetSource),
     targetMode: new fields.StringField({ initial: "single", choices: ENTITY_ACTION_CHOICES.followUpTargetMode }),
     targetAreas: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: ["original"] }),
     adjacentMode: new fields.StringField({ initial: "all", choices: ENTITY_ACTION_CHOICES.followUpAdjacentMode }),
@@ -322,6 +328,7 @@ const restoreResolveField = () => {
     fixed: new fields.NumberField({ initial: 0 }),
     dynamicSource: new fields.StringField({ initial: "curseZones", choices: ENTITY_ACTION_CHOICES.restoreSource }),
     dynamicNumber: new fields.NumberField({ initial: 0 }),
+    hunterCountScale: new fields.StringField({ initial: "full", choices: ENTITY_ACTION_CHOICES.hunterCountScale }),
     zoneMode: new fields.StringField({ initial: "single", choices: ENTITY_ACTION_CHOICES.zoneMode }),
     zones: zonesField(),
   });
@@ -381,6 +388,7 @@ const specialField = () => {
     }),
     trigger: new fields.SchemaField({
       event: new fields.StringField({ initial: "entityStart", choices: ENTITY_ACTION_CHOICES.triggerEvent }),
+      attackResult: new fields.StringField({ initial: "always", choices: ENTITY_ACTION_CHOICES.hunterAttackResult }),
       thresholdValue: new fields.NumberField({ initial: 3 }),
       effectType: new fields.StringField({ initial: "afterEffects", choices: ENTITY_ACTION_CHOICES.effectType }),
       targetMode: new fields.StringField({ initial: "eventTarget", choices: ENTITY_ACTION_CHOICES.triggerTargetMode }),

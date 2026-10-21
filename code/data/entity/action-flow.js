@@ -1,6 +1,6 @@
 import { chooseOneTarget, chooseOneZone, promptForZoneSelection } from "../../applications/apps/selection-dialogs.mjs";
 import { filterZonesByGroup, getAdjacentZones, getTokenZone, getZoneCurseValue, getZoneList, getActiveEntityActor, sceneHunterTokens } from "../../canvas/zone.js";
-import { matchesEntityAttackConditions } from "./action-rules.js";
+import { matchesEntityAttackConditions, scaleDynamicValue } from "./action-rules.js";
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { adjustEntityResource } from "../../documents/actor/resources.js";
 import { resolveEntitySourceValue } from "../../documents/entity/entity-stats.js";
@@ -189,15 +189,12 @@ export async function resolveRestoreResolve(config, entityActor) {
       restoreAmount = Math.max(0, (Number(restore.dynamicNumber ?? 0) || 0) * resolveEntitySourceValue("entityTerrain", { entityActor }));
     } else if (source === "entityCurse") {
       restoreAmount = resolveEntitySourceValue("entityCurse", { entityActor });
-    } else if (source === "huntersInZones") {
-      const zones = await resolveRestoreZones(restore);
-      const hunters = sceneHunterTokens();
-      restoreAmount = hunters.filter((t) => zones.includes(getTokenZone(t))).length;
-    } else if (source === "numberMinusHunters") {
+    } else if (["huntersInZones", "numberMinusHunters"].includes(source)) {
       const zones = await resolveRestoreZones(restore);
       const hunters = sceneHunterTokens();
       const count = hunters.filter((t) => zones.includes(getTokenZone(t))).length;
-      restoreAmount = Math.max(0, (Number(restore.dynamicNumber ?? 0) || 0) - count);
+      restoreAmount = scaleDynamicValue(count, restore.hunterCountScale);
+      if (source === "numberMinusHunters") restoreAmount = Math.max(0, restore.dynamicNumber - restoreAmount);
     } else {
       const zones = await resolveRestoreZones(restore);
       restoreAmount = resolveEntitySourceValue(source, { entityActor, zones });
