@@ -4,6 +4,13 @@
   "type": "weapon",
   "img": "icons/svg/combat.svg",
   "system": {
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Terribly Calm",
+      "mode": "multiple",
+      "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nasync function clearFocus(H, actor, reason) {\n  if (!H.resource.focusCount(actor)) return;\n  await H.resource.setFocus(actor, 0);\n  if (reason) await H.chat.post(actor.name + \" loses all Focus (\" + reason + \").\", actor);\n}\nreturn {\n  focus: { hook: \"resourceLimit\", run: (H, actor, ctx) => ctx.resource === \"focus\" ? Math.max(ctx.value, 5) : ctx.value },\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: (H, actor) => clearFocus(H, actor) },\n  broken: { hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self, run: (H, actor) => clearFocus(H, actor, \"Broken\") },\n  support: {\n    hook: \"interceptor\", event: \"hunter-zone-changed\", matchCarrier: self,\n    run: (H, actor, ctx) => ctx.toZone === \"Support\" ? clearFocus(H, actor, \"entered Support\") : null,\n  },\n};"
+    },
     "coreAbility": "Terribly Calm. Slow is smooth, smooth is fast. You may\nhold up to 5 Focus. Discard all your current Focus when\nyou become Broken or enter Support. Unless you have\nabilities which state otherwise, you still begin each battle\nwith 0 Focus.",
     "capacity": {
       "value": 0,

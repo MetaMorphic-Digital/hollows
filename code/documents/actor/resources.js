@@ -1,7 +1,14 @@
-import { hasWeaponEquipped } from "../../helpers/weapon-utils.js";
+import HollowsActor from "../actor.mjs";
+
+const RESOURCE_LIMIT_MODIFIERS = [];
+
+/** Register modifiers for resource limits such as maximum Focus. */
+export function registerResourceLimitModifier(modifier) {
+  RESOURCE_LIMIT_MODIFIERS.push(modifier);
+}
 
 export function getFocusLimit(actor) {
-  return hasWeaponEquipped(actor, "Rifle") ? 5 : 1;
+  return RESOURCE_LIMIT_MODIFIERS.reduce((limit, modifier) => modifier(actor, "focus", limit), 1);
 }
 
 export function getFocusCount(actor) {
@@ -93,12 +100,12 @@ export async function setFocusCount(actor, value) {
   const before = getFocusCount(actor);
   const limit = getFocusLimit(actor);
   const next = Math.max(0, Math.min(limit, Number(value ?? 0)));
-  await actor.update({ "system.focus.value": next });
-  const { addCondition, removeCondition } = await import("./conditions.js");
+  await HollowsActor.updateSafe(actor, { "system.focus.value": next });
+  const { setConditionSafe } = await import("./conditions.js");
   if (next > 0) {
-    if (!actor.statuses.has("focus")) await addCondition(actor, "focus");
+    if (!actor.statuses.has("focus")) await setConditionSafe(actor, "focus", true);
   } else if (actor.statuses.has("focus")) {
-    await removeCondition(actor, "focus");
+    await setConditionSafe(actor, "focus", false);
   }
   return { before, after: next, changed: next !== before };
 }
@@ -142,16 +149,15 @@ export async function adjustHunterResource(actor, { resolve = 0, wounds = 0, foc
 }
 
 /**
- * Adjust an Entity's Resolve/Wounds by clamped deltas (restore = +, damage/spend = −).
- * Floors at 0, caps at max (0/undefined max → 999) via the shared resourceState clamp.
- * The single Entity resolve/wounds mutation primitive. GM-side (entity is GM-owned).
+ * Apply Resolve/Wounds deltas through the GM when needed.
+ * Values stay between 0 and max, or 999 when max is unset.
  */
 export async function adjustEntityResource(entity, { resolve = 0, wounds = 0 } = {}) {
   if (!entity) return;
   const update = {};
   if (resolve) update["system.health.resolve.value"] = resourceState(entity.system?.health?.resolve?.value, entity.system?.health?.resolve?.max, asDelta(resolve)).after;
   if (wounds) update["system.health.wounds.value"] = resourceState(entity.system?.health?.wounds?.value, entity.system?.health?.wounds?.max, asDelta(wounds)).after;
-  if (Object.keys(update).length) await entity.update(update);
+  await HollowsActor.updateSafe(entity, update);
 }
 
 /**
@@ -171,5 +177,5 @@ export async function spendResolve(actor, amount) {
     const woundsCur = Number(actor.system?.health?.wounds?.value ?? 0);
     update["system.health.wounds.value"] = Math.max(0, woundsCur - fromWounds);
   }
-  await actor.update(update);
+  await HollowsActor.updateSafe(actor, update);
 }

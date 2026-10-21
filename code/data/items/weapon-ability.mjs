@@ -1,3 +1,5 @@
+import ScriptField from "../fields/script-field.mjs";
+
 export default class WeaponAbilityData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
   static defineSchema() {
@@ -8,6 +10,7 @@ export default class WeaponAbilityData extends foundry.abstract.TypeDataModel {
       durationType: new fields.StringField({ initial: "permanent" }),
       boundWeaponId: new fields.StringField({ initial: "" }),
       text: new fields.StringField({ initial: "" }),
+      script: new ScriptField(),
     };
   }
 }

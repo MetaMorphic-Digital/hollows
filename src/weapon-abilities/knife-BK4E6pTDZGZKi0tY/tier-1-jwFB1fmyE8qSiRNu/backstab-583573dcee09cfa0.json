@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "They left themselves open; it's more their fault than yours. While you are in Rear, inflict +1/+1 damage.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "attackDamage",
+      "rateLimit": "none",
+      "source": "if (H.zone.of(actor) !== \"Rear\") return null;\nreturn { resolve: 1, wounds: 1 };"
+    }
   },
   "flags": {
     "hollows": {

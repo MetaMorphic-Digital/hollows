@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Lead from the front. When you Move to a Close area, inflict 1 Resolve damage on the Entity.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onMove",
+      "rateLimit": "none",
+      "source": "if (!ctx.byOwner) return false;\nif (!H.zone.isClose(ctx.toZone)) return false;\nawait H.effects.apply([{ type: \"damageEntity\", resolve: 1, label: \"Charge\" }], ctx);"
+    }
   },
   "flags": {
     "hollows": {

@@ -11,7 +11,7 @@ import { openRecoverForActor } from "../../../data/actions/recover.js";
 import { openHealForActor } from "../../../data/actions/heal.js";
 import { getManoeuvreAvailability } from "../../../data/actions/index.js";
 import { getWeaponStatModsForActor } from "../../../data/actor-models.js";
-import { cleanupWeaponAbilitiesForActor, hasWeaponEquipped, isShotgunWeapon } from "../../../helpers/weapon-utils.js";
+import { cleanupWeaponAbilitiesForActor, isShotgunWeapon } from "../../../helpers/weapon-utils.js";
 import { addCondition, removeCondition } from "../../../documents/actor/conditions.js";
 import { getActiveCurseConfig } from "../../../canvas/overlays.js";
 import { deleteHunterEquipmentSlot, getHunterEquipmentItemForSlot } from "../../../documents/actor/hunter-equipment.js";
@@ -171,9 +171,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     data.weaponCount = weapons.length;
     const curseCfg = getActiveCurseConfig();
     data.curseTrackingEnabled = curseCfg.enabled && curseCfg.targets.hunter;
-    data.hasArmour = hasWeaponEquipped(this.actor, "Armour");
-    data.hasRifle = hasWeaponEquipped(this.actor, "Rifle");
-    data.hasBook = hasWeaponEquipped(this.actor, "Book");
+    data.readyActive = this.actor.statuses.has("ready");
     // Generic activated-manoeuvre surface: one button per ActivatedAbility the
     // actor carries (Ready-cost ones are surfaced in the Expend Ready dialog).
     data.activatedManoeuvres = getActivatedAbilities(this.actor)

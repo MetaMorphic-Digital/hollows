@@ -1,0 +1,98 @@
+<form class="hollows-sheet script-editor" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <div class="name">{{documentName}}</div>
+      <div class="subline">{{localize "HOLLOWS.SCRIPT.title"}}</div>
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <div class="hollows-form-row">
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.active"}}</div>
+      <input type="checkbox" name="enabled" {{checked block.enabled}} />
+    </div>
+    <div class="hollows-form-row">
+      <div class="stat-label" title="{{localize 'HOLLOWS.SCRIPT.trustedHint'}}">{{localize "HOLLOWS.SCRIPT.trusted"}}</div>
+      <input type="checkbox" name="trusted" {{checked block.trusted}}>
+    </div>
+    <div class="hollows-form-row">
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.label"}}</div>
+      <input type="text" name="label" value="{{block.label}}" placeholder="{{localize 'HOLLOWS.SCRIPT.labelPlaceholder'}}" />
+    </div>
+    <div class="hollows-form-row">
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.mode"}}</div>
+      <select name="mode">{{selectOptions modeChoices selected=block.mode localize=true}}</select>
+    </div>
+    <div class="hollows-form-row" {{#if multiple}}hidden{{/if}}>
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.runs"}}</div>
+      <select name="hook">{{selectOptions hookChoices selected=block.hook localize=true}}</select>
+    </div>
+    <div class="hollows-form-row script-event-row" {{#unless selectedHook.hasEvent}}hidden{{/unless}}>
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.event"}}</div>
+      <select name="eventType">{{selectOptions eventChoices selected=block.eventType localize=true}}</select>
+    </div>
+    <div class="hollows-form-row script-turn-row" {{#unless selectedHook.hasOn}}hidden{{/unless}}>
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.whoseTurn"}}</div>
+      <select name="on">{{selectOptions turnScopes selected=block.on localize=true}}</select>
+    </div>
+    <div class="hollows-form-row" {{#if hideLimit}}hidden{{/if}}>
+      <div class="stat-label">{{localize "HOLLOWS.SCRIPT.limit"}}</div>
+      <select name="rateLimit">{{selectOptions rateLimits selected=block.rateLimit localize=true}}</select>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>{{localize "HOLLOWS.SCRIPT.source"}}</h2>
+    {{#if multiple}}
+      <p class="muted">{{localize "HOLLOWS.SCRIPT.multipleHint"}}</p>
+      <p class="muted">{{localize "HOLLOWS.SCRIPT.reactionHint"}}</p>
+      <pre><code>return {
+  bonus: {
+    hook: "attackDamage",
+    run: (H, actor, ctx) =&gt; ({ resolve: 1, wounds: 0 }),
+  },
+  recover: {
+    hook: "startOfTurn",
+    rateLimit: "oncePerRound",
+    promptOnPlayer: H =&gt; H.ask.one({
+      title: "Recover",
+      options: [{ value: "resolve", label: "Resolve" }, { value: "focus", label: "Focus" }],
+    }),
+    applyOnGM: (H, actor, ctx, choice) =&gt; H.resource.adjust(actor, { [choice]: 1 }),
+  },
+};</code></pre>
+    {{else}}
+      <div class="script-context muted">
+        {{localize "HOLLOWS.SCRIPT.available"}} {{#each selectedHook.ctx as |key|}}<code>ctx.{{key}}</code> {{/each}}
+      </div>
+      <div class="script-context muted">
+        {{localize "HOLLOWS.SCRIPT.runsOn"}} <strong>{{runsOn}}</strong>
+      </div>
+      {{#if selectedHook.sync}}
+        <div class="script-context muted">{{localize "HOLLOWS.SCRIPT.syncHint"}}</div>
+      {{/if}}
+      {{#if selectedHook.returns}}
+        <div class="script-context muted">{{localize "HOLLOWS.SCRIPT.returns"}} {{selectedHook.returns}}</div>
+      {{/if}}
+    {{/if}}
+    <textarea name="source" rows="18" spellcheck="false">{{block.source}}</textarea>
+  </section>
+
+  <section class="sheet-section">
+    <h2>{{localize "HOLLOWS.SCRIPT.glossary"}}</h2>
+    {{#each glossary as |group|}}
+      <div class="hollows-form-row">
+        <div class="stat-label">{{group.name}}</div>
+        <div class="hollows-form-value">
+          {{group.members}}
+          {{#if group.note}}<div class="muted">{{group.note}}</div>{{/if}}
+        </div>
+      </div>
+    {{/each}}
+  </section>
+
+  <footer class="sheet-footer">
+    <button type="button" class="stat-roll" data-action="save" {{#unless canEdit}}disabled{{/unless}}>{{localize "HOLLOWS.SCRIPT.save"}}</button>
+    <button type="button" class="stat-roll" data-action="close">{{localize "HOLLOWS.SCRIPT.close"}}</button>
+  </footer>
+</form>

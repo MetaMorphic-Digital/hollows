@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Daub your body in the blood of the beast. While the Entity is Bleeding and you are in Close, when your turn ends, restore 2 Resolve.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "endOfTurn",
+      "rateLimit": "none",
+      "source": "if (!(H.zone.isClose(H.zone.of(actor)) && H.actors.entity()?.statuses.has(\"bleeding\"))) return false;\nawait H.resource.adjust(actor, { resolve: 2 });\nawait H.chat.post(`${actor.name} restores 2 Resolve (Anointed).`, actor);"
+    }
   },
   "flags": {
     "hollows": {

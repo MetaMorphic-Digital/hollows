@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "One shot is all you need. When you spend Focus as part of an attack, you may activate this ability. The attack gains +1/+1 for each Focus spent, but you do not roll with advantage as you normally would.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "const focusCost = (root, { focusCount }) => Math.min(focusCount,\n  Math.max(0, Math.floor(Number(root.querySelector(\"[name=aimFocus]\").value) || 0)));\nreturn {\n  attack: {\n    hook: \"attackOptions\",\n    run: () => ({\n      dialogHtml: () => \"<div class='form-group'><label>Aim For the Head: spend Focus for +1/+1 each</label><input type='number' name='aimFocus' min='0' value='0'></div>\",\n      focusCost,\n      prepare(root, ctx) {\n        const aim = root.querySelector(\"[name=aimFocus]\");\n        aim.max = ctx.focusCount;\n        aim.disabled = ctx.focusCount <= 0;\n        aim.addEventListener(\"input\", ctx.updateFocusCost);\n      },\n      damageBonus(root, actor, state) {\n        const spend = focusCost(root, state);\n        if (!spend) return;\n        state.damageResolve += spend;\n        state.damageWounds += spend;\n        state.cardLines.push(\"<div><strong>Aim For the Head:</strong> spent \" + spend + \" Focus for +\" + spend + \"/+\" + spend + \" damage.</div>\");\n      },\n    }),\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

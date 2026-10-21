@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "There's more of us than there are of them. When your turn ends, restore Resolve equal to the number of allies in your area, and every ally in your area restores 1 Resolve.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "endOfTurn",
+      "rateLimit": "none",
+      "source": "const allies = H.zone.allies(actor);\nif (!allies.length) return false;\nawait H.resource.adjust(actor, { resolve: allies.length });\nfor (const ally of allies) await H.resource.adjust(ally, { resolve: 1 });\nawait H.chat.postHtml(\n  `<strong>${foundry.utils.escapeHTML(actor.name)}</strong> restores <strong>${allies.length} Resolve</strong>; each ally restores <strong>1 Resolve</strong> (Back-To-Back).`,\n  actor,\n);"
+    }
   },
   "flags": {
     "hollows": {

@@ -25,22 +25,23 @@ export function getService(name) {
 const INTERCEPTORS = new Map();
 
 export function registerInterceptor(event, fn) {
-    const list = INTERCEPTORS.get(event) ?? [];
-    list.push(fn);
-    INTERCEPTORS.set(event, list);
+  const list = INTERCEPTORS.get(event) ?? [];
+  list.push(fn);
+  INTERCEPTORS.set(event, list);
 }
 
 export async function applyInterceptors(event, ctx, value) {
-    for (const fn of INTERCEPTORS.get(event) ?? []) {
-        value = await fn(ctx, value);
-    }
-    return value;
+  for (const fn of INTERCEPTORS.get(event) ?? []) {
+    value = await fn(ctx, value);
+  }
+  const scripts = getService("scriptInterceptors");
+  return scripts ? scripts(event, ctx, value) : value;
 }
 
 // For synchronous seams (document pre-hooks) where a returned Promise cannot veto.
 export function applyInterceptorsSync(event, ctx, value) {
-    for (const fn of INTERCEPTORS.get(event) ?? []) {
-        value = fn(ctx, value);
-    }
-    return value;
+  for (const fn of INTERCEPTORS.get(event) ?? []) {
+    value = fn(ctx, value);
+  }
+  return value;
 }

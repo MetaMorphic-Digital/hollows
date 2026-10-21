@@ -57,6 +57,14 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
         if (!this.isEditable) return;
         return this._onDeleteAbility(event, target);
       },
+      /** @this {HollowsWeaponSheet} */
+      editScript: async function(event, target) {
+        if (!this.isEditable) return;
+        const { default: HollowsScriptEditor } = await import("../../apps/script-editor.mjs");
+        HollowsScriptEditor.open(this.item, target.dataset.path, {
+          title: game.i18n.format(target.dataset.titleKey, { name: this.item.name }),
+        });
+      },
     },
   };
 
@@ -102,6 +110,8 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     data.attackProfileStatChoices = ATTACK_PROFILE_STATS;
     data.attackProfileDefenceChoices = ATTACK_PROFILE_DEFENCES;
     data.formsForDisplay = getAvailableWeaponForms(this.item);
+    data.scriptsAllowed = hollows.settings.allowCustomScripts;
+    data.canEditScripts = game.user.isGM && this.isEditable;
     data.effectiveDamage = getEffectiveWeaponDamage(this.item);
     data.effectiveCapacity = getEffectiveWeaponCapacity(this.item);
     data.effectiveHealthBonus = this.item.system.getEffectiveWeaponHealthBonus();
@@ -176,6 +186,16 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     if (name === "system.selectedForm") return this._onSelectedFormChange(event);
     if (name === "system.modifierChoice") return this._onModifierChoiceChange(event);
     if (name === "system.formAttackChoice") return this._onFormAttackChoiceChange(event);
+
+    // Toggling renown reveals/hides the whole section, so it needs a render;
+    // the name/text fields below take the silent renderless path.
+    if (name === "system.renown.enabled") {
+      event.preventDefault?.();
+      event.stopPropagation?.();
+      await this.item.update({ "system.renown.enabled": !!input.checked });
+      this.render();
+      return;
+    }
 
     if (input?.tagName !== "SELECT" && name && (name === "name" || name.startsWith("system."))) {
       event.preventDefault?.();

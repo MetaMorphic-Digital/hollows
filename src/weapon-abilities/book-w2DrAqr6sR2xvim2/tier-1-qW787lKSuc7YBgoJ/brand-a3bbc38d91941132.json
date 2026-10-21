@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Carve your dominion into its flesh. When you inflict damage on the Entity with a Book attack, one Hunter in your area or an adjacent area may Focus as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "none",
+      "source": "if (ctx.result !== \"hit\") return false;\nawait H.effects.apply([{ type: \"grantManoeuvre\", manoeuvre: \"focus\", scope: \"allyInZoneOrAdjacent\" }], ctx);\nreturn !ctx._cancelled;"
+    }
   },
   "flags": {
     "hollows": {

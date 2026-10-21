@@ -4,6 +4,13 @@
   "type": "weapon",
   "img": "icons/svg/combat.svg",
   "system": {
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Be Ready",
+      "mode": "multiple",
+      "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nfunction ready(H, actor) {\n  if (actor.system.health.resolve.value <= 0) return;\n  return H.condition.set(actor, \"ready\", true);\n}\nasync function unready(H, actor) {\n  const { removeCondition } = await import(\"/systems/hollows/code/documents/actor/conditions.js\");\n  await removeCondition(actor, \"ready\", { skipReactionDispatch: true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: ready },\n  guard: { hook: \"onEvent\", eventType: \"guard\", run: ready },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: ready },\n  broken: {\n    hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self,\n    async run(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return;\n      await unready(H, actor);\n      await H.chat.post(actor.name + \" becomes Unready (Broken).\", actor);\n    },\n  },\n  removed: {\n    hook: \"interceptor\", event: \"weapon-removed\",\n    async run(H, actor) {\n      if (!H.weapon.equipped(actor, \"Armour\")) await unready(H, actor);\n    },\n  },\n};"
+    },
     "coreAbility": "Be Ready. Stand your ground and brace for impact. When combat begins, you are Ready; when you become Broken or expend Ready, you are not. When you Guard, you become Ready again, in addition to the other benefits of Guarding. Track Ready with a dedicated coin or token. Some abilities are only active while you are Ready; others require you to expend Ready to activate them. Unless stated otherwise, expending Ready is an immediate action you can perform once on your turn.",
     "capacity": {
       "value": 0,

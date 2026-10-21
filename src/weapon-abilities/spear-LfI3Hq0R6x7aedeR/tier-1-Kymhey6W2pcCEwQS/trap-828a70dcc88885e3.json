@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Just try and take me down. While you are in a Close area with 3 or more Threat on it, make attack rolls with advantage.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  advantage: {\n    hook: \"attackRoll\", scope: \"self\", rollMode: \"adv\",\n    active(H, actor) {\n      const zone = H.zone.of(actor);\n      return [\"Front\", \"Flank Left\", \"Flank Right\"].includes(zone) && H.zone.threatIn(zone) >= 3;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

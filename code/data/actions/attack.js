@@ -16,7 +16,7 @@
  */
 import { STAT_LABELS } from "../_module.mjs";
 import {
-  getAttackOptions, renderAttackOptionHtml, prepareAttackOptions,
+  getAttackOptions, renderAttackOptionHtml, prepareAttackOptions, getAttackOptionFocusCost,
   applyAttackOptionBeforeRoll, applyAttackOptionDamageBonuses,
   applyAttackOptionAfterDamage,
 } from "./attack-options.js";
@@ -464,7 +464,6 @@ export async function openAttackDialog(actor, options = {}) {
         focusCount: getFocusCount(actor),
         updateSuggestedMode,
       });
-      updateSuggestedMode();
     },
     buttons: [
       {
@@ -551,7 +550,7 @@ export async function openAttackDialog(actor, options = {}) {
           const attackState = {
             useFocusAdv,
             focusCount,
-            focusSpend: useFocusAdv ? 1 : 0,
+            focusSpend: (useFocusAdv ? 1 : 0) + getAttackOptionFocusCost(attackOptions, dialog.element, { actor, zone, focusCount }),
             statBonus: 0,
             damageResolve: 0,
             damageWounds: 0,
@@ -594,9 +593,10 @@ export async function openAttackDialog(actor, options = {}) {
           let damageResolve = Number(baseDamage.resolve ?? profile?.damage?.resolve ?? 0) + Number(damageBonus?.resolve || 0);
           let damageWounds = Number(baseDamage.wounds ?? profile?.damage?.wounds ?? 0) + Number(damageBonus?.wounds || 0);
           {
-            // General damage modifiers (Backstab, Seeing Red) always apply.
+            // General damage modifiers also apply to attacks without weapon-item bonuses.
             const changed = applyAttackDamageChanges(actor, { resolve: damageResolve, wounds: damageWounds }, {
               attackerZone: zone,
+              targetType,
               weapon,
               weaponType: weapon?.system?.weaponType || "",
               suppressItemBonuses,

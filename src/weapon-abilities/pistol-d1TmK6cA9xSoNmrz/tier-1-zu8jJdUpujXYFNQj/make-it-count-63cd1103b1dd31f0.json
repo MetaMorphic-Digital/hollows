@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Hit it where it hurts. When you inflict Resolve damage with an attack, you may spend Focus to inflict 1 Wound damage on the Entity.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "none",
+      "source": "if (ctx.damageType !== \"Resolve\" || ctx.damageValue <= 0) return false;\nif (H.resource.focusCount(actor) < 1) return false;\nif (\n  !(await H.ask.confirm({\n    title: \"Make It Count\",\n    bodyHtml:\n      \"<div>Spend <strong>Focus</strong> to inflict <strong>1 Wound</strong> on the Entity (Make It Count)?</div>\",\n    yesLabel: \"Spend Focus\",\n    noLabel: \"Skip\",\n  }))\n)\n  return false;\nawait H.effects.apply(\n  [\n    { type: \"adjustFocus\", amount: -1 },\n    { type: \"damageEntity\", wounds: 1, label: \"Make It Count\" },\n  ],\n  ctx,\n);"
+    }
   },
   "flags": {
     "hollows": {

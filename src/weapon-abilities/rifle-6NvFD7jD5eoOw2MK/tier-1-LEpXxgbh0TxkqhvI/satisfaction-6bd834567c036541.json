@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Nothing like spilt blood to clear the mind. When you inflict Wound damage, gain 1 Focus.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "none",
+      "source": "if (ctx.damageType !== \"Wounds\" || ctx.damageValue <= 0) return false;\nconst result = await H.resource.adjust(actor, { focus: 1 });\nif (!result.focus.changed) return false;\nawait H.chat.post(`${actor.name} gains 1 Focus (Satisfaction).`, actor);"
+    }
   },
   "flags": {
     "hollows": {

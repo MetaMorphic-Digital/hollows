@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "You unravel the chaos of combat into reason. While you are Ready, when your turn ends, you may Shift 1 Threat in your or an adjacent area. During your turn, you may expend Ready to grant an ally in your area an immediate Reload, Take Cover or Move manoeuvre.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  grant: {\n    hook: \"applyToZone\",\n    label: \"Control: Grant Manoeuvre\",\n    subSelect: {\n      name: \"action\",\n      label: \"Manoeuvre\",\n      options: [\n        { value: \"reload\", label: \"Reload\" },\n        { value: \"take-cover\", label: \"Take Cover\" },\n        { value: \"move\", label: \"Move\" },\n      ],\n    },\n    run: async (H, actor, ctx) => {\n      await H.chat.post(actor.name + \" expends Ready to grant \" + ctx.target.name + \" an immediate manoeuvre (Control).\", actor);\n      await H.actions.grantManoeuvre(ctx.target, ctx.payload.action);\n    },\n  },\n  shift: {\n    hook: \"endOfTurn\",\n    run: (H, actor) => {\n      if (!H.condition.has(actor, \"ready\")) return false;\n      return H.threat.shift(actor, {\n        amount: 1, sourceConstraint: \"sameOrAdjacent\", destConstraint: \"adjacentToSource\",\n        excludeSupport: true, label: \"Control: Shift Threat\", reason: \"Control\",\n      });\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

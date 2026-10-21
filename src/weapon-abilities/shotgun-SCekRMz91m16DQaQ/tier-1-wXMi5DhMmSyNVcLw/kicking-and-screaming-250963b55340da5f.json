@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Never miss a chance to hurt something. While you are in Close, when you Reload the Shotgun, you may make an immediate 1/1 attack with Hard before flipping the Shotgun to Loaded. This attack is treated as an untyped attack, as though it is made with no Weapon, and is not treated as a Shotgun attack.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  attack: {\n    hook: \"onEvent\",\n    event: { type: \"reload\", phase: \"before\" },\n    promptOnPlayer: async (H, actor, ctx) => {\n      if (ctx.payload.weaponType !== \"Shotgun\" || !H.zone.isClose(H.zone.of(actor))) return false;\n      if (!(await H.ask.confirm({\n        title: \"Kicking and Screaming\",\n        bodyHtml: \"Make an immediate <strong>1/1 Hard</strong> attack before reloading?\",\n      }))) return false;\n      await H.actions.attack(actor, {\n        title: \"Kicking and Screaming\",\n        weaponless: true,\n        forcedProfile: { stat: \"hard\", defence: \"close\" },\n        damageOverride: { resolve: 1, wounds: 1 },\n      });\n      return true;\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

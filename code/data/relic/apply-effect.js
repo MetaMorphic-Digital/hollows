@@ -317,9 +317,10 @@ function hunterEffects(group) {
   }
   if (group.reaction?.enabled) {
     const kind = String(group.reaction.kind || "");
-    if (kind === "grantManoeuvre") fx.push({ type: "grantManoeuvre", scope: "self" });
-    else if (kind === "immediateMove") fx.push({ type: "chatNotice", message: "<strong>{actor}</strong> may immediately Move." });
-    else if (kind === "grantReaction") fx.push({ type: "grantReaction", reaction: String(group.reaction.reactionKey || "guard") });
+    if (kind === "grantManoeuvre") {
+      const options = group.reaction.manoeuvres || [];
+      fx.push({ type: "grantManoeuvre", scope: "self", manoeuvre: options.length === 1 ? options[0] : "", options });
+    } else if (kind === "immediateMove") fx.push({ type: "chatNotice", message: "<strong>{actor}</strong> may immediately Move." });
   }
   return fx;
 }

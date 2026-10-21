@@ -4,6 +4,13 @@
   "type": "weapon",
   "img": "icons/svg/combat.svg",
   "system": {
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Arms Reach",
+      "mode": "multiple",
+      "source": "return {\n  reach: {\n    hook: \"activated\", label: \"Arms Reach\", rateLimit: \"oncePerRound\",\n    async run(H, actor) {\n      const ctx = { actor };\n      await H.effects.apply([\n        { type: \"pickAmount\", requireMyTurn: true, maxResolve: true, maxZoneThreat: true,\n          ctxKey: \"spend\", title: \"Arms Reach\", label: \"Spend Resolve\",\n          description: \"Spend Resolve to remove equal Threat in your area.\" },\n        { type: \"spendResolve\", amount: { fromCtx: \"spend\" } },\n        { type: \"removeThreat\", zone: \"self\", amount: { fromCtx: \"spend\" } },\n      ], ctx);\n      return !ctx._cancelled;\n    },\n  },\n};"
+    },
     "coreAbility": "Arm?s Reach. It?s a tiring task, but you keep the beast at\nbay. Once per round during your turn, as an immediate\naction, you may spend Resolve up to the amount of\nThreat in your area to remove Threat from your area\nequal to the Resolve spent.",
     "capacity": {
       "value": 0,

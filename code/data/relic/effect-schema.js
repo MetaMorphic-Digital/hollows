@@ -173,7 +173,7 @@ const reactionClause = () => {
   return new f.SchemaField({
     enabled: new f.BooleanField({ initial: false }),
     kind: new f.StringField({ initial: "none", choices: C.reactionKind }),
-    reactionKey: new f.StringField({ initial: "guard", choices: C.grantableReaction })
+    manoeuvres: stringList(),
   });
 };
 

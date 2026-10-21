@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Feels good, doesn't it? Once per round, when you inflict Wound damage, restore 2 Resolve.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "oncePerRound",
+      "source": "if (ctx.damageType !== \"Wounds\" || ctx.damageValue <= 0) return false;\nawait H.resource.adjust(actor, { resolve: 2 });\nawait H.chat.post(`${actor.name} restores 2 Resolve (Momentum).`, actor);"
+    }
   },
   "flags": {
     "hollows": {

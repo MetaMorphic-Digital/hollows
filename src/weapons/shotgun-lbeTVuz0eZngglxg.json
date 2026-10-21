@@ -4,6 +4,13 @@
   "type": "weapon",
   "img": "icons/svg/combat.svg",
   "system": {
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Loaded",
+      "mode": "multiple",
+      "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nasync function load(H, actor, ctx) {\n  await ctx.item.update({ \"system.loaded\": true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: load },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: load },\n};"
+    },
     "coreAbility": "Loaded. All or nothing. The Shotgun doesn?t have Capacity\nlike other ranged Weapons. Instead, it is either Empty\nor Loaded. At the start of each fight, the Shotgun is\nLoaded: place the Shotgun token on your character\nsheet with the Loaded side up. While it?s Loaded, you\ncan make an attack by flipping it to Empty; while it?s\nEmpty, you can make a Reload manoeuvre to flip it to\nLoaded. You can only make attacks with the Shotgun\nwhile it is Loaded. You may only use the sections of your\nabilities matching the current state of your Weapon.\nIn general, effects that restore Capacity also allow you\nto flip the Shotgun from Empty to Loaded.",
     "capacity": {
       "value": 0,

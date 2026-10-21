@@ -23,10 +23,24 @@ export function renderAttackOptionHtml(options, context = {}) {
     .join("");
 }
 
+/** Reserve Focus for attack options instead of spending it on Advantage. */
 export function prepareAttackOptions(options, root, context = {}) {
-  for (const option of Array.isArray(options) ? options : []) {
-    option?.prepare?.(root, context);
-  }
+  const focus = root.querySelector("[name=useFocus]");
+  const updateFocusCost = () => {
+    const reserved = getAttackOptionFocusCost(options, root, context) > 0;
+    if (focus) {
+      if (reserved) focus.checked = false;
+      focus.disabled = reserved;
+    }
+    context.updateSuggestedMode();
+  };
+  for (const option of options) option.prepare?.(root, { ...context, updateFocusCost });
+  updateFocusCost();
+}
+
+/** Total Focus reserved by the selected attack options. */
+export function getAttackOptionFocusCost(options, root, context) {
+  return options.reduce((total, option) => total + (option.focusCost?.(root, context) || 0), 0);
 }
 
 export async function applyAttackOptionBeforeRoll(options, root, actor, attackState, context = {}) {

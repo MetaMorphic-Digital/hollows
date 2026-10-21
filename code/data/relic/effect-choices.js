@@ -1,3 +1,4 @@
+import { MANOEUVRE_LABELS } from "../gameplay-constants.js";
 import { HOLLOWS_CONDITIONS } from "../system-constants.js";
 
 // Choice vocabularies for the Relic / Rumour / Cypher effect builder. Kept as a
@@ -78,14 +79,12 @@ export const RELIC_EFFECT_CHOICES = {
   // Reaction / grant clause (bearer side only).
   reactionKind: {
     none: "None",
-    grantReaction: "Grant Reaction",
     grantManoeuvre: "Grant Manoeuvre",
     cancelAction: "Cancel Entity Action",
     deathSave: "Prevent Death",
     immediateMove: "Immediate Move (chat reminder)"
   },
-  // Reactions a relic can grant standalone (mirrors Bulwark / Control).
-  grantableReaction: { guard: "Guard", control: "Control" },
+  manoeuvre: MANOEUVRE_LABELS,
 
   // Item-level consumption.
   uses: { oneOff: "One-Off", reusable: "Reusable" }

@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Speak their bones back into their ordained form. Spend 1 Wound and a manoeuvre to activate this ability. Test Wise; on any success, an ally in your area heals 3 Wounds. On any failure, an ally in your area heals 1 Wound. If this action is performed in Support, roll with advantage.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  heal: {\n    hook: \"activated\",\n    available: (H, actor) => actor.system.health.wounds.value > 0,\n    async run(H, actor) {\n      const allies = H.zone.allies(actor);\n      if (!allies.length) {\n        ui.notifications.warn(\"Remake: no allies in your area.\");\n        return false;\n      }\n      const id = await H.ask.one({\n        title: \"Remake\",\n        label: \"Target Hunter\",\n        options: allies.map((h) => ({ value: h.id, label: h.name })),\n      });\n      if (!id) return false;\n      const target = allies.find((h) => h.id === id);\n      const statValue = await H.stat.total(actor, \"wise\");\n      const result = await H.stat.roll(actor, {\n        title: \"Remake\",\n        cardTitle: \"Wise\",\n        statLabel: \"Wise\",\n        statValue,\n        focusCount: H.resource.focusCount(actor),\n        spendFocus: () => H.resource.adjust(actor, { focus: -1 }),\n      }, { mode: H.zone.of(actor) === \"Support\" ? \"adv\" : \"normal\", useFocus: false });\n      if (!result) return false;\n      const outcome = result.chosen?.outcome?.label || \"Failure\";\n      const healed = [\"Success\", \"Superior Success\", \"Critical Success\"].includes(outcome) ? 3 : 1;\n      const esc = foundry.utils.escapeHTML;\n      await result.roll.toMessage({\n        speaker: ChatMessage.getSpeaker({ actor }),\n        flavor: \"Remake\",\n        content: `<div class=\"hollows-chat\"><strong>${esc(actor.name)}</strong> uses <strong>Remake</strong> on <strong>${esc(target.name)}</strong>.<div>Wise ${result.chosen?.value}/${statValue} — ${outcome}.</div><div>Heals <strong>${healed}</strong> Wounds.</div></div>`,\n      });\n      await H.resource.adjust(actor, { wounds: -1 });\n      await H.resource.adjust(target, { wounds: healed });\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

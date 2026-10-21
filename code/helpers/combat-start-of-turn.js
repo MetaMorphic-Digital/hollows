@@ -1,8 +1,4 @@
-import {
-  applySupportStartOfTurn,
-  clearGritYourTeeth,
-  clearSkirmisherBonus,
-} from "../documents/actor/hunter-combat.js";
+import { applySupportStartOfTurn } from "../documents/actor/hunter-combat.js";
 import { applyEntityBleedingStartOfTurn } from "../data/entity/actions/entity-special.js";
 import { runEntityStartOfTurnEnhancements } from "../documents/entity/entity-enhancements.js";
 import { runStartOfTurnAbilities } from "./weapon-abilities/dispatchers.js";
@@ -13,8 +9,7 @@ export async function runStartOfTurnEffects(combat, newCombatant) {
   if (!combat || !newCombatant) return;
   const actor = newCombatant.actor;
   if (actor?.type === "hunter") {
-    await clearGritYourTeeth(actor);
-    await clearSkirmisherBonus(actor);
+    await runStartOfTurnAbilities({ actor, stage: "cleanup" });
     await applySupportStartOfTurn(actor);
     await runStartOfTurnAbilities({ actor, on: "actor" });
     await runStartOfTurnAbilities({ actor, on: "actorAll" });

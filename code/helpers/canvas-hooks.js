@@ -4,7 +4,6 @@ import {
 } from "../canvas/lair.js";
 import { getActiveHollowActor, getTokenZone } from "../canvas/zone.js";
 import { refreshHunterCurseBadges, refreshTerrainPoolOverlay, refreshThreatOverlays } from "../canvas/overlays.js";
-import { getFocusCount, setFocusCount } from "../documents/actor/resources.js";
 import { hasEchoRestriction } from "../data/echo/index.js";
 import { getDefaultHollowsAssetImage, isGenericFoundryImage } from "../utils/asset-utils.js";
 import { refreshActiveEntityFromDoomChange } from "../data/entity/actions/entity-doom.js";
@@ -13,7 +12,7 @@ import {
   shouldConfigureHunterTokenForActor,
   shouldConfigureHunterTokenForNewActor,
 } from "../data/actor-models.js";
-import { hasWeaponEquipped } from "./weapon-utils.js";
+import { applyInterceptors } from "./extensions.js";
 import { runOnMove, runTerrainDiscardOnMove } from "./weapon-abilities/dispatchers.js";
 import { triggerUseOnManoeuvre } from "../data/actions/use.js";
 
@@ -165,19 +164,13 @@ export function registerCanvasHooks() {
         ui.notifications.warn(`${actor.name} is burdened and should not move into Support on their turn.`);
       }
     }
-    if (nextZone === "Support" && prevZone !== "Support") {
-      if (hasWeaponEquipped(actor, "Rifle") && getFocusCount(actor) > 0) {
-        await setFocusCount(actor, 0);
-        await ChatMessage.create({
-          speaker: ChatMessage.getSpeaker({ actor }),
-          content: `<div class="hollows-chat"><strong>${actor.name}</strong> loses all <strong>Focus</strong> (entered Support).</div>`,
-        });
-      }
+    if ((nextZone !== prevZone) && game.user.isGM) {
+      await applyInterceptors("hunter-zone-changed", { actor, fromZone: prevZone, toZone: nextZone }, null);
     }
     if (prevZone && nextZone && prevZone !== nextZone) {
       const movedByOwner = !!mover && !mover.isGM && !!actor?.testUserPermission?.(mover, "OWNER");
       await runTerrainDiscardOnMove(actor, { fromZone: prevZone, byOwner: movedByOwner });
-      await runOnMove(actor, { fromZone: prevZone, toZone: nextZone, phase: "after", byOwner: movedByOwner });
+      await runOnMove(actor, { fromZone: prevZone, toZone: nextZone, byOwner: movedByOwner });
       if (movedByOwner && game.user?.id === mover?.id) await triggerUseOnManoeuvre(actor, "move");
     }
   });

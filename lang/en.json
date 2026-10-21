@@ -1,5 +1,152 @@
 {
   "HOLLOWS": {
+    "SCRIPT": {
+      "modes": {
+        "single": "Single handler",
+        "multiple": "Multiple handlers"
+      },
+      "hooks": {
+        "activated": {
+          "label": "Activated — button on the Hunter sheet"
+        },
+        "applyToZone": {
+          "label": "Expend Ready — choose an ally in your area"
+        },
+        "startOfTurn": {
+          "label": "Start of turn"
+        },
+        "endOfTurn": {
+          "label": "End of your turn"
+        },
+        "onAttackResult": {
+          "label": "After your attack resolves",
+          "returns": "optionally { damageValue, cardLine } to change the attack before damage lands"
+        },
+        "onDefenceResult": {
+          "label": "After you are attacked",
+          "returns": "optionally { damageRedirected: true } or { convertTo: { damageType, damageValue } }"
+        },
+        "onMove": {
+          "label": "After you Move"
+        },
+        "onEvent": {
+          "label": "On a game event (Guard, Reload, Feint…)"
+        },
+        "statModifier": {
+          "label": "Passive stat bonus (return a number)",
+          "returns": "the bonus added to that stat"
+        },
+        "attackDamage": {
+          "label": "Modify your attack damage (return { resolve, wounds })",
+          "returns": "{ resolve, wounds } added to the attack's damage"
+        },
+        "incomingDamage": {
+          "label": "Modify damage you take",
+          "returns": "a finite number or { damageValue, note }; null leaves damage unchanged"
+        }
+      },
+      "events": {
+        "conditionRemoved": "When you lose a condition",
+        "threatPlaced": "When Threat is placed on the grid",
+        "hunterPlacedThreat": "When you place Threat",
+        "focus": "When you Focus",
+        "guard": "When you Guard",
+        "takeCover": "When you Take Cover",
+        "reload": "When you Reload",
+        "swordFeint": "When you Feint",
+        "turnEnd": "When your turn ends",
+        "threatSpent": "When Threat is spent",
+        "entityAttack": "When the Entity attacks",
+        "entityBleedingStart": "When the Entity's Bleeding is checked at turn start",
+        "incomingEntityWoundDamage": "When you take Wound damage from the Entity"
+      },
+      "clients": {
+        "activated": "the acting player",
+        "startOfTurn": "the GM",
+        "endOfTurn": "the GM",
+        "onAttackResult": "the attacking player",
+        "onDefenceResult": "the GM when damage is applied, or the defending player when the attack is avoided",
+        "onMove": "the GM",
+        "onEvent": "whoever triggered the event",
+        "attackDamage": "the attacking player",
+        "statModifier": "whoever renders the sheet",
+        "incomingDamage": "the GM"
+      },
+      "rateLimits": {
+        "none": "No limit",
+        "oncePerTurn": "Once per turn",
+        "oncePerRound": "Once per round",
+        "oncePerCombat": "Once per combat"
+      },
+      "turnScopes": {
+        "actor": "Your own turn",
+        "entity": "The Entity's turn",
+        "actorAll": "Any Hunter's turn"
+      },
+      "title": "Mechanic Script",
+      "abilityTitle": "{name} — Ability Script",
+      "renownTitle": "{name} — Renown Script",
+      "saved": "Script saved.",
+      "gmOnly": "Only a GM can edit mechanic scripts.",
+      "gmCreateOnly": "Ask a GM to create or import items containing mechanic scripts.",
+      "cannotEdit": "This script cannot be edited on the selected item.",
+      "disabledWarning": "Custom scripts are disabled. Enable Allow Custom Mechanic Scripts in the system settings first. Scripts run on connected clients; enable them only for trusted content.",
+      "disabled": "Custom scripts are disabled in system settings",
+      "noActive": "No active script",
+      "activeScript": "Script active",
+      "edit": "Edit Script",
+      "active": "Active",
+      "trusted": "Trusted",
+      "trustedHint": "Runs even when Allow Custom Scripts is disabled. Editing the code or execution settings clears this checkbox.",
+      "label": "Label",
+      "labelPlaceholder": "Shown on buttons and in chat",
+      "mode": "Script format",
+      "multipleHint": "Return named handlers with hook and run(H, actor, ctx); configuration-only modifiers need no run. actor is the affected Hunter; ctx.carrier owns the ability.",
+      "reactionHint": "For asynchronous hooks, use promptOnPlayer(H, actor, ctx) for the owner's choice and optional applyOnGM(H, actor, ctx, choice) for its effect. Return a JSON-serializable choice, or null/false to skip without spending the limit.",
+      "invalidDefinitions": "Return an object of named handlers.",
+      "invalidHandlerOption": "Handler \"{id}\" has an invalid {field} value.",
+      "ambiguousEvent": "Handler \"{id}\" must use either event or eventType, not both.",
+      "runs": "Runs",
+      "event": "Event",
+      "whoseTurn": "Whose turn",
+      "limit": "Limit",
+      "source": "Script",
+      "available": "Available:",
+      "runsOn": "Runs on:",
+      "syncHint": "Synchronous hook: no await; only the synchronous helpers below are available.",
+      "syncPromise": "A synchronous hook cannot return a Promise.",
+      "returns": "Return:",
+      "glossary": "Helper Glossary",
+      "apiNotes": {
+        "stat": "Returns a Promise; use await.",
+        "resource": "Resource changes are routed through the GM when needed. focusCount only reads state.",
+        "condition": "set routes changes through the GM when needed. has only reads state.",
+        "threat": "Threat changes are routed through the GM. remove and shift may prompt for zones.",
+        "ask": "Prompts appear on the client running the script.",
+        "effects": "Permissions and prompts depend on the chosen effects.",
+        "chat": "Uses the executing user's permission to create chat messages. Actor ownership is not required."
+      },
+      "save": "Save",
+      "close": "Close",
+      "automation": "Automation",
+      "defaultName": "Script",
+      "renown": {
+        "title": "Weapon of Renown",
+        "enabled": "Renowned",
+        "ability": "Ability",
+        "namePlaceholder": "Unique ability name",
+        "textPlaceholder": "Describe the unique ability."
+      },
+      "settings": {
+        "name": "Allow Custom Mechanic Scripts",
+        "hint": "Weapons and Weapon Abilities may carry GM-written JavaScript. These scripts run on connected clients, including players. Enable only for trusted content."
+      },
+      "error": "Script \"{key}\" {phase}: {message}. Further repeats are logged in the console.",
+      "phases": {
+        "compile": "failed to compile",
+        "runtime": "failed during execution"
+      }
+    },
     "ACTOR": {
       "ENTITY": {
         "TABS": {

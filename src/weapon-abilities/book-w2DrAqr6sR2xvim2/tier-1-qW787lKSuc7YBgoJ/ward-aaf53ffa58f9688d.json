@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Protective hexes shield you from the storm. While you hold a Sheltered terrain tag, it reduces damage suffered by 2. As an immediate action on your turn, you may spend 1 Wound to apply the effects of this ability to an ally in your area until the end of their next turn. If you do this, you no longer receive the benefit yourself.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  grant: {\n    hook: \"activated\", label: \"Ward Ally\",\n    available: (H, actor) => H.condition.has(actor, \"sheltered\")\n      && actor.system.health.wounds.value > 0,\n    async promptOnPlayer(H, actor) {\n      const allies = H.zone.allies(actor);\n      if (!allies.length) {\n        ui.notifications.warn(\"Ward: no allies in your area.\");\n        return false;\n      }\n      const targetId = await H.ask.one({\n        title: \"Ward: Choose Hunter\", label: \"Ward\",\n        options: allies.map(h => ({ value: h.id, label: h.name })),\n      });\n      if (!targetId) return false;\n      await H.resource.adjust(actor, { wounds: -1 });\n      await actor.setFlag(\"hollows\", \"ward\", { targetId });\n      await H.chat.post(`${actor.name} wards ${game.actors.get(targetId).name} (Ward).`, actor);\n      return true;\n    },\n  },\n  reduce: {\n    hook: \"incomingDamage\", scope: \"targetState\", damageSource: \"entity\", timing: \"postMitigation\",\n    aura: true, group: \"book.t1.ward.reduce\",\n    run(H, actor, ctx) {\n      const selfWard = ctx.carrierIds.includes(actor.id)\n        && H.condition.has(actor, \"sheltered\") && !actor.getFlag(\"hollows\", \"ward\");\n      const grantedWard = ctx.carrierIds.some(id => game.actors.get(id).getFlag(\"hollows\", \"ward\")?.targetId === actor.id);\n      if (!selfWard && !grantedWard) return null;\n      const reduction = ctx.shelteredApplied ? 1 : 2;\n      return { damageValue: Math.max(0, ctx.damageValue - reduction), note: `Ward: -${reduction}` };\n    },\n  },\n  reset: {\n    hook: \"interceptor\", event: \"combat-reset-hunter\",\n    run: (H, actor) => actor.unsetFlag(\"hollows\", \"ward\"),\n  },\n  clear: {\n    hook: \"onEvent\", event: { type: \"turnEnd\" }, aura: true, group: \"book.t1.ward.clear\",\n    async run(H, actor, ctx) {\n      for (const id of ctx.carrierIds) {\n        const carrier = game.actors.get(id);\n        if (carrier.getFlag(\"hollows\", \"ward\")?.targetId === actor.id) await carrier.unsetFlag(\"hollows\", \"ward\");\n      }\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

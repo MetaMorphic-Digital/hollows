@@ -4,12 +4,29 @@ import { setActorFlagSafe } from "../../utils/flag-utils.js";
 import { addTerrainPoolTag } from "../../canvas/terrain-pool.js";
 import { runGMQuery } from "../../helpers/queries.js";
 import { getEffectiveWeaponCapacity } from "../../data/weapons/index.js";
-import { getActiveEntityActor } from "../../canvas/zone.js";
+import { getActiveSceneHunters, getActiveEntityActor } from "../../canvas/zone.js";
 import { registerManoeuvreAvailabilityProvider } from "../../data/actions/manoeuvre-availability.js";
+import { applyInterceptors } from "../../helpers/extensions.js";
 
 const TERRAIN_TAG_KEYS = Object.freeze(
   Object.entries(HOLLOWS_CONDITIONS).filter(([, cfg]) => cfg?.terrain).map(([key]) => key),
 );
+
+/** Return the Staff owner associated with a Briar holder. */
+export function getBriarOwnerId(actor) {
+  return actor.getFlag("hollows", "briarOwnerId") || "";
+}
+
+/** Associate a Briar holder with its Staff owner, or clear the association. */
+export async function setBriarOwnerId(actor, ownerId = "") {
+  if (ownerId) await actor.setFlag("hollows", "briarOwnerId", ownerId);
+  else await actor.unsetFlag("hollows", "briarOwnerId");
+}
+
+/** Find the Hunter holding this owner's Briar on the current scene. */
+export function findBriarHolderByOwner(ownerId) {
+  return getActiveSceneHunters().find(actor => actor.statuses.has("briar") && (getBriarOwnerId(actor) === ownerId)) || null;
+}
 
 export function getConditionEffects(actor, key) {
   const cfg = HOLLOWS_CONDITIONS[key];
@@ -37,10 +54,12 @@ export async function addCondition(actor, key) {
   await actor.toggleStatusEffect(cfg.id, { active: true });
 }
 
+/** Remove a condition; terrain-destroy interceptors may convert destruction to a discard. */
 export async function removeCondition(actor, key, opts = {}) {
   const existing = getConditionEffects(actor, key);
   if (!existing.length) return;
 
+  const destroyed = opts.destroyed && await applyInterceptors("terrain-destroy", { actor, key }, true);
   const ids = existing.map(e => e.id);
   await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
 
@@ -59,6 +78,7 @@ export async function removeCondition(actor, key, opts = {}) {
       console.warn("Hollows | runOnConditionRemoved failed", err);
     }
   }
+  return destroyed;
 }
 
 export async function toggleCondition(actor, key, force = null) {
@@ -125,23 +145,25 @@ registerManoeuvreAvailabilityProvider((actor, manoeuvre) => {
   return specialConditionBlocks(actor, manoeuvre) ? { available: false, reason: "Special Condition" } : null;
 });
 
-export async function setConditionSafe(actor, key, active) {
+/** Set or clear a condition, forwarding removal options through the GM query when needed. */
+export async function setConditionSafe(actor, key, active, opts = {}) {
   if (!actor || !key) return false;
   if (game.user?.isGM) {
     if (active) await addCondition(actor, key);
-    else await removeCondition(actor, key);
+    else await removeCondition(actor, key, opts);
     return true;
   }
   if (actor.testUserPermission(game.user, "OWNER")) {
     if (active) await addCondition(actor, key);
-    else await removeCondition(actor, key);
+    else await removeCondition(actor, key, opts);
     return true;
   }
   try {
     await runGMQuery("hollows.actorMutation", {
       actorId: actor.id,
+      actorUuid: actor.uuid,
       type: "condition",
-      payload: { key, active: !!active },
+      payload: { key, active: !!active, opts },
     });
     return true;
   } catch (err) {
@@ -170,7 +192,7 @@ export function getActorTerrainTags(actor) {
 export function destroyTerrainConditionsOnActor(actor) {
   return Promise.all(TERRAIN_TAG_KEYS.map(async (key) => {
     if (!actor.statuses.has(key)) return null;
-    await removeCondition(actor, key, { skipPoolRefund: true });
+    await removeCondition(actor, key, { skipPoolRefund: true, destroyed: true });
     return HOLLOWS_CONDITIONS[key]?.label || key;
   })).then((removed) => removed.filter(Boolean));
 }
@@ -179,12 +201,12 @@ export async function destroyTerrainCondition(actor, key, zoneOverride = "") {
   if (!actor) return false;
   if (!isTerrainTag(key)) return false;
   if (!actor.statuses.has(key)) return false;
-  await removeCondition(actor, key, { skipPoolRefund: true });
+  const destroyed = await removeCondition(actor, key, { skipPoolRefund: true, destroyed: true });
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
     content: `
       <div class="hollows-chat">
-        <strong>${actor.name}</strong> destroys <strong>${HOLLOWS_CONDITIONS[key]?.label || key}</strong>.
+        <strong>${actor.name}</strong> ${destroyed ? "destroys" : "discards"} <strong>${HOLLOWS_CONDITIONS[key]?.label || key}</strong>.
         ${isPooledTerrainTag(key) ? `<span class="hollows-terrain-event" data-terrain-event="destroy" data-terrain-tag="${key}" data-zone="${foundry.utils.escapeHTML(String(zoneOverride || ""))}"></span>` : ""}
       </div>
     `,
@@ -228,7 +250,7 @@ export async function destroyGridTerrain(actor, { spareHolderId = "", spareTag =
     if (!holder || (holder.type !== "hunter")) continue;
     for (const tag of getActorTerrainTags(holder)) {
       if ((tag === spareTag) && (holder.id === spareHolderId)) continue;
-      await requestTerrainConditionApply(holder, tag, "", false, { skipPoolRefund: true });
+      await requestTerrainConditionApply(holder, tag, "", false, { skipPoolRefund: true, destroyed: true });
       destroyed += 1;
     }
   }

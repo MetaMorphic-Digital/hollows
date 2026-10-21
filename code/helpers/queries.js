@@ -92,6 +92,10 @@ export function registerQueries() {
   registerCategoryBHandlers();
   registerCategoryDHandlers();
   registerCategoryEHandlers();
+  registerHandler("hollows.scriptReaction", async request => {
+    const { default: ScriptCompiler } = await import("../documents/item/script-compiler.mjs");
+    return ScriptCompiler.runReaction(request);
+  });
   registerReactions(registerHandler);
   registerEchoQueries(registerHandler);
   for (const [name, fn] of HANDLERS) {
@@ -259,9 +263,7 @@ function registerCategoryDHandlers() {
     await applyRelicEffectPayload(payload);
   });
 
-  // GM→player reactions (counterattack / comeOutSwinging / arrogant /
-  // forewarned / martyr / distract / blockade / guard / control) live in
-  // reactions.js as `Reaction` instances and self-register via registerReactions().
+  // Registered reactions install their player handlers through registerReactions().
 }
 
 // ---------------------------------------------------------------------------
@@ -273,8 +275,7 @@ function registerCategoryEHandlers() {
     await applyRefugeActionPayload(payload);
   });
 
-  // GM→player: ask the owner to pick source+destination for Threat shift
-  // (Control, Goad, Misdirection, etc.). Returns { from, to } or null if skipped.
+  // Ask the owner to choose a Threat shift. Returns { from, to } or null on cancel.
   registerHandler("hollows.pickShiftThreat", async ({ sources, destPerSource, title, amount, reason } = {}) => {
     const list = Array.isArray(sources) ? sources : [];
     if (!list.length) return null;

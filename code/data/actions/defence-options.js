@@ -29,6 +29,11 @@ export async function applyDefenceOptionBeforeRoll(options, root, actor, defence
   }
 }
 
+/** Prepare defence controls and roll-mode suggestions before the player chooses. */
+export function prepareDefenceOptions(options, root, context = {}) {
+  for (const option of options) option.prepare?.(root, context);
+}
+
 export async function applyDefenceOptionMitigation(actor, damageState = {}, context = {}) {
   const out = {
     damageType: damageState.damageType || "",

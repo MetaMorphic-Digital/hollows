@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Gather them around you. While you are in an area with at least one ally, inflict +1/+0 damage with your attacks. While there is Threat in your area, allies in that area also inflict +1/+0 damage with their attacks.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  bonus: {\n    hook: \"attackDamage\", aura: true, group: \"sword.t1.got-your-back\",\n    run(H, actor, ctx) {\n      const zone = ctx.attackerZone;\n      if (!zone) return;\n      const allies = H.zone.huntersIn(zone).filter(h => h.id !== actor.id);\n      const selfBonus = ctx.carrierIds.includes(actor.id) && allies.length > 0;\n      const allyBonus = H.zone.threatIn(zone) > 0 && allies.some(h => ctx.carrierIds.includes(h.id));\n      return { resolve: selfBonus || allyBonus ? 1 : 0 };\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

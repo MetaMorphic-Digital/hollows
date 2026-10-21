@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Avoiding pain and suffering is simply a matter of not standing in the way of an enemy's attacks. When you would suffer or spend Resolve or Wound damage, you may immediately spend Focus up to the amount you currently hold. Reduce the damage suffered by the amount of Focus spent.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  reduce: {\n    hook: \"incomingDamage\", damageSource: \"entity\", timing: \"postMitigation\",\n    async promptOnPlayer(H, actor) {\n      const max = H.resource.focusCount(actor);\n      if (max <= 0) return false;\n      const choice = await H.ask.form({\n        title: \"Forewarned\",\n        bodyHtml: \"Spend Focus to reduce incoming damage.\",\n        fields: [{ type: \"number\", name: \"spend\", label: \"Spend Focus\", min: 0, max, value: 0 }],\n      });\n      const spend = Math.max(0, Math.min(max, choice?.spend ?? 0));\n      return spend > 0 ? { spend } : false;\n    },\n    async applyOnGM(H, actor, ctx, choice) {\n      await H.resource.adjust(actor, { focus: -choice.spend });\n      return { damageValue: Math.max(0, ctx.damageValue - choice.spend), note: `Forewarned: -${choice.spend}` };\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

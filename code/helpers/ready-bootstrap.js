@@ -50,6 +50,7 @@ async function buildWeaponIndex() {
 }
 
 async function hydrateWeaponsFromPack() {
+  if (!game.user.isGM) return;
   const applyFromPack = async (item) => {
     if (!item?.system || item.type !== "weapon") return;
     const weaponIndex = getHollowsWeaponIndex();
@@ -72,7 +73,9 @@ async function hydrateWeaponsFromPack() {
     }
   };
 
-  for (const item of game.items.contents) await applyFromPack(item);
+  for (const item of game.items.contents) {
+    await applyFromPack(item);
+  }
 
   for (const actor of game.actors.contents) {
     for (const item of actor.items.contents) {

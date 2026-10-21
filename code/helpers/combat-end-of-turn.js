@@ -35,14 +35,6 @@ export async function runEndOfTurnEffects(combat, prevCombatant) {
   await runEndOfTurnAbilities(actor);
   await runOnTurnEnd(actor);
 
-  const ward = actor.getFlag("hollows", "wardGranted");
-  if (ward?.sourceId) {
-    // Non-owners reach this path too, so the flag writes are allowed to fail.
-    const source = game.actors.get(ward.sourceId);
-    await source?.unsetFlag("hollows", "wardSuppressed");
-    await actor.unsetFlag("hollows", "wardGranted");
-  }
-
   const entityCombatant = combat.combatants.find((combatant) => combatant.actor?.type === "entity");
   const entityActor = entityCombatant?.actor || getActiveEntityActor();
   if (entityActor) await openInterruptPromptForHunterEnd(combat, entityActor);

@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "You can endure anything. While you are Ready, when your turn starts, restore 1 Resolve.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "startOfTurn",
+      "rateLimit": "none",
+      "source": "if (!H.condition.has(actor, \"ready\")) return false;\nawait H.resource.adjust(actor, { resolve: 1 });\nawait H.chat.post(`${actor.name} restores 1 Resolve (Stoic).`, actor);"
+    }
   },
   "flags": {
     "hollows": {

@@ -7,7 +7,7 @@
  * forms, hazards, etc.
  *
  * Contract:
- *   - `key` — canonical id (e.g. "knife.t1.backstab", "edge.demolish").
+ *   - `key` — unique mechanic id.
  *   - `weapon|source`, `tier`, `name`, `text` — metadata for UI / lookups.
  *   - `when` — optional gating predicate; each subclass decides what context
  *     it receives and when it is consulted. Absent means "always".

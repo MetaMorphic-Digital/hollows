@@ -12,10 +12,24 @@ import { getActiveHunterForUser } from "../../canvas/zone.js";
 const TABS = [];
 export default TABS;
 
-function registerRefugeTab(def) {
-  if (!def?.id || TABS.some((t) => t.id === def.id)) return;
-  TABS.push(def);
-  TABS.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+/** Registry exposed to content packs through hollows.applications.sheets. */
+export class RefugeTabRegistry {
+  /**
+   * Duplicate IDs are ignored; lower order values render first.
+   * @param {object} definition
+   * @param {string} definition.id Unique tab identifier.
+   * @param {string} definition.label Tab title.
+   * @param {string} definition.template Handlebars template path.
+   * @param {number} [definition.order] Sort priority.
+   * @param {Function} [definition.hasContent] Visibility predicate.
+   * @param {Function} [definition.prepareContext] Template data provider.
+   * @param {Function} [definition.activateListeners] DOM listener setup.
+   */
+  static register(definition) {
+    if (!definition?.id || TABS.some(tab => tab.id === definition.id)) return;
+    TABS.push(definition);
+    TABS.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }
 }
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
@@ -31,7 +45,7 @@ async function openRefugeAction(sheet, actionId) {
   await def.open(sheet.actor, activeHunter);
 }
 
-registerRefugeTab({
+RefugeTabRegistry.register({
   id: "actions",
   label: "Actions",
   order: 20,
@@ -59,7 +73,7 @@ registerRefugeTab({
 
 // ─── Resources ────────────────────────────────────────────────────────────────
 
-registerRefugeTab({
+RefugeTabRegistry.register({
   id: "resources",
   label: "Resources",
   order: 30,
@@ -88,7 +102,7 @@ async function getUnlockOptions(actor, kind) {
   }));
 }
 
-registerRefugeTab({
+RefugeTabRegistry.register({
   id: "unlocks",
   label: "Unlocks",
   order: 40,
@@ -121,7 +135,7 @@ registerRefugeTab({
 
 // ─── Residents ────────────────────────────────────────────────────────────────
 
-registerRefugeTab({
+RefugeTabRegistry.register({
   id: "residents",
   label: "Residents",
   order: 50,

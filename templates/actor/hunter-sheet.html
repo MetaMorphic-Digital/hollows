@@ -36,7 +36,7 @@
                     {{/each}}
                   </div>
                 {{/if}}
-                {{#if hasRifle}}
+                {{#if (gt focusLimit 1)}}
                   <div class="focus-counter" title="Focus">
                     <div class="focus-label">Focus</div>
                     <div class="focus-value">{{focusCount}} / {{focusLimit}}</div>
@@ -53,7 +53,7 @@
                 {{#each activatedManoeuvres}}
                   <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="activated-ability" data-ability-key="{{this.key}}">{{this.name}}</button></div>
                 {{/each}}
-                {{#if hasArmour}}
+                {{#if readyActive}}
                   <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="expend-ready">Expend Ready</button></div>
                 {{/if}}
                 <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="take-cover">Take Cover</button></div>

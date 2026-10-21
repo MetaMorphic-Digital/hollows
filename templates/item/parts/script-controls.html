@@ -1,0 +1,17 @@
+<div class="hollows-form-row">
+  <div class="stat-label">{{label}}</div>
+  <div class="script-controls">
+    {{#if canEditScripts}}
+      <button type="button" class="stat-roll" data-action="{{action}}" data-path="{{path}}" data-title-key="{{titleKey}}">{{localize "HOLLOWS.SCRIPT.edit"}}</button>
+    {{/if}}
+    <span class="muted">
+      {{#unless scriptsAllowed}}
+        {{localize "HOLLOWS.SCRIPT.disabled"}}
+      {{else if block.enabled}}
+        {{localize "HOLLOWS.SCRIPT.activeScript"}}
+      {{else}}
+        {{localize "HOLLOWS.SCRIPT.noActive"}}
+      {{/unless}}
+    </span>
+  </div>
+</div>

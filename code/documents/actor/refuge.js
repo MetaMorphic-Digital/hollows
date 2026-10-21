@@ -76,7 +76,7 @@ export async function applyRecover(refuge, hunter, mode = "full") {
       `
     });
   }
-  await applyInterceptors("refuge-recover", { refuge, hunter, mode });
+  await applyInterceptors("refuge-recover", { actor: hunter, refuge, hunter, mode });
   return true;
 }
 

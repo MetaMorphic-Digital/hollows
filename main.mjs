@@ -18,12 +18,30 @@ globalThis.hollows = {
   dice,
   documents,
   helpers,
+  settings: {
+    /** @returns {boolean} False until system settings have been registered. */
+    get allowCustomScripts() {
+      const key = "allowCustomScripts";
+      return game.settings.settings.has(`${hollows.id}.${key}`)
+        && game.settings.get(hollows.id, key);
+    },
+  },
   // utils,
 };
 
 /* -------------------------------------------------- */
 
 Hooks.once("init", () => {
+  game.settings.register(hollows.id, "allowCustomScripts", {
+    name: "HOLLOWS.SCRIPT.settings.name",
+    hint: "HOLLOWS.SCRIPT.settings.hint",
+    scope: CONST.SETTING_SCOPES.WORLD,
+    config: true,
+    requiresReload: true,
+    type: new foundry.data.fields.BooleanField(),
+    default: false,
+  });
+
   registerDocumentClasses();
   registerSubtypes();
   registerSheets();

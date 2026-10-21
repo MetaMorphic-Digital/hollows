@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Do. It. Again. Once per round, when you miss with an attack, you may Reload as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "oncePerRound",
+      "source": "if (ctx.result !== \"miss\") return false;\nawait H.effects.apply([{ type: \"grantManoeuvre\", scope: \"self\", manoeuvre: \"reload\" }], ctx);"
+    }
   },
   "flags": {
     "hollows": {

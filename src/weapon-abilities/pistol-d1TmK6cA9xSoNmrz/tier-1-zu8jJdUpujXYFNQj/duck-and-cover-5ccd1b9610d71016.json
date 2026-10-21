@@ -8,7 +8,15 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Get your head down! Once per round, when you inflict Wound damage, one Hunter in your area may Take Cover as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "onAttackResult",
+      "rateLimit": "oncePerRound",
+      "source": "if (ctx.damageType !== \"Wounds\" || ctx.damageValue <= 0) return false;\nif (\n  !(await H.ask.confirm({\n    title: \"Duck and Cover\",\n    bodyHtml:\n      \"<div>A Hunter in your area may <strong>Take Cover</strong> as an immediate action (Duck and Cover).</div>\",\n    yesLabel: \"Grant Take Cover\",\n    noLabel: \"Skip\",\n  }))\n)\n  return false;\nawait H.effects.apply([{ type: \"grantManoeuvre\", scope: \"zoneMate\", manoeuvre: \"take-cover\" }], ctx);\nreturn !ctx._cancelled;"
+    }
   },
   "flags": {
     "hollows": {

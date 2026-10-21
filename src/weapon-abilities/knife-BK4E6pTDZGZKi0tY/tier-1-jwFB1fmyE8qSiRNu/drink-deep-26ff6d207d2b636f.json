@@ -8,7 +8,13 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "Take your fill and bleed the bastard dry. While the Entity is Bleeding, when its turn starts, instead of inflicting damage and tossing the token, you may opt to remove it. If you do so, all Hunters in your area may Focus as an immediate action.",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "multiple",
+      "source": "return {\n  focus: {\n    hook: \"onEvent\",\n    eventType: \"entityBleedingStart\",\n    promptOnPlayer: (H, actor, ctx) => {\n      const entity = game.actors.get(ctx.payload.entityId);\n      if (!H.condition.has(entity, \"bleeding\")) return false;\n      return H.ask.confirm({\n        title: \"Drink Deep\",\n        bodyHtml: \"Remove Bleeding from the Entity to grant Focus to all Hunters in your area?\",\n        noLabel: \"Skip\",\n      });\n    },\n    applyOnGM: async (H, actor, ctx) => {\n      const entity = game.actors.get(ctx.payload.entityId);\n      if (!H.condition.has(entity, \"bleeding\")) return false;\n      await H.condition.set(entity, \"bleeding\", false);\n      const zone = H.zone.of(actor);\n      for (const hunter of H.zone.huntersIn(zone)) await H.actions.focus(hunter, actor);\n      await H.chat.post(`${actor.name} uses Drink Deep. Bleeding ends; all Hunters in ${zone} may Focus.`, actor);\n    },\n  },\n};"
+    }
   },
   "flags": {
     "hollows": {

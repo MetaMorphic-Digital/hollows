@@ -8,7 +8,16 @@
     "tier": 1,
     "durationType": "permanent",
     "text": "The monster can wait; you've got things to do. Instead of your attack action each turn, you may make two manoeuvres (allowing you to make three manoeuvres in total on your turn).",
-    "boundWeaponId": ""
+    "boundWeaponId": "",
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "mode": "single",
+      "hook": "startOfTurn",
+      "on": "actor",
+      "rateLimit": "none",
+      "source": "await H.chat.post(`${actor.name} may make 3 manoeuvres this turn instead of attacking (Brandish).`, actor);"
+    }
   },
   "flags": {
     "hollows": {

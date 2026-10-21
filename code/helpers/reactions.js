@@ -1,12 +1,6 @@
 /**
  * Reaction registry — collects all `Reaction` instances declared across the
  * codebase and registers their player-side handlers with CONFIG.queries.
- *
- * The Reaction class itself lives in `code/data/mechanics/Reaction.js`.
- * Individual reactions live next to the ability/feature that owns them:
- *   - Weapon-ability reactions:  code/data/abilities/<weapon>/<ability>.js
- *   - Weapon-form reactions:     code/data/weapons/forms/<weapon>/<form>.js
- *   - Entity-tied reactions:     code/documents/entity/<file>.js
  */
 
 import { Reaction } from "../data/mechanics/Reaction.js";
@@ -59,7 +53,7 @@ export function registerReactions(registerHandler) {
 
 // Resolve a Reaction instance by its `key` from the full reaction registry.
 // Single source of truth for reaction-routed mechanics (OnDefenceResultAction,
-// IncomingDamageModifier, grantReaction effect). Returns null if not found.
+// IncomingDamageModifier). Returns null if not found.
 export function getReactionByKey(key) {
   if (!key) return null;
   return getAllReactions().find((reaction) => reaction.key === String(key)) || null;
