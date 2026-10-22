@@ -9,8 +9,8 @@ export default class HollowsItem extends foundry.documents.Item {
       { path: "system.script", text: this.system.coreAbility, enabled: true },
       { path: "system.renown.script", text: this.system.renown.text, enabled: this.system.renown.enabled },
     ];
-    if (this.type === "weaponAbility") return [
-      { path: "system.script", text: this.system.text, enabled: true },
+    if (["weaponAbility", "weaponForm"].includes(this.type)) return [
+      { path: "system.script", text: this.system.text, enabled: this.type === "weaponAbility" },
     ];
     return [];
   }

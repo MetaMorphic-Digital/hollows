@@ -74,6 +74,7 @@
     "Item": {
       "weapon": {},
       "weaponAbility": {},
+      "weaponForm": {},
       "equipment": {},
       "echo": {},
       "entityAbility": {},

@@ -98,6 +98,7 @@ function registerSubtypes() {
     relic: RelicDataModel,
     rumour: RumourDataModel,
     weapon: data.items.WeaponData,
+    weaponForm: data.items.WeaponFormData,
   });
 
 }
@@ -135,6 +136,7 @@ function registerSheets() {
   register(Item, applications.sheets.items.HollowsRelicSheet, ["relic"]);
   register(Item, applications.sheets.items.HollowsRumourSheet, ["rumour"]);
   register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weaponAbility"]);
+  register(Item, applications.sheets.items.HollowsWeaponFormSheet, ["weaponForm"]);
   register(Item, applications.sheets.items.HollowsWeaponSheet, ["weapon"]);
 
   // Register journal entry sheets.

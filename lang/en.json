@@ -85,6 +85,7 @@
       },
       "title": "Mechanic Script",
       "abilityTitle": "{name} — Ability Script",
+      "formTitle": "{name} — Form Script",
       "renownTitle": "{name} — Renown Script",
       "saved": "Script saved.",
       "gmOnly": "Only a GM can edit mechanic scripts.",
@@ -333,7 +334,8 @@
       "relic": "Relic",
       "rumour": "Rumour",
       "weapon": "Weapon",
-      "weaponAbility": "Weapon Ability"
+      "weaponAbility": "Weapon Ability",
+      "weaponForm": "Weapon Form"
     }
   },
 
