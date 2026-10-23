@@ -1,0 +1,46 @@
+{
+  "_id": "a01b39ddb4cd0c3d",
+  "name": "Sawn-Off",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Shotgun",
+    "text": "Roll with advantage when you attack from Close with the Shotgun.\nAlso: scattergun, blunderbus.",
+    "damage": {
+      "resolve": 2,
+      "wounds": 2
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Sawn-Off",
+      "mode": "multiple",
+      "source": "return {\n  advantage: {\n    hook: \"attackRoll\",\n    when(H, actor, ctx) {\n      return (ctx.weapon?.id === ctx.item.id) && H.zone.isClose(ctx.zone);\n    },\n  },\n};"
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 8000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!a01b39ddb4cd0c3d"
+}

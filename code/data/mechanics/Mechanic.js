@@ -13,18 +13,16 @@
  *     it receives and when it is consulted. Absent means "always".
  *
  * Subclasses add mechanic-specific fields and methods (match/run/apply).
- * Aggregation happens in helpers/weapon-abilities/registry.js (or future
- * registries for edges/forms/etc).
+ * Registered and scripted mechanics use the same dispatchers.
  */
 export class Mechanic {
-  constructor({ key, weapon, tier, name, text, form, when } = {}) {
+  constructor({ key, weapon, tier, name, text, when } = {}) {
     if (!key) throw new Error("Mechanic requires `key`");
     this.key = key;
     this.weapon = weapon || "";
     this.tier = tier || 0;
     this.name = name || key;
     this.text = text || "";
-    this.form = form || "";
     this.when = when ?? null;
   }
 }

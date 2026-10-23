@@ -1,0 +1,46 @@
+{
+  "_id": "08ae81fbcc066304",
+  "name": "Single Action",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Pistol",
+    "text": "Capacity 3.",
+    "damage": {
+      "resolve": 2,
+      "wounds": 1
+    },
+    "capacity": {
+      "max": 3
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": false,
+      "trusted": false,
+      "label": "Single Action",
+      "mode": "multiple",
+      "source": ""
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 6000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!08ae81fbcc066304"
+}

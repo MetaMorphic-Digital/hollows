@@ -830,37 +830,29 @@ export async function runOnEntityAttack(entityActor, targetTokens = []) {
   );
 }
 
+/** Discard terrain after an owner's move, keeping the tag chosen by a script. */
 export async function runTerrainDiscardOnMove(actor, { fromZone, byOwner } = {}) {
   if (!actor || !game.user?.isGM || !byOwner) return;
   const { getActorTerrainTags, discardTerrainCondition } = await import("../../documents/actor/conditions.js");
   const tags = getActorTerrainTags(actor);
   if (!tags.length) return;
-  const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
-  let keepTag = "";
-  for (const reaction of getAllReactions()) {
-    if (!reaction.event || reaction.event.type !== "terrainDiscard") continue;
-    if (!carries(actor, reaction)) continue;
-    const owner = primaryOwnerOf(actor) || game.user;
-    const choice = await reaction.offer(owner, { actorId: actor.id, tags, fromZone });
-    if (choice?.keepTag !== undefined) { keepTag = String(choice.keepTag || ""); break; }
-  }
+  const choices = await ScriptCompiler.runEvents(event => event.type === "terrainDiscard", {
+    actor, payload: { tags, fromZone },
+  });
+  const keepTag = choices.find(choice => choice?.keepTag)?.keepTag;
   for (const tag of tags) {
     if (tag !== keepTag) await discardTerrainCondition(actor, tag, fromZone);
   }
 }
 
+/** Resolve optional reductions before applying Wound damage from an Entity attack. */
 export async function runOnIncomingEntityWoundDamage(actor, { damageValue } = {}) {
   if (!actor || !game.user?.isGM) return { damageValue: Number(damageValue || 0) };
-  const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
   let remaining = Number(damageValue || 0);
-  await ScriptCompiler.runEvents(event => event.type === "incomingEntityWoundDamage", {
+  const choices = await ScriptCompiler.runEvents(event => event.type === "incomingEntityWoundDamage", {
     actor, payload: { damageValue: remaining },
   });
-  for (const reaction of getAllReactions()) {
-    if (!reaction.event || reaction.event.type !== "incomingEntityWoundDamage") continue;
-    if (!carries(actor, reaction)) continue;
-    const owner = primaryOwnerOf(actor) || game.user;
-    const choice = await reaction.offer(owner, { actorId: actor.id, damageValue: remaining });
+  for (const choice of choices) {
     const reduction = Number(choice?.damageReduction || 0);
     if (reduction > 0) remaining = Math.max(0, remaining - reduction);
   }

@@ -132,16 +132,16 @@ export function registerCanvasHooks() {
     refreshHunterCurseBadges();
     refreshTerrainPoolOverlay();
     if (game.hollowsTokenZoneCache) game.hollowsTokenZoneCache.delete(tokenDoc.id);
-    if (game.hollowsSilkPrevZone) game.hollowsSilkPrevZone.delete(tokenDoc.id);
+    if (game.hollowsTokenPrevZone) game.hollowsTokenPrevZone.delete(tokenDoc.id);
   });
 
   Hooks.on("preUpdateToken", (tokenDoc, changed, options, userId) => {
     const moved = Object.prototype.hasOwnProperty.call(changed || {}, "x") ||
       Object.prototype.hasOwnProperty.call(changed || {}, "y");
     if (!moved) return;
-    if (!game.hollowsSilkPrevZone) game.hollowsSilkPrevZone = new Map();
+    if (!game.hollowsTokenPrevZone) game.hollowsTokenPrevZone = new Map();
     const prevZone = getTokenZone(tokenDoc.object || tokenDoc) || "";
-    game.hollowsSilkPrevZone.set(tokenDoc.id, prevZone);
+    game.hollowsTokenPrevZone.set(tokenDoc.id, prevZone);
   });
 
   Hooks.on("updateToken", async (tokenDoc, changed, options, userId) => {
@@ -150,10 +150,10 @@ export function registerCanvasHooks() {
       Object.prototype.hasOwnProperty.call(changed || {}, "y");
     if (!moved) return;
     if (!game.hollowsTokenZoneCache) game.hollowsTokenZoneCache = new Map();
-    const prevZone = game.hollowsSilkPrevZone?.get(tokenDoc.id) || game.hollowsTokenZoneCache.get(tokenDoc.id) || "";
+    const prevZone = game.hollowsTokenPrevZone?.get(tokenDoc.id) || game.hollowsTokenZoneCache.get(tokenDoc.id) || "";
     const nextZone = getTokenZone(tokenDoc) || "";
     game.hollowsTokenZoneCache.set(tokenDoc.id, nextZone);
-    if (game.hollowsSilkPrevZone) game.hollowsSilkPrevZone.delete(tokenDoc.id);
+    if (game.hollowsTokenPrevZone) game.hollowsTokenPrevZone.delete(tokenDoc.id);
     const actor = tokenDoc?.actor;
     if (!actor || actor.type !== "hunter") return;
     if (prevZone && nextZone && prevZone !== nextZone) {

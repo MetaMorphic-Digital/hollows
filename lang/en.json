@@ -58,7 +58,8 @@
         "threatSpent": "When Threat is spent",
         "entityAttack": "When the Entity attacks",
         "entityBleedingStart": "When the Entity's Bleeding is checked at turn start",
-        "incomingEntityWoundDamage": "When you take Wound damage from the Entity"
+        "incomingEntityWoundDamage": "When you take Wound damage from the Entity",
+        "terrainDiscard": "When you discard terrain after moving"
       },
       "clients": {
         "activated": "the acting player",
@@ -285,7 +286,8 @@
     "PACKS": {
       "WEAPONS": "Hollows - Weapons",
       "WEAPON_ABILITIES": "Hollows - Weapon Abilities",
-      "QUICKSTART": "Hollows - Quickstart"
+      "QUICKSTART": "Hollows - Quickstart",
+      "WEAPON_FORMS": "Hollows - Weapon Forms"
     },
     "THREAT": {
       "SCOPE": {

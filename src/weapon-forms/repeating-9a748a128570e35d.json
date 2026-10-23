@@ -1,0 +1,46 @@
+{
+  "_id": "9a748a128570e35d",
+  "name": "Repeating",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Rifle",
+    "text": "Capacity 4.\nAlso: carbine, lever-action.",
+    "damage": {
+      "resolve": 2,
+      "wounds": 2
+    },
+    "capacity": {
+      "max": 4
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": false,
+      "trusted": false,
+      "label": "Repeating",
+      "mode": "multiple",
+      "source": ""
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 7000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!9a748a128570e35d"
+}

@@ -22,7 +22,10 @@ export default class WeaponFormData extends foundry.abstract.TypeDataModel {
       }),
       changesAttackProfile: new fields.BooleanField({ initial: false }),
       attackProfile: attackProfile(),
-      versusWyrd: new fields.BooleanField({ initial: false }),
+      versusWyrd: new fields.SchemaField({
+        close: new fields.BooleanField({ initial: false }),
+        ranged: new fields.BooleanField({ initial: false }),
+      }),
       alternativeVariant: new fields.BooleanField({ initial: false }),
       alternativeAttackProfile: attackProfile(),
       script: new ScriptField(),
@@ -40,7 +43,7 @@ export default class WeaponFormData extends foundry.abstract.TypeDataModel {
     return ["Close", "Ranged"].filter(range => profile[range.toLowerCase()] !== "none").map(range => ({
       range,
       stat: profile[range.toLowerCase()],
-      defence: form.versusWyrd ? "Wyrd" : range,
+      defence: form.versusWyrd[range.toLowerCase()] ? "Wyrd" : range,
     }));
   }
 

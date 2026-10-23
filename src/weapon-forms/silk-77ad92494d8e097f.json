@@ -1,0 +1,46 @@
+{
+  "_id": "77ad92494d8e097f",
+  "name": "Silk",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Armour",
+    "text": "Attack with Quick or Sharp from Close (choose one when you take this Weapon; you can Reforge it (p. 155) to change to the other option). When you Take Cover or Move, become Ready.\nAlso: three-piece suit, expensive hat, lit cigarette.",
+    "damage": {
+      "resolve": 1,
+      "wounds": 1
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": true,
+    "attackProfile": {
+      "close": "Quick",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": true,
+    "alternativeAttackProfile": {
+      "close": "Sharp",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Silk",
+      "mode": "multiple",
+      "source": "async function becomeReady(H, actor) {\n  await H.condition.set(actor, \"ready\", true);\n  await H.chat.post(\"Silk: become Ready.\", actor);\n}\nreturn {\n  cover: {\n    hook: \"onEvent\",\n    eventType: \"takeCover\",\n    async run(H, actor) {\n      if (H.condition.has(actor, \"ready\")) return;\n      await becomeReady(H, actor);\n    },\n  },\n  move: {\n    hook: \"onMove\",\n    ownerMoveOnly: true,\n    async promptOnPlayer(H, actor) {\n      if (H.condition.has(actor, \"ready\")) return false;\n      if (!await H.ask.confirm({\n        title: \"Silk Armour\",\n        bodyHtml: \"<p>Was this a Move manoeuvre?</p>\",\n        yesLabel: \"Become Ready\",\n        noLabel: \"Cancel\",\n      })) return false;\n      await becomeReady(H, actor);\n      return true;\n    },\n  },\n};"
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 2000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!77ad92494d8e097f"
+}

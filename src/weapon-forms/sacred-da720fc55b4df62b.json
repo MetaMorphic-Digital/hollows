@@ -1,0 +1,46 @@
+{
+  "_id": "da720fc55b4df62b",
+  "name": "Sacred",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Book",
+    "text": "When you Guard, an ally may restore 1 Resolve.",
+    "damage": {
+      "resolve": 1,
+      "wounds": 1
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Sacred",
+      "mode": "multiple",
+      "source": "return {\n  guard: {\n    hook: \"onEvent\",\n    eventType: \"guard\",\n    async promptOnPlayer(H, actor) {\n      const allies = H.actors.hunters().filter(hunter => (hunter.id !== actor.id) && !H.condition.has(hunter, \"dead\"));\n      const targetId = await H.ask.one({\n        title: \"Sacred\",\n        label: \"Choose a Hunter to restore 1 Resolve\",\n        options: allies.map(hunter => ({ value: hunter.id, label: hunter.name })),\n      });\n      if (!targetId) return false;\n      const target = allies.find(hunter => hunter.id === targetId);\n      await H.resource.adjust(target, { resolve: 1 });\n      await H.chat.post(`${target.name} restores 1 Resolve (Sacred).`, actor);\n      return true;\n    },\n  },\n};"
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 3000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!da720fc55b4df62b"
+}

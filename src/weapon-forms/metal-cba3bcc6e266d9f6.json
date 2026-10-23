@@ -1,0 +1,46 @@
+{
+  "_id": "cba3bcc6e266d9f6",
+  "name": "Metal",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Armour",
+    "text": "When you would suffer Wound damage from an Entity attack, you may expend Ready to reduce the damage suffered by 1.\nAlso: heavy plate, chainmail, greatshield.",
+    "damage": {
+      "resolve": 2,
+      "wounds": 1
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Metal",
+      "mode": "multiple",
+      "source": "return {\n  absorb: {\n    hook: \"onEvent\",\n    eventType: \"incomingEntityWoundDamage\",\n    async promptOnPlayer(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return false;\n      if (!await H.ask.confirm({\n        title: \"Metal Armour\",\n        bodyHtml: \"<p>Expend Ready to reduce Wound damage by 1?</p>\",\n        yesLabel: \"Expend Ready\",\n        noLabel: \"Keep Ready\",\n      })) return false;\n      await H.condition.set(actor, \"ready\", false);\n      await H.chat.post(\"Metal: expend Ready to reduce Wound damage by 1.\", actor);\n      return { damageReduction: 1 };\n    },\n  },\n};"
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 1000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!cba3bcc6e266d9f6"
+}

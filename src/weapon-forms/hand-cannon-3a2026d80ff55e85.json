@@ -1,0 +1,46 @@
+{
+  "_id": "3a2026d80ff55e85",
+  "name": "Hand Cannon",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Pistol",
+    "text": "Capacity 1.",
+    "damage": {
+      "resolve": 3,
+      "wounds": 3
+    },
+    "capacity": {
+      "max": 1
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": false,
+      "trusted": false,
+      "label": "Hand Cannon",
+      "mode": "multiple",
+      "source": ""
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 5000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!3a2026d80ff55e85"
+}

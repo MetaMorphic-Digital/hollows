@@ -406,8 +406,7 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
           const range = foundry.utils.escapeHTML(String(atk.range || ""));
           const stat = foundry.utils.escapeHTML(String(atk.stat || ""));
           const defence = foundry.utils.escapeHTML(String(atk.defence || ""));
-          const condition = atk.condition ? ` - ${foundry.utils.escapeHTML(String(atk.condition))}` : "";
-          return `<div>With ${stat} from ${range} vs ${defence}${condition}</div>`;
+          return `<div>With ${stat} from ${range} vs ${defence}</div>`;
         }).join("");
       };
       const updateForms = async () => {
@@ -616,6 +615,7 @@ export async function openCharacterCreationWizard(actor) {
     }
     if (step === "weapon1") {
       const result = await promptWeaponSelection(actor, weaponDocsByType, [], allowBack);
+      if (result === false) continue;
       if (!result) return;
       if (result?.__back) { stepIndex -= 1; continue; }
       weapon1 = result;
@@ -624,6 +624,7 @@ export async function openCharacterCreationWizard(actor) {
     }
     if (step === "weapon2") {
       const result = await promptWeaponSelection(actor, weaponDocsByType, [weapon1?.weaponType].filter(Boolean), allowBack);
+      if (result === false) continue;
       if (!result) return;
       if (result?.__back) { stepIndex -= 1; continue; }
       weapon2 = result;

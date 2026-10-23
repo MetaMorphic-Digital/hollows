@@ -1,13 +1,8 @@
-import { getWeaponDefinition } from "./registry.js";
 import WeaponFormData from "../items/weapon-form.mjs";
 
 export function getWeaponType(weaponOrType) {
   if (typeof weaponOrType === "string") return weaponOrType;
   return String(weaponOrType?.system?.weaponType || weaponOrType?.name || "");
-}
-
-export function getWeaponConfig(weaponOrType) {
-  return getWeaponDefinition(getWeaponType(weaponOrType));
 }
 
 /**

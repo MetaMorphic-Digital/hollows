@@ -31,11 +31,11 @@ export default class HollowsItem extends foundry.documents.Item {
     })).filter(({ script }) => script?.source || script?.enabled || script?.trusted);
     if (!user.isGM && scripts.length) {
       const source = data._stats?.compendiumSource && await fromUuid(data._stats.compendiumSource);
-      const trustedImport = source && scripts.every(({ path, script }) => {
-        const original = foundry.utils.getProperty(source, path);
-        return original?.trusted && foundry.utils.equals(script, original);
-      });
-      if (!trustedImport) {
+      for (const { path, script } of scripts) {
+        const original = source && foundry.utils.getProperty(source, path);
+        if (original?.trusted && foundry.utils.equals(script, original)) continue;
+        if ((path === "system.appliedForm.script")
+          && await this.#canImportFormScript(this.system.appliedForm, this.system.weaponType)) continue;
         ui.notifications.warn(game.i18n.localize("HOLLOWS.SCRIPT.gmCreateOnly"));
         return false;
       }
@@ -57,15 +57,19 @@ export default class HollowsItem extends foundry.documents.Item {
       if (path === "system.appliedForm.script") {
         const form = updated.system.appliedForm;
         if (!form) continue;
-        const original = await fromUuid(form.uuid);
-        if ((original?.type === "weaponForm") && (original.system.weaponType === updated.system.weaponType)) {
-          const script = original.system.toObject().script;
-          const canImport = script.trusted || (!script.source && !script.enabled);
-          if (canImport && foundry.utils.equals(form.script, script)) continue;
-        }
+        if (await this.#canImportFormScript(form, updated.system.weaponType)) continue;
       }
       ui.notifications.warn(game.i18n.localize("HOLLOWS.SCRIPT.gmOnly"));
       return false;
     }
+  }
+
+  /** Verify a form's script against its source item. */
+  async #canImportFormScript(form, weaponType) {
+    const original = await fromUuid(form.uuid);
+    if ((original?.type !== "weaponForm") || (original.system.weaponType !== weaponType)) return false;
+    const script = original.system.toObject().script;
+    const canImport = script.trusted || (!script.source && !script.enabled);
+    return canImport && foundry.utils.equals(form.script, script);
   }
 }

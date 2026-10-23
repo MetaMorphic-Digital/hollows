@@ -1,0 +1,46 @@
+{
+  "_id": "51c2c5f23cfc6e8a",
+  "name": "Heavy",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Spear",
+    "text": "Attack with Strong from Close, instead of Quick.\nAlso: halberd, glaive.",
+    "damage": {
+      "resolve": 2,
+      "wounds": 3
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": true,
+    "attackProfile": {
+      "close": "Strong",
+      "ranged": "none"
+    },
+    "versusWyrd": {
+      "close": false,
+      "ranged": false
+    },
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": false,
+      "trusted": false,
+      "label": "Heavy",
+      "mode": "multiple",
+      "source": ""
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 9000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!51c2c5f23cfc6e8a"
+}

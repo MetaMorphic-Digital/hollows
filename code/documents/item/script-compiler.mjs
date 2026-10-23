@@ -555,23 +555,25 @@ ${source}
    * @param {object} [context] Event context.
    * @param {Actor|null} [context.actor] Actor for a local event; null for a scene event.
    * @param {object} [context.payload] Event-specific data passed to the script.
-   * @returns {Promise<void>}
+   * @returns {Promise<*[]>} Results returned by matching handlers.
    */
   static async runEvents(matches, { actor = null, payload = {} } = {}) {
-    if (!actor && !game.user.isGM) return;
+    if (!actor && !game.user.isGM) return [];
     const local = actor ? this.getMechanics(actor, ScriptedEvent) : this.getSceneMechanics(ScriptedEvent);
     const zone = actor && getActorZone(actor);
     const foreign = zone ? this.getSceneMechanics(ScriptedEvent).filter(mechanic =>
       (mechanic.event.scope === "zoneMate") && (mechanic.carrier.id !== actor.id)
       && (getActorZone(mechanic.carrier) === zone)) : [];
     const seen = new Set();
+    const results = [];
     for (const mechanic of [
       ...local.filter(m => !m.aura && (m.event.scope !== "zoneMate")), ...foreign, ...this.getAuras(ScriptedEvent),
     ]) {
       if (!matches(mechanic.event)) continue;
       if (mechanic.group && seen.has(mechanic.group)) continue;
       if (mechanic.group) seen.add(mechanic.group);
-      await mechanic.run(actor || mechanic.carrier, payload);
+      results.push(await mechanic.run(actor || mechanic.carrier, payload));
     }
+    return results;
   }
 }
