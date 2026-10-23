@@ -1,4 +1,5 @@
 import { getWeaponDefinition } from "./registry.js";
+import WeaponFormData from "../items/weapon-form.mjs";
 
 export function getWeaponType(weaponOrType) {
   if (typeof weaponOrType === "string") return weaponOrType;
@@ -44,6 +45,8 @@ export function getEffectiveWeaponCapacity(weapon) {
 }
 
 export function getEffectiveWeaponAttackProfiles(weapon) {
+  const form = getSelectedWeaponForm(weapon);
+  if (form?.changesAttackProfile) return WeaponFormData.getAttackProfiles(form, form.attackProfileVariant);
   return foundry.utils.deepClone(weapon.system.attackProfiles);
 }
 

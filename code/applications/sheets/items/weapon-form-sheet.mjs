@@ -31,6 +31,7 @@ export default class HollowsWeaponFormSheet extends HandlebarsApplicationMixin(I
       ...context,
       item: this.item,
       system: this.item.system,
+      systemFields: this.item.system.schema.fields,
       editable: this.isEditable,
       owner: this.document.isOwner,
       limited: this.document.limited,
@@ -47,6 +48,7 @@ export default class HollowsWeaponFormSheet extends HandlebarsApplicationMixin(I
 
   /** @inheritdoc */
   async _processSubmitData(event, form, submitData, options) {
-    return super._processSubmitData(event, form, submitData, { ...options, render: false });
+    const render = ["system.changesAttackProfile", "system.alternativeVariant"].includes(event.target.name);
+    return super._processSubmitData(event, form, submitData, { ...options, render });
   }
 }

@@ -27,6 +27,7 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
         ...WeaponFormData.defineSchema(),
         uuid: new fields.StringField({ initial: "" }),
         name: new fields.StringField({ initial: "" }),
+        attackProfileVariant: new fields.StringField({ initial: "primary", choices: ["primary", "alternative"] }),
       }, { nullable: true, initial: null }),
       capacity: new fields.SchemaField({
         value: new fields.NumberField({ initial: 0 }),
@@ -67,15 +68,23 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
   /**
    * Copy a form onto this weapon; null removes the current form.
    * @param {Item|null} form
-   * @returns {Promise<Item|undefined>} The updated weapon, or undefined for an incompatible form.
+   * @param {object} [options]
+   * @param {string} [options.variant] Attack variant already chosen during character creation.
+   * @returns {Promise<Item|undefined>} The updated weapon, or undefined if incompatible or canceled.
    */
-  async applyForm(form) {
+  async applyForm(form, { variant } = {}) {
     if (form && ((form.type !== "weaponForm") || (form.system.weaponType !== this.weaponType))) {
       ui.notifications.warn(`Select a ${this.weaponType} Weapon Form.`);
       return;
     }
+    if (form) {
+      variant ??= await form.system.chooseAttackProfile();
+      if (!variant) return;
+    }
     return this.parent.update({
-      "system.appliedForm": form ? { ...form.system.toObject(), uuid: form.uuid, name: form.name } : null,
+      "system.appliedForm": form ? {
+        ...form.system.toObject(), uuid: form.uuid, name: form.name, attackProfileVariant: variant,
+      } : null,
       "system.capacity.value": 0,
     });
   }

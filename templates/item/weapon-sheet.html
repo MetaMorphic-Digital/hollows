@@ -19,23 +19,32 @@
     </div>
     <div class="muted">Select or drop a Weapon Form item for this weapon.</div>
     {{#if activeForm}}
-      <div class="hollows-form-section">
-        <h3>Form Abilities</h3>
-        <div class="hollows-form-value multiline">{{activeForm.text}}</div>
-        <div class="hollows-form-value">Damage: {{effectiveDamage.resolve}} / {{effectiveDamage.wounds}}</div>
-        {{#if (gt effectiveCapacity.max 0)}}
-          <div class="hollows-form-row">
-            <div class="stat-label">Capacity</div>
-            <div class="weapon-capacity">
-              <input type="number" name="system.capacity.value" value="{{system.capacity.value}}" min="0" max="{{effectiveCapacity.max}}">
-              <span class="slash">/ {{effectiveCapacity.max}}</span>
-            </div>
-          </div>
-        {{/if}}
-        {{> "systems/hollows/templates/item/parts/script-controls.html"
-        label=(localize "HOLLOWS.SCRIPT.automation") action="editScript" path="system.appliedForm.script" titleKey="HOLLOWS.SCRIPT.formTitle"
-        block=system.appliedForm.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
+    <div class="hollows-form-section">
+      <h3>Form Abilities</h3>
+      <div class="hollows-form-value multiline">{{activeForm.text}}</div>
+      <div class="hollows-form-value">Damage: {{effectiveDamage.resolve}} / {{effectiveDamage.wounds}}</div>
+      {{#if activeForm.changesAttackProfile}}
+      <div class="hollows-form-value">
+        {{#each attackProfilesForDisplay as |atk|}}
+        <div>{{atk.range}} with {{atk.stat}} vs {{atk.defence}}</div>
+        {{else}}
+        No attack profiles.
+        {{/each}}
       </div>
+      {{/if}}
+      {{#if (gt effectiveCapacity.max 0)}}
+      <div class="hollows-form-row">
+        <div class="stat-label">Capacity</div>
+        <div class="weapon-capacity">
+          <input type="number" name="system.capacity.value" value="{{system.capacity.value}}" min="0" max="{{effectiveCapacity.max}}">
+          <span class="slash">/ {{effectiveCapacity.max}}</span>
+        </div>
+      </div>
+      {{/if}}
+      {{> "systems/hollows/templates/item/parts/script-controls.html"
+      label=(localize "HOLLOWS.SCRIPT.automation") action="editScript" path="system.appliedForm.script" titleKey="HOLLOWS.SCRIPT.formTitle"
+      block=system.appliedForm.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
+    </div>
     {{/if}}
   </section>
 
@@ -194,9 +203,9 @@
       </div>
       <button type="button" class="stat-roll" data-action="addAttackProfile">Add Attack Profile</button>
       {{else}}
-      {{#if attackProfilesForDisplay.length}}
+      {{#if system.attackProfiles.length}}
         <div class="attack-profiles">
-          {{#each attackProfilesForDisplay as |atk|}}
+        {{#each system.attackProfiles as |atk|}}
             <div class="hollows-form-value">
               {{atk.range}} / {{atk.stat}} vs {{atk.defence}}
               {{#if atk.form}} - Form: {{atk.form}}{{/if}}

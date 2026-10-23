@@ -1,4 +1,5 @@
 import { getAvailableWeaponForms, getWeaponPackDocs } from "../../data/weapons/index.js";
+import WeaponFormData from "../../data/items/weapon-form.mjs";
 import { getWeaponAbilityDocs, grantWeaponAbilityToHunter } from "../../documents/actor/ability-grant.js";
 import { getContentPacks } from "../../helpers/extensions.js";
 import { getEquipmentPackDocs } from "../../documents/actor/hunter-equipment.js";
@@ -389,7 +390,10 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
       ui.notifications.warn("Select a modifier set.");
       return false;
     }
-    return { weaponType, formUuid, abilityId, modifierChoiceId };
+    const form = await fromUuid(formUuid);
+    const attackProfileVariant = await form.system.chooseAttackProfile();
+    if (!attackProfileVariant) return false;
+    return { weaponType, formUuid, abilityId, modifierChoiceId, attackProfileVariant };
   } });
   return await foundry.applications.api.DialogV2.wait({
     window: { title: "Character Creation: Weapon" },
@@ -426,6 +430,10 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
             capacityLine,
           ].join("").trim();
           el.querySelector("[data-form-desc]").innerHTML = formatLongText(desc);
+          const variants = form?.alternativeVariant ? ["primary", "alternative"] : ["primary"];
+          el.querySelector("[data-attack-profiles]").innerHTML = form?.changesAttackProfile
+            ? variants.map(variant => renderAttackProfiles(WeaponFormData.getAttackProfiles(form, variant))).join("<p>or</p>")
+            : renderAttackProfiles(doc.system.attackProfiles);
         };
         el.querySelector("[data-core-ability]").innerHTML = formatLongText(doc.system.coreAbility);
         el.querySelector("[data-attack-profiles]").innerHTML = renderAttackProfiles(doc.system.attackProfiles);
@@ -701,7 +709,7 @@ export async function openCharacterCreationWizard(actor) {
     const created = await actor.createEmbeddedDocuments("Item", [payload]);
     const weapon = created?.[0] || null;
     if (!weapon) return null;
-    await weapon.system.applyForm(await fromUuid(pick.formUuid));
+    await weapon.system.applyForm(await fromUuid(pick.formUuid), { variant: pick.attackProfileVariant });
     const modifierChoices = doc.system.modifierChoices;
     if (modifierChoices.length) {
       const choice = modifierChoices.find(c => c.id === pick.modifierChoiceId) || modifierChoices[0];

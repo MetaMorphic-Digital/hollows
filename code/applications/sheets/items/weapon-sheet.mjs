@@ -28,7 +28,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       /** @this {HollowsWeaponSheet} */
       addAttackProfile: async function() {
         if (!this.isEditable || !game.user.isGM) return;
-        const profiles = getEffectiveWeaponAttackProfiles(this.item);
+        const profiles = foundry.utils.deepClone(this.item.system.attackProfiles);
         profiles.push({ range: "Close", stat: "Strong", defence: "Close" });
         await this.item.update({ "system.attackProfiles": profiles });
         this.render();
@@ -36,7 +36,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       /** @this {HollowsWeaponSheet} */
       removeAttackProfile: async function(event, target) {
         if (!this.isEditable || !game.user.isGM) return;
-        const profiles = getEffectiveWeaponAttackProfiles(this.item);
+        const profiles = foundry.utils.deepClone(this.item.system.attackProfiles);
         profiles.splice(Number(target.dataset.index), 1);
         await this.item.update({ "system.attackProfiles": profiles });
         this.render();
@@ -192,7 +192,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       else if (input.dataset.dtype === "Boolean") value = value === "true";
       if (name.startsWith("system.attackProfiles.")) {
         const [, , index, field] = name.split(".");
-        const profiles = getEffectiveWeaponAttackProfiles(this.item);
+        const profiles = foundry.utils.deepClone(this.item.system.attackProfiles);
         profiles[index][field] = value;
         await this.item.update({ "system.attackProfiles": profiles }, { render: false });
       } else {
