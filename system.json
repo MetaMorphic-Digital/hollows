@@ -49,6 +49,7 @@
       "packs": [
         "weapons",
         "weapon-abilities",
+        "quickstart",
         "hollows-grisham-priory"
       ]
     }
