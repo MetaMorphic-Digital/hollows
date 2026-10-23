@@ -6,4 +6,5 @@ export { default as HollowsEquipmentSheet } from "./equipment-sheet.mjs";
 export { default as HollowsRelicSheet } from "./relic-sheet.mjs";
 export { default as HollowsRumourSheet } from "./rumour-sheet.mjs";
 export { default as HollowsWeaponAbilitySheet } from "./weapon-ability-sheet.mjs";
+export { default as HollowsWeaponFormSheet } from "./weapon-form-sheet.mjs";
 export { default as HollowsWeaponSheet } from "./weapon-sheet.mjs";

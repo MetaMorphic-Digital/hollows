@@ -35,6 +35,11 @@
       "type": "JournalEntry"
     },
     {
+      "name": "weapon-forms",
+      "label": "HOLLOWS.PACKS.WEAPON_FORMS",
+      "type": "Item"
+    },
+    {
       "name": "hollows-grisham-priory",
       "label": "The Sins of Grisham Priory",
       "path": "packs/hollows-grisham-priory",
@@ -50,6 +55,7 @@
         "weapons",
         "weapon-abilities",
         "quickstart",
+        "weapon-forms",
         "hollows-grisham-priory"
       ]
     }
@@ -74,6 +80,7 @@
     "Item": {
       "weapon": {},
       "weaponAbility": {},
+      "weaponForm": {},
       "equipment": {},
       "echo": {},
       "entityAbility": {},

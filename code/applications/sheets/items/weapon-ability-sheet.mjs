@@ -1,3 +1,4 @@
+import { editItemScript } from "../../apps/script-editor.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -8,16 +9,7 @@ export default class HollowsWeaponAbilitySheet extends HandlebarsApplicationMixi
     position: { width: 520, height: 520 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
-    actions: {
-      /** @this {HollowsWeaponAbilitySheet} */
-      editAbilityScript: async function() {
-        if (!this.isEditable) return;
-        const { default: HollowsScriptEditor } = await import("../../apps/script-editor.mjs");
-        HollowsScriptEditor.open(this.item, "system.script", {
-          title: game.i18n.format("HOLLOWS.SCRIPT.abilityTitle", { name: this.item.name }),
-        });
-      },
-    },
+    actions: { editScript: editItemScript },
   };
 
   static PARTS = {
@@ -50,18 +42,8 @@ export default class HollowsWeaponAbilitySheet extends HandlebarsApplicationMixi
     this.element.querySelector(".window-content")?.classList.add("hollows-sheet");
   }
 
-  async _onChangeForm(formConfig, event) {
-    const input = event?.target;
-    const name = String(input?.name ?? "");
-    if (name && (name === "name" || name.startsWith("system."))) {
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const value = input.type === "checkbox" ? input.checked
-        : input.type === "number" ? (Number(input.value) || 0)
-          : String(input.value ?? "");
-      await this.document.update({ [name]: value }, { render: false });
-      return;
-    }
-    return super._onChangeForm(formConfig, event);
+  /** @inheritdoc */
+  async _processSubmitData(event, form, submitData, options) {
+    return super._processSubmitData(event, form, submitData, { ...options, render: false });
   }
 }

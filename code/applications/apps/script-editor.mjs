@@ -4,6 +4,17 @@ import ScriptField from "../../data/fields/script-field.mjs";
 
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
+/**
+ * Open the script field specified by an item sheet's button.
+ * @this {ItemSheetV2}
+ */
+export function editItemScript(event, target) {
+  if (!this.isEditable) return;
+  HollowsScriptEditor.open(this.item, target.dataset.path, {
+    title: game.i18n.format(target.dataset.titleKey, { name: this.item.name }),
+  });
+}
+
 /** GM editor for an item's automation script, with a draft until Save. */
 export default class HollowsScriptEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   /**

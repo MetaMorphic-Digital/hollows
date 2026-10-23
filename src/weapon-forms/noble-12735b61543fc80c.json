@@ -1,0 +1,43 @@
+{
+  "_id": "12735b61543fc80c",
+  "name": "Noble",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Sword",
+    "text": "When you Feint, one Hunter in your area may Guard as an immediate action.\nAlso: rapier, ceremonial.",
+    "damage": {
+      "resolve": 2,
+      "wounds": 2
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": [],
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Noble",
+      "mode": "multiple",
+      "source": "return {\n  feint: {\n    hook: \"onEvent\",\n    eventType: \"swordFeint\",\n    async promptOnPlayer(H, actor) {\n      const target = await H.ask.hunterInZone(H.zone.of(actor), \"Noble: choose a Hunter to guard\");\n      if (!target) return false;\n      await H.actions.grantManoeuvre(target, \"guard\");\n      return true;\n    },\n  },\n};"
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 10000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!12735b61543fc80c"
+}

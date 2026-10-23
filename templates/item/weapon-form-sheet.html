@@ -1,0 +1,75 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Form Name">
+      <div class="subline">{{localize "TYPES.Item.weaponForm"}}</div>
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    <h2>Basics</h2>
+    <div class="hollows-form-row">
+      <div class="stat-label">Weapon Type</div>
+      <input type="text" name="system.weaponType" value="{{system.weaponType}}">
+    </div>
+    <div class="hollows-form-grid">
+      <div class="hollows-form-row">
+        <div class="stat-label">Resolve Damage</div>
+        <input type="number" name="system.damage.resolve" value="{{system.damage.resolve}}">
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Wound Damage</div>
+        <input type="number" name="system.damage.wounds" value="{{system.damage.wounds}}">
+      </div>
+      <div class="hollows-form-row">
+        <div class="stat-label">Capacity</div>
+        <input type="number" name="system.capacity.max" value="{{system.capacity.max}}">
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h2>Attack Profile</h2>
+    <label class="hollows-form-row">
+      <span class="stat-label">Changes Attack Profile</span>
+      <input type="checkbox" name="system.changesAttackProfile" {{checked system.changesAttackProfile}}>
+    </label>
+    {{#if system.changesAttackProfile}}
+    <label class="hollows-form-row">
+      <span class="stat-label">Close with</span>
+      {{formInput systemFields.attackProfile.fields.close value=system.attackProfile.close}}
+    </label>
+    <label class="hollows-form-row">
+      <span class="stat-label">Ranged with</span>
+      {{formInput systemFields.attackProfile.fields.ranged value=system.attackProfile.ranged}}
+    </label>
+    {{formGroup systemFields.versusWyrd value=system.versusWyrd label="Versus Wyrd" type="checkboxes"}}
+    <label class="hollows-form-row">
+      <span class="stat-label">Alternative variant</span>
+      <input type="checkbox" name="system.alternativeVariant" {{checked system.alternativeVariant}}>
+    </label>
+    {{#if system.alternativeVariant}}
+    <label class="hollows-form-row">
+      <span class="stat-label">Close with</span>
+      {{formInput systemFields.alternativeAttackProfile.fields.close value=system.alternativeAttackProfile.close}}
+    </label>
+    <label class="hollows-form-row">
+      <span class="stat-label">Ranged with</span>
+      {{formInput systemFields.alternativeAttackProfile.fields.ranged value=system.alternativeAttackProfile.ranged}}
+    </label>
+    {{/if}}
+    {{/if}}
+  </section>
+
+  <section class="sheet-section">
+    <h2>Text</h2>
+    <textarea name="system.text" rows="6">{{system.text}}</textarea>
+  </section>
+
+  <section class="sheet-section">
+    <h2>{{localize "HOLLOWS.SCRIPT.automation"}}</h2>
+    {{> "systems/hollows/templates/item/parts/script-controls.html"
+    label=(localize "HOLLOWS.SCRIPT.source") action="editScript" path="system.script" titleKey="HOLLOWS.SCRIPT.formTitle"
+    block=system.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
+  </section>
+</form>

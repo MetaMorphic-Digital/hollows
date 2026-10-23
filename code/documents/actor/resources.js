@@ -1,14 +1,9 @@
 import HollowsActor from "../actor.mjs";
+import HunterData from "../../data/actors/hunter.mjs";
 
-const RESOURCE_LIMIT_MODIFIERS = [];
-
-/** Register modifiers for resource limits such as maximum Focus. */
-export function registerResourceLimitModifier(modifier) {
-  RESOURCE_LIMIT_MODIFIERS.push(modifier);
-}
-
+/** Maximum Focus after applying the hunter's resource modifiers. */
 export function getFocusLimit(actor) {
-  return RESOURCE_LIMIT_MODIFIERS.reduce((limit, modifier) => modifier(actor, "focus", limit), 1);
+  return HunterData.getResourceLimit(actor, "focus", 1);
 }
 
 export function getFocusCount(actor) {

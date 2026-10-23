@@ -1,38 +1,20 @@
 import { getHollowsWeaponIndex } from "../../../helpers/runtime-state.js";
 import {
   STAT_LABELS,
+  DEFENCE_LABELS,
 } from "../../../data/_module.mjs";
+import { editItemScript } from "../../apps/script-editor.mjs";
 import {
   getAvailableWeaponForms,
   getEffectiveWeaponAttackProfiles,
   getEffectiveWeaponCapacity,
   getEffectiveWeaponDamage,
-  getEffectiveWeaponModifierChoices,
+  getSelectedWeaponForm,
   getWeaponPackDocs,
 } from "../../../data/weapons/index.js";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
-
-const ATTACK_PROFILE_RANGES = [
-  { value: "Close", label: "Close" },
-  { value: "Ranged", label: "Ranged" },
-  { value: "Anywhere", label: "Anywhere" },
-];
-
-const ATTACK_PROFILE_STATS = [
-  { value: "Strong", label: "Strong" },
-  { value: "Hard", label: "Hard" },
-  { value: "Quick", label: "Quick" },
-  { value: "Sharp", label: "Sharp" },
-  { value: "Wise", label: "Wise" },
-];
-
-const ATTACK_PROFILE_DEFENCES = [
-  { value: "Close", label: "Close" },
-  { value: "Ranged", label: "Ranged" },
-  { value: "Wyrd", label: "Wyrd" },
-];
 
 export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
   static DEFAULT_OPTIONS = {
@@ -41,13 +23,22 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      addCustomAttackProfile: async function(event, target) {
-        if (!this.isEditable) return;
-        return this._onAddCustomAttackProfile(event, target);
+      editScript: editItemScript,
+      /** @this {HollowsWeaponSheet} */
+      addAttackProfile: async function() {
+        if (!this.isEditable || !game.user.isGM) return;
+        const profiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+        profiles.push({ range: "Close", stat: "Strong", defence: "Close" });
+        await this.item.update({ "system.attackProfiles": profiles });
+        this.render();
       },
-      removeCustomAttackProfile: async function(event, target) {
-        if (!this.isEditable) return;
-        return this._onRemoveCustomAttackProfile(event, target);
+      /** @this {HollowsWeaponSheet} */
+      removeAttackProfile: async function(event, target) {
+        if (!this.isEditable || !game.user.isGM) return;
+        const profiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+        profiles.splice(Number(target.dataset.index), 1);
+        await this.item.update({ "system.attackProfiles": profiles });
+        this.render();
       },
       unbindAbility: async function(event, target) {
         if (!this.isEditable) return;
@@ -56,14 +47,6 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       deleteAbility: async function(event, target) {
         if (!this.isEditable) return;
         return this._onDeleteAbility(event, target);
-      },
-      /** @this {HollowsWeaponSheet} */
-      editScript: async function(event, target) {
-        if (!this.isEditable) return;
-        const { default: HollowsScriptEditor } = await import("../../apps/script-editor.mjs");
-        HollowsScriptEditor.open(this.item, target.dataset.path, {
-          title: game.i18n.format(target.dataset.titleKey, { name: this.item.name }),
-        });
       },
     },
   };
@@ -98,28 +81,31 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       owner: this.document.isOwner,
       limited: this.document.limited,
       statLabels: STAT_LABELS,
+      canEditWeapon: game.user.isGM && this.isEditable,
+      attackProfileChoices: {
+        range: ["Close", "Ranged", "Anywhere"],
+        stat: Object.values(STAT_LABELS),
+        defence: Object.values(DEFENCE_LABELS),
+      },
     };
 
     let packDoc = null;
-    data.modifierChoicesForDisplay = getEffectiveWeaponModifierChoices(this.item);
+    data.modifierChoicesForDisplay = system.modifierChoices;
     data.attackProfilesForDisplay = getEffectiveWeaponAttackProfiles(this.item);
-    data.customAttackProfilesForDisplay = Array.isArray(system.customForm?.attackProfiles)
-      ? system.customForm.attackProfiles
-      : [];
-    data.attackProfileRangeChoices = ATTACK_PROFILE_RANGES;
-    data.attackProfileStatChoices = ATTACK_PROFILE_STATS;
-    data.attackProfileDefenceChoices = ATTACK_PROFILE_DEFENCES;
-    data.formsForDisplay = getAvailableWeaponForms(this.item);
+    data.formsForDisplay = await getAvailableWeaponForms(this.item);
+    data.activeForm = getSelectedWeaponForm(this.item);
+    if (system.appliedForm && !data.formsForDisplay.some(form => form.uuid === system.appliedForm.uuid)) {
+      const { uuid, name, weaponType } = system.appliedForm;
+      data.formsForDisplay.push({ uuid, name, weaponType });
+    }
     data.scriptsAllowed = hollows.settings.allowCustomScripts;
     data.canEditScripts = game.user.isGM && this.isEditable;
     data.effectiveDamage = getEffectiveWeaponDamage(this.item);
     data.effectiveCapacity = getEffectiveWeaponCapacity(this.item);
-    data.effectiveHealthBonus = this.item.system.getEffectiveWeaponHealthBonus();
     data.system.capacity = {
       value: Number(this.item.system?.capacity?.value ?? data.effectiveCapacity.value ?? 0),
       max: Number(data.effectiveCapacity.max ?? 0),
     };
-    data.system.health_bonus = data.effectiveHealthBonus;
 
     if (this.item.pack) {
       const pack = game.packs.get(this.item.pack);
@@ -131,7 +117,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     if (!packDoc) {
       const docs = await getWeaponPackDocs();
       packDoc = docs.find(d => d.name === this.item.name) ||
-        docs.find(d => d.system?.weaponType && d.system.weaponType === this.item.system.weaponType) ||
+        docs.find(d => d.system?.weaponType && (d.system.weaponType === this.item.system.weaponType)) ||
         null;
     }
     const weaponIndex = getHollowsWeaponIndex();
@@ -141,7 +127,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       packDoc = byName || byType || null;
     }
     if (packDoc?.system) {
-      const fields = ["outlook", "lies", "fears", "description", "coreAbility"];
+      const fields = ["description", "coreAbility"];
       for (const field of fields) {
         if (!data.system[field]) {
           data.system[field] = packDoc.system[field] || this.item._source?.system?.[field] || "";
@@ -161,7 +147,6 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     } else {
       data.assignedAbilities = [];
     }
-    this._formsForDisplay = data.formsForDisplay;
     return data;
   }
 
@@ -175,17 +160,16 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     }
     if (this.isEditable) {
       this.element.addEventListener("dragover", ev => ev.preventDefault());
-      this.element.addEventListener("drop", this._onDropAbility.bind(this));
+      this.element.addEventListener("drop", this._onDropItem.bind(this));
     }
   }
 
   async _onChangeForm(formConfig, event) {
-    const input = event?.target;
-    const name = String(input?.name ?? "");
+    const input = event.target;
+    const name = input.name;
 
-    if (name === "system.selectedForm") return this._onSelectedFormChange(event);
+    if (name === "formUuid") return this._onSelectedFormChange(event);
     if (name === "system.modifierChoice") return this._onModifierChoiceChange(event);
-    if (name === "system.formAttackChoice") return this._onFormAttackChoiceChange(event);
 
     // Toggling renown reveals/hides the whole section, so it needs a render;
     // the name/text fields below take the silent renderless path.
@@ -197,51 +181,34 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
       return;
     }
 
-    if (input?.tagName !== "SELECT" && name && (name === "name" || name.startsWith("system."))) {
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const value = input.type === "checkbox" ? input.checked
-        : input.type === "number" ? (Number(input.value) || 0)
-          : String(input.value ?? "");
-      await this.document.update({ [name]: value }, { render: false });
+    if ((name === "name") || name.startsWith("system.")) {
+      event.preventDefault();
+      event.stopPropagation();
+      let value = input.value;
+      if (input.type === "checkbox") value = input.checked;
+      else if (input.type === "number") value = Number(value);
+      else if (input.dataset.dtype === "Boolean") value = value === "true";
+      if (name.startsWith("system.attackProfiles.")) {
+        const [, , index, field] = name.split(".");
+        const profiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+        profiles[index][field] = value;
+        await this.item.update({ "system.attackProfiles": profiles }, { render: false });
+      } else {
+        await this.document.update({ [name]: value }, { render: false });
+      }
       return;
     }
 
     return super._onChangeForm(formConfig, event);
   }
 
-  _getCustomAttackProfiles() {
-    const profiles = this.item.system?.customForm?.attackProfiles;
-    return Array.isArray(profiles)
-      ? foundry.utils.deepClone(profiles)
-      : [];
-  }
-
-  async _onAddCustomAttackProfile(event) {
-    event.preventDefault();
-    const profiles = this._getCustomAttackProfiles();
-    profiles.push({ range: "Close", stat: "Strong", defence: "Close" });
-    await this.item.update({ "system.customForm.attackProfiles": profiles });
-    this.render();
-  }
-
-  async _onRemoveCustomAttackProfile(event, target = event.currentTarget) {
-    event.preventDefault();
-    const index = Number(target?.dataset?.index ?? -1);
-    const profiles = this._getCustomAttackProfiles();
-    if (index < 0 || index >= profiles.length) return;
-    profiles.splice(index, 1);
-    await this.item.update({ "system.customForm.attackProfiles": profiles });
-    this.render();
-  }
-
   async _onUnbindAbility(event, target = event.currentTarget) {
     event.preventDefault();
     const abilityId = String(target?.dataset?.abilityId || "");
     const owner = this.item.parent;
-    if (!owner || owner.type !== "hunter") return;
+    if (!owner || (owner.type !== "hunter")) return;
     const ability = owner.items.get(abilityId);
-    if (!ability || ability.type !== "weaponAbility") return;
+    if (!ability || (ability.type !== "weaponAbility")) return;
     await ability.update({ "system.boundWeaponId": "" });
     this.render();
   }
@@ -250,20 +217,16 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     event.preventDefault();
     const abilityId = String(target?.dataset?.abilityId || "");
     const owner = this.item.parent;
-    if (!owner || owner.type !== "hunter") return;
+    if (!owner || (owner.type !== "hunter")) return;
     const ability = owner.items.get(abilityId);
-    if (!ability || ability.type !== "weaponAbility") return;
+    if (!ability || (ability.type !== "weaponAbility")) return;
     await ability.delete();
     this.render();
   }
 
-  async _onDropAbility(event) {
+  /** Apply a dropped form or bind a weapon ability. */
+  async _onDropItem(event) {
     event.preventDefault();
-    const owner = this.item.parent;
-    if (!owner || owner.type !== "hunter") {
-      ui.notifications.warn("Open this weapon from a Hunter to assign abilities.");
-      return;
-    }
     const targetWeaponType = String(this.item.system?.weaponType || "");
     if (!targetWeaponType) {
       ui.notifications.warn("This weapon has no weapon type.");
@@ -278,9 +241,19 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     try {
       dropped = await Item.implementation.fromDropData(dropData);
     } catch { dropped = null; }
-    if (!dropped || dropped.type !== "weaponAbility") return;
+    if (dropped?.type === "weaponForm") {
+      await this.item.system.applyForm(dropped);
+      this.render();
+      return;
+    }
+    if (!dropped || (dropped.type !== "weaponAbility")) return;
+    const owner = this.item.parent;
+    if (!owner || (owner.type !== "hunter")) {
+      ui.notifications.warn("Open this weapon from a Hunter to assign abilities.");
+      return;
+    }
     const droppedWeaponType = String(dropped.system?.weaponType || "");
-    if (!droppedWeaponType || droppedWeaponType !== targetWeaponType) {
+    if (!droppedWeaponType || (droppedWeaponType !== targetWeaponType)) {
       ui.notifications.warn(`Only ${targetWeaponType} abilities can be assigned to this weapon.`);
       return;
     }
@@ -298,31 +271,12 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     if (created?.length) this.render();
   }
 
+  /** Apply the form selected from the catalogue. */
   async _onSelectedFormChange(event) {
-    event.preventDefault?.();
-    event.stopPropagation?.();
-    const value = event.target?.value ?? event.currentTarget?.value;
-    const forms = this._formsForDisplay || getAvailableWeaponForms(this.item);
-    const form = forms.find(f => f.name === value || f.key === value);
-    const update = {
-      "system.selectedForm": value,
-      "system.modifierChoice": "",
-    };
-    if (form?.capacity) {
-      update["system.capacity.value"] = Number(form.capacity.value ?? 0);
-    }
-    if (value === "Silk" && !this.item.system.formAttackChoice) {
-      update["system.formAttackChoice"] = "Quick";
-    }
-    await this.item.update(update);
-    this.render();
-  }
-
-  async _onFormAttackChoiceChange(event) {
-    event.preventDefault?.();
-    event.stopPropagation?.();
-    const choice = event.target?.value ?? event.currentTarget?.value;
-    await this.item.update({ "system.formAttackChoice": choice });
+    event.preventDefault();
+    event.stopPropagation();
+    const uuid = event.target.value;
+    await this.item.system.applyForm(uuid ? await fromUuid(uuid) : null);
     this.render();
   }
 
@@ -330,7 +284,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     event.preventDefault?.();
     event.stopPropagation?.();
     const choiceId = event.target?.value ?? event.currentTarget?.value;
-    const choices = getEffectiveWeaponModifierChoices(this.item);
+    const choices = this.item.system.modifierChoices;
     const choice = choices.find(c => c.id === choiceId);
     if (!choice) {
       await this.item.update({ "system.modifierChoice": "" });

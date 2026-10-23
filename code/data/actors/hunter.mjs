@@ -1,4 +1,16 @@
 export default class HunterData extends foundry.abstract.TypeDataModel {
+  static #resourceLimitModifiers = [];
+
+  /** Register a modifier for maximum Focus, Resolve or Wounds. */
+  static registerResourceLimitModifier(modifier) {
+    this.#resourceLimitModifiers.push(modifier);
+  }
+
+  /** Apply the hunter's resource limit modifiers to the base maximum. */
+  static getResourceLimit(actor, resource, value) {
+    return this.#resourceLimitModifiers.reduce((limit, modifier) => modifier(actor, resource, limit), value);
+  }
+
   /** @inheritdoc */
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -83,13 +95,13 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       .slice(0, 2);
 
     for (const weapon of weapons) {
-      const healthBonus = weapon.system.getEffectiveWeaponHealthBonus();
+      const healthBonus = weapon.system.health_bonus;
       resolveBonus += healthBonus.resolve || 0;
       woundsBonus += healthBonus.wounds || 0;
     }
 
     const penalty = this.parent.getFlag("hollows", "battleMaxPenalty") || {};
-    this.health.resolve.max = Math.max(0, resolveBonus - (Number(penalty.resolve) || 0));
-    this.health.wounds.max = Math.max(0, woundsBonus - (Number(penalty.wounds) || 0));
+    this.health.resolve.max = Math.max(0, HunterData.getResourceLimit(this.parent, "resolve", resolveBonus) - (Number(penalty.resolve) || 0));
+    this.health.wounds.max = Math.max(0, HunterData.getResourceLimit(this.parent, "wounds", woundsBonus) - (Number(penalty.wounds) || 0));
   }
 }

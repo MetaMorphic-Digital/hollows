@@ -1,0 +1,43 @@
+{
+  "_id": "71c435a6e2037c8f",
+  "name": "Wicked",
+  "type": "weaponForm",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "weaponType": "Knife",
+    "text": "When you inflict Wound damage with this Weapon, heal 1 Wound.\nAlso: syringe, cleaver.",
+    "damage": {
+      "resolve": 1,
+      "wounds": 3
+    },
+    "capacity": {
+      "max": 0
+    },
+    "changesAttackProfile": false,
+    "attackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "versusWyrd": [],
+    "alternativeVariant": false,
+    "alternativeAttackProfile": {
+      "close": "none",
+      "ranged": "none"
+    },
+    "script": {
+      "enabled": true,
+      "trusted": true,
+      "label": "Wicked",
+      "mode": "multiple",
+      "source": "return {\n  heal: {\n    hook: \"onAttackResult\",\n    timing: \"afterDamageApplied\",\n    damageType: \"Wounds\",\n    active(H, actor, ctx) { return ctx.weapon?.id === ctx.item.id; },\n    async run(H, actor) {\n      await H.resource.adjust(actor, { wounds: 1 });\n      await H.chat.post(\"Wicked: heal 1 Wound.\", actor);\n    },\n  },\n};"
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 4000,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!71c435a6e2037c8f"
+}

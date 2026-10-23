@@ -45,6 +45,7 @@ export async function grantWeaponAbilityToHunter(hunter, abilityDoc, durationTyp
   if (!hunter || hunter.type !== "hunter" || !abilityDoc) return null;
   const data = foundry.utils.deepClone(abilityDoc.toObject());
   delete data._id;
+  if (abilityDoc.pack) foundry.utils.setProperty(data, "_stats.compendiumSource", abilityDoc.uuid);
   data.system = data.system || {};
   data.system.durationType = durationType || "temporary";
   data.system.boundWeaponId = boundWeaponId || "";

@@ -10,7 +10,7 @@ import { registerDefenceOptionProvider } from "../data/actions/defence-options.j
 import { registerTerrainDiscardProvider } from "../data/actions/terrain-discard-options.js";
 import { registerManoeuvreAvailabilityProvider } from "../data/actions/manoeuvre-availability.js";
 import { registerThreatEnhancementModifier } from "../documents/entity/entity-threat.js";
-import { registerResourceLimitModifier } from "../documents/actor/resources.js";
+import HunterData from "../data/actors/hunter.mjs";
 import { registerService } from "./extensions.js";
 
 export function runHollowsInit() {
@@ -69,7 +69,7 @@ function registerScriptProviders() {
     }
     return null;
   });
-  registerResourceLimitModifier((actor, resource, value) => {
+  HunterData.registerResourceLimitModifier((actor, resource, value) => {
     for (const mechanic of ScriptCompiler.getProviders("resourceLimit", actor)) {
       value = mechanic.run(actor, { resource, value }) ?? value;
     }

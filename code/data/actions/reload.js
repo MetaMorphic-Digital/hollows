@@ -11,7 +11,6 @@
 import { isShotgunWeapon, isShotgunLoaded } from "../../helpers/weapon-utils.js";
 import { runOnReload, runReloadFullCheck } from "../../helpers/weapon-abilities/dispatchers.js";
 import { getEffectiveCapacity } from "../../documents/item/weapon.js";
-import { getSelectedWeaponForm } from "../weapons/index.js";
 
 export async function openReloadForActor(actor) {
   if (!actor || actor.type !== "hunter") return;
@@ -29,12 +28,11 @@ export async function openReloadForActor(actor) {
     }
     const max = getEffectiveCapacity(weapon);
     if (!max) return;
-    const reloadToFull = getSelectedWeaponForm(weapon)?.reload?.capacity === "full";
     const current = Number(weapon.system.capacity.value ?? 0);
     // An ability may convert this Reload into a full-Capacity refill (Come Out
     // Shooting). reload.js stays ability-agnostic — it just asks the dispatcher.
     const abilityFull = await runReloadFullCheck(actor, weapon);
-    const next = (abilityFull || reloadToFull) ? max : Math.min(max, current + 1);
+    const next = abilityFull ? max : Math.min(max, current + 1);
     if (next <= current) return;        // no actual capacity gain — emit nothing
     await weapon.update({ "system.capacity.value": next });
     await runOnReload(actor, { weapon, phase: "after" });

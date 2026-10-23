@@ -422,10 +422,10 @@ ${source}
   /**
    * Cache per document instance so synthetic actors do not share compiled scripts.
    * @param {Item} item
-   * @param {{path: string, text: string}} slot
+   * @param {{path: string, text: string, name?: string}} slot
    * @returns {Mechanic[]} Compiled mechanics; empty for disabled or invalid scripts.
    */
-  static #compile(item, { path, text }) {
+  static #compile(item, { path, text, name: slotName }) {
     const block = foundry.utils.getProperty(item, path);
     const source = String(block?.source ?? "");
     if (!block?.enabled || !source.trim()) return [];
@@ -434,7 +434,7 @@ ${source}
     const hook = block.hook || "activated";
     if (!multiple && !Object.hasOwn(ScriptField.hooks, hook)) return [];
     const key = `script.${item.id}.${path}`;
-    const name = block.label || item.name || game.i18n.localize("HOLLOWS.SCRIPT.defaultName");
+    const name = block.label || slotName || item.name || game.i18n.localize("HOLLOWS.SCRIPT.defaultName");
     const stamp = JSON.stringify([
       multiple, hook, block.rateLimit, block.on, block.eventType, name, text, item.system?.weaponType, source,
     ]);
@@ -502,7 +502,7 @@ ${source}
   }
 
   /**
-   * Renown scripts require enabled Renown; base scripts do not.
+   * Compile scripts from the item's active slots.
    * @param {Actor|null} actor Carrier actor.
    * @param {Function|null} [type] Mechanic constructor to select.
    * @returns {Mechanic[]} Actor's compiled mechanics.
@@ -555,23 +555,25 @@ ${source}
    * @param {object} [context] Event context.
    * @param {Actor|null} [context.actor] Actor for a local event; null for a scene event.
    * @param {object} [context.payload] Event-specific data passed to the script.
-   * @returns {Promise<void>}
+   * @returns {Promise<*[]>} Results returned by matching handlers.
    */
   static async runEvents(matches, { actor = null, payload = {} } = {}) {
-    if (!actor && !game.user.isGM) return;
+    if (!actor && !game.user.isGM) return [];
     const local = actor ? this.getMechanics(actor, ScriptedEvent) : this.getSceneMechanics(ScriptedEvent);
     const zone = actor && getActorZone(actor);
     const foreign = zone ? this.getSceneMechanics(ScriptedEvent).filter(mechanic =>
       (mechanic.event.scope === "zoneMate") && (mechanic.carrier.id !== actor.id)
       && (getActorZone(mechanic.carrier) === zone)) : [];
     const seen = new Set();
+    const results = [];
     for (const mechanic of [
       ...local.filter(m => !m.aura && (m.event.scope !== "zoneMate")), ...foreign, ...this.getAuras(ScriptedEvent),
     ]) {
       if (!matches(mechanic.event)) continue;
       if (mechanic.group && seen.has(mechanic.group)) continue;
       if (mechanic.group) seen.add(mechanic.group);
-      await mechanic.run(actor || mechanic.carrier, payload);
+      results.push(await mechanic.run(actor || mechanic.carrier, payload));
     }
+    return results;
   }
 }

@@ -26,25 +26,19 @@ import { StatOverride } from "../../data/mechanics/StatOverride.js";
 import { EntityStatModifier } from "../../data/mechanics/EntityStatModifier.js";
 import { EntityAbilityModifier } from "../../data/mechanics/EntityAbilityModifier.js";
 import { TakeCoverModifier } from "../../data/mechanics/TakeCoverModifier.js";
-import { getSelectedWeaponFormMechanics, getAllRegisteredWeaponFormMechanics } from "../../data/weapons/index.js";
 import { EntityActionPause } from "../../data/mechanics/EntityActionPause.js";
 import { ThreatLock } from "../../data/mechanics/ThreatLock.js";
 import { OnDeath } from "../../data/mechanics/OnDeath.js";
 import { WeaponModifier } from "../../data/mechanics/WeaponModifier.js";
 import ScriptCompiler, { ScriptedEvent } from "../../documents/item/script-compiler.mjs";
 
-function sameKey(a, b) {
-  return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
-}
-
 function carries(actor, ability) {
   if (!actor) return false;
   if (ability.carrier) return ability.carrier === actor;
-  if (ability?.weapon && Number(ability.tier || 0) <= 0) {
+  if (ability?.weapon && (Number(ability.tier || 0) <= 0)) {
     return (actor.items || []).some((item) =>
-      item.type === "weapon"
-      && String(item.system?.weaponType || "") === String(ability.weapon)
-      && (!ability.form || sameKey(item.system?.selectedForm, ability.form)),
+      (item.type === "weapon")
+      && (String(item.system?.weaponType || "") === String(ability.weapon)),
     );
   }
   return hasWeaponAbility(actor, {
@@ -53,17 +47,6 @@ function carries(actor, ability) {
     weaponType: ability.weapon,
     tier: ability.tier,
   });
-}
-
-function selectedFormMechanics(context = {}, ctor = null) {
-  const mechanics = getSelectedWeaponFormMechanics(context.weapon);
-  return ctor ? mechanics.filter((mechanic) => mechanic instanceof ctor) : mechanics;
-}
-
-function selectedActorFormMechanics(actor, ctor = null) {
-  const weapons = actor?.items?.filter?.((item) => item.type === "weapon") || [];
-  const mechanics = weapons.flatMap((weapon) => getSelectedWeaponFormMechanics(weapon));
-  return ctor ? mechanics.filter((mechanic) => mechanic instanceof ctor) : mechanics;
 }
 
 /** Group reactions that share a scope and group key. */
@@ -124,11 +107,9 @@ function applyDamageModifierResult(out, result, before) {
 // input route the dialog to the actor's owner via per-effect queries.
 export async function runEndOfTurnAbilities(actor) {
   if (!actor || !game.user?.isGM) return;
-  const formActions = getAllRegisteredWeaponFormMechanics()
-    .filter((mechanic) => mechanic instanceof EndOfTurnAction);
   const scripted = ScriptCompiler.getMechanics(actor, EndOfTurnAction);
   const borne = new Set(scripted);
-  for (const ability of [...scripted, ...MECHANIC_BUCKETS.endOfTurn, ...formActions]) {
+  for (const ability of [...scripted, ...MECHANIC_BUCKETS.endOfTurn]) {
     if (!borne.has(ability) && !carries(actor, ability)) continue;
     await ability.run(actor);
   }
@@ -218,12 +199,11 @@ export function applyAttackDamageChanges(actor, damage = {}, context = {}) {
   };
   const abilityMatches = MECHANIC_BUCKETS.attackDamage
     .filter((ability) => ability.aura || carries(actor, ability));
-  const formMatches = selectedFormMechanics(context, AttackDamageChange);
   const scriptMatches = [
     ...ScriptCompiler.getMechanics(actor, AttackDamageChange).filter(m => !m.aura),
     ...ScriptCompiler.getAuras(AttackDamageChange),
   ];
-  const matching = [...abilityMatches, ...formMatches, ...scriptMatches]
+  const matching = [...abilityMatches, ...scriptMatches]
     .filter((ability) => ability.match(actor, context));
   for (const ability of matching.filter((a) => a.mode === "set")) {
     out.resolve = Number(ability.value?.resolve ?? out.resolve);
@@ -373,12 +353,11 @@ export async function runOnAttackResult(actor, result, context = {}) {
     else if (mutation.cardLine) out.cardLines.push(mutation.cardLine);
   };
   const borneMechanics = [
-    ...selectedFormMechanics(context, OnAttackResultAction),
     ...ScriptCompiler.getMechanics(actor, OnAttackResultAction).filter(m => !m.aura),
     ...ScriptCompiler.getAuras(OnAttackResultAction),
     ...ScriptCompiler.getSceneMechanics(OnAttackResultAction).filter(m => (m.scope === "zoneMate") && (m.carrier !== actor)),
   ];
-  const formMechanicSet = new Set(borneMechanics);
+  const borne = new Set(borneMechanics);
   for (const ability of [...borneMechanics, ...MECHANIC_BUCKETS.onAttackResult]) {
     if (!ability.matchResult(result)) continue;
     if (context.timing && ability.timing !== context.timing && ability.timing !== "any") continue;
@@ -419,9 +398,8 @@ export async function runOnAttackResult(actor, result, context = {}) {
       continue;
     }
 
-    const isFormMechanic = formMechanicSet.has(ability);
     if (!actor.isOwner) continue;
-    if (!isFormMechanic && !ability.aura && !carries(actor, ability)) continue;
+    if (!borne.has(ability) && !ability.aura && !carries(actor, ability)) continue;
     if (!ability.matchActive(actor, currentContext())) continue;
     if (ability.rateLimit && isRateLimited(actor, ability)) continue;
     const fired = await ability.run({ actor, result, ...currentContext() });
@@ -444,12 +422,10 @@ export async function runOnAttackResult(actor, result, context = {}) {
 export async function runOnDefenceResult(actor, ctx = {}) {
   const out = { damageRedirected: false };
   if (!actor) return out;
-  const formMechanics = selectedActorFormMechanics(actor, OnDefenceResultAction);
-  const formMechanicSet = new Set(formMechanics);
   const mechanics = [
     ...ScriptCompiler.getMechanics(actor, OnDefenceResultAction).filter(m => m.scope === "self"),
     ...ScriptCompiler.getSceneMechanics(OnDefenceResultAction).filter(m => m.scope === "zoneMate"),
-    ...formMechanics, ...MECHANIC_BUCKETS.onDefenceResult,
+    ...MECHANIC_BUCKETS.onDefenceResult,
   ];
   const zone = getActorZone(actor);
   const zoneMates = getActiveSceneHunters().filter(carrier => (carrier.id !== actor.id)
@@ -458,7 +434,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
     const candidates = group.flatMap(ability => {
       if (!ability.matches(ctx)) return [];
       if (ability.scope === "self") {
-        if (!formMechanicSet.has(ability) && !carries(actor, ability)) return [];
+        if (!carries(actor, ability)) return [];
         if (ability.when && !ability.when({ actor })) return [];
         return [{ ability, carrier: actor }];
       }
@@ -485,12 +461,11 @@ export async function runOnDefenceResult(actor, ctx = {}) {
 export async function runOnMove(actor, { fromZone, toZone, byOwner } = {}) {
   if (!actor || !game.user?.isGM) return;
   const borneMechanics = [
-    ...selectedActorFormMechanics(actor, OnMoveAction),
     ...ScriptCompiler.getMechanics(actor, OnMoveAction).filter(m => !m.aura), ...ScriptCompiler.getAuras(OnMoveAction),
   ];
-  const formMechanicSet = new Set(borneMechanics);
+  const borne = new Set(borneMechanics);
   for (const ability of [...borneMechanics, ...MECHANIC_BUCKETS.onMove]) {
-    if (!ability.aura && !formMechanicSet.has(ability) && !carries(actor, ability)) continue;
+    if (!ability.aura && !borne.has(ability) && !carries(actor, ability)) continue;
     await ability.run({ actor, fromZone, toZone, byOwner });
   }
   await runRelicTriggers("onEnterZone", { bearer: actor });
@@ -855,37 +830,29 @@ export async function runOnEntityAttack(entityActor, targetTokens = []) {
   );
 }
 
+/** Discard terrain after an owner's move, keeping the tag chosen by a script. */
 export async function runTerrainDiscardOnMove(actor, { fromZone, byOwner } = {}) {
   if (!actor || !game.user?.isGM || !byOwner) return;
   const { getActorTerrainTags, discardTerrainCondition } = await import("../../documents/actor/conditions.js");
   const tags = getActorTerrainTags(actor);
   if (!tags.length) return;
-  const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
-  let keepTag = "";
-  for (const reaction of getAllReactions()) {
-    if (!reaction.event || reaction.event.type !== "terrainDiscard") continue;
-    if (!carries(actor, reaction)) continue;
-    const owner = primaryOwnerOf(actor) || game.user;
-    const choice = await reaction.offer(owner, { actorId: actor.id, tags, fromZone });
-    if (choice?.keepTag !== undefined) { keepTag = String(choice.keepTag || ""); break; }
-  }
+  const choices = await ScriptCompiler.runEvents(event => event.type === "terrainDiscard", {
+    actor, payload: { tags, fromZone },
+  });
+  const keepTag = choices.find(choice => choice?.keepTag)?.keepTag;
   for (const tag of tags) {
     if (tag !== keepTag) await discardTerrainCondition(actor, tag, fromZone);
   }
 }
 
+/** Resolve optional reductions before applying Wound damage from an Entity attack. */
 export async function runOnIncomingEntityWoundDamage(actor, { damageValue } = {}) {
   if (!actor || !game.user?.isGM) return { damageValue: Number(damageValue || 0) };
-  const { getAllReactions, primaryOwnerOf } = await import("../reactions.js");
   let remaining = Number(damageValue || 0);
-  await ScriptCompiler.runEvents(event => event.type === "incomingEntityWoundDamage", {
+  const choices = await ScriptCompiler.runEvents(event => event.type === "incomingEntityWoundDamage", {
     actor, payload: { damageValue: remaining },
   });
-  for (const reaction of getAllReactions()) {
-    if (!reaction.event || reaction.event.type !== "incomingEntityWoundDamage") continue;
-    if (!carries(actor, reaction)) continue;
-    const owner = primaryOwnerOf(actor) || game.user;
-    const choice = await reaction.offer(owner, { actorId: actor.id, damageValue: remaining });
+  for (const choice of choices) {
     const reduction = Number(choice?.damageReduction || 0);
     if (reduction > 0) remaining = Math.max(0, remaining - reduction);
   }
@@ -915,11 +882,6 @@ export function getAttackRollMode(attacker, context = {}) {
       if (ability.appliesTo(attacker, context)) mode = mode || ability.rollMode;
     }
   }
-  for (const ability of selectedFormMechanics(context, AttackRollModifier)) {
-    if (!ability.active(attacker, context)) continue;
-    if (ability.scope === "self") mode = mode || ability.rollMode;
-    else if (ability.appliesTo(attacker, context)) mode = mode || ability.rollMode;
-  }
   if (!mode && attacker?.type === "hunter" && getHunterSpecialConditions(attacker).some((c) => c.disadvAttacks)) {
     mode = "dis";
   }
@@ -938,9 +900,7 @@ export async function applyIncomingDamageModifiers(target, context = {}) {
   const timing = context.timing || "preMitigation";
   const carriers = getActiveSceneHunters();
   const local = ScriptCompiler.getMechanics(target, IncomingDamageModifier).filter(m => !m.aura);
-  const formMechanics = [
-    ...selectedActorFormMechanics(target, IncomingDamageModifier), ...local.filter(m => m.scope === "self"),
-  ];
+  const selfMechanics = local.filter(m => m.scope === "self");
   const scripted = [
     ...ScriptCompiler.getSceneMechanics(IncomingDamageModifier).filter(m => m.carrier !== target),
     ...local.filter(m => m.scope !== "self"),
@@ -996,7 +956,7 @@ export async function applyIncomingDamageModifiers(target, context = {}) {
       applyDamageModifierResult(out, result, before);
     }
   }
-  for (const ability of formMechanics) {
+  for (const ability of selfMechanics) {
     if (ability.timing !== timing) continue;
     if (!ability.active(target)) continue;
     if (!ability.appliesToTarget(target, target, source)) continue;

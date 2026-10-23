@@ -7,6 +7,7 @@ export const HOLLOWS_TEMPLATE_PATHS = [
   "systems/hollows/templates/actor/hollow-sheet.html",
   "systems/hollows/templates/item/weapon-sheet.html",
   "systems/hollows/templates/item/weapon-ability-sheet.html",
+  "systems/hollows/templates/item/weapon-form-sheet.html",
   "systems/hollows/templates/item/equipment-sheet.html",
   "systems/hollows/templates/item/entity-enhancement-sheet.html",
   "systems/hollows/templates/actor/hazard-sheet.html",

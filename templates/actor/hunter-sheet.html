@@ -212,9 +212,6 @@
                     {{else}}
                       <div class="muted">No form selected.</div>
                     {{/if}}
-                    {{#if entry.availableForms.length}}
-                      <div class="muted">Available: {{entry.availableForms}}</div>
-                    {{/if}}
                   </div>
 
                   <div class="hollows-form-section">
@@ -224,8 +221,6 @@
                         {{#each entry.attackProfiles as |atk|}}
                           <div class="hollows-form-value">
                             {{atk.range}} / {{atk.stat}} vs {{atk.defence}}
-                            {{#if atk.form}} � Form: {{atk.form}}{{/if}}
-                            {{#if atk.condition}} � {{atk.condition}}{{/if}}
                           </div>
                         {{/each}}
                       </div>

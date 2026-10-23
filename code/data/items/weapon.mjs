@@ -1,5 +1,5 @@
-import { getSelectedWeaponForm } from "../weapons/resolvers.js";
 import ScriptField from "../fields/script-field.mjs";
+import WeaponFormData from "./weapon-form.mjs";
 
 export default class WeaponData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
@@ -23,7 +23,12 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
     });
     return {
       weaponType: new fields.StringField({ initial: "" }),
-      form: new fields.StringField({ initial: "" }),
+      appliedForm: new fields.SchemaField({
+        ...WeaponFormData.defineSchema(),
+        uuid: new fields.StringField({ initial: "" }),
+        name: new fields.StringField({ initial: "" }),
+        attackProfileVariant: new fields.StringField({ initial: "primary", choices: ["primary", "alternative"] }),
+      }, { nullable: true, initial: null }),
       capacity: new fields.SchemaField({
         value: new fields.NumberField({ initial: 0 }),
         max: new fields.NumberField({ initial: 0 }),
@@ -54,21 +59,6 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
       outlook: new fields.StringField({ initial: "" }),
       lies: new fields.StringField({ initial: "" }),
       fears: new fields.StringField({ initial: "" }),
-      forms: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
-      selectedForm: new fields.StringField({ initial: "" }),
-      formAttackChoice: new fields.StringField({ initial: "" }),
-      customForm: new fields.SchemaField({
-        name: new fields.StringField({ initial: "" }),
-        text: new fields.StringField({ initial: "" }),
-        capacity: new fields.SchemaField({
-          max: new fields.NumberField({ initial: 0 }),
-        }),
-        damage: new fields.SchemaField({
-          resolve: new fields.NumberField({ initial: 0 }),
-          wounds: new fields.NumberField({ initial: 0 }),
-        }),
-        attackProfiles: new fields.ArrayField(attackProfileSchema(), { initial: [] }),
-      }),
       attackProfiles: new fields.ArrayField(attackProfileSchema(), { initial: [] }),
     };
   }
@@ -76,12 +66,26 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
   /* -------------------------------------------------- */
 
   /**
-   * @returns {{ resolve: number, wounds: number }}
+   * Copy a form onto this weapon; null removes the current form.
+   * @param {Item|null} form
+   * @param {object} [options]
+   * @param {string} [options.variant] Attack variant already chosen during character creation.
+   * @returns {Promise<Item|undefined>} The updated weapon, or undefined if incompatible or canceled.
    */
-  getEffectiveWeaponHealthBonus() {
-    const weapon = this.parent;
-    const form = getSelectedWeaponForm(weapon);
-    const source = form?.healthBonus || this.health_bonus || { resolve: 0, wounds: 0 };
-    return { resolve: source.resolve, wounds: source.wounds };
+  async applyForm(form, { variant } = {}) {
+    if (form && ((form.type !== "weaponForm") || (form.system.weaponType !== this.weaponType))) {
+      ui.notifications.warn(`Select a ${this.weaponType} Weapon Form.`);
+      return;
+    }
+    if (form) {
+      variant ??= await form.system.chooseAttackProfile();
+      if (!variant) return;
+    }
+    return this.parent.update({
+      "system.appliedForm": form ? {
+        ...form.system.toObject(), uuid: form.uuid, name: form.name, attackProfileVariant: variant,
+      } : null,
+      "system.capacity.value": 0,
+    });
   }
 }

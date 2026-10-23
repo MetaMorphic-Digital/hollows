@@ -153,6 +153,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
     focus: "HOLLOWS.SCRIPT.events.focus",
     guard: "HOLLOWS.SCRIPT.events.guard",
     takeCover: "HOLLOWS.SCRIPT.events.takeCover",
+    terrainDiscard: "HOLLOWS.SCRIPT.events.terrainDiscard",
     reload: "HOLLOWS.SCRIPT.events.reload",
     swordFeint: "HOLLOWS.SCRIPT.events.swordFeint",
     turnEnd: "HOLLOWS.SCRIPT.events.turnEnd",

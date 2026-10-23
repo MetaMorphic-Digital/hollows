@@ -743,7 +743,6 @@
               "wounds": 3
             },
             "weaponType": "Sword",
-            "form": "",
             "outlook": "The Sword is the King of Weapons. Ancient empires\nrose and fell at its point. For millennia, the Sword has\nbeen a symbol of power and authority beyond measure:\n\na tool for the masters of men to wield with skill and\ngrace. To cut away the weakest parts of society and to do\nwhat must be done to ensure civilisation's survival and\nprosperity.\nFate coalesces around the Sword's point. The Sword\nmakes myths. It rests in stones waiting for someone\ndeserving of the honour to rule the kingdom. It severs the\nheads of tyrants and rests upon the right hands of great\nmen. It can elevate a common citizen to knighthood with\nbut a touch.\nNext to the Sword, the frantic fear of the Knife and the\nSpear fall away to nothing. The brutish Bludgeon falters\nand stumbles. The Book is cut to shreds, the Staff sliced\nin twain, the Armour rent asunder and the sound and fury\nof the firearm silenced. It gladly bears the burden laid\nupon its shoulders - someone's got to do it. Someone has\nto lead the charge.",
             "lies": "The Sword believes in heroes in the ancient sense of\nthe word. It wants to convince its wielders that they\nstand proudly ahead of their peers: that there are those\nwho are born to lead, thanks to some indefinable spark of\ngreatness deep within their being, and it is their duty to\nshepherd the people beneath them.\nBut the glorious ages of the past have died. The world\nhas grown sour and corrupt, and the concepts of which\nthe Sword sings - honour, duty, nobility and sacrifice -\nare twisted and withered things. It spits hate on the\nfeckless masses and preaches exceptionalism. It tells you:\nyou alone are meant for greatness. These pitiful creatures\nare nothing without you to lead them. You are worthy of\nthe respect you see glinting in their bovine eyes.",
             "fears": "The Sword's time in the sun is over, and it clings to\nwhat little relevance it retains. As the rifle and the\nfield gun scar the globe into new and terrible empires, the\nSword sees their eyes on the throne. It feels itself slipping\ninto rite and ritual as it becomes a relic of bygone days.\nThe Sword only matters if the people know it matters. Its\nauthority is not innate, but granted with conditions. Spears\noutreach it. Knives carve and craft and make. It glances off\nArmour's skin and every single gun outranges it.\nSo it speaks of honourable combat. It admonishes those\nwho fight dirty and births schools of duellists, manuals\nof techniques, and reams of rules designed to fashion\nthe grim business of ending lives into something that\ndemands admiration and grace. It is desperate to dictate\nthe battlefield and hold onto its unfair advantage, because\nwithout it, it is nothing but a length of sharpened steel.",
@@ -754,197 +753,7 @@
                 "defence": "Close"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you Feint, your Sword damage\nincreases to 3/3 until the end of your turn.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Strong",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Mighty",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Strong +1 Quick +1 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 1,
-                      "hard": 0,
-                      "quick": 1,
-                      "sharp": -1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Strong +2 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": -1
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Quick +2 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": 2,
-                      "sharp": -1
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you Feint, one Hunter in your\narea may Guard as an immediate action.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Strong",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Noble",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Strong +1 Quick +1 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 1,
-                      "hard": 0,
-                      "quick": 1,
-                      "sharp": -1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Strong +2 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": -1
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Quick +2 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": 2,
-                      "sharp": -1
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you Feint, one Hunter in your\narea may Focus as an immediate action.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Strong",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Short",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Strong +1 Quick +1 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 1,
-                      "hard": 0,
-                      "quick": 1,
-                      "sharp": -1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Strong +2 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": -1
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Quick +2 Sharp -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": 2,
-                      "sharp": -1
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Noble",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c2",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -997,16 +806,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Sword",
+              "text": "When you Feint, one Hunter in your area may Guard as an immediate action.\nAlso: rapier, ceremonial.",
+              "damage": {
+                "resolve": 2,
+                "wounds": 2
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": true,
+                "trusted": true,
+                "label": "Noble",
+                "mode": "multiple",
+                "source": "return {\n  feint: {\n    hook: \"onEvent\",\n    eventType: \"swordFeint\",\n    async promptOnPlayer(H, actor) {\n      const target = await H.ask.hunterInZone(H.zone.of(actor), \"Noble: choose a Hunter to guard\");\n      if (!target) return false;\n      await H.actions.grantManoeuvre(target, \"guard\");\n      return true;\n    },\n  },\n};"
+              },
+              "name": "Noble",
+              "uuid": "Compendium.hollows.weapon-forms.Item.12735b61543fc80c",
+              "attackProfileVariant": "primary"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Flourish",
+              "mode": "multiple",
+              "source": "return {\n  feint: {\n    hook: \"activated\", label: \"Feint\", rateLimit: \"oncePerTurn\",\n    async run(H, actor, ctx) {\n      const zone = H.zone.of(actor);\n      if (!zone) {\n        ui.notifications.warn(\"Your token is not inside a zone region.\");\n        return false;\n      }\n      if (!(await H.threat.place(actor, zone, 2, { source: \"ability\", reason: \"Feint\" }))) {\n        ui.notifications.warn(\"Unable to place Threat in this zone.\");\n        return false;\n      }\n      await H.chat.post(actor.name + \" Feints with \" + ctx.item.name + \" in \" + zone + \". Threat: +2.\", actor);\n      await H.events.swordFeint(actor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -1023,7 +860,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.tgIioyf5KndRxuYX",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1040,15 +877,12 @@
             "text": "Lead from the front. When you Move to a Close area, inflict 1 Resolve damage on the Entity.",
             "boundWeaponId": "IRzubZa9GU6ixf9s",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
+              "hook": "onMove",
               "rateLimit": "none",
-              "source": ""
+              "source": "if (!ctx.byOwner) return false;\nif (!H.zone.isClose(ctx.toZone)) return false;\nawait H.effects.apply([{ type: \"damageEntity\", resolve: 1, label: \"Charge\" }], ctx);"
             }
           },
           "flags": {
@@ -1069,7 +903,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.0be0c09caf5cb5f2",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1097,7 +931,6 @@
               "wounds": 3
             },
             "weaponType": "Pistol",
-            "form": "",
             "outlook": "The Pistol is chief amongst the new gods of bloodshed;\ngunpowder and lead put a lightning strike in the\npalm of the everyman, and almost every hero of every\nstory now clutches a handgun at some point in the tale.\nWhere clergymen would bless swords, they now pray\nover pistols and ask the gods to guide the shooter's hand.\nAdvertisements on street corners and the back pages of\nperiodicals boast of skull-cracking strength, quick-draw\ndesigns and affordable ammunition.\nThe Sword has been replaced as a mark of personal\nprowess - no longer do you have to train for years to use\na weapon, or risk your skin by coming close to those you\nwant to hurt. Anyone with a few quid and a vendetta can\nset the odds in their favour with a Pistol in their pocket.",
             "lies": "The Pistol tells you: you're the best there is. No-one\nhas what you've got; you're unique, and special, and\nfascinating. The world is chaotic and unfocused but you,\nPistol gripped against your skin, rise above the noise and\nmove unfettered.\nA lack of success or prosperity should be no indication that\nmaybe you've overestimated yourself; instead, it's everyone\nelse's fault that you've not made it yet. Your ideas are too\nnew, too revolutionary, to be accepted. Anyone who passes\nyou over or looks down on you knows the truth: they're\njealous of your ability and scared of what you might do.\nThis absolute refusal to change based on new\ninformation brings with it a bullet-proof confidence, and\nthe Pistol wants to propel its bearers forward into the\nfuture on the back of it. Reality is what you make it, and\nyou're the guy holding the gun.",
             "fears": "Ignore the flash and the posturing. The Pistol believes\nthat it isn't supposed to be here, but as long as no-one\nelse finds out, it's fine. It's fine.\nIt's not an instrument of war; no great glories, no stern\nsacrifices, no tactical masterstrokes owe it thanks. It's not a\ntool for hunting, either; thick hides turn aside little bullets,\nrifles outrange it, and it's a coward's crutch next to the cut\nand thrust of finishing the beast with blade and bludgeon.\nIt's not a part of anything greater, or ancient, or more noble.\nNo abstraction or artifice masks it with the sacrosanct.\nAll it does is kill people. Is that enough? Is the Pistol\nenough?\nIt spins stories of its own prowess and whispers feverish\nin the ears of those who carry it: you're the best, you're\nthe greatest, you're streets ahead of these fools. It keeps\neveryone and everything at arm's length. It never shows\nan ounce of weakness or confusion if it can help it. The\nalternative is unthinkable; a crash and burn, a dethroning,\nand a cold eternity of exile. Better to keep up the act\nforever than run the risk of discovery.",
@@ -1113,212 +946,7 @@
                 "defence": "Ranged"
               }
             ],
-            "forms": [
-              {
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "name": "Automatic",
-                "text": "Capacity 5. When you Reload,\\nrestore Capacity to full.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 1,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 2,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "sharp": 2,
-                      "wise": 0,
-                      "quick": 0,
-                      "strong": 0
-                    },
-                    "id": "c3"
-                  }
-                ],
-                "capacity": {
-                  "value": 5,
-                  "max": 5
-                }
-              },
-              {
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "name": "Hand Cannon",
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "damage": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 1,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 2,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "sharp": 2,
-                      "wise": 0,
-                      "quick": 0,
-                      "strong": 0
-                    },
-                    "id": "c3"
-                  }
-                ],
-                "capacity": {
-                  "value": 1,
-                  "max": 1
-                }
-              },
-              {
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "name": "Single Action",
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 1
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 1,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 2,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "sharp": 2,
-                      "wise": 0,
-                      "quick": 0,
-                      "strong": 0
-                    },
-                    "id": "c3"
-                  }
-                ],
-                "capacity": {
-                  "value": 3,
-                  "max": 3
-                }
-              }
-            ],
-            "selectedForm": "Single Action",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c2",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -1381,6 +1009,38 @@
               "eventType": "guard",
               "rateLimit": "none",
               "source": ""
+            },
+            "appliedForm": {
+              "weaponType": "Pistol",
+              "text": "Capacity 3.",
+              "damage": {
+                "resolve": 2,
+                "wounds": 1
+              },
+              "capacity": {
+                "max": 3
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": false,
+                "trusted": false,
+                "label": "Single Action",
+                "mode": "multiple",
+                "source": ""
+              },
+              "name": "Single Action",
+              "uuid": "Compendium.hollows.weapon-forms.Item.08ae81fbcc066304",
+              "attackProfileVariant": "primary"
             }
           },
           "effects": [],
@@ -1397,7 +1057,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.xxbvfTXEU4k16S3D",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1414,15 +1074,10 @@
             "text": "Line up the perfect shot. When you Move to a Close area, gain +2 Quick until the start of your next turn. When you Move to a Ranged area, gain +2 Sharp until the start of your next turn.",
             "boundWeaponId": "iBlildJoBrvhRw7n",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "const flag = \"skirmisherBonus\";\nreturn {\n  move: {\n    hook: \"onMove\", ownerMoveOnly: true,\n    async run(H, actor, ctx) {\n      const stat = H.zone.isClose(ctx.toZone) ? \"quick\" : H.zone.isRanged(ctx.toZone) ? \"sharp\" : \"\";\n      if (!stat) return;\n      const bonus = actor.getFlag(\"hollows\", flag) || {};\n      if (bonus[stat]) return;\n      await actor.setFlag(\"hollows\", flag, { ...bonus, [stat]: 2 });\n      await H.chat.post(actor.name + \" gains +2 \" + stat + \" until their next turn (Skirmisher).\", actor);\n    },\n  },\n  bonus: {\n    hook: \"statModifier\",\n    run: (H, actor, ctx) => actor.getFlag(\"hollows\", flag)?.[ctx.stat] || 0,\n  },\n  clear: {\n    hook: \"startOfTurn\", stage: \"cleanup\",\n    run: (H, actor) => actor.unsetFlag(\"hollows\", flag),\n  },\n  combat: {\n    hook: \"interceptor\", event: \"combat-start-hunter\",\n    run: (H, actor) => actor.unsetFlag(\"hollows\", flag),\n  },\n};"
             }
           },
           "flags": {
@@ -1443,7 +1098,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.3d453be5b4812289",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1648,7 +1303,6 @@
               "wounds": 3
             },
             "weaponType": "Pistol",
-            "form": "",
             "outlook": "The Pistol is chief amongst the new gods of bloodshed;\ngunpowder and lead put a lightning strike in the\npalm of the everyman, and almost every hero of every\nstory now clutches a handgun at some point in the tale.\nWhere clergymen would bless swords, they now pray\nover pistols and ask the gods to guide the shooter's hand.\nAdvertisements on street corners and the back pages of\nperiodicals boast of skull-cracking strength, quick-draw\ndesigns and affordable ammunition.\nThe Sword has been replaced as a mark of personal\nprowess - no longer do you have to train for years to use\na weapon, or risk your skin by coming close to those you\nwant to hurt. Anyone with a few quid and a vendetta can\nset the odds in their favour with a Pistol in their pocket.",
             "lies": "The Pistol tells you: you're the best there is. No-one\nhas what you've got; you're unique, and special, and\nfascinating. The world is chaotic and unfocused but you,\nPistol gripped against your skin, rise above the noise and\nmove unfettered.\nA lack of success or prosperity should be no indication that\nmaybe you've overestimated yourself; instead, it's everyone\nelse's fault that you've not made it yet. Your ideas are too\nnew, too revolutionary, to be accepted. Anyone who passes\nyou over or looks down on you knows the truth: they're\njealous of your ability and scared of what you might do.\nThis absolute refusal to change based on new\ninformation brings with it a bullet-proof confidence, and\nthe Pistol wants to propel its bearers forward into the\nfuture on the back of it. Reality is what you make it, and\nyou're the guy holding the gun.",
             "fears": "Ignore the flash and the posturing. The Pistol believes\nthat it isn't supposed to be here, but as long as no-one\nelse finds out, it's fine. It's fine.\nIt's not an instrument of war; no great glories, no stern\nsacrifices, no tactical masterstrokes owe it thanks. It's not a\ntool for hunting, either; thick hides turn aside little bullets,\nrifles outrange it, and it's a coward's crutch next to the cut\nand thrust of finishing the beast with blade and bludgeon.\nIt's not a part of anything greater, or ancient, or more noble.\nNo abstraction or artifice masks it with the sacrosanct.\nAll it does is kill people. Is that enough? Is the Pistol\nenough?\nIt spins stories of its own prowess and whispers feverish\nin the ears of those who carry it: you're the best, you're\nthe greatest, you're streets ahead of these fools. It keeps\neveryone and everything at arm's length. It never shows\nan ounce of weakness or confusion if it can help it. The\nalternative is unthinkable; a crash and burn, a dethroning,\nand a cold eternity of exile. Better to keep up the act\nforever than run the risk of discovery.",
@@ -1664,212 +1318,7 @@
                 "defence": "Ranged"
               }
             ],
-            "forms": [
-              {
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "name": "Automatic",
-                "text": "Capacity 5. When you Reload,\\nrestore Capacity to full.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 1,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 2,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "sharp": 2,
-                      "wise": 0,
-                      "quick": 0,
-                      "strong": 0
-                    },
-                    "id": "c3"
-                  }
-                ],
-                "capacity": {
-                  "value": 5,
-                  "max": 5
-                }
-              },
-              {
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "name": "Hand Cannon",
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "damage": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 1,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 2,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "sharp": 2,
-                      "wise": 0,
-                      "quick": 0,
-                      "strong": 0
-                    },
-                    "id": "c3"
-                  }
-                ],
-                "capacity": {
-                  "value": 1,
-                  "max": 1
-                }
-              },
-              {
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "name": "Single Action",
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 1
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 1,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "quick": 2,
-                      "wise": 0,
-                      "strong": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "hard": -1,
-                      "sharp": 2,
-                      "wise": 0,
-                      "quick": 0,
-                      "strong": 0
-                    },
-                    "id": "c3"
-                  }
-                ],
-                "capacity": {
-                  "value": 3,
-                  "max": 3
-                }
-              }
-            ],
-            "selectedForm": "Hand Cannon",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c1",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -1932,6 +1381,38 @@
               "eventType": "guard",
               "rateLimit": "none",
               "source": ""
+            },
+            "appliedForm": {
+              "weaponType": "Pistol",
+              "text": "Capacity 1.",
+              "damage": {
+                "resolve": 3,
+                "wounds": 3
+              },
+              "capacity": {
+                "max": 1
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": false,
+                "trusted": false,
+                "label": "Hand Cannon",
+                "mode": "multiple",
+                "source": ""
+              },
+              "name": "Hand Cannon",
+              "uuid": "Compendium.hollows.weapon-forms.Item.3a2026d80ff55e85",
+              "attackProfileVariant": "primary"
             }
           },
           "effects": [],
@@ -1948,7 +1429,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.xxbvfTXEU4k16S3D",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1965,15 +1446,13 @@
             "text": "The monster can wait; you've got things to do. Instead of your attack action each turn, you may make two manoeuvres (allowing you to make three manoeuvres in total on your turn).",
             "boundWeaponId": "bNcPIBZVLDXV88ld",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
+              "hook": "startOfTurn",
               "on": "actor",
-              "eventType": "guard",
               "rateLimit": "none",
-              "source": ""
+              "source": "await H.chat.post(`${actor.name} may make 3 manoeuvres this turn instead of attacking (Brandish).`, actor);"
             }
           },
           "flags": {
@@ -1994,7 +1473,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.15930be2c0185556",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2022,7 +1501,6 @@
               "wounds": 3
             },
             "weaponType": "Knife",
-            "form": "",
             "outlook": "The Knife is the perpetual underdog. Every\nwarrior in every army throughout history has\ncarried a Knife, but they carried a proper Weapon\ntoo. Something you can wave around and threaten\npeople with, something with a bit of heft behind it,\nsomething you can hang on the wall when you come\nback from the chaos. Something that means business.\nThe Knife wants to show those bastards that it\nmeans business.\nIt's sharp. One cut will kill you. No hustle and\nbluster; nothing but blood.\nIt's everywhere. It's in every house in the kingdom,\nevery pocket in the street. It's out of the shadows and\nat their throats. No-one sees it coming.\nAnd it's personal. You kill something with a Knife,\nyou have to want it dead. You open yourself up to\nattack. You grip white-knuckled to the fucker and\nstab until your arms ache. By the end, you're soaked\nin scarlet. You earn your kill.",
             "lies": "Outlook\n\n\nThe Knife is the perpetual underdog. Every\nwarrior in every army throughout history has\ncarried a Knife, but they carried a proper Weapon\ntoo. Something you can wave around and threaten\npeople with, something with a bit of heft behind it,\nsomething you can hang on the wall when you come\nback from the chaos. Something that means business.\nThe Knife wants to show those bastards that it\nmeans business.\nIt's sharp. One cut will kill you. No hustle and\nbluster; nothing but blood.\nIt's everywhere. It's in every house in the kingdom,\nevery pocket in the street. It's out of the shadows and\nat their throats. No-one sees it coming.\nAnd it's personal. You kill something with a Knife,\nyou have to want it dead. You open yourself up to\nattack. You grip white-knuckled to the fucker and\nstab until your arms ache. By the end, you're soaked\nin scarlet. You earn your kill.\n\nLies\n\n\nThe Knife knows that the world is out to get you.\nYou never wanted this to happen; maybe it's the\nway you look, or who your parents were, or what side\nof the river you grew up on. The odds were stacked\nagainst you before you even drew a card. At every\nturn, someone's arrived to steal what you've fought so\nhard for without giving you a second thought.\nYou're not the aggressor, says the Knife: you're\ntaking revenge. Every drop of blood is justified. They\nand theirs have kept you down for too long; you need\nto fight back and take what you're owed. Your only\nmistake was not doing it sooner.\nIf you win, you're a hero. If you lose, you were never\nsupposed to succeed. There's a comfort in occupying\nthe bottom rung, especially when it opens your\nenemies up to retribution.",
             "fears": "Some of the bearers that the Knife chooses are, in\nfact, the sort of embittered underdogs it believes\nthem to be - but many aren't. They wear their\nimagined persecution as a badge of honour and think\nthat, if so many people are dead-set against them,\nthey must be doing something revolutionary to shake\nup the status quo.\nThe Knife is scared of not being underestimated.\nOf not being hated. It doesn't want to be accepted.\nIt doesn't want people to think it's important, or\nwelcome it as a part of something larger and more\nimportant. It can only imagine the world as a frantic\nbattle, and for its unceasing, spiteful aggression to\nmake any sort of sense, it must be under constant\nattack. If it's not a victim, it's nothing.",
@@ -2033,202 +1511,7 @@
                 "defence": "Close"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "Instead of inflicting Bleeding\non Wound damage only,\nyou inflict Bleeding when\nyou inflict any damage with the Knife.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Bloody",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 1,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 2,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "In addition to the Knife?s Close attack, you\nmay now attack with Sharp from Ranged.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "Weighted",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 1,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 2,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you inflict Wound damage\nwith this Weapon, heal 1 Wound.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Wicked",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 3
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Sharp +1 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 1,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 2,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Hard -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": -1,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Wicked",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c2",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -2281,16 +1564,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Knife",
+              "text": "When you inflict Wound damage with this Weapon, heal 1 Wound.\nAlso: syringe, cleaver.",
+              "damage": {
+                "resolve": 1,
+                "wounds": 3
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": true,
+                "trusted": true,
+                "label": "Wicked",
+                "mode": "multiple",
+                "source": "return {\n  heal: {\n    hook: \"onAttackResult\",\n    timing: \"afterDamageApplied\",\n    damageType: \"Wounds\",\n    active(H, actor, ctx) { return ctx.weapon?.id === ctx.item.id; },\n    async run(H, actor) {\n      await H.resource.adjust(actor, { wounds: 1 });\n      await H.chat.post(\"Wicked: heal 1 Wound.\", actor);\n    },\n  },\n};"
+              },
+              "name": "Wicked",
+              "uuid": "Compendium.hollows.weapon-forms.Item.71c435a6e2037c8f",
+              "attackProfileVariant": "primary"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Bleeding",
+              "mode": "multiple",
+              "source": "return {\n  bleeding: {\n    hook: \"onAttackResult\", timing: \"afterDamageApplied\", damageType: \"Wounds\", weaponType: \"Knife\",\n    async run(H, actor, ctx) {\n      if (ctx.targetType !== \"entity\" || H.condition.has(ctx.targetActor, \"bleeding\")) return;\n      await H.condition.set(ctx.targetActor, \"bleeding\", true);\n      await H.chat.post(ctx.targetActor.name + \" begins Bleeding.\", ctx.targetActor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -2307,7 +1618,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.MRLeZpSdloGUto7V",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2324,15 +1635,12 @@
             "text": "Daub your body in the blood of the beast. While the Entity is Bleeding and you are in Close, when your turn ends, restore 2 Resolve.",
             "boundWeaponId": "zAG03dkef3qXWjyE",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
+              "hook": "endOfTurn",
               "rateLimit": "none",
-              "source": ""
+              "source": "if (!(H.zone.isClose(H.zone.of(actor)) && H.actors.entity()?.statuses.has(\"bleeding\"))) return false;\nawait H.resource.adjust(actor, { resolve: 2 });\nawait H.chat.post(`${actor.name} restores 2 Resolve (Anointed).`, actor);"
             }
           },
           "flags": {
@@ -2353,7 +1661,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.7e7c582e7bb93103",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2558,7 +1866,6 @@
               "wounds": 5
             },
             "weaponType": "Armour",
-            "form": "",
             "outlook": "utting something sturdier than skin over the top of\nyour skin has been perennially popular ever since\nhumans discovered they can pull the fur off things\nthey've killed and wear it on their heads, but ramshackle\nprotection like that isn't real Armour. It wouldn't be seen\ndead in uncured pelts these days.\nArmour is expensive. If it's not, it's not Armour - it's just\nsafety equipment. No-one gives a shit about aprons but\neveryone wants to wear the Armour.\nArmour is polished steel, layered silk, lacquered wood\nand hardened leather. Armour is as much the filigree\nand flash as it is a physical barrier. The Armour is a\nmessage, turning the wearer into a beacon of security and\nprosperity. The Armour says: you've made it, and it wants\nothers to hear.",
             "lies": "The Armour wants you to understand that what people\nthink of you is infinitely more important than what you\ndo or who you are. Honesty, integrity and earnestness are\nall well and good but they're useless compared to letting\nothers bask in your glory. Everyone else is looking blindly\nfor the answers to questions they don't even know how to\nask, but you can show them the way.\nNot that you want them to become like you, you\nunderstand. Not that they could. You're better than these\npeople; you've cut through the horseshit and you see how to\nplay the system to your advantage. You want them in your\nwake, singing your praises, carrying your kit and paying you\ntithes. You are their champion, leading the fight against those\nthey despise, protecting that which they value. You want\nthem to believe they're dependent on you.\nThe Armour's favourite lie is of the self-made man - that\nthe bearer did it all themselves, that they had no unfair\nadvantages on their path to success, and that similar\noutcomes are possible to anyone who applies themselves\nwith enough gumption. It laughs at the thought that\nanyone helped them get to the top. It despises the idea of\nluck. You don't need luck when you're this good.",
             "fears": "The Armour is a shell to keep the world out. It hates\nintimacy. Everyone who sees you without the Armour,\nwho witnesses the vulnerable human you are and not the\nshining paragon you project, has leverage over you. It longs\nto be as close to your heart as possible and to be the only\nthing that gives you strength.\nSpend long enough with it and you welcome the lies\ninto your life for the power they provide. Your allies\nshelter behind you when the storm rolls in, and it feels\ngood to be impenetrable. Each time you drown out the\nweak part of you inside, what little humanity remains\nis made smaller and weaker, until only the image of the\nArmour remains and you are left strange and empty.",
@@ -2569,202 +1876,7 @@
                 "defence": "Close"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "While you are Ready, when you would suffer Resolve damage from an Entity attack, you suffer 1 less damage.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Hard",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Hide",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 2,
-                  "wounds": 5
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you would suffer Wound damage from an Entity attack, you may expend Ready to reduce the damage suffered by 1.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Hard",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Metal",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 2,
-                  "wounds": 5
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "Attack with Quick or Sharp from Close (choose one when you take this Weapon; you can Reforge it (p. 155) to change to the other option). When you Take Cover or Move, become Ready.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Silk",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 2,
-                  "wounds": 5
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Silk",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c2",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -2817,16 +1929,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Armour",
+              "text": "Attack with Quick or Sharp from Close (choose one when you take this Weapon; you can Reforge it (p. 155) to change to the other option). When you Take Cover or Move, become Ready.\nAlso: three-piece suit, expensive hat, lit cigarette.",
+              "damage": {
+                "resolve": 1,
+                "wounds": 1
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": true,
+              "attackProfile": {
+                "close": "Quick",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": true,
+              "alternativeAttackProfile": {
+                "close": "Sharp",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": true,
+                "trusted": true,
+                "label": "Silk",
+                "mode": "multiple",
+                "source": "async function becomeReady(H, actor) {\n  await H.condition.set(actor, \"ready\", true);\n  await H.chat.post(\"Silk: become Ready.\", actor);\n}\nreturn {\n  cover: {\n    hook: \"onEvent\",\n    eventType: \"takeCover\",\n    async run(H, actor) {\n      if (H.condition.has(actor, \"ready\")) return;\n      await becomeReady(H, actor);\n    },\n  },\n  move: {\n    hook: \"onMove\",\n    ownerMoveOnly: true,\n    async promptOnPlayer(H, actor) {\n      if (H.condition.has(actor, \"ready\")) return false;\n      if (!await H.ask.confirm({\n        title: \"Silk Armour\",\n        bodyHtml: \"<p>Was this a Move manoeuvre?</p>\",\n        yesLabel: \"Become Ready\",\n        noLabel: \"Cancel\",\n      })) return false;\n      await becomeReady(H, actor);\n      return true;\n    },\n  },\n};"
+              },
+              "name": "Silk",
+              "uuid": "Compendium.hollows.weapon-forms.Item.77ad92494d8e097f",
+              "attackProfileVariant": "alternative"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Be Ready",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nfunction ready(H, actor) {\n  if (actor.system.health.resolve.value <= 0) return;\n  return H.condition.set(actor, \"ready\", true);\n}\nfunction unready(H, actor) {\n  return H.condition.set(actor, \"ready\", false, { skipReactionDispatch: true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: ready },\n  guard: { hook: \"onEvent\", eventType: \"guard\", run: ready },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: ready },\n  broken: {\n    hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self,\n    async run(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return;\n      await unready(H, actor);\n      await H.chat.post(actor.name + \" becomes Unready (Broken).\", actor);\n    },\n  },\n  removed: {\n    hook: \"interceptor\", event: \"weapon-removed\",\n    async run(H, actor) {\n      if (!H.weapon.equipped(actor, \"Armour\")) await unready(H, actor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -2843,7 +1983,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.WUptGdl5qd0feCbC",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2860,15 +2000,10 @@
             "text": "You unravel the chaos of combat into reason. While you are Ready, when your turn ends, you may Shift 1 Threat in your or an adjacent area. During your turn, you may expend Ready to grant an ally in your area an immediate Reload, Take Cover or Move manoeuvre.",
             "boundWeaponId": "js9F7VySObBfis2i",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "return {\n  grant: {\n    hook: \"applyToZone\",\n    label: \"Control: Grant Manoeuvre\",\n    subSelect: {\n      name: \"action\",\n      label: \"Manoeuvre\",\n      options: [\n        { value: \"reload\", label: \"Reload\" },\n        { value: \"take-cover\", label: \"Take Cover\" },\n        { value: \"move\", label: \"Move\" },\n      ],\n    },\n    run: async (H, actor, ctx) => {\n      await H.chat.post(actor.name + \" expends Ready to grant \" + ctx.target.name + \" an immediate manoeuvre (Control).\", actor);\n      await H.actions.grantManoeuvre(ctx.target, ctx.payload.action);\n    },\n  },\n  shift: {\n    hook: \"endOfTurn\",\n    run: (H, actor) => {\n      if (!H.condition.has(actor, \"ready\")) return false;\n      return H.threat.shift(actor, {\n        amount: 1, sourceConstraint: \"sameOrAdjacent\", destConstraint: \"adjacentToSource\",\n        excludeSupport: true, label: \"Control: Shift Threat\", reason: \"Control\",\n      });\n    },\n  },\n};"
             }
           },
           "flags": {
@@ -2889,7 +2024,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.8eb18f67118e982f",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2917,7 +2052,6 @@
               "wounds": 3
             },
             "weaponType": "Rifle",
-            "form": "",
             "outlook": "The Rifle conquered the world. When the dominion\nof the Isles was at its height, it was at the heart of\nevery conquering force: trade and diplomacy may be\nwhat cements an empire in place, but violence digs the\nfoundations. The Rifle was the perfect tool for the job:\naccurate, reliable, and deadly. The long barrel and heavy\ncharge of gunpowder let soldiers engage with the enemy\nat a respectable distance - no swirling melee, no barbaric\nbrawling, but a measured march towards victory. With a\nRifle, you can kill a man and never see the fear in his eyes,\nor smell the stench of death, or hear the last breath stutter\nstaccato out of his foaming mouth.\nBut one Rifle doesn't win a war; ten thousand Rifles\ndo. To deliver ten thousand Rifles - and the ammunition\nneeded to fire them, and the tools to maintain them, and\nthe spare parts to swap out during a campaign, and the\nsoldiers to carry them - you need infrastructure. You need\nsteel refineries and weapons manufacturers and cargo ships\nand iron ore mines and anti-union laws and strikebreakers\nand vassal nations and bloodlines and flags and the\ncontinual threat, whether implied or explicit, of absolute\nviolence against those who disagree with you. You need\ncivilisation.\nThe Rifle is the foremost, sharpest point of the grand\nmachine that was the empire.",
             "lies": "Stand up straight and walk tall - you've earned it. A life\nof hard work and good decisions, backed up by the\nhard work and good decisions of your forefathers, sets\nyou apart from the rest. You've earned your money, your\ncomfort, your security.\nYou are untouchable, unimpeachable, unflappable. You\ncan do whatever you want because you are in charge and\nwhatever you want is the right thing to do. Those who think\ndifferently to you are weak, immoral, bestial, petty, deluded.\nThings instead of people.\nYou're the conquering army. You're the state. You're the\nrules. You're the boys' club, the back-room deal, the secret\nhandshake, the right choice made at the right time with the\nright people. You cannot be stopped.",
             "fears": "What use is a Rifle without bullets? What happens when\nthe sights misalign, when the mechanism jams, when\nthe bolt sticks in the chamber or the powder's too wet to fire?\nIt's just dead weight to carry around - an obligation you've\nbrought upon yourself and that you're too proud to forsake.\nThe Rifle is scared of being unsupported and alone -\naway from supply lines, from convenience and comfort,\nfrom those it deems peer or peon. It knows that, if left\nalone and told to manifest its destiny, it's dead in the water.\nIt needs everything underneath it ticking like clockwork to\neven survive.",
@@ -2933,212 +2067,7 @@
                 "defence": "Ranged"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 1,
-                  "max": 1
-                },
-                "text": "Modifier: -1 Quick.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "High Calibre",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 4
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Sharp +1 Wise +1 Quick -2",
-                    "modifiers": {
-                      "wise": 1,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -2,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Sharp +2 Quick -2",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -2,
-                      "sharp": 2
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Wise +2 Quick -2",
-                    "modifiers": {
-                      "wise": 2,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -2,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 4,
-                  "max": 4
-                },
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "Repeating",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Sharp +1 Wise +1 Quick -1",
-                    "modifiers": {
-                      "wise": 1,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -1,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Sharp +2 Quick -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -1,
-                      "sharp": 2
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Wise +2 Quick -1",
-                    "modifiers": {
-                      "wise": 2,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -1,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 1,
-                  "max": 1
-                },
-                "text": "Modifier: +1 Sharp.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "Scoped",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 3
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 3
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Sharp +2 Wise +1 Quick -1",
-                    "modifiers": {
-                      "wise": 1,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -1,
-                      "sharp": 2
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Sharp +3 Quick -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -1,
-                      "sharp": 3
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Wise +2 Sharp +1 Quick -1",
-                    "modifiers": {
-                      "wise": 2,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": -1,
-                      "sharp": 1
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Repeating",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c2",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -3191,16 +2120,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Rifle",
+              "text": "Capacity 4.\nAlso: carbine, lever-action.",
+              "damage": {
+                "resolve": 2,
+                "wounds": 2
+              },
+              "capacity": {
+                "max": 4
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": false,
+                "trusted": false,
+                "label": "Repeating",
+                "mode": "multiple",
+                "source": ""
+              },
+              "name": "Repeating",
+              "uuid": "Compendium.hollows.weapon-forms.Item.9a748a128570e35d",
+              "attackProfileVariant": "primary"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Terribly Calm",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nasync function clearFocus(H, actor, reason) {\n  if (!H.resource.focusCount(actor)) return;\n  await H.resource.setFocus(actor, 0);\n  if (reason) await H.chat.post(actor.name + \" loses all Focus (\" + reason + \").\", actor);\n}\nreturn {\n  focus: { hook: \"resourceLimit\", run: (H, actor, ctx) => ctx.resource === \"focus\" ? Math.max(ctx.value, 5) : ctx.value },\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: (H, actor) => clearFocus(H, actor) },\n  broken: { hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self, run: (H, actor) => clearFocus(H, actor, \"Broken\") },\n  support: {\n    hook: \"interceptor\", event: \"hunter-zone-changed\", matchCarrier: self,\n    run: (H, actor, ctx) => ctx.toZone === \"Support\" ? clearFocus(H, actor, \"entered Support\") : null,\n  },\n};"
             }
           },
           "effects": [],
@@ -3217,7 +2174,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.nBBGn3GDNnupJMel",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3234,15 +2191,10 @@
             "text": "One shot is all you need. When you spend Focus as part of an attack, you may activate this ability. The attack gains +1/+1 for each Focus spent, but you do not roll with advantage as you normally would.",
             "boundWeaponId": "nbSyPMb2XODNUCUu",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "const focusCost = (root, { focusCount }) => Math.min(focusCount,\n  Math.max(0, Math.floor(Number(root.querySelector(\"[name=aimFocus]\").value) || 0)));\nreturn {\n  attack: {\n    hook: \"attackOptions\",\n    run: () => ({\n      dialogHtml: () => \"<div class='form-group'><label>Aim For the Head: spend Focus for +1/+1 each</label><input type='number' name='aimFocus' min='0' value='0'></div>\",\n      focusCost,\n      prepare(root, ctx) {\n        const aim = root.querySelector(\"[name=aimFocus]\");\n        aim.max = ctx.focusCount;\n        aim.disabled = ctx.focusCount <= 0;\n        aim.addEventListener(\"input\", ctx.updateFocusCost);\n      },\n      damageBonus(root, actor, state) {\n        const spend = focusCost(root, state);\n        if (!spend) return;\n        state.damageResolve += spend;\n        state.damageWounds += spend;\n        state.cardLines.push(\"<div><strong>Aim For the Head:</strong> spent \" + spend + \" Focus for +\" + spend + \"/+\" + spend + \" damage.</div>\");\n      },\n    }),\n  },\n};"
             }
           },
           "flags": {
@@ -3263,7 +2215,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.b3ef18c1348a34fe",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3468,7 +2420,6 @@
               "wounds": 4
             },
             "weaponType": "Shotgun",
-            "form": "",
             "outlook": "The Shotgun (or blunderbuss, or dragon, or\nscattergun, or coach gun) uses a sizeable charge\nto fire multiple projectiles at a target. On the upside,\nthe spread of shot means that accuracy is no longer a\nconcern - on the downside, the laborious process of\nloading the ammunition leaves the bearer vulnerable to\nattack once they've pulled the trigger.\nIt is not a new or complicated concept. Whilst\nthe Rifle and Pistol have made recent advances with\nregards to accuracy, capacity and rate of fire, the\nShotgun has been perfectly happy to blast great clouds\nof debris downrange for centuries with very little\nchange in its construction. It is easy to make, easy to\nuse, and you can fire pretty much anything out of it\nand still make an impact.\nIt is immediate and indiscriminate violence in physical\nform. It promises absolute destruction at the pull of\na trigger: an attack without patience or restraint that\nsends even the fiercest foe reeling.",
             "lies": "What if, the Shotgun asks, you no longer held\nback? The world is a web of carefully-maintained\nsocial constructs designed to hold our baser impulses in\ncheck and, not coincidentally, keep power in the hands\nof those who already possess it. The game is rigged\nfrom the start, but you don't have to play it. There's an\nadvantage in being the wild card, and to ignore all the\nrestrictions and boundaries placed upon you. To do the\nunthinkable. To kill and maim and ruin.\nCertainly intimidation and fear have their place, but\nthat's not what the blood-hungry Shotgun is interested\nin. It wants action. It wants to blow the world clean\nin half and relish in the aftermath. It wants to break\nthings to prove that they can be broken. Violence is the\nonly form of communication that matters, and you've\ngot the ultimate solution to any given problem: death.",
             "fears": "Death is not the ultimate solution to any problem.\nThe Shotgun knows this.\nThose carefully-maintained social constructs can't\nbe torn asunder so easily. The Shotgun doesn't like to\nthink about what happens after the shot is fired and\nthe smoke clears; that it is empty, and powerless, and\nopen to retribution.\nIt hates being unloaded, and it hates not being fired.\nWhat it desires is impossible and intoxicating: no\nwaiting and no need for recovery, but only an endless\ninstant of fury. It exists solely for that brief moment of\nfire and noise and the fleeting taste of absolute power.\nThe lies it tells are wild and unsustainable, but to the\nright person, they'll hold together long enough.",
@@ -3484,212 +2435,7 @@
                 "defence": "Ranged"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "Roll with advantage when you attack\nfrom Ranged with the Shotgun.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "Long-Barrel",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Sharp +1 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you would flip the Shotgun\nto Empty, toss the Shotgun token\nlike a coin. If it shows Loaded, it?s\nLoaded; if it shows Empty, it?s Empty.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "Repeater",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Sharp +1 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "Roll with advantage when you attack\nfrom Close with the Shotgun.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Sharp",
-                    "defence": "Ranged"
-                  }
-                ],
-                "name": "Sawn-Off",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Sharp +1 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Sawn-Off",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c3",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -3742,16 +2488,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Shotgun",
+              "text": "Roll with advantage when you attack from Close with the Shotgun.\nAlso: scattergun, blunderbus.",
+              "damage": {
+                "resolve": 2,
+                "wounds": 2
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": true,
+                "trusted": true,
+                "label": "Sawn-Off",
+                "mode": "multiple",
+                "source": "return {\n  advantage: {\n    hook: \"attackRoll\",\n    when(H, actor, ctx) {\n      return (ctx.weapon?.id === ctx.item.id) && H.zone.isClose(ctx.zone);\n    },\n  },\n};"
+              },
+              "name": "Sawn-Off",
+              "uuid": "Compendium.hollows.weapon-forms.Item.a01b39ddb4cd0c3d",
+              "attackProfileVariant": "primary"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Loaded",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nasync function load(H, actor, ctx) {\n  await ctx.item.update({ \"system.loaded\": true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: load },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: load },\n};"
             }
           },
           "effects": [],
@@ -3768,7 +2542,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.lbeTVuz0eZngglxg",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3785,15 +2559,12 @@
             "text": "Kill it! Kill it now! The first time each turn you miss with an attack, you suffer 1 Resolve damage and inflict 2 Resolve damage on the Entity.",
             "boundWeaponId": "RtdK1GIRm5s3yTvF",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "hook": "onAttackResult",
+              "rateLimit": "oncePerTurn",
+              "source": "if (ctx.result !== \"miss\") return false;\nawait H.resource.adjust(actor, { resolve: -1 });\nawait H.chat.post(`${actor.name} suffers 1 Resolve (Frantic).`, actor);\nawait H.effects.apply([{ type: \"damageEntity\", resolve: 2, label: \"Frantic\" }], ctx);"
             }
           },
           "flags": {
@@ -3814,7 +2585,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.c4be07192a3c89a9",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3842,7 +2613,6 @@
               "wounds": 4
             },
             "weaponType": "Book",
-            "form": "",
             "outlook": "The Book is the latest form of an ancient concept -\nknowledge, materialised, that can be shared or jealously\nhoarded. What is now paper and ink was once chiselled\ntablets of stone or rich pigment daubed across the walls of\nfirelit caves. It sees the world not as a chaotic mess, but instead\na series of rules which can be manipulated to its advantage.\nThe Book's violence is more subtle than that of its\ncompanions in the Weapons' bloodstained pantheon. Every\nWeapon is a tool through which humans impose their will\nupon the world, and where the others may do so directly\nwith fire and iron, the Book holds itself above such base\nmatters. Violence is not only the crack of bone and tang\nof blood; pure violence, unsullied by the sweat and pain of\nthe melee, is the subjugation of that which you deem to be\nbeneath you. The Book knows that everything is beneath it.",
             "lies": "The Old Faith spoke of the power of words. Their\ngodlings possessed true names that could be used to\ncontrol them by simply being spoken aloud, and the Book\nsees the wisdom in this concept. Let others grunt and strain\nto make an impact; to understand something is to control it.\nAbsolute truth is not only possible but extant, and it lies\nwithin the pages of the Book. Where others stumble around in\ndarkness, you have the intellect and the determination to pierce\nthe veil of ignorance and see the world for what it really is.\nNot only that; when you impose structure on the world\naround you, you give it a form pleasing to your eye. You\ncreate species and periodic tables, constellations and\ncountries, ethnicities and social classes, heretics and saints.\nEverything you see is yours to control and order with you,\nbright and brilliant as the sun, at the centre.",
             "fears": "The thought that the Book might be one day disproved fills it\nwith an existential dread. It cannot allow any part of itself to\nbecome false; to do so would be to invalidate its entire existence.\nOnce conjecture coalesces into truth, that truth becomes\nbrittle and breakable. The stern wisdom that the Book\nprovides offers no quarter and permits no incursion upon its\nsanctity. Those who build their foundations upon the Book's\ntruth are moral and sensible and good; those who offer an\nalternative viewpoint are, logically (and the Book loves logic)\nimmoral, foolish, and evil. Genuine truths do not bend and\nadapt in the presence of conflicting evidence, but instead\nmust be defended against deluded and malicious agents hellbent on their destruction.\nIt isn't stupid. It knows that, from the moment its final\npage is written, any insight it offers becomes less relevant.\nContexts shift and erode. Touchstones crumble, idioms\ninvert themselves, and audiences die out. The Book is true\nonly as long as people believe it is, and that truth - the only\ntruth the Book can really guarantee - is at the root of its\nimplacable refusal to compromise.",
@@ -3858,212 +2628,7 @@
                 "defence": "Wyrd"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you Focus, the Entity\nsuffers 1 Resolve damage.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Wise",
-                    "defence": "Wyrd"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Wise",
-                    "defence": "Wyrd"
-                  }
-                ],
-                "name": "Eldritch",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Wise +1 Sharp +1 Strong -1",
-                    "modifiers": {
-                      "wise": 1,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Wise +2 Strong -1",
-                    "modifiers": {
-                      "wise": 2,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Wise",
-                    "defence": "Wyrd"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Wise",
-                    "defence": "Wyrd"
-                  }
-                ],
-                "name": "Profane",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Wise +1 Sharp +1 Strong -1",
-                    "modifiers": {
-                      "wise": 1,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Wise +2 Strong -1",
-                    "modifiers": {
-                      "wise": 2,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you Guard, an ally\nmay restore 1 Resolve.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Wise",
-                    "defence": "Wyrd"
-                  },
-                  {
-                    "range": "Ranged",
-                    "stat": "Wise",
-                    "defence": "Wyrd"
-                  }
-                ],
-                "name": "Sacred",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Wise +1 Sharp +1 Strong -1",
-                    "modifiers": {
-                      "wise": 1,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 1
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Wise +2 Strong -1",
-                    "modifiers": {
-                      "wise": 2,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Sharp +2 Strong -1",
-                    "modifiers": {
-                      "wise": 0,
-                      "strong": -1,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 2
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Sacred",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c3",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -4126,6 +2691,38 @@
               "eventType": "guard",
               "rateLimit": "none",
               "source": ""
+            },
+            "appliedForm": {
+              "weaponType": "Book",
+              "text": "When you Guard, an ally may restore 1 Resolve.",
+              "damage": {
+                "resolve": 1,
+                "wounds": 1
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": true,
+                "trusted": true,
+                "label": "Sacred",
+                "mode": "multiple",
+                "source": "return {\n  guard: {\n    hook: \"onEvent\",\n    eventType: \"guard\",\n    async promptOnPlayer(H, actor) {\n      const allies = H.actors.hunters().filter(hunter => (hunter.id !== actor.id) && !H.condition.has(hunter, \"dead\"));\n      const targetId = await H.ask.one({\n        title: \"Sacred\",\n        label: \"Choose a Hunter to restore 1 Resolve\",\n        options: allies.map(hunter => ({ value: hunter.id, label: hunter.name })),\n      });\n      if (!targetId) return false;\n      const target = allies.find(hunter => hunter.id === targetId);\n      await H.resource.adjust(target, { resolve: 1 });\n      await H.chat.post(`${target.name} restores 1 Resolve (Sacred).`, actor);\n      return true;\n    },\n  },\n};"
+              },
+              "name": "Sacred",
+              "uuid": "Compendium.hollows.weapon-forms.Item.da720fc55b4df62b",
+              "attackProfileVariant": "primary"
             }
           },
           "effects": [],
@@ -4142,7 +2739,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.faBferj6jLwmwfwd",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -4159,15 +2756,12 @@
             "text": "Chastise it for daring to stand against you. When you inflict damage with a Book attack, you may activate this ability. If you inflict Resolve damage, remove 2 Threat from your or an adjacent area. If you inflict Wound damage, remove 4 Threat from your or an adjacent area.",
             "boundWeaponId": "ztMhbNzhI7RBJ5d3",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
+              "hook": "onAttackResult",
               "rateLimit": "none",
-              "source": ""
+              "source": "if (ctx.result !== \"hit\") return false;\nawait H.effects.apply(\n  [\n    {\n      type: \"removeThreat\",\n      amount: { fromDamageType: { Wounds: 4, default: 2 } },\n      zone: \"selfOrAdjacent\",\n    },\n  ],\n  ctx,\n);"
             }
           },
           "flags": {
@@ -4188,7 +2782,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.307712ba4c12057f",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -4393,7 +2987,6 @@
               "wounds": 5
             },
             "weaponType": "Armour",
-            "form": "",
             "outlook": "utting something sturdier than skin over the top of\nyour skin has been perennially popular ever since\nhumans discovered they can pull the fur off things\nthey've killed and wear it on their heads, but ramshackle\nprotection like that isn't real Armour. It wouldn't be seen\ndead in uncured pelts these days.\nArmour is expensive. If it's not, it's not Armour - it's just\nsafety equipment. No-one gives a shit about aprons but\neveryone wants to wear the Armour.\nArmour is polished steel, layered silk, lacquered wood\nand hardened leather. Armour is as much the filigree\nand flash as it is a physical barrier. The Armour is a\nmessage, turning the wearer into a beacon of security and\nprosperity. The Armour says: you've made it, and it wants\nothers to hear.",
             "lies": "The Armour wants you to understand that what people\nthink of you is infinitely more important than what you\ndo or who you are. Honesty, integrity and earnestness are\nall well and good but they're useless compared to letting\nothers bask in your glory. Everyone else is looking blindly\nfor the answers to questions they don't even know how to\nask, but you can show them the way.\nNot that you want them to become like you, you\nunderstand. Not that they could. You're better than these\npeople; you've cut through the horseshit and you see how to\nplay the system to your advantage. You want them in your\nwake, singing your praises, carrying your kit and paying you\ntithes. You are their champion, leading the fight against those\nthey despise, protecting that which they value. You want\nthem to believe they're dependent on you.\nThe Armour's favourite lie is of the self-made man - that\nthe bearer did it all themselves, that they had no unfair\nadvantages on their path to success, and that similar\noutcomes are possible to anyone who applies themselves\nwith enough gumption. It laughs at the thought that\nanyone helped them get to the top. It despises the idea of\nluck. You don't need luck when you're this good.",
             "fears": "The Armour is a shell to keep the world out. It hates\nintimacy. Everyone who sees you without the Armour,\nwho witnesses the vulnerable human you are and not the\nshining paragon you project, has leverage over you. It longs\nto be as close to your heart as possible and to be the only\nthing that gives you strength.\nSpend long enough with it and you welcome the lies\ninto your life for the power they provide. Your allies\nshelter behind you when the storm rolls in, and it feels\ngood to be impenetrable. Each time you drown out the\nweak part of you inside, what little humanity remains\nis made smaller and weaker, until only the image of the\nArmour remains and you are left strange and empty.",
@@ -4404,202 +2997,7 @@
                 "defence": "Close"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "While you are Ready, when you would suffer Resolve damage from an Entity attack, you suffer 1 less damage.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Hard",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Hide",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 2,
-                  "wounds": 5
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "When you would suffer Wound damage from an Entity attack, you may expend Ready to reduce the damage suffered by 1.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Hard",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Metal",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 2,
-                  "wounds": 5
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "Attack with Quick or Sharp from Close (choose one when you take this Weapon; you can Reforge it (p. 155) to change to the other option). When you Take Cover or Move, become Ready.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  },
-                  {
-                    "range": "Close",
-                    "stat": "Sharp",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Silk",
-                "damage": {
-                  "resolve": 1,
-                  "wounds": 1
-                },
-                "healthBonus": {
-                  "resolve": 2,
-                  "wounds": 5
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Hard +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 1,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Hard +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 2,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Metal",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c2",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -4652,16 +3050,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Armour",
+              "text": "When you would suffer Wound damage from an Entity attack, you may expend Ready to reduce the damage suffered by 1.\nAlso: heavy plate, chainmail, greatshield.",
+              "damage": {
+                "resolve": 2,
+                "wounds": 1
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": false,
+              "attackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": true,
+                "trusted": true,
+                "label": "Metal",
+                "mode": "multiple",
+                "source": "return {\n  absorb: {\n    hook: \"onEvent\",\n    eventType: \"incomingEntityWoundDamage\",\n    async promptOnPlayer(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return false;\n      if (!await H.ask.confirm({\n        title: \"Metal Armour\",\n        bodyHtml: \"<p>Expend Ready to reduce Wound damage by 1?</p>\",\n        yesLabel: \"Expend Ready\",\n        noLabel: \"Keep Ready\",\n      })) return false;\n      await H.condition.set(actor, \"ready\", false);\n      await H.chat.post(\"Metal: expend Ready to reduce Wound damage by 1.\", actor);\n      return { damageReduction: 1 };\n    },\n  },\n};"
+              },
+              "name": "Metal",
+              "uuid": "Compendium.hollows.weapon-forms.Item.cba3bcc6e266d9f6",
+              "attackProfileVariant": "primary"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Be Ready",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nfunction ready(H, actor) {\n  if (actor.system.health.resolve.value <= 0) return;\n  return H.condition.set(actor, \"ready\", true);\n}\nfunction unready(H, actor) {\n  return H.condition.set(actor, \"ready\", false, { skipReactionDispatch: true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: ready },\n  guard: { hook: \"onEvent\", eventType: \"guard\", run: ready },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: ready },\n  broken: {\n    hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self,\n    async run(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return;\n      await unready(H, actor);\n      await H.chat.post(actor.name + \" becomes Unready (Broken).\", actor);\n    },\n  },\n  removed: {\n    hook: \"interceptor\", event: \"weapon-removed\",\n    async run(H, actor) {\n      if (!H.weapon.equipped(actor, \"Armour\")) await unready(H, actor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -4678,7 +3104,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.WUptGdl5qd0feCbC",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -4695,15 +3121,10 @@
             "text": "Everyone cowers while you alone weather the storm. While you are Ready, allies in your area restore +1 Resolve when they Guard. Expend Ready to grant an immediate Guard manoeuvre to an ally in your area.",
             "boundWeaponId": "TOwqsSpw7EXwy4uh",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "return {\n  guard: {\n    hook: \"applyToZone\", label: \"Bulwark: Grant Guard\",\n    async run(H, actor, ctx) {\n      await H.chat.post(`${actor.name} expends Ready to grant ${ctx.target.name} an immediate Guard (Bulwark).`, actor);\n      await H.actions.grantManoeuvre(ctx.target, \"guard\");\n    },\n  },\n  bonus: {\n    hook: \"onEvent\", event: { type: \"guard\", scope: \"zoneMate\" }, group: \"armour.t1.bulwark\",\n    promptOnPlayer(H, actor, ctx) {\n      return H.condition.has(ctx.carrier, \"ready\");\n    },\n    async applyOnGM(H, actor) {\n      const result = await H.resource.adjust(actor, { resolve: 1 });\n      if (result.resolve.changed) await H.chat.post(`${actor.name} gains +1 Resolve from Bulwark.`, actor);\n    },\n  },\n};"
             }
           },
           "flags": {
@@ -4724,7 +3145,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.01dcfe1c24276137",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -4752,7 +3173,6 @@
               "wounds": 4
             },
             "weaponType": "Spear",
-            "form": "",
             "outlook": "The Spear is, in all likelihood, the oldest man-made weapon\nin existence. It has evolved from a length of wood that's\nsharper on one end than it is on the other to a panoply of\n\npolearms that defined the shape of warfare for thousands of\nyears. Whilst it lacks the idealism attached to the Sword or\nthe utility bound up in the Knife, the Spear was the weapon of\nchoice for the common soldier until upstart firearms arrived and\npushed it off the top spot.\nThe ubiquity and archaic nature of the Spear makes it\nunfashionable, but the Spear doesn't mind. The Spear was there\nat the dawn of time when the first humans decided that they\nwanted to bring down beasts ten times their size, or to stab\nsomeone whilst staying out of stabbing range themselves. The\nSpear predates machines, structures, clothing, the written word,\nlanguage, and numeracy. The Spear has watched the rise and fall\nof other pretenders - the aloof longbow, the cackling crossbow,\nthe spiteful warhammer - and knows that it will be here long after\nthe cities have crumbled to dust and the last bullet has been fired.",
             "lies": "The Spear knows that the home - the hearth, the space you claim\nas your own - is sacred. It wants to help you keep it sacred by\nensuring the profane - which is to say anything you decide you don't\nlike - is excluded by force. To breach the sacred is unthinkable,\nand anyone who would even consider it should be destroyed.\n\"Home\", of course, is a malleable concept. Home can be the house\nin which you live, but it can be your church. Your town. Your nation.\nYour kingdom. Wherever people who look like you exist. Wherever\npeople who share your ideals make a stand. When it comes to\nHollows, an entire plane of reality - as battered and bruised as it is -\ncan be a home, and worth defending. The Spear doesn't like to think\nof itself as attacking. Anything the Spear does is defence, no matter\nhow pre-emptive it might seem or if it has to be carried over borders\nand jammed in some poor bastard's guts to do it.\nYou are supposed to be here. You are entitled to occupy this\nspace, and furthermore, you are entitled to everything within\nit. Anyone you let inside is yours to protect, but yours to use as\nyou will, and can be expelled whenever you please. They owe you\ntheir life, after all.",
             "fears": "The Spear is terrified of being abandoned. Although it is\nvery picky about who it lets inside what it considers to be\nhome, it knows (but would hesitate to say) that it needs others\nto survive. What good is a King who is reliant on his subjects?\nWhat good is a man who cannot protect his family with his own\nstrength and cunning alone?\nIt brags of sole mastery over its domain - of permissions granted\nand contracts bestowed, of sworn oaths and kind allowances - but\ndreads the day that its power is found wanting and those under its\nprotection are killed, or worse, decide to leave before it is ready to\nlet them go. The crossed spears, a symbol of barring and refusal,\nare just as frequently used against those under the Spear's authority\nas they are against those who stand against it.",
@@ -4763,197 +3183,7 @@
                 "defence": "Close"
               }
             ],
-            "forms": [
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Strong",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Heavy",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 3
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 0,
-                      "quick": 1,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": 2,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "Modifier: +1 Quick.",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Light",
-                "damage": {
-                  "resolve": 2,
-                  "wounds": 3
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +2 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 0,
-                      "quick": 2,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +3 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": 3,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Quick +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 1,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              },
-              {
-                "capacity": {
-                  "value": 0,
-                  "max": 0
-                },
-                "text": "",
-                "attackProfiles": [
-                  {
-                    "range": "Close",
-                    "stat": "Quick",
-                    "defence": "Close"
-                  }
-                ],
-                "name": "Long",
-                "damage": {
-                  "resolve": 3,
-                  "wounds": 2
-                },
-                "healthBonus": {
-                  "resolve": 3,
-                  "wounds": 4
-                },
-                "modifierChoices": [
-                  {
-                    "label": "Quick +1 Strong +1 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 1,
-                      "hard": 0,
-                      "quick": 1,
-                      "sharp": 0
-                    },
-                    "id": "c1"
-                  },
-                  {
-                    "label": "Quick +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 0,
-                      "hard": 0,
-                      "quick": 2,
-                      "sharp": 0
-                    },
-                    "id": "c2"
-                  },
-                  {
-                    "label": "Strong +2 Wise -1",
-                    "modifiers": {
-                      "wise": -1,
-                      "strong": 2,
-                      "hard": 0,
-                      "quick": 0,
-                      "sharp": 0
-                    },
-                    "id": "c3"
-                  }
-                ]
-              }
-            ],
-            "selectedForm": "Heavy",
-            "customForm": {
-              "damage": {
-                "resolve": 0,
-                "wounds": 0
-              },
-              "name": "",
-              "attackProfiles": [],
-              "text": "",
-              "capacity": {
-                "max": 0
-              }
-            },
             "modifierChoice": "c3",
-            "formAttackChoice": "",
             "loaded": false,
             "modifierChoices": [
               {
@@ -5006,16 +3236,44 @@
                 "source": ""
               }
             },
+            "appliedForm": {
+              "weaponType": "Spear",
+              "text": "Attack with Strong from Close, instead of Quick.\nAlso: halberd, glaive.",
+              "damage": {
+                "resolve": 2,
+                "wounds": 3
+              },
+              "capacity": {
+                "max": 0
+              },
+              "changesAttackProfile": true,
+              "attackProfile": {
+                "close": "Strong",
+                "ranged": "none"
+              },
+              "versusWyrd": [],
+              "alternativeVariant": false,
+              "alternativeAttackProfile": {
+                "close": "none",
+                "ranged": "none"
+              },
+              "script": {
+                "enabled": false,
+                "trusted": false,
+                "label": "Heavy",
+                "mode": "multiple",
+                "source": ""
+              },
+              "name": "Heavy",
+              "uuid": "Compendium.hollows.weapon-forms.Item.51c2c5f23cfc6e8a",
+              "attackProfileVariant": "primary"
+            },
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "label": "Arms Reach",
+              "mode": "multiple",
+              "source": "return {\n  reach: {\n    hook: \"activated\", label: \"Arms Reach\", rateLimit: \"oncePerRound\",\n    async run(H, actor) {\n      const ctx = { actor };\n      await H.effects.apply([\n        { type: \"pickAmount\", requireMyTurn: true, maxResolve: true, maxZoneThreat: true,\n          ctxKey: \"spend\", title: \"Arms Reach\", label: \"Spend Resolve\",\n          description: \"Spend Resolve to remove equal Threat in your area.\" },\n        { type: \"spendResolve\", amount: { fromCtx: \"spend\" } },\n        { type: \"removeThreat\", zone: \"self\", amount: { fromCtx: \"spend\" } },\n      ], ctx);\n      return !ctx._cancelled;\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -5032,7 +3290,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.a95Bv6TudmpOHKPF",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -5049,15 +3307,10 @@
             "text": "A sacrifice worth making. When an ally makes a ranged attack through your area, that attack gains +1/+1.",
             "boundWeaponId": "5dBbpLb4JfPmL0Sg",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "return {\n  bonus: {\n    hook: \"attackDamage\", aura: true, group: \"spear.t1.decoy\",\n    run(H, actor, ctx) {\n      const lane = { \"Ranged Left\": \"Flank Left\", \"Ranged Front\": \"Front\", \"Ranged Right\": \"Flank Right\" };\n      const zone = lane[ctx.attackerZone];\n      if (!zone) return;\n      const carrier = H.zone.huntersIn(zone).some(h => h.id !== actor.id\n        && ctx.carrierIds.includes(h.id));\n      return carrier ? { resolve: 1, wounds: 1 } : null;\n    },\n  },\n};"
             }
           },
           "flags": {
@@ -5078,7 +3331,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.30a8d7069444bab4",
             "duplicateSource": null,
             "exportSource": null
           },
