@@ -44,13 +44,6 @@ async function loadCharacterCreationData() {
   return data;
 }
 
-async function applyWeaponFormData(weapon, form) {
-  if (!weapon || !form) return;
-  await weapon.update({
-    "system.capacity.value": Number(form.capacity?.value ?? 0),
-  });
-}
-
 function formatLongText(text) {
   const safe = foundry.utils.escapeHTML(String(text || ""));
   return safe.replaceAll("\n", "<br/>");
@@ -333,20 +326,13 @@ async function promptStatSelection(state, allowBack = false) {
   }) ?? null;
 }
 
-function getModifierChoicesForWeapon(doc, weaponType, formName) {
-  const forms = getAvailableWeaponForms(weaponType);
-  const form = forms.find(f => f.name === formName);
-  if (form?.modifierChoices?.length) return form.modifierChoices;
-  if (doc?.system?.modifierChoices?.length) return doc.system.modifierChoices;
-  return [];
-}
-
 async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklist = [], allowBack = false) {
   const available = Array.from(weaponDocsByType.entries())
     .filter(([type]) => !weaponTypeBlacklist.includes(type))
     .map(([type, doc]) => ({ type, doc }))
     .sort((a, b) => a.type.localeCompare(b.type));
   if (!available.length) return null;
+  const formIndex = await getAvailableWeaponForms();
   const options = available.map(w => `<option value="${foundry.utils.escapeHTML(w.type)}">${w.type}</option>`).join("");
   const content = `
       <form class="hollows-roll-dialog">
@@ -356,7 +342,7 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
         </div>
         <div class="form-group">
           <label>Form</label>
-          <select name="formName"></select>
+          <select name="formUuid"></select>
         </div>
         <div class="form-group">
           <label>Form Details</label>
@@ -390,20 +376,20 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
   }
   buttons.push({ action: "next", label: "Next", default: true, callback: async (_e, _b, dialog) => {
     const weaponType = String(dialog.element.querySelector("[name=weaponType]")?.value || "");
-    const formName = String(dialog.element.querySelector("[name=formName]")?.value || "");
+    const formUuid = String(dialog.element.querySelector("[name=formUuid]")?.value || "");
     const abilityId = String(dialog.element.querySelector("[name=abilityId]")?.value || "");
     const modifierChoiceId = String(dialog.element.querySelector("[name=modifierChoice]")?.value || "");
-    if (!weaponType || !formName || !abilityId) {
+    if (!weaponType || !formUuid || !abilityId) {
       ui.notifications.warn("Select a weapon, form, and ability.");
       return false;
     }
     const doc = weaponDocsByType.get(weaponType);
-    const choices = getModifierChoicesForWeapon(doc, weaponType, formName);
+    const choices = doc.system.modifierChoices;
     if (choices.length && !modifierChoiceId) {
       ui.notifications.warn("Select a modifier set.");
       return false;
     }
-    return { weaponType, formName, abilityId, modifierChoiceId };
+    return { weaponType, formUuid, abilityId, modifierChoiceId };
   } });
   return await foundry.applications.api.DialogV2.wait({
     window: { title: "Character Creation: Weapon" },
@@ -423,12 +409,14 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
       const updateForms = async () => {
         const weaponType = String(el.querySelector("[name=weaponType]")?.value || "");
         const doc = weaponDocsByType.get(weaponType);
-        const forms = getAvailableWeaponForms(weaponType);
-        const formOptions = forms.map(f => `<option value="${foundry.utils.escapeHTML(f.name)}">${f.name}</option>`).join("");
-        el.querySelector("[name=formName]").innerHTML = formOptions;
-        const updateFormDesc = () => {
-          const name = String(el.querySelector("[name=formName]")?.value || "");
-          const form = forms.find(f => f.name === name);
+        const forms = formIndex.filter(form => form.weaponType === weaponType);
+        const formOptions = forms.map(f => `<option value="${foundry.utils.escapeHTML(f.uuid)}">${foundry.utils.escapeHTML(f.name)}</option>`).join("");
+        el.querySelector("[name=formUuid]").innerHTML = formOptions || "<option value=\"\">No Weapon Form items available</option>";
+        const updateFormDesc = async () => {
+          const uuid = el.querySelector("[name=formUuid]").value;
+          const formDoc = uuid ? await fromUuid(uuid) : null;
+          if (uuid !== el.querySelector("[name=formUuid]").value) return;
+          const form = formDoc?.system;
           const capacityLine = form?.capacity
             ? `\nCapacity: ${Number(form.capacity.max ?? 0)}`
             : "";
@@ -438,16 +426,11 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
             capacityLine,
           ].join("").trim();
           el.querySelector("[data-form-desc]").innerHTML = formatLongText(desc);
-          const coreText = String(doc?.system?.coreAbility || "");
-          el.querySelector("[data-core-ability]").innerHTML = formatLongText(coreText);
-          const baseProfiles = doc?.system?.attackProfiles || [];
-          const formProfiles = form?.attackProfiles || [];
-          const profiles = formProfiles.length ? formProfiles : baseProfiles;
-          el.querySelector("[data-attack-profiles]").innerHTML = renderAttackProfiles(profiles);
         };
+        el.querySelector("[data-core-ability]").innerHTML = formatLongText(doc.system.coreAbility);
+        el.querySelector("[data-attack-profiles]").innerHTML = renderAttackProfiles(doc.system.attackProfiles);
         const updateModifiers = () => {
-          const name = String(el.querySelector("[name=formName]")?.value || "");
-          const choices = getModifierChoicesForWeapon(doc, weaponType, name);
+          const choices = doc.system.modifierChoices;
           const select = el.querySelector("[name=modifierChoice]");
           if (!choices.length) {
             select.innerHTML = "";
@@ -458,14 +441,15 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
           select.disabled = false;
           select.innerHTML = opts;
         };
-        const formNameEl = el.querySelector("[name=formName]");
-        formNameEl.removeEventListener("change", formNameEl._changeHandler);
-        formNameEl._changeHandler = () => { updateFormDesc(); updateModifiers(); };
-        formNameEl.addEventListener("change", formNameEl._changeHandler);
+        const formUuidEl = el.querySelector("[name=formUuid]");
+        formUuidEl.removeEventListener("change", formUuidEl._changeHandler);
+        formUuidEl._changeHandler = updateFormDesc;
+        formUuidEl.addEventListener("change", formUuidEl._changeHandler);
         updateFormDesc();
         updateModifiers();
 
         const abilities = await getWeaponAbilityDocs(weaponType, 1);
+        if (weaponType !== el.querySelector("[name=weaponType]").value) return;
         const abilityOptions = abilities.map(a => `<option value="${a.id}">${a.name}</option>`).join("");
         el.querySelector("[name=abilityId]").innerHTML = abilityOptions;
         const updateAbilityDesc = () => {
@@ -713,13 +697,12 @@ export async function openCharacterCreationWizard(actor) {
     if (!doc) return null;
     const payload = foundry.utils.deepClone(doc.toObject());
     delete payload._id;
+    foundry.utils.setProperty(payload, "_stats.compendiumSource", doc.uuid);
     const created = await actor.createEmbeddedDocuments("Item", [payload]);
     const weapon = created?.[0] || null;
     if (!weapon) return null;
-    await weapon.update({ "system.selectedForm": pick.formName });
-    const form = getAvailableWeaponForms(pick.weaponType).find(f => f.name === pick.formName);
-    if (form) await applyWeaponFormData(weapon, form);
-    const modifierChoices = getModifierChoicesForWeapon(doc, pick.weaponType, pick.formName);
+    await weapon.system.applyForm(await fromUuid(pick.formUuid));
+    const modifierChoices = doc.system.modifierChoices;
     if (modifierChoices.length) {
       const choice = modifierChoices.find(c => c.id === pick.modifierChoiceId) || modifierChoices[0];
       if (choice) {

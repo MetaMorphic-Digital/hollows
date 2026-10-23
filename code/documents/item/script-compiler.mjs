@@ -422,10 +422,10 @@ ${source}
   /**
    * Cache per document instance so synthetic actors do not share compiled scripts.
    * @param {Item} item
-   * @param {{path: string, text: string}} slot
+   * @param {{path: string, text: string, name?: string}} slot
    * @returns {Mechanic[]} Compiled mechanics; empty for disabled or invalid scripts.
    */
-  static #compile(item, { path, text }) {
+  static #compile(item, { path, text, name: slotName }) {
     const block = foundry.utils.getProperty(item, path);
     const source = String(block?.source ?? "");
     if (!block?.enabled || !source.trim()) return [];
@@ -434,7 +434,7 @@ ${source}
     const hook = block.hook || "activated";
     if (!multiple && !Object.hasOwn(ScriptField.hooks, hook)) return [];
     const key = `script.${item.id}.${path}`;
-    const name = block.label || item.name || game.i18n.localize("HOLLOWS.SCRIPT.defaultName");
+    const name = block.label || slotName || item.name || game.i18n.localize("HOLLOWS.SCRIPT.defaultName");
     const stamp = JSON.stringify([
       multiple, hook, block.rateLimit, block.on, block.eventType, name, text, item.system?.weaponType, source,
     ]);
@@ -502,7 +502,7 @@ ${source}
   }
 
   /**
-   * Renown scripts require enabled Renown; base scripts do not.
+   * Compile scripts from the item's active slots.
    * @param {Actor|null} actor Carrier actor.
    * @param {Function|null} [type] Mechanic constructor to select.
    * @returns {Mechanic[]} Actor's compiled mechanics.

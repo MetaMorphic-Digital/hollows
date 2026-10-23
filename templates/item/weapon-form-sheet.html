@@ -36,7 +36,7 @@
   <section class="sheet-section">
     <h2>{{localize "HOLLOWS.SCRIPT.automation"}}</h2>
     {{> "systems/hollows/templates/item/parts/script-controls.html"
-    label=(localize "HOLLOWS.SCRIPT.source") action="editFormScript"
+    label=(localize "HOLLOWS.SCRIPT.source") action="editScript" path="system.script" titleKey="HOLLOWS.SCRIPT.formTitle"
     block=system.script scriptsAllowed=scriptsAllowed canEditScripts=canEditScripts}}
   </section>
 </form>

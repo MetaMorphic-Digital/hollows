@@ -4,7 +4,6 @@
  */
 
 import { Reaction } from "../data/mechanics/Reaction.js";
-import { getAllRegisteredWeaponFormMechanics } from "../data/weapons/registry.js";
 import { MECHANIC_BUCKETS } from "./mechanic-registry.js";
 import { BAPTISM_REWARD } from "../documents/entity/baptism.js";
 import { GRANT_MANOEUVRE } from "../data/actions/index.js";
@@ -24,13 +23,10 @@ export {
 // reaction import is initialised before the list is read — avoids a
 // circular-import temporal-dead-zone error.
 export function getAllReactions() {
-  const formReactions = getAllRegisteredWeaponFormMechanics()
-    .filter((mechanic) => mechanic instanceof Reaction);
   return [
     ...MECHANIC_BUCKETS.reactions,
     BAPTISM_REWARD,
     GRANT_MANOEUVRE,
-    ...formReactions
   ];
 }
 

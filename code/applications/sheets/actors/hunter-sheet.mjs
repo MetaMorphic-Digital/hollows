@@ -31,7 +31,6 @@ import { openAttackDialog } from "../../../data/actions/attack.js";
 import { openExpendReadyDialog } from "../../../data/actions/expend-ready.js";
 import { getEffectiveCapacity } from "../../../documents/item/weapon.js";
 import {
-  getAvailableWeaponForms,
   getEffectiveWeaponAttackProfiles,
   getSelectedWeaponForm,
   getWeaponPackDocs,
@@ -151,7 +150,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
         };
       });
     data.weaponsWithAbilities = weapons.map((weapon, index) => {
-      const baseForms = getAvailableWeaponForms(weapon);
       const activeForm = getSelectedWeaponForm(weapon);
       const attackProfiles = getEffectiveWeaponAttackProfiles(weapon);
       return {
@@ -165,7 +163,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
         }),
         activeForm,
         attackProfiles,
-        availableForms: baseForms.map(f => f.name),
       };
     });
     data.weaponCount = weapons.length;
