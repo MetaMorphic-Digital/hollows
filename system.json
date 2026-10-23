@@ -30,6 +30,11 @@
       "type": "Item"
     },
     {
+      "name": "quickstart",
+      "label": "HOLLOWS.PACKS.QUICKSTART",
+      "type": "JournalEntry"
+    },
+    {
       "name": "hollows-grisham-priory",
       "label": "The Sins of Grisham Priory",
       "path": "packs/hollows-grisham-priory",

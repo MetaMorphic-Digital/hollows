@@ -283,7 +283,8 @@
     },
     "PACKS": {
       "WEAPONS": "Hollows - Weapons",
-      "WEAPON_ABILITIES": "Hollows - Weapon Abilities"
+      "WEAPON_ABILITIES": "Hollows - Weapon Abilities",
+      "QUICKSTART": "Hollows - Quickstart"
     },
     "THREAT": {
       "SCOPE": {
