@@ -1,7 +1,7 @@
 import { getContentPacks } from "../../helpers/extensions.js";
 
 /** Collect the system weapon pack and weapon packs registered by content modules. */
-export function getWeaponsPacks() {
+function getWeaponsPacks() {
   return [
     game.packs.get("hollows.weapons") ||
       game.packs.find((p) => (p.metadata?.package === "hollows") && (p.metadata?.name === "weapons")),

@@ -9,7 +9,6 @@ import {
   getEffectiveWeaponAttackProfiles,
   getEffectiveWeaponCapacity,
   getEffectiveWeaponDamage,
-  getEffectiveWeaponModifierChoices,
   getSelectedWeaponForm,
   getWeaponPackDocs,
 } from "../../../data/weapons/index.js";
@@ -91,7 +90,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     };
 
     let packDoc = null;
-    data.modifierChoicesForDisplay = getEffectiveWeaponModifierChoices(this.item);
+    data.modifierChoicesForDisplay = system.modifierChoices;
     data.attackProfilesForDisplay = getEffectiveWeaponAttackProfiles(this.item);
     data.formsForDisplay = await getAvailableWeaponForms(this.item);
     data.activeForm = getSelectedWeaponForm(this.item);
@@ -103,7 +102,6 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     data.canEditScripts = game.user.isGM && this.isEditable;
     data.effectiveDamage = getEffectiveWeaponDamage(this.item);
     data.effectiveCapacity = getEffectiveWeaponCapacity(this.item);
-    data.effectiveHealthBonus = this.item.system.getEffectiveWeaponHealthBonus();
     data.system.capacity = {
       value: Number(this.item.system?.capacity?.value ?? data.effectiveCapacity.value ?? 0),
       max: Number(data.effectiveCapacity.max ?? 0),
@@ -286,7 +284,7 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
     event.preventDefault?.();
     event.stopPropagation?.();
     const choiceId = event.target?.value ?? event.currentTarget?.value;
-    const choices = getEffectiveWeaponModifierChoices(this.item);
+    const choices = this.item.system.modifierChoices;
     const choice = choices.find(c => c.id === choiceId);
     if (!choice) {
       await this.item.update({ "system.modifierChoice": "" });

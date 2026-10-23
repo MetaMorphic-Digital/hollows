@@ -806,17 +806,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Sword",
               "text": "When you Feint, one Hunter in your area may Guard as an immediate action.\nAlso: rapier, ceremonial.",
@@ -832,10 +821,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -851,6 +837,13 @@
               "name": "Noble",
               "uuid": "Compendium.hollows.weapon-forms.Item.12735b61543fc80c",
               "attackProfileVariant": "primary"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Flourish",
+              "mode": "multiple",
+              "source": "return {\n  feint: {\n    hook: \"activated\", label: \"Feint\", rateLimit: \"oncePerTurn\",\n    async run(H, actor, ctx) {\n      const zone = H.zone.of(actor);\n      if (!zone) {\n        ui.notifications.warn(\"Your token is not inside a zone region.\");\n        return false;\n      }\n      if (!(await H.threat.place(actor, zone, 2, { source: \"ability\", reason: \"Feint\" }))) {\n        ui.notifications.warn(\"Unable to place Threat in this zone.\");\n        return false;\n      }\n      await H.chat.post(actor.name + \" Feints with \" + ctx.item.name + \" in \" + zone + \". Threat: +2.\", actor);\n      await H.events.swordFeint(actor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -867,7 +860,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.tgIioyf5KndRxuYX",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -884,15 +877,12 @@
             "text": "Lead from the front. When you Move to a Close area, inflict 1 Resolve damage on the Entity.",
             "boundWeaponId": "IRzubZa9GU6ixf9s",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
+              "hook": "onMove",
               "rateLimit": "none",
-              "source": ""
+              "source": "if (!ctx.byOwner) return false;\nif (!H.zone.isClose(ctx.toZone)) return false;\nawait H.effects.apply([{ type: \"damageEntity\", resolve: 1, label: \"Charge\" }], ctx);"
             }
           },
           "flags": {
@@ -913,7 +903,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.0be0c09caf5cb5f2",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1035,10 +1025,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -1070,7 +1057,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.xxbvfTXEU4k16S3D",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1087,15 +1074,10 @@
             "text": "Line up the perfect shot. When you Move to a Close area, gain +2 Quick until the start of your next turn. When you Move to a Ranged area, gain +2 Sharp until the start of your next turn.",
             "boundWeaponId": "iBlildJoBrvhRw7n",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "const flag = \"skirmisherBonus\";\nreturn {\n  move: {\n    hook: \"onMove\", ownerMoveOnly: true,\n    async run(H, actor, ctx) {\n      const stat = H.zone.isClose(ctx.toZone) ? \"quick\" : H.zone.isRanged(ctx.toZone) ? \"sharp\" : \"\";\n      if (!stat) return;\n      const bonus = actor.getFlag(\"hollows\", flag) || {};\n      if (bonus[stat]) return;\n      await actor.setFlag(\"hollows\", flag, { ...bonus, [stat]: 2 });\n      await H.chat.post(actor.name + \" gains +2 \" + stat + \" until their next turn (Skirmisher).\", actor);\n    },\n  },\n  bonus: {\n    hook: \"statModifier\",\n    run: (H, actor, ctx) => actor.getFlag(\"hollows\", flag)?.[ctx.stat] || 0,\n  },\n  clear: {\n    hook: \"startOfTurn\", stage: \"cleanup\",\n    run: (H, actor) => actor.unsetFlag(\"hollows\", flag),\n  },\n  combat: {\n    hook: \"interceptor\", event: \"combat-start-hunter\",\n    run: (H, actor) => actor.unsetFlag(\"hollows\", flag),\n  },\n};"
             }
           },
           "flags": {
@@ -1116,7 +1098,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.3d453be5b4812289",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1415,10 +1397,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -1450,7 +1429,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.xxbvfTXEU4k16S3D",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1467,15 +1446,13 @@
             "text": "The monster can wait; you've got things to do. Instead of your attack action each turn, you may make two manoeuvres (allowing you to make three manoeuvres in total on your turn).",
             "boundWeaponId": "bNcPIBZVLDXV88ld",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
+              "hook": "startOfTurn",
               "on": "actor",
-              "eventType": "guard",
               "rateLimit": "none",
-              "source": ""
+              "source": "await H.chat.post(`${actor.name} may make 3 manoeuvres this turn instead of attacking (Brandish).`, actor);"
             }
           },
           "flags": {
@@ -1496,7 +1473,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.15930be2c0185556",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1587,17 +1564,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Knife",
               "text": "When you inflict Wound damage with this Weapon, heal 1 Wound.\nAlso: syringe, cleaver.",
@@ -1613,10 +1579,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -1632,6 +1595,13 @@
               "name": "Wicked",
               "uuid": "Compendium.hollows.weapon-forms.Item.71c435a6e2037c8f",
               "attackProfileVariant": "primary"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Bleeding",
+              "mode": "multiple",
+              "source": "return {\n  bleeding: {\n    hook: \"onAttackResult\", timing: \"afterDamageApplied\", damageType: \"Wounds\", weaponType: \"Knife\",\n    async run(H, actor, ctx) {\n      if (ctx.targetType !== \"entity\" || H.condition.has(ctx.targetActor, \"bleeding\")) return;\n      await H.condition.set(ctx.targetActor, \"bleeding\", true);\n      await H.chat.post(ctx.targetActor.name + \" begins Bleeding.\", ctx.targetActor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -1648,7 +1618,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.MRLeZpSdloGUto7V",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1665,15 +1635,12 @@
             "text": "Daub your body in the blood of the beast. While the Entity is Bleeding and you are in Close, when your turn ends, restore 2 Resolve.",
             "boundWeaponId": "zAG03dkef3qXWjyE",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
+              "hook": "endOfTurn",
               "rateLimit": "none",
-              "source": ""
+              "source": "if (!(H.zone.isClose(H.zone.of(actor)) && H.actors.entity()?.statuses.has(\"bleeding\"))) return false;\nawait H.resource.adjust(actor, { resolve: 2 });\nawait H.chat.post(`${actor.name} restores 2 Resolve (Anointed).`, actor);"
             }
           },
           "flags": {
@@ -1694,7 +1661,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.7e7c582e7bb93103",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -1962,17 +1929,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Armour",
               "text": "Attack with Quick or Sharp from Close (choose one when you take this Weapon; you can Reforge it (p. 155) to change to the other option). When you Take Cover or Move, become Ready.\nAlso: three-piece suit, expensive hat, lit cigarette.",
@@ -1988,10 +1944,7 @@
                 "close": "Quick",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": true,
               "alternativeAttackProfile": {
                 "close": "Sharp",
@@ -2007,6 +1960,13 @@
               "name": "Silk",
               "uuid": "Compendium.hollows.weapon-forms.Item.77ad92494d8e097f",
               "attackProfileVariant": "alternative"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Be Ready",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nfunction ready(H, actor) {\n  if (actor.system.health.resolve.value <= 0) return;\n  return H.condition.set(actor, \"ready\", true);\n}\nfunction unready(H, actor) {\n  return H.condition.set(actor, \"ready\", false, { skipReactionDispatch: true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: ready },\n  guard: { hook: \"onEvent\", eventType: \"guard\", run: ready },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: ready },\n  broken: {\n    hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self,\n    async run(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return;\n      await unready(H, actor);\n      await H.chat.post(actor.name + \" becomes Unready (Broken).\", actor);\n    },\n  },\n  removed: {\n    hook: \"interceptor\", event: \"weapon-removed\",\n    async run(H, actor) {\n      if (!H.weapon.equipped(actor, \"Armour\")) await unready(H, actor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -2023,7 +1983,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.WUptGdl5qd0feCbC",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2040,15 +2000,10 @@
             "text": "You unravel the chaos of combat into reason. While you are Ready, when your turn ends, you may Shift 1 Threat in your or an adjacent area. During your turn, you may expend Ready to grant an ally in your area an immediate Reload, Take Cover or Move manoeuvre.",
             "boundWeaponId": "js9F7VySObBfis2i",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "return {\n  grant: {\n    hook: \"applyToZone\",\n    label: \"Control: Grant Manoeuvre\",\n    subSelect: {\n      name: \"action\",\n      label: \"Manoeuvre\",\n      options: [\n        { value: \"reload\", label: \"Reload\" },\n        { value: \"take-cover\", label: \"Take Cover\" },\n        { value: \"move\", label: \"Move\" },\n      ],\n    },\n    run: async (H, actor, ctx) => {\n      await H.chat.post(actor.name + \" expends Ready to grant \" + ctx.target.name + \" an immediate manoeuvre (Control).\", actor);\n      await H.actions.grantManoeuvre(ctx.target, ctx.payload.action);\n    },\n  },\n  shift: {\n    hook: \"endOfTurn\",\n    run: (H, actor) => {\n      if (!H.condition.has(actor, \"ready\")) return false;\n      return H.threat.shift(actor, {\n        amount: 1, sourceConstraint: \"sameOrAdjacent\", destConstraint: \"adjacentToSource\",\n        excludeSupport: true, label: \"Control: Shift Threat\", reason: \"Control\",\n      });\n    },\n  },\n};"
             }
           },
           "flags": {
@@ -2069,7 +2024,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.8eb18f67118e982f",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2165,17 +2120,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Rifle",
               "text": "Capacity 4.\nAlso: carbine, lever-action.",
@@ -2191,10 +2135,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -2210,6 +2151,13 @@
               "name": "Repeating",
               "uuid": "Compendium.hollows.weapon-forms.Item.9a748a128570e35d",
               "attackProfileVariant": "primary"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Terribly Calm",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nasync function clearFocus(H, actor, reason) {\n  if (!H.resource.focusCount(actor)) return;\n  await H.resource.setFocus(actor, 0);\n  if (reason) await H.chat.post(actor.name + \" loses all Focus (\" + reason + \").\", actor);\n}\nreturn {\n  focus: { hook: \"resourceLimit\", run: (H, actor, ctx) => ctx.resource === \"focus\" ? Math.max(ctx.value, 5) : ctx.value },\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: (H, actor) => clearFocus(H, actor) },\n  broken: { hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self, run: (H, actor) => clearFocus(H, actor, \"Broken\") },\n  support: {\n    hook: \"interceptor\", event: \"hunter-zone-changed\", matchCarrier: self,\n    run: (H, actor, ctx) => ctx.toZone === \"Support\" ? clearFocus(H, actor, \"entered Support\") : null,\n  },\n};"
             }
           },
           "effects": [],
@@ -2226,7 +2174,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.nBBGn3GDNnupJMel",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2243,15 +2191,10 @@
             "text": "One shot is all you need. When you spend Focus as part of an attack, you may activate this ability. The attack gains +1/+1 for each Focus spent, but you do not roll with advantage as you normally would.",
             "boundWeaponId": "nbSyPMb2XODNUCUu",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "const focusCost = (root, { focusCount }) => Math.min(focusCount,\n  Math.max(0, Math.floor(Number(root.querySelector(\"[name=aimFocus]\").value) || 0)));\nreturn {\n  attack: {\n    hook: \"attackOptions\",\n    run: () => ({\n      dialogHtml: () => \"<div class='form-group'><label>Aim For the Head: spend Focus for +1/+1 each</label><input type='number' name='aimFocus' min='0' value='0'></div>\",\n      focusCost,\n      prepare(root, ctx) {\n        const aim = root.querySelector(\"[name=aimFocus]\");\n        aim.max = ctx.focusCount;\n        aim.disabled = ctx.focusCount <= 0;\n        aim.addEventListener(\"input\", ctx.updateFocusCost);\n      },\n      damageBonus(root, actor, state) {\n        const spend = focusCost(root, state);\n        if (!spend) return;\n        state.damageResolve += spend;\n        state.damageWounds += spend;\n        state.cardLines.push(\"<div><strong>Aim For the Head:</strong> spent \" + spend + \" Focus for +\" + spend + \"/+\" + spend + \" damage.</div>\");\n      },\n    }),\n  },\n};"
             }
           },
           "flags": {
@@ -2272,7 +2215,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.b3ef18c1348a34fe",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2545,17 +2488,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Shotgun",
               "text": "Roll with advantage when you attack from Close with the Shotgun.\nAlso: scattergun, blunderbus.",
@@ -2571,10 +2503,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -2590,6 +2519,13 @@
               "name": "Sawn-Off",
               "uuid": "Compendium.hollows.weapon-forms.Item.a01b39ddb4cd0c3d",
               "attackProfileVariant": "primary"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Loaded",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nasync function load(H, actor, ctx) {\n  await ctx.item.update({ \"system.loaded\": true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: load },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: load },\n};"
             }
           },
           "effects": [],
@@ -2606,7 +2542,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.lbeTVuz0eZngglxg",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2623,15 +2559,12 @@
             "text": "Kill it! Kill it now! The first time each turn you miss with an attack, you suffer 1 Resolve damage and inflict 2 Resolve damage on the Entity.",
             "boundWeaponId": "RtdK1GIRm5s3yTvF",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "hook": "onAttackResult",
+              "rateLimit": "oncePerTurn",
+              "source": "if (ctx.result !== \"miss\") return false;\nawait H.resource.adjust(actor, { resolve: -1 });\nawait H.chat.post(`${actor.name} suffers 1 Resolve (Frantic).`, actor);\nawait H.effects.apply([{ type: \"damageEntity\", resolve: 2, label: \"Frantic\" }], ctx);"
             }
           },
           "flags": {
@@ -2652,7 +2585,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.c4be07192a3c89a9",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2774,10 +2707,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -2809,7 +2739,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.faBferj6jLwmwfwd",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -2826,15 +2756,12 @@
             "text": "Chastise it for daring to stand against you. When you inflict damage with a Book attack, you may activate this ability. If you inflict Resolve damage, remove 2 Threat from your or an adjacent area. If you inflict Wound damage, remove 4 Threat from your or an adjacent area.",
             "boundWeaponId": "ztMhbNzhI7RBJ5d3",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
+              "enabled": true,
+              "trusted": true,
               "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
+              "hook": "onAttackResult",
               "rateLimit": "none",
-              "source": ""
+              "source": "if (ctx.result !== \"hit\") return false;\nawait H.effects.apply(\n  [\n    {\n      type: \"removeThreat\",\n      amount: { fromDamageType: { Wounds: 4, default: 2 } },\n      zone: \"selfOrAdjacent\",\n    },\n  ],\n  ctx,\n);"
             }
           },
           "flags": {
@@ -2855,7 +2782,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.307712ba4c12057f",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3123,17 +3050,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Armour",
               "text": "When you would suffer Wound damage from an Entity attack, you may expend Ready to reduce the damage suffered by 1.\nAlso: heavy plate, chainmail, greatshield.",
@@ -3149,10 +3065,7 @@
                 "close": "none",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -3168,6 +3081,13 @@
               "name": "Metal",
               "uuid": "Compendium.hollows.weapon-forms.Item.cba3bcc6e266d9f6",
               "attackProfileVariant": "primary"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Be Ready",
+              "mode": "multiple",
+              "source": "function self(H, actor, ctx) { return actor === ctx.carrier && actor; }\nfunction ready(H, actor) {\n  if (actor.system.health.resolve.value <= 0) return;\n  return H.condition.set(actor, \"ready\", true);\n}\nfunction unready(H, actor) {\n  return H.condition.set(actor, \"ready\", false, { skipReactionDispatch: true });\n}\nreturn {\n  combat: { hook: \"interceptor\", event: \"combat-start-hunter\", matchCarrier: self, run: ready },\n  guard: { hook: \"onEvent\", eventType: \"guard\", run: ready },\n  support: { hook: \"interceptor\", event: \"support-recovery\", matchCarrier: self, run: ready },\n  broken: {\n    hook: \"interceptor\", event: \"hunter-broken\", matchCarrier: self,\n    async run(H, actor) {\n      if (!H.condition.has(actor, \"ready\")) return;\n      await unready(H, actor);\n      await H.chat.post(actor.name + \" becomes Unready (Broken).\", actor);\n    },\n  },\n  removed: {\n    hook: \"interceptor\", event: \"weapon-removed\",\n    async run(H, actor) {\n      if (!H.weapon.equipped(actor, \"Armour\")) await unready(H, actor);\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -3184,7 +3104,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.WUptGdl5qd0feCbC",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3201,15 +3121,10 @@
             "text": "Everyone cowers while you alone weather the storm. While you are Ready, allies in your area restore +1 Resolve when they Guard. Expend Ready to grant an immediate Guard manoeuvre to an ally in your area.",
             "boundWeaponId": "TOwqsSpw7EXwy4uh",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "return {\n  guard: {\n    hook: \"applyToZone\", label: \"Bulwark: Grant Guard\",\n    async run(H, actor, ctx) {\n      await H.chat.post(`${actor.name} expends Ready to grant ${ctx.target.name} an immediate Guard (Bulwark).`, actor);\n      await H.actions.grantManoeuvre(ctx.target, \"guard\");\n    },\n  },\n  bonus: {\n    hook: \"onEvent\", event: { type: \"guard\", scope: \"zoneMate\" }, group: \"armour.t1.bulwark\",\n    promptOnPlayer(H, actor, ctx) {\n      return H.condition.has(ctx.carrier, \"ready\");\n    },\n    async applyOnGM(H, actor) {\n      const result = await H.resource.adjust(actor, { resolve: 1 });\n      if (result.resolve.changed) await H.chat.post(`${actor.name} gains +1 Resolve from Bulwark.`, actor);\n    },\n  },\n};"
             }
           },
           "flags": {
@@ -3230,7 +3145,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.01dcfe1c24276137",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3321,17 +3236,6 @@
                 "source": ""
               }
             },
-            "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
-            },
             "appliedForm": {
               "weaponType": "Spear",
               "text": "Attack with Strong from Close, instead of Quick.\nAlso: halberd, glaive.",
@@ -3347,10 +3251,7 @@
                 "close": "Strong",
                 "ranged": "none"
               },
-              "versusWyrd": {
-                "close": false,
-                "ranged": false
-              },
+              "versusWyrd": [],
               "alternativeVariant": false,
               "alternativeAttackProfile": {
                 "close": "none",
@@ -3366,6 +3267,13 @@
               "name": "Heavy",
               "uuid": "Compendium.hollows.weapon-forms.Item.51c2c5f23cfc6e8a",
               "attackProfileVariant": "primary"
+            },
+            "script": {
+              "enabled": true,
+              "trusted": true,
+              "label": "Arms Reach",
+              "mode": "multiple",
+              "source": "return {\n  reach: {\n    hook: \"activated\", label: \"Arms Reach\", rateLimit: \"oncePerRound\",\n    async run(H, actor) {\n      const ctx = { actor };\n      await H.effects.apply([\n        { type: \"pickAmount\", requireMyTurn: true, maxResolve: true, maxZoneThreat: true,\n          ctxKey: \"spend\", title: \"Arms Reach\", label: \"Spend Resolve\",\n          description: \"Spend Resolve to remove equal Threat in your area.\" },\n        { type: \"spendResolve\", amount: { fromCtx: \"spend\" } },\n        { type: \"removeThreat\", zone: \"self\", amount: { fromCtx: \"spend\" } },\n      ], ctx);\n      return !ctx._cancelled;\n    },\n  },\n};"
             }
           },
           "effects": [],
@@ -3382,7 +3290,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapons.Item.a95Bv6TudmpOHKPF",
             "duplicateSource": null,
             "exportSource": null
           },
@@ -3399,15 +3307,10 @@
             "text": "A sacrifice worth making. When an ally makes a ranged attack through your area, that attack gains +1/+1.",
             "boundWeaponId": "5dBbpLb4JfPmL0Sg",
             "script": {
-              "enabled": false,
-              "trusted": false,
-              "label": "",
-              "mode": "single",
-              "hook": "activated",
-              "on": "actor",
-              "eventType": "guard",
-              "rateLimit": "none",
-              "source": ""
+              "enabled": true,
+              "trusted": true,
+              "mode": "multiple",
+              "source": "return {\n  bonus: {\n    hook: \"attackDamage\", aura: true, group: \"spear.t1.decoy\",\n    run(H, actor, ctx) {\n      const lane = { \"Ranged Left\": \"Flank Left\", \"Ranged Front\": \"Front\", \"Ranged Right\": \"Flank Right\" };\n      const zone = lane[ctx.attackerZone];\n      if (!zone) return;\n      const carrier = H.zone.huntersIn(zone).some(h => h.id !== actor.id\n        && ctx.carrierIds.includes(h.id));\n      return carrier ? { resolve: 1, wounds: 1 } : null;\n    },\n  },\n};"
             }
           },
           "flags": {
@@ -3428,7 +3331,7 @@
             "createdTime": null,
             "modifiedTime": null,
             "lastModifiedBy": null,
-            "compendiumSource": null,
+            "compendiumSource": "Compendium.hollows.weapon-abilities.Item.30a8d7069444bab4",
             "duplicateSource": null,
             "exportSource": null
           },

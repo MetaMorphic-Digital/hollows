@@ -1,6 +1,6 @@
 import WeaponFormData from "../items/weapon-form.mjs";
 
-export function getWeaponType(weaponOrType) {
+function getWeaponType(weaponOrType) {
   if (typeof weaponOrType === "string") return weaponOrType;
   return String(weaponOrType?.system?.weaponType || weaponOrType?.name || "");
 }
@@ -43,10 +43,6 @@ export function getEffectiveWeaponAttackProfiles(weapon) {
   const form = getSelectedWeaponForm(weapon);
   if (form?.changesAttackProfile) return WeaponFormData.getAttackProfiles(form, form.attackProfileVariant);
   return foundry.utils.deepClone(weapon.system.attackProfiles);
-}
-
-export function getEffectiveWeaponModifierChoices(weapon) {
-  return foundry.utils.deepClone(weapon.system.modifierChoices);
 }
 
 export function getEffectiveWeaponModifiers(weapon) {

@@ -95,7 +95,7 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       .slice(0, 2);
 
     for (const weapon of weapons) {
-      const healthBonus = weapon.system.getEffectiveWeaponHealthBonus();
+      const healthBonus = weapon.system.health_bonus;
       resolveBonus += healthBonus.resolve || 0;
       woundsBonus += healthBonus.wounds || 0;
     }

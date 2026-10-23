@@ -18,10 +18,7 @@
       "close": "Quick",
       "ranged": "none"
     },
-    "versusWyrd": {
-      "close": false,
-      "ranged": false
-    },
+    "versusWyrd": [],
     "alternativeVariant": true,
     "alternativeAttackProfile": {
       "close": "Sharp",

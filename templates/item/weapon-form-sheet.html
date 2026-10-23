@@ -43,14 +43,7 @@
       <span class="stat-label">Ranged with</span>
       {{formInput systemFields.attackProfile.fields.ranged value=system.attackProfile.ranged}}
     </label>
-    <label class="hollows-form-row">
-      <span class="stat-label">Close versus Wyrd</span>
-      <input type="checkbox" name="system.versusWyrd.close" {{checked system.versusWyrd.close}}>
-    </label>
-    <label class="hollows-form-row">
-      <span class="stat-label">Ranged versus Wyrd</span>
-      <input type="checkbox" name="system.versusWyrd.ranged" {{checked system.versusWyrd.ranged}}>
-    </label>
+    {{formGroup systemFields.versusWyrd value=system.versusWyrd label="Versus Wyrd" type="checkboxes"}}
     <label class="hollows-form-row">
       <span class="stat-label">Alternative variant</span>
       <input type="checkbox" name="system.alternativeVariant" {{checked system.alternativeVariant}}>

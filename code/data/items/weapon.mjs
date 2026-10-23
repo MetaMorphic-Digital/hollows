@@ -88,11 +88,4 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
       "system.capacity.value": 0,
     });
   }
-
-  /**
-   * @returns {{ resolve: number, wounds: number }}
-   */
-  getEffectiveWeaponHealthBonus() {
-    return { ...this.health_bonus };
-  }
 }
