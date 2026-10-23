@@ -1,12 +1,15 @@
 import {
   getActorZone,
+  getActorTokenOnScene,
   getTokenZone,
+  getZoneList,
   getAdjacentZones,
   getHuntersInZone,
   getThreatInZone,
   getZoneCurseValue,
   isCloseZone,
   isRangedZone,
+  isThreatZone,
   getActiveSceneHunters,
   getActiveEntityActor,
   getActiveHollowActor,
@@ -15,7 +18,10 @@ import {
   placeThreatFromHunter,
   removeThreatViaDialog,
   shiftThreatViaDialog,
+  pickThreatRemovalsFromZones,
+  removeThreatFromZones,
 } from "./canvas/threat-ops.js";
+import { getTerrainPoolValue, spendTerrainPoolTag } from "./canvas/terrain-pool.js";
 import {
   adjustHunterResource,
   adjustEntityResource,
@@ -28,6 +34,9 @@ import {
   getActorTerrainTags,
   getEntityTerrainCounts,
   discardTerrainCondition,
+  destroyTerrainCondition,
+  destroyGridTerrain,
+  requestTerrainConditionApply,
 } from "./documents/actor/conditions.js";
 import {
   pickOne,
@@ -39,10 +48,12 @@ import {
   chooseOneTarget,
 } from "./applications/apps/selection-dialogs.mjs";
 import { applyEffects } from "./data/mechanics/dsl/effects.js";
-import { hasWeaponEquipped, hasWeaponAbility, isWeaponOfType } from "./helpers/weapon-utils.js";
-import { getEffectiveWeaponDamage, getSelectedWeaponForm } from "./data/weapons/index.js";
+import { hasWeaponEquipped, hasWeaponAbility, isWeaponOfType, getShotgunWeapons, isShotgunLoaded } from "./helpers/weapon-utils.js";
+import { getEffectiveWeaponDamage, getSelectedWeaponForm, getAvailableWeaponForms } from "./data/weapons/index.js";
+import { buildMoveOutcomeCardHtml } from "./applications/ui/move-card.js";
+import { Mechanic } from "./data/mechanics/Mechanic.js";
 
-/** Chat and stat helpers for mechanic scripts. */
+/** Operations exposed to mechanic scripts. */
 export class HollowsScriptAPI {
   /**
    * Load combat helpers on demand to avoid an import cycle.
@@ -61,6 +72,76 @@ export class HollowsScriptAPI {
     return zone ? getHuntersInZone(zone).filter(hunter => hunter.id !== actor.id) : [];
   }
 
+  /** Resolve the actor's primary player owner. */
+  static async owner(actor) {
+    const { primaryOwnerOf } = await import("./helpers/reactions.js");
+    return primaryOwnerOf(actor);
+  }
+
+  /** Update an actor through the GM when the caller lacks ownership. */
+  static async updateActor(actor, changes) {
+    const { default: HollowsActor } = await import("./documents/actor.mjs");
+    return HollowsActor.updateSafe(actor, changes);
+  }
+
+  /** Apply a signed Threat delta, preserving placement locks and event options. */
+  static async adjustThreat(zone, amount, options) {
+    const { addThreatToZoneSafe } = await import("./canvas/overlays.js");
+    return addThreatToZoneSafe(zone, amount, options);
+  }
+
+  /** Read the combat, round and combatant identifying a turn. */
+  static async turnKey(combat = game.combat) {
+    const { getCombatTurnKey } = await import("./helpers/combat-runtime.js");
+    return getCombatTurnKey(combat);
+  }
+
+  /** Check a script's usage against the shared combat limiter. */
+  static isUsed(actor, key, rateLimit) {
+    return Mechanic.isRateLimited(actor, { key, rateLimit });
+  }
+
+  /** Record a script's use in the current combat turn. */
+  static markUsed(actor, key) {
+    return Mechanic.markRateLimit(actor, { key });
+  }
+
+  /** Set a terrain tag, optionally identifying its token for the GM query. */
+  static setTerrain(actor, key, active = true, { tokenUuid = "", ...opts } = {}) {
+    return requestTerrainConditionApply(actor, key, tokenUuid, active, opts);
+  }
+
+  /** Prepare an Interrupt item for a free use or a specified target. */
+  static #interruptConfig(item, { free = false, target = null } = {}) {
+    const config = foundry.utils.deepClone(item.toObject().system);
+    if (target) {
+      const zone = getActorZone(target);
+      const allowed = config.profile.allowedZones;
+      if (!isThreatZone(zone) || (allowed.length && !allowed.includes(zone))) return null;
+      config.profile.allowedZones = [zone];
+    }
+    if (free) config.cost = { ...config.cost, enabled: false, amount: 0 };
+    return config;
+  }
+
+  /** Check an Interrupt item's costs and targets with the requested overrides. */
+  static async canInterrupt(entity, item, options = {}) {
+    const { isInterruptFeasible } = await import("./data/entity/action-rules.js");
+    const config = HollowsScriptAPI.#interruptConfig(item, options);
+    return !!config && isInterruptFeasible(config, entity);
+  }
+
+  /** Run an Interrupt item, optionally waiving its cost and fixing its target. */
+  static async interrupt(entity, item, { free = false, target = null } = {}) {
+    const { triggerEntityInterrupt } = await import("./data/entity/actions/entity-interrupt.js");
+    const config = HollowsScriptAPI.#interruptConfig(item, { free, target });
+    if (!config) return false;
+    return triggerEntityInterrupt(entity, config, item, {
+      freeCost: free,
+      forcedTargets: target ? [getActorTokenOnScene(target)] : [],
+    });
+  }
+
   /** Open Take Cover with the same targeting and roll options as the action. */
   static async takeCover(actor, options) {
     const { openTakeCoverForActor } = await import("./data/actions/take-cover.js");
@@ -77,6 +158,12 @@ export class HollowsScriptAPI {
   static async grantManoeuvre(actor, manoeuvre, options) {
     const { grantManoeuvre } = await import("./data/actions/index.js");
     return grantManoeuvre(actor, manoeuvre, options);
+  }
+
+  /** Run a manoeuvre on the caller's client, prompting when no name is supplied. */
+  static async manoeuvre(actor, name, options) {
+    const { runManoeuvre } = await import("./data/actions/index.js");
+    return runManoeuvre(name, actor, options);
   }
 
   /** Perform Focus, attributing the chat message to its source. */
@@ -109,6 +196,12 @@ export class HollowsScriptAPI {
     return runOnSwordFeint(actor);
   }
 
+  /** Dispatch a Reload phase for actions that replace the normal Reload effect. */
+  static async reloadEvent(actor, context) {
+    const { runOnReload } = await import("./helpers/weapon-abilities/dispatchers.js");
+    return runOnReload(actor, context);
+  }
+
   /**
    * Post escaped plain text to chat.
    * @param {string} message
@@ -139,6 +232,7 @@ export const HOLLOWS_API = Object.freeze({
   zone: Object.freeze({
     of: getActorZone,
     ofToken: getTokenZone,
+    list: getZoneList,
     adjacent: getAdjacentZones,
     huntersIn: getHuntersInZone,
     allies: HollowsScriptAPI.allies,
@@ -152,6 +246,9 @@ export const HOLLOWS_API = Object.freeze({
     hunters: getActiveSceneHunters,
     entity: getActiveEntityActor,
     hollow: getActiveHollowActor,
+    token: getActorTokenOnScene,
+    owner: HollowsScriptAPI.owner,
+    update: HollowsScriptAPI.updateActor,
   }),
 
   resource: Object.freeze({
@@ -169,12 +266,17 @@ export const HOLLOWS_API = Object.freeze({
 
   terrain: Object.freeze({
     tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts, discard: discardTerrainCondition,
+    destroy: destroyTerrainCondition, destroyGrid: destroyGridTerrain, set: HollowsScriptAPI.setTerrain,
+    pool: getTerrainPoolValue, spendPool: spendTerrainPoolTag,
   }),
 
   threat: Object.freeze({
     place: placeThreatFromHunter,
     remove: removeThreatViaDialog,
     shift: shiftThreatViaDialog,
+    adjust: HollowsScriptAPI.adjustThreat,
+    pickRemovals: pickThreatRemovalsFromZones,
+    removeFromZones: removeThreatFromZones,
   }),
 
   ask: Object.freeze({
@@ -193,6 +295,9 @@ export const HOLLOWS_API = Object.freeze({
     hasAbility: hasWeaponAbility,
     damage: getEffectiveWeaponDamage,
     form: getSelectedWeaponForm,
+    forms: getAvailableWeaponForms,
+    shotguns: getShotgunWeapons,
+    isLoaded: isShotgunLoaded,
   }),
 
   stat: Object.freeze({
@@ -203,17 +308,22 @@ export const HOLLOWS_API = Object.freeze({
   actions: Object.freeze({
     takeCover: HollowsScriptAPI.takeCover,
     grantManoeuvre: HollowsScriptAPI.grantManoeuvre,
+    manoeuvre: HollowsScriptAPI.manoeuvre,
     focus: HollowsScriptAPI.focus,
     attack: HollowsScriptAPI.attack,
     reload: HollowsScriptAPI.reload,
     guard: HollowsScriptAPI.guard,
   }),
 
-  events: Object.freeze({ swordFeint: HollowsScriptAPI.swordFeint }),
+  events: Object.freeze({ swordFeint: HollowsScriptAPI.swordFeint, reload: HollowsScriptAPI.reloadEvent }),
+
+  combat: Object.freeze({ turnKey: HollowsScriptAPI.turnKey, isUsed: HollowsScriptAPI.isUsed, markUsed: HollowsScriptAPI.markUsed }),
+
+  entity: Object.freeze({ canInterrupt: HollowsScriptAPI.canInterrupt, interrupt: HollowsScriptAPI.interrupt }),
 
   effects: Object.freeze({ apply: applyEffects }),
 
-  chat: Object.freeze({ post: HollowsScriptAPI.post, postHtml: HollowsScriptAPI.postHtml }),
+  chat: Object.freeze({ post: HollowsScriptAPI.post, postHtml: HollowsScriptAPI.postHtml, moveCardHtml: buildMoveOutcomeCardHtml }),
 });
 
 /** Permission and prompt notes shown in the editor. */
@@ -230,9 +340,15 @@ export const HOLLOWS_API_NOTES = Object.freeze({
 /** Synchronous hooks can only read state; async results would arrive too late. */
 export const HOLLOWS_SYNC_API = Object.freeze({
   zone: HOLLOWS_API.zone,
-  actors: HOLLOWS_API.actors,
-  weapon: HOLLOWS_API.weapon,
+  actors: Object.freeze({
+    hunters: getActiveSceneHunters, entity: getActiveEntityActor, hollow: getActiveHollowActor, token: getActorTokenOnScene,
+  }),
+  weapon: Object.freeze({
+    equipped: hasWeaponEquipped, isType: isWeaponOfType, hasAbility: hasWeaponAbility,
+    damage: getEffectiveWeaponDamage, form: getSelectedWeaponForm, shotguns: getShotgunWeapons, isLoaded: isShotgunLoaded,
+  }),
   resource: Object.freeze({ focusCount: getFocusCount }),
+  combat: Object.freeze({ isUsed: HollowsScriptAPI.isUsed }),
   condition: Object.freeze({ has: HOLLOWS_API.condition.has }),
-  terrain: Object.freeze({ tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts }),
+  terrain: Object.freeze({ tags: getActorTerrainTags, entityCounts: getEntityTerrainCounts, pool: getTerrainPoolValue }),
 });

@@ -4,6 +4,7 @@
  * mechanic-specific logic for abilities the actor actually carries.
  */
 
+import { Mechanic } from "../../data/mechanics/Mechanic.js";
 import { MECHANIC_BUCKETS } from "../mechanic-registry.js";
 import { runRelicTriggers, runRelicDeathSave, runRelicActionCancel } from "../../data/relic/apply-effect.js";
 import { relicHunterStatDelta, relicIncomingDamageDelta } from "../../data/relic/passive.js";
@@ -65,7 +66,7 @@ async function runReactionGroup(candidates, context, run) {
   const { primaryOwnerOf, getReactionByKey } = await import("../reactions.js");
   const byOwner = new Map();
   for (const candidate of candidates) {
-    if (candidate.ability.rateLimit && isRateLimited(candidate.carrier, candidate.ability)) continue;
+    if (candidate.ability.rateLimit && Mechanic.isRateLimited(candidate.carrier, candidate.ability)) continue;
     const owner = primaryOwnerOf(candidate.carrier) || game.user;
     const list = byOwner.get(owner.id) || { owner, candidates: [] };
     list.candidates.push(candidate);
@@ -250,7 +251,7 @@ export function getStatOverrides(actor, scope) {
     if (ability.scope !== scope) continue;
     if (!carries(actor, ability)) continue;
     if (!ability.available(actor)) continue;
-    if (ability.rateLimit && isRateLimited(actor, ability)) continue;
+    if (ability.rateLimit && Mechanic.isRateLimited(actor, ability)) continue;
     out.push(ability);
   }
   return out;
@@ -261,12 +262,12 @@ export function getStatOverrides(actor, scope) {
 // shortfall in Wounds) — same path as activated abilities.
 export async function tryActivateStatOverride(actor, override) {
   if (!actor || !override) return false;
-  if (override.rateLimit && isRateLimited(actor, override)) {
+  if (override.rateLimit && Mechanic.isRateLimited(actor, override)) {
     ui.notifications?.warn?.(`${override.name} is on cooldown.`);
     return false;
   }
   await payResourceCost(actor, override);
-  if (override.rateLimit) await markRateLimit(actor, override);
+  if (override.rateLimit) await Mechanic.markRateLimit(actor, override);
   return true;
 }
 
@@ -281,47 +282,6 @@ export function evaluateStatOverrideSuccess(override, ctx = {}) {
     return String(ctx.damageType) === String(cond.damageType) && Number(ctx.damageValue) > 0;
   }
   return false;
-}
-
-/**
- * Check a mechanic's persisted combat usage limit.
- * @param {Actor} actor Carrier actor.
- * @param {Mechanic} ability Mechanic with a rate limit.
- * @returns {boolean} Whether it has already been used in this period.
- */
-export function isRateLimited(actor, ability) {
-  const flag = actor.getFlag("hollows", `ability.${ability.key}.usedAt`);
-  if (!flag) return false;
-  const combat = game.combat;
-  if (!combat?.started) return false;
-  if (ability.rateLimit === "oncePerCombat") {
-    return flag.combatId === combat.id;
-  }
-  if (ability.rateLimit === "oncePerRound") {
-    return flag.combatId === combat.id && Number(flag.round) === Number(combat.round ?? 0);
-  }
-  if (ability.rateLimit === "oncePerTurn") {
-    return flag.combatId === combat.id
-      && Number(flag.round) === Number(combat.round ?? 0)
-      && flag.turnId === combat.combatant?.id;
-  }
-  return false;
-}
-
-export async function markRateLimit(actor, ability) {
-  const combat = game.combat;
-  if (!combat?.started) return;
-  const key = `ability.${ability.key}.usedAt`;
-  const value = {
-    combatId: combat.id,
-    round: Number(combat.round ?? 0),
-    turnId: combat.combatant?.id || null,
-  };
-  if (actor.isOwner) return actor.setFlag("hollows", key, value);
-  const { runGMQuery } = await import("../queries.js");
-  await runGMQuery("hollows.actorMutation", {
-    actorUuid: actor.uuid, type: "flag", payload: { key, value },
-  });
 }
 
 // ─── On attack result ────────────────────────────────────────────────────
@@ -376,7 +336,7 @@ export async function runOnAttackResult(actor, result, context = {}) {
       if (ability.reaction && !reaction) continue;
       for (const carrier of zoneMates) {
         if (!reaction && !ability.carrier && !carrier.isOwner) continue;
-        if (ability.rateLimit && isRateLimited(carrier, ability)) continue;
+        if (ability.rateLimit && Mechanic.isRateLimited(carrier, ability)) continue;
         let fired;
         if (reaction) {
           const owner = reactionsMod.primaryOwnerOf(carrier) || game.user;
@@ -385,7 +345,7 @@ export async function runOnAttackResult(actor, result, context = {}) {
           const actors = ability.carrier ? { actor, carrier } : { actor: carrier, attacker: actor };
           fired = await ability.run({ ...actors, result, ...currentContext() });
         }
-        if ((fired !== false) && ability.rateLimit) await markRateLimit(carrier, ability);
+        if ((fired !== false) && ability.rateLimit) await Mechanic.markRateLimit(carrier, ability);
       }
       continue;
     }
@@ -401,10 +361,10 @@ export async function runOnAttackResult(actor, result, context = {}) {
     if (!actor.isOwner) continue;
     if (!borne.has(ability) && !ability.aura && !carries(actor, ability)) continue;
     if (!ability.matchActive(actor, currentContext())) continue;
-    if (ability.rateLimit && isRateLimited(actor, ability)) continue;
+    if (ability.rateLimit && Mechanic.isRateLimited(actor, ability)) continue;
     const fired = await ability.run({ actor, result, ...currentContext() });
     applyMutation(fired);
-    if (fired !== false && ability.rateLimit) await markRateLimit(actor, ability);
+    if (fired !== false && ability.rateLimit) await Mechanic.markRateLimit(actor, ability);
   }
   return out;
 }
@@ -531,7 +491,7 @@ export function getActivatedAbilities(actor) {
 
 export async function activateAbility(actor, ability, extraCtx = {}) {
   if (!actor || !ability) return false;
-  if (ability.rateLimit && isRateLimited(actor, ability)) {
+  if (ability.rateLimit && Mechanic.isRateLimited(actor, ability)) {
     ui.notifications?.warn?.(`${ability.name} is on cooldown.`);
     return false;
   }
@@ -546,7 +506,7 @@ export async function activateAbility(actor, ability, extraCtx = {}) {
   else await applyEffects(ability.effects, ctx);
   if (ctx._cancelled) return false;
   await payResourceCost(actor, ability);
-  if (ability.rateLimit) await markRateLimit(actor, ability);
+  if (ability.rateLimit) await Mechanic.markRateLimit(actor, ability);
   return true;
 }
 
@@ -604,7 +564,7 @@ export function getApplyToZoneAbilities(actor) {
   for (const ability of [...scripted, ...MECHANIC_BUCKETS.applyToZone]) {
     if (!borne.has(ability) && !carries(actor, ability)) continue;
     if (!ability.available(actor)) continue;
-    if (ability.rateLimit && isRateLimited(actor, ability)) continue;
+    if (ability.rateLimit && Mechanic.isRateLimited(actor, ability)) continue;
     out.push(ability);
   }
   return out;

@@ -25,4 +25,41 @@ export class Mechanic {
     this.text = text || "";
     this.when = when ?? null;
   }
+
+  /** Check a mechanic's persisted combat usage limit. */
+  static isRateLimited(actor, ability) {
+    const flag = actor.getFlag("hollows", `ability.${ability.key}.usedAt`);
+    if (!flag) return false;
+    const combat = game.combat;
+    if (!combat?.started) return false;
+    if (ability.rateLimit === "oncePerCombat") {
+      return flag.combatId === combat.id;
+    }
+    if (ability.rateLimit === "oncePerRound") {
+      return (flag.combatId === combat.id) && (Number(flag.round) === Number(combat.round ?? 0));
+    }
+    if (ability.rateLimit === "oncePerTurn") {
+      return (flag.combatId === combat.id)
+        && (Number(flag.round) === Number(combat.round ?? 0))
+        && (flag.turnId === combat.combatant?.id);
+    }
+    return false;
+  }
+
+  /** Record a completed use on the carrier, routing through the GM when needed. */
+  static async markRateLimit(actor, ability) {
+    const combat = game.combat;
+    if (!combat?.started) return;
+    const key = `ability.${ability.key}.usedAt`;
+    const value = {
+      combatId: combat.id,
+      round: Number(combat.round ?? 0),
+      turnId: combat.combatant?.id || null,
+    };
+    if (actor.isOwner) return actor.setFlag("hollows", key, value);
+    const { runGMQuery } = await import("../../helpers/queries.js");
+    await runGMQuery("hollows.actorMutation", {
+      actorUuid: actor.uuid, type: "flag", payload: { key, value },
+    });
+  }
 }

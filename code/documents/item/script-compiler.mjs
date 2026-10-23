@@ -212,10 +212,9 @@ ${source}
     if (running.has(mechanic.key)) return this.#failed;
     running.add(mechanic.key);
     try {
-      const { isRateLimited, markRateLimit } = await import("../../helpers/weapon-abilities/dispatchers.js");
-      if (isRateLimited(actor, mechanic)) return this.#failed;
+      if (Mechanic.isRateLimited(actor, mechanic)) return this.#failed;
       const result = await run();
-      if ((result !== this.#failed) && (result !== false)) await markRateLimit(actor, mechanic);
+      if ((result !== this.#failed) && (result !== false)) await Mechanic.markRateLimit(actor, mechanic);
       return result;
     } finally {
       running.delete(mechanic.key);
