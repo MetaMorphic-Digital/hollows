@@ -11,7 +11,7 @@ import {
   isRangedZone,
   isThreatZone,
 } from "./zone.js";
-import { HOLLOWS_LAIR_LABEL_OFFSETS } from "../data/_module.mjs";
+import { HOLLOWS_LAIR_LABEL_OFFSETS, HOLLOWS_LAIR_TEMPLATE } from "../data/_module.mjs";
 
 // ─── Math helpers ──────────────────────────────────────────────────────
 
@@ -288,6 +288,8 @@ export function refreshThreatOverlays() {
   canvas.controls.hollowsThreat = layer;
 
   const regions = canvas.regions.placeables || [];
+  const grid = canvas.scene.tiles.find(t => t.getFlag("hollows", "gridOverlay"));
+  const scale = grid ? grid.width / HOLLOWS_LAIR_TEMPLATE.rect.width : 1;
   const curseCfg = getActiveCurseConfig();
   const zoneCurseEnabled = curseCfg.enabled && curseCfg.targets.zone;
   for (const regionObj of regions) {
@@ -316,7 +318,7 @@ export function refreshThreatOverlays() {
     const paddingX = 8;
     const paddingY = 5;
     const bg = new PIXI.Graphics();
-    bg.beginFill(0x120f12, 0.75);
+    bg.beginFill(0x120f12);
     bg.lineStyle(1, 0x7b6a5a, 0.9);
     bg.drawRoundedRect(
       -text.width / 2 - paddingX,
@@ -328,19 +330,28 @@ export function refreshThreatOverlays() {
     bg.endFill();
 
     const container = new PIXI.Container();
-    container.position.set(center.x + offset.x, center.y + offset.y);
+    container.position.set(center.x + offset.x * scale, center.y + offset.y * scale);
+    container.scale.set(scale);
     container.addChild(bg);
     container.addChild(text);
+    container.eventMode = "static";
+    container.interactiveChildren = false;
+    container.hitArea = new PIXI.Rectangle(
+      -text.width / 2 - paddingX,
+      -text.height / 2 - paddingY,
+      text.width + paddingX * 2,
+      text.height + paddingY * 2,
+    );
+    container.on("pointerover", () => {
+      bg.alpha = 0.9;
+      text.alpha = 1;
+    });
+    container.on("pointerout", () => {
+      bg.alpha = 0.3;
+      text.alpha = 0.8;
+    });
 
     if (game.user?.isGM) {
-      container.eventMode = "static";
-      container.interactiveChildren = false;
-      container.hitArea = new PIXI.Rectangle(
-        -text.width / 2 - paddingX,
-        -text.height / 2 - paddingY,
-        text.width + paddingX * 2,
-        text.height + paddingY * 2,
-      );
       container.cursor = "pointer";
       container.on("pointerdown", async (ev) => {
         const isShift = !!ev?.data?.originalEvent?.shiftKey;
@@ -364,6 +375,10 @@ export function refreshThreatOverlays() {
     }
 
     layer.addChild(container);
+    const mouse = container.toLocal(canvas.mousePosition, canvas.stage);
+    const hovered = container.hitArea.contains(mouse.x, mouse.y);
+    bg.alpha = hovered ? 0.9 : 0.3;
+    text.alpha = hovered ? 1 : 0.8;
   }
   refreshHunterCurseBadges();
 }
