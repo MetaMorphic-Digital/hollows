@@ -17,7 +17,8 @@ function getSceneRect(scene) {
   return { x, y, width, height };
 }
 
-async function ensureGridOverlay(scene, style) {
+/** Fit the lair grid to the scene and apply its color. */
+export async function updateGridOverlay(scene, style) {
   if (!scene) return;
   const gridSrc = style === "black"
     ? "systems/hollows/assets/hollows-grid-black.webp"
@@ -145,7 +146,7 @@ async function ensureLairRegions(scene) {
 
 export async function applyEntityLair(scene, style, { refreshThreatOverlays } = {}) {
   if (!scene) return;
-  await ensureGridOverlay(scene, style);
+  await updateGridOverlay(scene, style);
   await ensureLairRegions(scene);
   if (typeof refreshThreatOverlays === "function") refreshThreatOverlays();
 }

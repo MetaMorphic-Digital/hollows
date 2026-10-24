@@ -1,6 +1,7 @@
 import {
   applyEntityLair as applyEntityLairCanvas,
   clearEntityLair as clearEntityLairCanvas,
+  updateGridOverlay as updateGridOverlayCanvas,
 } from "../canvas/lair.js";
 import { getActiveHollowActor, getTokenZone } from "../canvas/zone.js";
 import { refreshHunterCurseBadges, refreshTerrainPoolOverlay, refreshThreatOverlays } from "../canvas/overlays.js";
@@ -211,7 +212,7 @@ export function registerCanvasHooks() {
   });
 
   Hooks.on("updateScene", async (scene, data, options, userId) => {
-    if (!game.user?.isGM) return;
+    if (!game.user?.isGM || (game.user.id !== userId)) return;
     const flags = scene.getFlag("hollows", "entityLair") || {};
     const enabled = flags.enabled;
     if (!enabled) {
@@ -220,14 +221,13 @@ export function registerCanvasHooks() {
       }
       return;
     }
-    const changed =
-      data?.flags?.hollows?.entityLair ||
-      data?.background?.src ||
-      data?.width ||
-      data?.height ||
-      data?.dimensions;
-    if (changed) {
+    const lairChanges = data.flags?.hollows?.entityLair;
+    const layoutChanged = ["width", "height", "padding", "shiftX", "shiftY", "dimensions"].some(key => key in data)
+      || (data.grid?.size !== undefined);
+    if (lairChanges?.enabled || layoutChanged) {
       await applyEntityLairCanvas(scene, flags.gridStyle || "white", { refreshThreatOverlays });
+    } else if (lairChanges?.gridStyle) {
+      await updateGridOverlayCanvas(scene, flags.gridStyle);
     }
   });
 
