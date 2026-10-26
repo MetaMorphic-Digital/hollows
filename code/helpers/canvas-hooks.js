@@ -212,7 +212,7 @@ export function registerCanvasHooks() {
   });
 
   Hooks.on("updateScene", async (scene, data, options, userId) => {
-    if (!game.user?.isGM || (game.user.id !== userId)) return;
+    if (!game.user.isActiveGM) return;
     const flags = scene.getFlag("hollows", "entityLair") || {};
     const enabled = flags.enabled;
     if (!enabled) {

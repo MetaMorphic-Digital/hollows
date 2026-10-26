@@ -144,14 +144,13 @@ export function getZoneRegionDoc(zoneId, scene = canvas?.scene) {
   }) || null;
 }
 
-/** List lair regions that can hold Threat. */
+/** List one Threat region per zone in combat order. */
 export function getThreatRegionDocs(scene = canvas?.scene) {
-  const regions = scene?.regions?.contents || [];
-  return regions.filter((r) => {
-    if (!r.getFlag("hollows", "lairRegion")) return false;
-    const zoneId = r.getFlag("hollows", "zoneId") || r.name || "";
-    return isThreatZone(zoneId);
-  });
+  const order = [...ZONE_GROUPS.close, ...ZONE_GROUPS.ranged];
+  return getZoneList(scene)
+    .filter(isThreatZone)
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b))
+    .map(zoneId => getZoneRegionDoc(zoneId, scene));
 }
 
 /** Count Threat in a zone. */

@@ -19,8 +19,8 @@ export const WEAPON_TYPE_ORDER = [
 ];
 
 export const ZONE_GROUPS = {
-  close: ["Front", "Rear", "Flank Left", "Flank Right"],
-  ranged: ["Ranged Left", "Ranged Front", "Ranged Right"],
+  close: ["Front", "Flank Left", "Flank Right", "Rear"],
+  ranged: ["Ranged Front", "Ranged Left", "Ranged Right"],
 };
 
 // Stored scope keys mapped to labels.
