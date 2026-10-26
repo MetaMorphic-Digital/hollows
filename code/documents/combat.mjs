@@ -1,19 +1,21 @@
 import { getActiveEntityActor, getActiveHollowActor } from "../canvas/zone.js";
 import { triggerEntityTriggeredAbilities } from "../data/entity/actions/entity-special.js";
 import {
+  applyFirstPickSelection,
   beginFirstPick,
   clearActedForBracket,
   ensureFirstPickDialog,
-  maybeSetTurnToHighest,
   resetHunterRoundFlagsForNewRound,
   shouldCurrentUserHandleFirstPick,
 } from "../helpers/combat-first-pick.js";
 import { processEndOfTurn, processStartOfTurn } from "../helpers/combat-lifecycle.js";
-import { getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from "../helpers/combat-runtime.js";
+import { createSetupRollMessage, getCombatantBracket, getCombatantOwners, getCombatantsInBracket } from "../helpers/combat-runtime.js";
 import { getTerrainTagKeys, removeCondition } from "./actor/conditions.js";
 import { initializeHunterCoreStatesForCombat } from "./actor/hunter-combat.js";
 import { getFocusCount, setFocusCount } from "./actor/resources.js";
 import { applyInterceptors } from "../helpers/extensions.js";
+import { COMBAT_QUERY_TIMEOUT, runUserQuery } from "../helpers/queries.js";
+import { getEffectiveEntityStat } from "./entity/entity-stats.js";
 
 /**
  * System implementation of the Combat class.
@@ -26,19 +28,81 @@ export default class HollowsCombat extends foundry.documents.Combat {
    */
   lastCombatantId = null;
 
+  #starting = false;
+  #preparingSetup = false;
+
+  /** Whether every Hunter has rolled Setup and chosen a bracket. */
+  get isSetupComplete() {
+    const hunters = this.combatants.filter(c => c.actor?.type === "hunter");
+    return (hunters.length > 0) && hunters.every(c => c.getFlag("hollows", "setup")?.bracket
+      && (c.initiative != null));
+  }
+
+  /** Prepare Setup rolls for Hunters who have not received a roll card. */
+  async prepareSetup() {
+    if (!game.user.isActiveGM) {
+      await runUserQuery(game.users.activeGM, "hollows.prepareSetup", { combatId: this.id }, { timeout: COMBAT_QUERY_TIMEOUT });
+      return this;
+    }
+    if (this.started || this.#preparingSetup) return this;
+    const entity = getActiveEntityActor();
+    if (!entity) {
+      ui.notifications.warn("No Entity actor found for setup roll.");
+      return this;
+    }
+    const requested = new Set(this.getFlag("hollows", "setupRolls") || []);
+    const hunters = this.combatants.filter(c => (c.actor?.type === "hunter") && !requested.has(c.id));
+    if (!hunters.length) return this;
+    this.#preparingSetup = true;
+    try {
+      if (!requested.size) await this.#resetHunterCombatFlags();
+      const tn = getEffectiveEntityStat(entity, "ranged");
+      const entityCombatant = this.combatants.find(c => c.actor?.type === "entity");
+      if (entityCombatant) await entityCombatant.update({ initiative: 1 });
+      for (const combatant of hunters) {
+        await createSetupRollMessage(combatant, tn);
+        requested.add(combatant.id);
+      }
+      await this.setFlag("hollows", "setupRolls", [...requested]);
+      return this;
+    } finally {
+      this.#preparingSetup = false;
+    }
+  }
+
   /* -------------------------------------------------- */
 
   /** @inheritdoc */
   async startCombat() {
-    // Before super, so this still runs against the pre-start round and turn.
-    if (game.user.isActiveGM) {
+    if (!game.user.isActiveGM) {
+      await runUserQuery(game.users.activeGM, "hollows.startCombat", { combatId: this.id }, { timeout: COMBAT_QUERY_TIMEOUT });
+      return this;
+    }
+    if (this.started || this.#starting || this.#preparingSetup) return this;
+    if (!this.isSetupComplete) {
+      ui.notifications.warn("Finish Setup rolls and choose Before or After before starting combat.");
+      return this;
+    }
+    this.#starting = true;
+    try {
+      const entity = getActiveEntityActor();
       const hollow = getActiveHollowActor();
       if (hollow) await hollow.unsetFlag("hollows", "explorationTNMod");
-      this.lastCombatantId = this.combatant?.id || null;
-      await triggerEntityTriggeredAbilities(getActiveEntityActor(), "battleStart", {}, ["special", "doom"]);
-      await this.#resetHunterCombatFlags();
+      this.lastCombatantId = null;
+      if (!this.getFlag("hollows", "setupRolls")) await this.#resetHunterCombatFlags();
+      await super.startCombat();
+      await initializeHunterCoreStatesForCombat(this);
+      await triggerEntityTriggeredAbilities(entity, "battleStart", {}, ["special", "doom"]);
+      if (getCombatantsInBracket(this, "before").length) {
+        await beginFirstPick(this, "before", null, "setup");
+      } else {
+        const entityCombatant = this.combatants.find(c => c.actor?.type === "entity");
+        if (entityCombatant) await applyFirstPickSelection(this, entityCombatant.id, null, "setup", true);
+      }
+      return this;
+    } finally {
+      this.#starting = false;
     }
-    return super.startCombat();
   }
 
   /* -------------------------------------------------- */
@@ -60,22 +124,9 @@ export default class HollowsCombat extends foundry.documents.Combat {
     // Above the guard: the dialog is opened by whichever user was picked to choose.
     this.#onAwaitingFirstPickUpdate(changed);
 
-    if (!game.user.isActiveGM) return;
+    if (!game.user.isActiveGM || this.#starting) return;
 
-    // Must stay unchained — awaiting the first delays the turn machine and double-advances the round.
-    this.#onInitializeUpdate();
     this.#onTurnChange(changed, options);
-  }
-
-  /* -------------------------------------------------- */
-
-  /** @inheritdoc */
-  _onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId) {
-    super._onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId);
-    if (collection !== "combatants") return;
-    if (!game.user.isActiveGM) return;
-    const relevant = changes.some(c => c.flags?.hollows?.setup || ("initiative" in c));
-    if (relevant) maybeSetTurnToHighest(this);
   }
 
   /* -------------------------------------------------- */
@@ -83,6 +134,7 @@ export default class HollowsCombat extends foundry.documents.Combat {
   /** @inheritdoc */
   async _onDelete(options, userId) {
     super._onDelete(options, userId);
+    this.updateCombatantActors();
 
     if (!game.user.isActiveGM) return;
 
@@ -170,14 +222,6 @@ export default class HollowsCombat extends foundry.documents.Combat {
     if (!awaiting) return;
     if (!shouldCurrentUserHandleFirstPick(awaiting)) return;
     window.setTimeout(() => ensureFirstPickDialog(this), 0);
-  }
-
-  /* -------------------------------------------------- */
-
-  /** Seed hunter state once the combat is under way. */
-  async #onInitializeUpdate() {
-    if (!this.started && ((this.round ?? 0) <= 0)) return;
-    await initializeHunterCoreStatesForCombat(this);
   }
 
   /* -------------------------------------------------- */

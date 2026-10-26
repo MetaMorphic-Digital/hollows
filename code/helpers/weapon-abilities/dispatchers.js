@@ -419,7 +419,7 @@ export async function runOnDefenceResult(actor, ctx = {}) {
 // ─── On move ─────────────────────────────────────────────────────────────
 /** Dispatch movement effects on the GM after a token changes zones. */
 export async function runOnMove(actor, { fromZone, toZone, byOwner } = {}) {
-  if (!actor || !game.user?.isGM) return;
+  if (!actor || !game.user.isActiveGM) return;
   const borneMechanics = [
     ...ScriptCompiler.getMechanics(actor, OnMoveAction).filter(m => !m.aura), ...ScriptCompiler.getAuras(OnMoveAction),
   ];
@@ -491,6 +491,7 @@ export function getActivatedAbilities(actor) {
 
 export async function activateAbility(actor, ability, extraCtx = {}) {
   if (!actor || !ability) return false;
+  if (!game.combat?.started) return false;
   if (ability.rateLimit && Mechanic.isRateLimited(actor, ability)) {
     ui.notifications?.warn?.(`${ability.name} is on cooldown.`);
     return false;
@@ -792,7 +793,7 @@ export async function runOnEntityAttack(entityActor, targetTokens = []) {
 
 /** Discard terrain after an owner's move, keeping the tag chosen by a script. */
 export async function runTerrainDiscardOnMove(actor, { fromZone, byOwner } = {}) {
-  if (!actor || !game.user?.isGM || !byOwner) return;
+  if (!actor || !game.user.isActiveGM || !byOwner) return;
   const { getActorTerrainTags, discardTerrainCondition } = await import("../../documents/actor/conditions.js");
   const tags = getActorTerrainTags(actor);
   if (!tags.length) return;

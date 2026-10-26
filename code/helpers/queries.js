@@ -20,8 +20,8 @@
  */
 
 import { HANDLERS } from "./queries-state.js";
-import { applyAdvanceTurnGM, applyPassInitiativeGM } from "./combat-runtime.js";
-import { applyFirstPickSelection } from "./combat-first-pick.js";
+import { applyAdvanceTurnGM, applyPassInitiativeGM, getCombatTurnKey, isSameCombatTurn } from "./combat-runtime.js";
+import { applyFirstPickSelection, finishEntityTurnAndBeginFirstPick } from "./combat-first-pick.js";
 import { promptIncursionRollQuery } from "../documents/actor/incursion.js";
 import { addCondition, removeCondition } from "../documents/actor/conditions.js";
 import { adjustHunterResource, adjustEntityResource } from "../documents/actor/resources.js";
@@ -34,6 +34,8 @@ import { getActiveEntityActor } from "../canvas/zone.js";
 import { resolveEntityKillRewardsFromMessage } from "../documents/entity/baptism.js";
 import { QueryPermissionError } from "../utils/permissions.js";
 import { registerReactions } from "./reactions.js";
+
+export const COMBAT_QUERY_TIMEOUT = 300_000;
 
 // NOTE: permission helpers exist in ../utils/permissions.js. They are *not*
 // used here because Foundry runs query handlers under the receiver's identity.
@@ -115,6 +117,18 @@ function resolveCombatOrThrow(combatId) {
 }
 
 function registerCategoryAHandlers() {
+  registerHandler("hollows.prepareSetup", async ({ combatId }) => {
+    await resolveCombatOrThrow(combatId).prepareSetup();
+  });
+
+  registerHandler("hollows.startCombat", async ({ combatId }) => {
+    await resolveCombatOrThrow(combatId).startCombat();
+  });
+
+  registerHandler("hollows.finishEntityTurn", async ({ combatId, turn }) => {
+    await finishEntityTurnAndBeginFirstPick(resolveCombatOrThrow(combatId), turn);
+  });
+
   registerHandler("hollows.passInitiative", async ({ combatId, fromCombatantId, toCombatantId } = {}) => {
     const combat = resolveCombatOrThrow(combatId);
     await applyPassInitiativeGM(combat, fromCombatantId, toCombatantId);
@@ -125,13 +139,14 @@ function registerCategoryAHandlers() {
     await applyAdvanceTurnGM(combat, fromCombatantId, mode);
   });
 
-  registerHandler("hollows.firstPickChoice", async ({ combatId, combatantId, prevCombatantId, reason, eotDone } = {}) => {
+  registerHandler("hollows.firstPickChoice", async ({ combatId, combatantId, nonce, turn, prevCombatantId, reason }) => {
     const combat = resolveCombatOrThrow(combatId);
     const awaiting = combat.getFlag("hollows", "awaitingFirstPick") || {};
-    const prevId = prevCombatantId || awaiting.prevCombatantId || null;
-    const eventReason = reason || awaiting.reason || "round-start";
-    const eotFlag = typeof eotDone === "boolean" ? eotDone : !!awaiting.eotDone;
-    await applyFirstPickSelection(combat, combatantId, prevId, eventReason, eotFlag);
+    if (nonce !== (awaiting.nonce || "")) return;
+    if (!isSameCombatTurn(turn, getCombatTurnKey(combat))) return;
+    const prevId = awaiting.prevCombatantId || prevCombatantId || null;
+    const eventReason = awaiting.reason || reason || "round-start";
+    await applyFirstPickSelection(combat, combatantId, prevId, eventReason, !!awaiting.eotDone);
   });
 
   registerHandler("hollows.setMessageFlag", async ({ messageId, key, value } = {}) => {

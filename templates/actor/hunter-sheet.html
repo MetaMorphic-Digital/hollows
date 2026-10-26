@@ -12,7 +12,7 @@
       <div class="header-actions">
         {{#if isNewHunter}}
           <button type="button" class="stat-roll attack-primary begin-character-creation" data-action="begin-character-creation">Begin Character Creation</button>
-        {{else}}
+        {{else if combatStarted}}
           {{#if isDead}}
             <div class="muted">Dead</div>
           {{else}}
