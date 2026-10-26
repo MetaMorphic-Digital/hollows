@@ -57,8 +57,13 @@ export const HOLLOWS_LAIR_TEMPLATE = {
   ],
 };
 
+// Label offsets in the 1024px lair template, scaled with the grid.
 export const HOLLOWS_LAIR_LABEL_OFFSETS = {
-  "Ranged Front": { x: 0, y: 40 },
-  "Ranged Left": { x: -30, y: 20 },
-  "Ranged Right": { x: 30, y: -20 },
+  Rear: { x: 0, y: -45 },
+  "Flank Left": { x: 0, y: -90 },
+  "Flank Right": { x: 0, y: -90 },
+  Front: { x: 0, y: 45 },
+  "Ranged Front": { x: 0, y: 75 },
+  "Ranged Left": { x: -30, y: -130 },
+  "Ranged Right": { x: 30, y: -130 },
 };
