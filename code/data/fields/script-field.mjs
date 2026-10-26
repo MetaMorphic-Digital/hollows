@@ -8,19 +8,19 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
 
   /**
    * @type {Record<string, {
-   *   label?: string, ctx?: string[], returns?: string, sync?: boolean,
+   *   label?: string, ctx?: string[], returns?: string, sync?: boolean, combatOnly?: boolean,
    *   hasOn?: boolean, hasEvent?: boolean, multipleOnly?: boolean, fallback?: *, options?: boolean, optionalRun?: boolean
    * }>}
    */
   static hooks = {
-    reloadFullCheck: { multipleOnly: true },
+    reloadFullCheck: { multipleOnly: true, combatOnly: true },
     entityActionPause: { multipleOnly: true },
-    onDeath: { multipleOnly: true },
+    onDeath: { multipleOnly: true, combatOnly: true },
     threatLock: { multipleOnly: true, sync: true, fallback: [] },
     weaponModifier: { multipleOnly: true, sync: true },
     attackOptions: { multipleOnly: true, sync: true, fallback: null, options: true },
     defenceOptions: { multipleOnly: true, sync: true, fallback: null, options: true },
-    terrainDiscard: { multipleOnly: true, fallback: null },
+    terrainDiscard: { multipleOnly: true, fallback: null, combatOnly: true },
     manoeuvreAvailability: { multipleOnly: true, sync: true, fallback: null },
     resourceLimit: { multipleOnly: true, sync: true, fallback: null },
     threatEnhancement: { multipleOnly: true, sync: true, fallback: null },
@@ -89,6 +89,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
       ],
     },
     onMove: {
+      combatOnly: true,
       label: "HOLLOWS.SCRIPT.hooks.onMove.label",
       ctx: [
         "actor",
@@ -99,6 +100,7 @@ export default class ScriptField extends foundry.data.fields.SchemaField {
       ],
     },
     onEvent: {
+      combatOnly: true,
       label: "HOLLOWS.SCRIPT.hooks.onEvent.label",
       ctx: [
         "actor",

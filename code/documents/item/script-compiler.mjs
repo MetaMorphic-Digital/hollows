@@ -93,12 +93,13 @@ ${source}
    * @param {Function} fn
    * @param {string} key
    * @param {Item} item
-   * @param {{sync?: boolean, routeToGM?: boolean, runOnGM?: boolean, carrierIds?: string[], fallback?: *, api?: object}} [options]
+   * @param {{sync?: boolean, routeToGM?: boolean, runOnGM?: boolean, combatOnly?: boolean, carrierIds?: string[], fallback?: *, api?: object}} [options]
    * @returns {Function} Returns the fallback on failure; void remains a successful result.
    */
-  static #makeInvoker(fn, key, item, { sync = false, routeToGM = false, runOnGM = false, carrierIds, fallback = this.#failed, api = sync ? SYNC_API : API } = {}) {
+  static #makeInvoker(fn, key, item, { sync = false, routeToGM = false, runOnGM = false, combatOnly = false, carrierIds, fallback = this.#failed, api = sync ? SYNC_API : API } = {}) {
     const context = (actor, ctx) => ({ carrier: item.parent, carrierIds, ...ctx, actor, item });
     if (sync) return (actor, ctx = {}) => {
+      if (combatOnly && !game.combat?.started) return fallback;
       try {
         const result = fn(api, actor, context(actor, ctx));
         if (result && (typeof result.then === "function")) {
@@ -112,6 +113,7 @@ ${source}
       }
     };
     return async (actor, ctx = {}, choice) => {
+      if (combatOnly && !game.combat?.started) return fallback;
       try {
         ctx = context(actor, ctx);
         if ((runOnGM && !game.user.isGM) || (routeToGM && !ctx.carrier.isOwner)) {
@@ -375,7 +377,9 @@ ${source}
     const { key, hook } = config;
     const sync = !!ScriptField.hooks[hook].sync;
     const reaction = callbacks.promptOnPlayer !== undefined;
-    const invoker = (fn, options = {}) => this.#makeInvoker(fn, key, item, { carrierIds, ...options });
+    const invoker = (fn, options = {}) => this.#makeInvoker(fn, key, item, {
+      carrierIds, combatOnly: ScriptField.hooks[hook].combatOnly, ...options,
+    });
     const recipient = callbacks.recipient && invoker(callbacks.recipient, { sync: true, fallback: false });
     const run = reaction ? (_H, actor, ctx) => {
       const user = recipient && recipient(actor, ctx);
@@ -401,7 +405,7 @@ ${source}
     for (const method of ["active", "matchCarrier", "available", "getLabel"]) {
       if (!callbacks[method]) continue;
       mechanic[method] = invoker(callbacks[method], {
-        sync: true, fallback: method === "getLabel" ? mechanic.name : false,
+        sync: true, combatOnly: false, fallback: method === "getLabel" ? mechanic.name : false,
       });
     }
     if (callbacks.when) {

@@ -181,6 +181,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     data.isDying = this.actor.statuses.has("dying");
     data.isDead = this.actor.statuses.has("dead");
     data.isNewHunter = isNewHunterActor(this.actor);
+    data.combatStarted = !!game.combat?.started;
     data.currentZone = getActorZone(this.actor);
     data.isInSupport = data.currentZone === "Support";
     data.focusCount = getFocusCount(this.actor);

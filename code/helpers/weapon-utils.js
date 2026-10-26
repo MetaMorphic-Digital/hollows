@@ -1,6 +1,5 @@
 import { WEAPON_TYPE_ORDER } from "../data/_module.mjs";
 import { resolveSuggestedRollMode } from "../dice/_module.mjs";
-import { getEffectiveWeaponCapacity } from "../data/weapons/index.js";
 import { addCondition, removeCondition } from "../documents/actor/conditions.js";
 
 /**
@@ -97,10 +96,11 @@ export async function cleanupWeaponAbilitiesForActor(actor) {
 
 export async function restoreWeaponsCapacity(actor) {
   if (!actor || actor.type !== "hunter") return;
+  const { getEffectiveCapacity } = await import("../documents/item/weapon.js");
   const weapons = actor.items.filter(i => i.type === "weapon");
   const updates = [];
   for (const weapon of weapons) {
-    const max = Number(getEffectiveWeaponCapacity(weapon).max ?? 0);
+    const max = getEffectiveCapacity(weapon);
     if (max <= 0) continue;
     const cur = Number(weapon.system?.capacity?.value ?? 0);
     if (cur !== max) {

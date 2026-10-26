@@ -16,17 +16,13 @@ export function getTotalStatForActor(actor, statKey) {
 }
 
 export async function initializeHunterCoreStatesForCombat(combat) {
-  if (!game.user?.isGM) return;
-  if (!combat?.started) return;
-  const already = combat.getFlag("hollows", "coreStatesInitialized");
-  if (already) return;
   const hunters = combat.combatants
     .map((c) => c.actor)
     .filter((a) => a?.type === "hunter");
   for (const hunter of hunters) {
+    await restoreWeaponsCapacity(hunter);
     await applyInterceptors("combat-start-hunter", { actor: hunter, hunter }, null);
   }
-  await combat.setFlag("hollows", "coreStatesInitialized", true);
 }
 
 export async function applySupportStartOfTurn(actor) {

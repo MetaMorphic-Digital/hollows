@@ -1,29 +1,9 @@
-import { getCombatantsInBracket } from "./combat-runtime.js";
+import { getCombatantsInBracket, getCombatTurnKey, isSameCombatTurn } from "./combat-runtime.js";
 import { processEndOfTurn, processStartOfTurn } from "./combat-lifecycle.js";
-import { dispatchToGM } from "./queries.js";
+import { COMBAT_QUERY_TIMEOUT, runUserQuery } from "./queries.js";
 
-
-export async function maybeSetTurnToHighest(combat) {
-  if (!combat || !game.user?.isGM) return;
-  if (!combat.started) return;
-  const hunters = combat.combatants.filter((combatant) => combatant.actor?.type === "hunter");
-  if (!hunters.length) return;
-  const allReady = hunters.every((combatant) => (combatant.getFlag("hollows", "setup") || {}).bracket && combatant.initiative !== null && combatant.initiative !== undefined);
-  if (!allReady) return;
-  const setupDone = combat.getFlag("hollows", "setupFirstPickDone");
-  const awaiting = combat.getFlag("hollows", "awaitingFirstPick");
-  if (!setupDone && !awaiting) {
-    const beforeCount = getCombatantsInBracket(combat, "before").length;
-    const afterCount = getCombatantsInBracket(combat, "after").length;
-    if (beforeCount > 0) {
-      await beginFirstPick(combat, "before", null, "setup");
-    } else if (afterCount > 0) {
-      const entityCombatant = combat.combatants.find((combatant) => combatant.actor?.type === "entity");
-      if (!entityCombatant) return;
-      await applyFirstPickSelection(combat, entityCombatant.id, null, "setup", true);
-    }
-  }
-}
+const selectionInProgress = new WeakSet();
+const entityEndInProgress = new WeakSet();
 
 export async function resetHunterRoundFlagsForNewRound() {
   if (!game.user?.isGM) return;
@@ -36,43 +16,45 @@ export async function resetHunterRoundFlagsForNewRound() {
 
 export async function applyFirstPickSelection(combat, combatantId, prevCombatantId, reason = "", eotDone = false) {
   if (!combat || !game.user?.isGM) return;
-  const prevId = prevCombatantId || null;
-  if (reason !== "setup" && prevId && !eotDone) {
-    const prevCombatant = combat.combatants.get(prevId);
-    if (prevCombatant) {
-      if (!prevCombatant.getFlag("hollows", "acted")) {
-        await prevCombatant.setFlag("hollows", "acted", true);
+  if (selectionInProgress.has(combat)) return;
+  selectionInProgress.add(combat);
+  try {
+    const prevId = prevCombatantId || null;
+    if (reason !== "setup" && prevId && !eotDone) {
+      const prevCombatant = combat.combatants.get(prevId);
+      if (prevCombatant) {
+        if (!prevCombatant.getFlag("hollows", "acted")) {
+          await prevCombatant.setFlag("hollows", "acted", true);
+        }
+        await processEndOfTurn(combat, prevCombatant);
       }
-      await processEndOfTurn(combat, prevCombatant);
     }
-  }
-  await combat.setFlag("hollows", "awaitingFirstPick", null);
-  if (reason === "setup") {
-    await combat.setFlag("hollows", "setupFirstPickDone", true);
-  }
-
-  const turns = combat.turns || [];
-  const index = turns.findIndex((turn) => turn.id === combatantId);
-  if (index === -1) return;
-  if (combat.turn !== index || (reason === "round-start")) {
-    const updateData = { turn: index };
-    if (reason === "round-start") {
-      updateData.round = Math.max(1, Number(combat.round || 0) + 1);
-      await resetHunterRoundFlagsForNewRound();
+    await combat.setFlag("hollows", "awaitingFirstPick", null);
+    const turns = combat.turns || [];
+    const index = turns.findIndex((turn) => turn.id === combatantId);
+    if (index === -1) return;
+    if (combat.turn !== index || (reason === "round-start")) {
+      const updateData = { turn: index };
+      if (reason === "round-start") {
+        updateData.round = Math.max(1, Number(combat.round || 0) + 1);
+        await resetHunterRoundFlagsForNewRound();
+      }
+      await combat.update(updateData, { hollowsSkipTurnProcessing: true, turnEvents: false });
     }
-    await combat.update(updateData, { hollowsSkipTurnProcessing: true, turnEvents: false });
-  }
 
-  const newCombatant = combat.combatants.get(combatantId);
-  await processStartOfTurn(combat, newCombatant);
-  combat.lastCombatantId = combatantId;
+    const newCombatant = combat.combatants.get(combatantId);
+    await processStartOfTurn(combat, newCombatant);
+    combat.lastCombatantId = combatantId;
+  } finally {
+    selectionInProgress.delete(combat);
+  }
 }
 
 export function shouldCurrentUserHandleFirstPick(awaiting = null) {
   if (!awaiting) return false;
   const chooserUserId = String(awaiting.chooserUserId || "");
   if (chooserUserId) return chooserUserId === String(game.user?.id || "");
-  return !!game.user?.isGM;
+  return game.user.isActiveGM;
 }
 
 export async function ensureFirstPickDialog(combat, nonce = "") {
@@ -84,8 +66,6 @@ export async function ensureFirstPickDialog(combat, nonce = "") {
   await openFirstPickDialog(combat, awaiting.bracket, expectedNonce, {
     prevCombatantId: awaiting.prevCombatantId || "",
     reason: awaiting.reason || "",
-    chooserUserId: awaiting.chooserUserId || "",
-    eotDone: !!awaiting.eotDone,
     persistent: true,
     forceReopen: true
   });
@@ -117,6 +97,7 @@ export async function openFirstPickDialog(combat, bracket, nonce = "", options =
     game.hollowsFirstPickNonceSeen.set(combat.id, nonce);
   }
   const optionHtml = candidates.map((combatant) => `<option value="${combatant.id}">${combatant.name}</option>`).join("");
+  const turn = getCombatTurnKey(combat);
   const content = `
     <form class="hollows-roll-dialog">
       <p>Choose which combatant acts first in this bracket.</p>
@@ -135,22 +116,14 @@ export async function openFirstPickDialog(combat, bracket, nonce = "", options =
         choiceMade = true;
         const id = String(dlg.element.querySelector("[name=combatantId]")?.value || "");
         if (!id) return;
-        if (game.user?.isGM) {
-          const awaiting = combat.getFlag("hollows", "awaitingFirstPick") || {};
-          const prevId = options.prevCombatantId || awaiting.prevCombatantId || null;
-          const reason = options.reason || awaiting.reason || "round-start";
-          const eotDone = !!awaiting.eotDone;
-          await applyFirstPickSelection(combat, id, prevId, reason, eotDone);
-          return;
-        }
-        await dispatchToGM("firstPickChoice", {
+        await runUserQuery(game.users.activeGM, "hollows.firstPickChoice", {
           combatId: combat.id,
           combatantId: id,
-          userId: game.user?.id,
+          nonce,
+          turn,
           prevCombatantId: options.prevCombatantId || "",
           reason: options.reason || "",
-          bracket
-        });
+        }, { timeout: COMBAT_QUERY_TIMEOUT });
       }},
       { action: "skip", label: "Skip", callback: () => { choiceMade = true; } }
     ]
@@ -201,24 +174,33 @@ export async function beginFirstPick(combat, bracket, prevCombatantId = null, re
     eotDone: !!eotDone,
     nonce
   });
-  if (chooserUserId && chooserUserId !== game.user?.id) return;
-  await openFirstPickDialog(combat, bracket, nonce);
+  await ensureFirstPickDialog(combat, nonce);
 }
 
-export async function finishEntityTurnAndBeginFirstPick(combat, entityCombatant) {
-  if (!combat?.started || !game.user?.isGM) return;
-  if (!entityCombatant || entityCombatant.actor?.type !== "entity") return;
-  await processEndOfTurn(combat, entityCombatant);
-  await clearActedForBracket(combat, "after");
-  await clearActedForBracket(combat, "before");
-  const afterList = getCombatantsInBracket(combat, "after");
-  if (afterList.length) {
-    await beginFirstPick(combat, "after", entityCombatant.id, "after-entity", null, true, true);
-    return;
-  }
-  const beforeList = getCombatantsInBracket(combat, "before");
-  if (beforeList.length) {
-    await beginFirstPick(combat, "before", entityCombatant.id, "round-start", null, true, true);
+/** Finish an Entity turn once and offer the next bracket to the active GM. */
+export async function finishEntityTurnAndBeginFirstPick(combat, turn) {
+  if (!combat.started || !game.user.isActiveGM) return;
+  if (!isSameCombatTurn(turn, getCombatTurnKey(combat))) return;
+  if (entityEndInProgress.has(combat) || selectionInProgress.has(combat)) return;
+  if (combat.getFlag("hollows", "awaitingFirstPick")) return;
+  const entityCombatant = combat.combatant;
+  if (entityCombatant.actor.type !== "entity") return;
+  entityEndInProgress.add(combat);
+  try {
+    await processEndOfTurn(combat, entityCombatant);
+    await clearActedForBracket(combat, "after");
+    await clearActedForBracket(combat, "before");
+    const afterList = getCombatantsInBracket(combat, "after");
+    if (afterList.length) {
+      await beginFirstPick(combat, "after", entityCombatant.id, "after-entity", null, true, true);
+      return;
+    }
+    const beforeList = getCombatantsInBracket(combat, "before");
+    if (beforeList.length) {
+      await beginFirstPick(combat, "before", entityCombatant.id, "round-start", null, true, true);
+    }
+  } finally {
+    entityEndInProgress.delete(combat);
   }
 }
 

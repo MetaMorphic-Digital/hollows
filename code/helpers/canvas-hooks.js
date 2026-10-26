@@ -155,6 +155,7 @@ export function registerCanvasHooks() {
     const nextZone = getTokenZone(tokenDoc) || "";
     game.hollowsTokenZoneCache.set(tokenDoc.id, nextZone);
     if (game.hollowsTokenPrevZone) game.hollowsTokenPrevZone.delete(tokenDoc.id);
+    if (!game.combat?.started) return;
     const actor = tokenDoc?.actor;
     if (!actor || actor.type !== "hunter") return;
     if (prevZone && nextZone && prevZone !== nextZone) {
@@ -165,7 +166,7 @@ export function registerCanvasHooks() {
         ui.notifications.warn(`${actor.name} is burdened and should not move into Support on their turn.`);
       }
     }
-    if ((nextZone !== prevZone) && game.user.isGM) {
+    if ((nextZone !== prevZone) && game.user.isActiveGM) {
       await applyInterceptors("hunter-zone-changed", { actor, fromZone: prevZone, toZone: nextZone }, null);
     }
     if (prevZone && nextZone && prevZone !== nextZone) {
@@ -212,7 +213,7 @@ export function registerCanvasHooks() {
   });
 
   Hooks.on("updateScene", async (scene, data, options, userId) => {
-    if (!game.user?.isGM || (game.user.id !== userId)) return;
+    if (!game.user.isActiveGM) return;
     const flags = scene.getFlag("hollows", "entityLair") || {};
     const enabled = flags.enabled;
     if (!enabled) {

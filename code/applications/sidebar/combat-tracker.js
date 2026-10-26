@@ -2,18 +2,15 @@ import {
   addSceneCombatantsToCombat,
   applyAdvanceTurnGM,
   applyPassInitiativeGM,
-  createSetupRollMessage,
   getCombatantBracket,
   getCombatantsInBracket,
+  getCombatTurnKey,
   promptSceneCombatantAdditions,
 } from "../../helpers/combat-runtime.js";
-import { dispatchToGM } from "../../helpers/queries.js";
-import { getActiveEntityActor } from "../../canvas/zone.js";
-import { getEffectiveEntityStat } from "../../documents/entity/entity-stats.js";
+import { COMBAT_QUERY_TIMEOUT, dispatchToGM, runUserQuery } from "../../helpers/queries.js";
 import {
   beginFirstPick,
   ensureFirstPickDialog,
-  finishEntityTurnAndBeginFirstPick,
   openFirstPickDialog,
   shouldCurrentUserHandleFirstPick,
 } from "../../helpers/combat-first-pick.js";
@@ -112,7 +109,7 @@ function onRenderCombatTracker(app, html) {
       });
       controls.append(addCombatantBtn);
       if (started) {
-        controls.querySelectorAll(".hollows-setup-init").forEach(e => e.remove());
+        controls.querySelectorAll(".hollows-setup-init, .hollows-start-combat").forEach(e => e.remove());
       } else if (!controls.querySelector(".hollows-setup-init")) {
         const btn = makeEl("<button type=\"button\" class=\"hollows-setup-init\"><i class=\"fas fa-dice-d20\"></i> Setup Rolls</button>");
         btn.addEventListener("click", async (event) => {
@@ -126,28 +123,28 @@ function onRenderCombatTracker(app, html) {
             ui.notifications.warn("Combat already started.");
             return;
           }
-          const entity = getActiveEntityActor();
-          if (!entity) {
-            ui.notifications.warn("No Entity actor found for setup roll.");
-            return;
-          }
-          const tn = getEffectiveEntityStat(entity, "ranged");
           const hunters = combat.combatants.filter((c) => c.actor?.type === "hunter");
           if (!hunters.length) {
             ui.notifications.warn("No Hunter combatants to roll setup.");
             return;
           }
-          await combat.startCombat();
-          const entityCombatant = combat.combatants.find((c) => c.actor?.type === "entity");
-          if (entityCombatant) {
-            await entityCombatant.update({ initiative: 1 });
-          }
-          for (const combatant of hunters) {
-            await createSetupRollMessage(combatant, tn);
-          }
+          await combat.prepareSetup();
           ui.combat?.render();
         });
         controls.append(btn);
+      }
+      if (!started) {
+        const requested = combat?.getFlag("hollows", "setupRolls") || [];
+        const setupBtn = controls.querySelector(".hollows-setup-init");
+        setupBtn.disabled = !combat?.combatants.some(c => (c.actor?.type === "hunter") && !requested.includes(c.id));
+        controls.querySelectorAll(".hollows-start-combat").forEach(e => e.remove());
+        const startBtn = makeEl("<button type=\"button\" class=\"hollows-start-combat\"><i class=\"fas fa-play\"></i> Start Combat</button>");
+        startBtn.disabled = !combat?.isSetupComplete;
+        startBtn.addEventListener("click", async () => {
+          await game.combat.startCombat();
+          ui.combat?.render();
+        });
+        controls.append(startBtn);
       }
     }
     controls.querySelectorAll(".hollows-pass-init").forEach(e => e.remove());
@@ -155,7 +152,7 @@ function onRenderCombatTracker(app, html) {
     const isHunterOwner = combatant?.actor?.type === "hunter" &&
       combatant.actor?.testUserPermission(game.user, "OWNER");
     const canPass = !!combatant && (game.user?.isGM || isHunterOwner);
-    if (canPass) {
+    if (started && canPass) {
       const passBtn = makeEl("<button type=\"button\" class=\"hollows-pass-init\"><i class=\"fas fa-share\"></i> End Turn / Pass Initiative</button>");
       passBtn.addEventListener("click", async () => {
         const combat = game.combat;
@@ -175,7 +172,10 @@ function onRenderCombatTracker(app, html) {
         }
         if (current.actor?.type === "entity") {
           if (!game.user?.isGM) return;
-          await finishEntityTurnAndBeginFirstPick(combat, current);
+          await runUserQuery(game.users.activeGM, "hollows.finishEntityTurn", {
+            combatId: combat.id,
+            turn: getCombatTurnKey(combat),
+          }, { timeout: COMBAT_QUERY_TIMEOUT });
           ui.combat?.render();
           return;
         }
