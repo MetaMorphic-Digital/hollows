@@ -20,6 +20,7 @@ export async function initializeHunterCoreStatesForCombat(combat) {
     .map((c) => c.actor)
     .filter((a) => a?.type === "hunter");
   for (const hunter of hunters) {
+    await restoreWeaponsCapacity(hunter);
     await applyInterceptors("combat-start-hunter", { actor: hunter, hunter }, null);
   }
 }

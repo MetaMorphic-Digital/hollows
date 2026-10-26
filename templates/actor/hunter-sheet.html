@@ -12,57 +12,70 @@
       <div class="header-actions">
         {{#if isNewHunter}}
           <button type="button" class="stat-roll attack-primary begin-character-creation" data-action="begin-character-creation">Begin Character Creation</button>
-        {{else if combatStarted}}
+        {{else}}
           {{#if isDead}}
-            <div class="muted">Dead</div>
+            {{#if combatStarted}}
+              <div class="muted">Dead</div>
+            {{/if}}
           {{else}}
             {{#if isDying}}
-              <button type="button" class="stat-roll attack-primary" data-action="cling-to-life">Cling to Life</button>
+              {{#if combatStarted}}
+                <button type="button" class="stat-roll attack-primary" data-action="cling-to-life">Cling to Life</button>
+              {{/if}}
             {{else}}
               <div class="header-action-row">
                 <button type="button" class="stat-roll attack-primary" data-action="attack-entity">Attack</button>
-                {{#if hasReloadableWeapons}}
-                  <button type="button" class="stat-roll attack-primary" data-action="reload-weapon">Reload</button>
-                  <div class="capacity-list">
-                    {{#each reloadableWeapons as |w|}}
-                      <div class="capacity-chip" data-weapon-id="{{w.id}}">
-                        <span class="capacity-name">{{w.name}}</span>
-                        {{#if w.isShotgun}}
-                          <span class="capacity-value">{{w.loaded}}</span>
-                        {{else}}
-                          <span class="capacity-value">{{w.current}}/{{w.max}}</span>
-                        {{/if}}
-                      </div>
-                    {{/each}}
-                  </div>
-                {{/if}}
-                {{#if (gt focusLimit 1)}}
-                  <div class="focus-counter" title="Focus">
-                    <div class="focus-label">Focus</div>
-                    <div class="focus-value">{{focusCount}} / {{focusLimit}}</div>
-                  </div>
+                {{#if combatStarted}}
+                  {{#if hasReloadableWeapons}}
+                    <button type="button" class="stat-roll attack-primary" data-action="reload-weapon">Reload</button>
+                    <div class="capacity-list">
+                      {{#each reloadableWeapons as |w|}}
+                        <div class="capacity-chip" data-weapon-id="{{w.id}}">
+                          <span class="capacity-name">{{w.name}}</span>
+                          {{#if w.isShotgun}}
+                            <span class="capacity-value">{{w.loaded}}</span>
+                          {{else}}
+                            <span class="capacity-value">{{w.current}}/{{w.max}}</span>
+                          {{/if}}
+                        </div>
+                      {{/each}}
+                    </div>
+                  {{/if}}
+                  {{#if (gt focusLimit 1)}}
+                    <div class="focus-counter" title="Focus">
+                      <div class="focus-label">Focus</div>
+                      <div class="focus-value">{{focusCount}} / {{focusLimit}}</div>
+                    </div>
+                  {{/if}}
                 {{/if}}
               </div>
-              <div class="hunter-action-stack">
-                {{#if canFocus}}
-                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="focus">Focus</button></div>
-                {{/if}}
-                {{#if canGuard}}
-                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="guard">Guard</button></div>
-                {{/if}}
-                {{#each activatedManoeuvres}}
-                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="activated-ability" data-ability-key="{{this.key}}">{{this.name}}</button></div>
-                {{/each}}
-                {{#if readyActive}}
-                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="expend-ready">Expend Ready</button></div>
-                {{/if}}
-                <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="take-cover">Take Cover</button></div>
-                {{#if canUse}}
-                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="use">Use</button></div>
-                {{/if}}
-                <div class="hunter-action-stack-row"><button type="button" class="stat-roll {{#unless isInSupport}}muted{{/unless}}" data-action="support-recover" {{#unless isInSupport}}disabled{{/unless}}>Recover</button></div>
-                <div class="hunter-action-stack-row"><button type="button" class="stat-roll {{#unless isInSupport}}muted{{/unless}}" data-action="support-heal" {{#unless isInSupport}}disabled{{/unless}}>Heal</button></div>
-              </div>
+              {{#if combatStarted}}
+                <div class="hunter-action-stack">
+                  {{#if canFocus}}
+                    <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="focus">Focus</button></div>
+                  {{/if}}
+                  {{#if canGuard}}
+                    <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="guard">Guard</button></div>
+                  {{/if}}
+                  {{#each activatedManoeuvres}}
+                    <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="activated-ability" data-ability-key="{{this.key}}">{{this.name}}</button></div>
+                  {{/each}}
+                  {{#if readyActive}}
+                    <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="expend-ready">Expend Ready</button></div>
+                  {{/if}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="take-cover">Take Cover</button></div>
+                  {{#if canUse}}
+                    <div class="hunter-action-stack-row"><button type="button" class="stat-roll" data-action="use">Use</button></div>
+                  {{/if}}
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll {{#unless isInSupport}}muted{{/unless}}" data-action="support-recover" {{#unless isInSupport}}disabled{{/unless}}>Recover</button></div>
+                  <div class="hunter-action-stack-row"><button type="button" class="stat-roll {{#unless isInSupport}}muted{{/unless}}" data-action="support-heal" {{#unless isInSupport}}disabled{{/unless}}>Heal</button></div>
+                </div>
+              {{else}}
+                <div class="muted">
+                  <p><em>Your Weapon whispers of what you could become. Only an Entity puts those promises to the test.</em></p>
+                  <p>Once combat begins, your Manoeuvres and Weapon Abilities are unleashed.</p>
+                </div>
+              {{/if}}
             {{/if}}
           {{/if}}
 

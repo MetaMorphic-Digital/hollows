@@ -500,6 +500,7 @@ export async function openAttackDialog(actor, options = {}) {
           let useFocusAdv = useFocus && (focusCount > 0);
           const mode = normalizeRollModeValue(selectedMode);
           const weapon = weaponless ? null : actor.items.get(weaponId);
+          const usesAmmo = !weaponless && game.combat?.started;
           let profile;
           if (weaponless) {
             profile = forcedProfile
@@ -519,7 +520,7 @@ export async function openAttackDialog(actor, options = {}) {
             return;
           }
 
-          if (!weaponless) {
+          if (usesAmmo) {
             const isShotgun = isShotgunWeapon(weapon);
             if (isShotgun && !isShotgunLoaded(weapon)) {
               ui.notifications.warn("Shotgun is Empty. Reload first.");
@@ -634,12 +635,12 @@ export async function openAttackDialog(actor, options = {}) {
             return;
           }
 
-          if (!weaponless && getEffectiveWeaponCapacity(weapon).max > 0) {
+          if (usesAmmo && getEffectiveWeaponCapacity(weapon).max > 0) {
             const current = Number(weapon.system.capacity.value ?? 0);
             const next = Math.max(0, current - 1);
             await weapon.update({ "system.capacity.value": next });
           }
-          if (!weaponless && isShotgunWeapon(weapon)) {
+          if (usesAmmo && isShotgunWeapon(weapon)) {
             await weapon.update({ "system.loaded": false });
           }
 
