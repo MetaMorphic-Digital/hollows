@@ -4,14 +4,9 @@ import {
   getPrimaryRefugeActor,
   getRefugeActionHandler,
   registerRefugeActionHandler,
-  registerRefugeActions,
-  canRecover,
-  getRecoverOptions,
-  getRecoverAmounts
 } from "../../data/refuge/index.js";
-import { pickOne, resolveActionHunter } from "../../applications/apps/selection-dialogs.mjs";
 import { applyInterceptors } from "../../helpers/extensions.js";
-import { adjustHunterResource } from "./resources.js";
+import { removeCondition } from "./conditions.js";
 
 export async function requestRefugeAction(data) {
   if (game.user?.isGM) return false;
@@ -49,34 +44,22 @@ export async function addRefugeResources(deltaBone, deltaHearts) {
   return true;
 }
 
-export async function applyRecover(refuge, hunter, mode = "full") {
-  if (!refuge || refuge.type !== "refuge" || !hunter) return false;
-  const recovery = getRecoverAmounts(refuge, hunter, mode);
-  if (recovery.mode === "full") {
-    await adjustHunterResource(hunter, {
-      resolve: recovery.resolveValue,
-      wounds: recovery.woundsValue
-    });
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: refuge }),
-      content: `<div class="hollows-chat"><strong>${hunter.name}</strong> fully recovers.</div>`
-    });
-  } else {
-    await adjustHunterResource(hunter, {
-      resolve: recovery.resolveDelta,
-      wounds: recovery.woundsDelta
-    }, { allowTemporary: true });
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: refuge }),
-      content: `
-        <div class="hollows-chat">
-          <div><strong>${hunter.name}</strong> gains temporary recovery.</div>
-          <div>Resolve +${recovery.resolveDelta}, Wounds +${recovery.woundsDelta}</div>
-        </div>
-      `
-    });
-  }
-  await applyInterceptors("refuge-recover", { actor: hunter, refuge, hunter, mode });
+/** Restore a Hunter's health and wake them from death in the Refuge. */
+export async function applyRecover(refuge, hunter) {
+  if (hunter?.type !== "hunter") return false;
+  await hunter.update({
+    "system.health.resolve.value": hunter.system.health.resolve.max,
+    "system.health.wounds.value": hunter.system.health.wounds.max,
+  });
+  await removeCondition(hunter, "dead");
+  await removeCondition(hunter, "dying");
+  await ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor: refuge }),
+    content: `<div class="hollows-chat">${game.i18n.format("HOLLOWS.REFUGE.recovered", {
+      name: foundry.utils.escapeHTML(hunter.name),
+    })}</div>`,
+  });
+  await applyInterceptors("refuge-recover", { actor: hunter, refuge, hunter, mode: "full" });
   return true;
 }
 
@@ -103,13 +86,6 @@ export async function applyEnterRefuge(refuge) {
   return true;
 }
 
-export async function applySetUnlocks(refuge, kind, list = []) {
-  if (!refuge || refuge.type !== "refuge") return false;
-  const key = String(kind || "") === "exploration" ? "system.unlockedExploration" : "system.unlockedBattle";
-  await refuge.update({ [key]: Array.isArray(list) ? list : [] });
-  return true;
-}
-
 export async function applyRefugeActionPayload(data = {}) {
   const type = String(data.type || "");
   const refuge = data.refugeId ? game.actors.get(String(data.refugeId)) : getPrimaryRefugeActor();
@@ -118,32 +94,13 @@ export async function applyRefugeActionPayload(data = {}) {
   if (handler) await handler(refuge, data);
 }
 
-async function openRecover(refuge, hunter = null) {
-  if (!canRecover(refuge)) return;
-  const target = await resolveActionHunter(hunter, { title: "Recover" });
-  if (!target) return;
-  const recoverOptions = getRecoverOptions(refuge);
-  let mode = "full";
-  if (recoverOptions.length > 1) {
-    mode = await pickOne({
-      title: "Recover",
-      label: "Recovery Type",
-      options: recoverOptions.map((o) => ({ value: o.id, label: o.label }))
-    });
-    if (!mode) return;
-  }
-  await applyRecover(refuge, target, mode);
-}
-
-registerRefugeActions([{
-  id: "recover",
-  name: "Recover",
-  category: "Recover",
-  requires: [],
-  description: "Restore lost Resolve and Wounds.",
-  open: openRecover
-}]);
-
+registerRefugeActionHandler("buyUpgrade", async (refuge, data) => {
+  const upgrade = await fromUuid(data.upgradeUuid);
+  return refuge.system.buyUpgrade(upgrade);
+});
+registerRefugeActionHandler("useUpgrade", async (refuge, data) => {
+  const hunter = await fromUuid(data.hunterUuid);
+  return refuge.system.useUpgrade(data.itemId, data.action, hunter);
+});
 registerRefugeActionHandler("enterRefuge", async (refuge) => applyEnterRefuge(refuge));
 registerRefugeActionHandler("spendBone", async (refuge, data) => spendRefugeBone(refuge, data.amount));
-registerRefugeActionHandler("setUnlocks", async (refuge, data) => applySetUnlocks(refuge, String(data.kind || ""), Array.isArray(data.list) ? data.list : []));

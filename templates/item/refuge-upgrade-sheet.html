@@ -1,0 +1,26 @@
+<form class="hollows-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-left">
+      <input class="name" name="name" type="text" value="{{item.name}}">
+      <div class="subline">{{localize "TYPES.Item.refugeUpgrade"}}</div>
+    </div>
+    <div class="header-portrait">
+      <img src="{{item.img}}" data-action="editImage" data-edit="img" alt="{{item.name}}">
+    </div>
+  </header>
+
+  <section class="sheet-section">
+    {{formGroup systemFields.category value=system.category label="HOLLOWS.REFUGE.category" localize=true}}
+    {{formGroup systemFields.default value=system.default label="HOLLOWS.REFUGE.default" hint="HOLLOWS.REFUGE.defaultHint" localize=true}}
+    <h2>{{localize "HOLLOWS.REFUGE.purchaseCost"}}</h2>
+    {{formGroup systemFields.cost.fields.bone value=system.cost.bone label="HOLLOWS.REFUGE.bone" localize=true}}
+    {{formGroup systemFields.cost.fields.hearts value=system.cost.hearts label="HOLLOWS.REFUGE.hearts" localize=true}}
+    {{formGroup systemFields.requiredNpcRoles value=system.requiredNpcRoles label="HOLLOWS.REFUGE.requiredNpcRoles" type="checkboxes" localize=true}}
+  </section>
+
+  <section class="sheet-section">
+    {{formGroup systemFields.actions value=system.actions label="HOLLOWS.REFUGE.actions" type="checkboxes" localize=true}}
+    <h2>{{localize "HOLLOWS.REFUGE.description"}}</h2>
+    <textarea name="system.text" rows="8">{{system.text}}</textarea>
+  </section>
+</form>

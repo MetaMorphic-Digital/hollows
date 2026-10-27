@@ -1,13 +1,6 @@
 // Refuge sheet tab registry. A tab renders only when its `hasContent` passes;
 
-import { getRefugeActions, getRefugeNpcRoles } from "../../data/refuge/index.js";
-import {
-  equipmentDocMatchesReference,
-  getEquipmentDocReference,
-  getEquipmentDocs,
-} from "../../documents/actor/hunter-equipment.js";
-import { requestRefugeAction, applySetUnlocks } from "../../documents/actor/refuge.js";
-import { getActiveHunterForUser } from "../../canvas/zone.js";
+import { getRefugeNpcRoles } from "../../data/refuge/index.js";
 
 const TABS = [];
 export default TABS;
@@ -32,43 +25,44 @@ export class RefugeTabRegistry {
   }
 }
 
-// ─── Actions ──────────────────────────────────────────────────────────────────
+// ─── Upgrades ─────────────────────────────────────────────────────────────────
 
-async function openRefugeAction(sheet, actionId) {
-  const def = getRefugeActions().find((a) => a.id === actionId);
-  if (typeof def?.open !== "function") return;
-  const activeHunter = game.user?.isGM ? null : getActiveHunterForUser();
-  if (!game.user?.isGM && !activeHunter) {
-    ui.notifications.warn("Select or control your Hunter to use Refuge actions.");
-    return;
-  }
-  await def.open(sheet.actor, activeHunter);
-}
+RefugeTabRegistry.register({
+  id: "upgrades",
+  label: "HOLLOWS.REFUGE.upgrades",
+  order: 10,
+  template: "systems/hollows/templates/actor/refuge/upgrades-tab.html",
+  prepareContext: (sheet) => ({
+    upgrades: sheet.actor.system.upgradeItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      text: item.system.text,
+      category: item.system.schema.fields.category.choices[item.system.category],
+      cost: item.system.cost,
+      missing: item.system.getMissingNpcRoles(sheet.actor)
+        .map(key => getRefugeNpcRoles().find(role => role.key === key).label).join(", "),
+    })),
+  }),
+});
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
 
 RefugeTabRegistry.register({
   id: "actions",
   label: "Actions",
   order: 20,
   template: "systems/hollows/templates/actor/refuge/actions-tab.html",
-  hasContent: () => getRefugeActions().length > 0,
+  hasContent: actor => actor.system.upgradeItems.some(item => item.system.actions.size),
   prepareContext: (sheet) => ({
-    actionsCatalog: getRefugeActions().map((a) => ({
-      id: a.id,
-      name: a.name,
-      category: a.category,
-      description: a.description,
-      requires: a.requires || [],
-      available: typeof a.available === "function" ? !!a.available(sheet.actor) : true,
-    })),
+    actionsCatalog: sheet.actor.system.upgradeItems.flatMap(item => [...item.system.actions].map(action => ({
+      itemId: item.id,
+      action,
+      name: item.system.schema.fields.actions.element.choices[action],
+      upgradeName: item.name,
+      description: item.system.text,
+      available: item.system.getMissingNpcRoles(sheet.actor).length === 0,
+    }))),
   }),
-  activateListeners: (sheet, root) => {
-    for (const el of root.querySelectorAll("[data-action-use]")) {
-      el.addEventListener("click", async (event) => {
-        event.preventDefault();
-        await openRefugeAction(sheet, String(event.currentTarget.dataset.actionUse || ""));
-      });
-    }
-  },
 });
 
 // ─── Resources ────────────────────────────────────────────────────────────────
@@ -78,59 +72,6 @@ RefugeTabRegistry.register({
   label: "Resources",
   order: 30,
   template: "systems/hollows/templates/actor/refuge/resources-tab.html",
-});
-
-// ─── Unlocks ──────────────────────────────────────────────────────────────────
-
-async function getUnlockDocs(kind) {
-  return getEquipmentDocs(kind);
-}
-
-function unlockedIds(actor, kind) {
-  const list = kind === "exploration" ? actor.system?.unlockedExploration : actor.system?.unlockedBattle;
-  return Array.isArray(list) ? list : [];
-}
-
-async function getUnlockOptions(actor, kind) {
-  const ids = unlockedIds(actor, kind);
-  return (await getUnlockDocs(kind)).map((doc) => ({
-    id: getEquipmentDocReference(doc),
-    docId: String(doc.id || ""),
-    name: doc.name,
-    text: doc.system?.text || "",
-    unlocked: ids.some((id) => equipmentDocMatchesReference(doc, id)),
-  }));
-}
-
-RefugeTabRegistry.register({
-  id: "unlocks",
-  label: "Unlocks",
-  order: 40,
-  template: "systems/hollows/templates/actor/refuge/unlocks-tab.html",
-  hasContent: async () =>
-    (await getUnlockDocs("exploration")).length + (await getUnlockDocs("battle")).length > 0,
-  prepareContext: async (sheet) => ({
-    unlockExplorationOptions: await getUnlockOptions(sheet.actor, "exploration"),
-    unlockBattleOptions: await getUnlockOptions(sheet.actor, "battle"),
-  }),
-  activateListeners: (sheet, root) => {
-    for (const el of root.querySelectorAll("[data-unlock-kind]")) {
-      el.addEventListener("change", async (event) => {
-        event.preventDefault();
-        const input = event.currentTarget;
-        const kind = String(input.dataset.unlockKind || "");
-        const id = String(input.dataset.unlockId || "");
-        const docId = String(input.dataset.unlockDocId || "");
-        if (!kind || !id) return;
-        const current = unlockedIds(sheet.actor, kind);
-        const next = input.checked
-          ? (current.includes(id) ? current : current.concat([id]))
-          : current.filter((x) => x !== id && x !== docId);
-        if (await requestRefugeAction({ type: "setUnlocks", refugeId: sheet.actor.id, kind, list: next })) return;
-        await applySetUnlocks(sheet.actor, kind, next);
-      });
-    }
-  },
 });
 
 // ─── Residents ────────────────────────────────────────────────────────────────

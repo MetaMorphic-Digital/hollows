@@ -1,5 +1,43 @@
 {
   "HOLLOWS": {
+    "REFUGE": {
+      "upgrades": "Upgrades",
+      "category": "Category",
+      "default": "Starting Upgrade",
+      "defaultHint": "Added automatically when a new Refuge is created.",
+      "categories": {
+        "recover": "Recover",
+        "rearm": "Rearm",
+        "reforge": "Reforge",
+        "renew": "Renew",
+        "research": "Research",
+        "resupply": "Resupply",
+        "revel": "Revel"
+      },
+      "purchaseCost": "Purchase Cost",
+      "bone": "Bone",
+      "hearts": "Hearts",
+      "requiredNpcRoles": "Required NPCs",
+      "description": "Description",
+      "actions": "Refuge Actions",
+      "fullRecovery": "Full Recovery",
+      "missingNpcRoles": "Requires NPCs in the Refuge: {roles}.",
+      "alreadyInstalled": "This upgrade is already installed.",
+      "insufficientResources": "Not enough Bone or Hearts to buy this upgrade.",
+      "recovered": "{name} fully recovers Wounds and Resolve.",
+      "buyUpgrade": "Buy Upgrade",
+      "confirmPurchase": "Buy {name} for {bone} Bone and {hearts} Hearts?",
+      "buy": "Buy",
+      "selectHunter": "Select or control your Hunter to use Refuge actions.",
+      "removeUpgrade": "Remove Upgrade",
+      "confirmRemoval": "Remove {name}? Its purchase cost will not be refunded.",
+      "remove": "Remove",
+      "edit": "Edit",
+      "use": "Use",
+      "available": "Available",
+      "locked": "Locked",
+      "noUpgrades": "No upgrades installed. Buy an upgrade or drag one onto this sheet."
+    },
     "SCRIPT": {
       "modes": {
         "single": "Single handler",
@@ -287,7 +325,8 @@
       "WEAPONS": "Hollows - Weapons",
       "WEAPON_ABILITIES": "Hollows - Weapon Abilities",
       "QUICKSTART": "Hollows - Quickstart",
-      "WEAPON_FORMS": "Hollows - Weapon Forms"
+      "WEAPON_FORMS": "Hollows - Weapon Forms",
+      "REFUGE_UPGRADES": "Hollows - Refuge Upgrades"
     },
     "THREAT": {
       "SCOPE": {
@@ -333,6 +372,7 @@
       "entityAbility": "Entity Ability",
       "entityEnhancement": "Entity Enhancement",
       "equipment": "Equipment",
+      "refugeUpgrade": "Refuge Upgrade",
       "relic": "Relic",
       "rumour": "Rumour",
       "weapon": "Weapon",

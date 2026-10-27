@@ -1,5 +1,5 @@
 // Registries external content plugs into: action handlers, weapon-damage
-// contributors, Recover modes, and weapon-ability tiers.
+// contributors and weapon-ability tiers.
 
 const HANDLERS = new Map();
 
@@ -21,17 +21,6 @@ export function getRefugeWeaponBonusProviders() {
   return WEAPON_BONUS;
 }
 
-// Recover modes beyond the base "full".
-const RECOVER_MODES = new Map();
-
-export function registerRefugeRecoverMode(mode) {
-  if (mode?.id) RECOVER_MODES.set(String(mode.id), mode);
-}
-
-export function getRefugeRecoverModes() {
-  return [...RECOVER_MODES.values()];
-}
-
 // Weapon-ability tiers a refuge grants beyond Tier 1.
 const WEAPON_TIERS = [];
 
@@ -44,14 +33,13 @@ export function getRefugeWeaponTierProviders() {
 }
 
 // NPC roles surfaced on the refuge sheet.
-const NPC_ROLES = [{ key: "keeper", label: "Keeper" }];
-
-export function registerRefugeNpcRoles(roles = []) {
-  for (const role of roles) {
-    if (!role?.key || NPC_ROLES.some((r) => r.key === role.key)) continue;
-    NPC_ROLES.push(role);
-  }
-}
+const NPC_ROLES = [
+  { key: "keeper", label: "Keeper" },
+  { key: "doctor", label: "Doctor" },
+  { key: "apprentice", label: "Apprentice" },
+  { key: "smith", label: "Smith" },
+  { key: "magus", label: "Magus" },
+];
 
 export function getRefugeNpcRoles() {
   return NPC_ROLES;

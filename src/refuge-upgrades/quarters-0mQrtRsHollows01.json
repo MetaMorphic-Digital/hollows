@@ -1,0 +1,27 @@
+{
+  "_id": "0mQrtRsHollows01",
+  "name": "Quarters",
+  "type": "refugeUpgrade",
+  "img": "icons/svg/house.svg",
+  "system": {
+    "text": "Recover in the Refuge, or awaken here after death. Restore Wounds and Resolve to their maximum values.",
+    "category": "recover",
+    "default": true,
+    "cost": {
+      "bone": 0,
+      "hearts": 0
+    },
+    "requiredNpcRoles": [],
+    "actions": [
+      "fullRecovery"
+    ]
+  },
+  "effects": [],
+  "flags": {},
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "_key": "!items!0mQrtRsHollows01"
+}

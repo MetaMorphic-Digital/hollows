@@ -95,6 +95,7 @@ function registerSubtypes() {
     weaponAbility: data.items.WeaponAbilityData,
     echo: EchoDataModel,
     equipment: data.items.EquipmentData,
+    refugeUpgrade: data.items.RefugeUpgradeData,
     relic: RelicDataModel,
     rumour: RumourDataModel,
     weapon: data.items.WeaponData,
@@ -133,6 +134,7 @@ function registerSheets() {
   register(Item, applications.sheets.items.HollowsEntityAbilitySheet, ["entityAbility"]);
   register(Item, applications.sheets.items.HollowsEntityEnhancementSheet, ["entityEnhancement"]);
   register(Item, applications.sheets.items.HollowsEquipmentSheet, ["equipment"]);
+  register(Item, applications.sheets.items.HollowsRefugeUpgradeSheet, ["refugeUpgrade"]);
   register(Item, applications.sheets.items.HollowsRelicSheet, ["relic"]);
   register(Item, applications.sheets.items.HollowsRumourSheet, ["rumour"]);
   register(Item, applications.sheets.items.HollowsWeaponAbilitySheet, ["weaponAbility"]);

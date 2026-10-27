@@ -1,7 +1,6 @@
-// Registry for refuge upgrade and action definitions.
+// Registry for refuge upgrade definitions.
 
 const UPGRADES = [];
-const ACTIONS = [];
 
 export function registerRefugeUpgrades(defs = []) {
   for (const def of defs) {
@@ -10,19 +9,8 @@ export function registerRefugeUpgrades(defs = []) {
   }
 }
 
-export function registerRefugeActions(defs = []) {
-  for (const def of defs) {
-    if (!def?.id || ACTIONS.some((a) => a.id === def.id)) continue;
-    ACTIONS.push(def);
-  }
-}
-
 export function getRefugeUpgrades() {
   return UPGRADES;
-}
-
-export function getRefugeActions() {
-  return ACTIONS;
 }
 
 export function getRefugeDefaultUpgradeIds() {

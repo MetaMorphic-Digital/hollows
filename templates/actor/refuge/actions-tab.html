@@ -1,24 +1,21 @@
 <section class="sheet-section">
-  <h2>Refuge Actions</h2>
+  <h2>{{localize "HOLLOWS.REFUGE.actions"}}</h2>
   <div class="abilities-list">
     {{#each actionsCatalog as |a|}}
       <div class="ability-card">
         <div class="ability-row">
           <div class="stat-label">
-            {{a.name}}
-            <span class="ability-duration-badge">{{a.category}}</span>
+            {{localize a.name}}
+            <span class="ability-duration-badge">{{a.upgradeName}}</span>
             {{#if a.available}}
-              <span class="ability-duration-badge">Available</span>
+              <span class="ability-duration-badge">{{localize "HOLLOWS.REFUGE.available"}}</span>
             {{else}}
-              <span class="ability-duration-badge">Locked</span>
+              <span class="ability-duration-badge">{{localize "HOLLOWS.REFUGE.locked"}}</span>
             {{/if}}
           </div>
-          <button type="button" class="stat-roll" data-action-use="{{a.id}}" {{#unless a.available}}disabled{{/unless}}>Use</button>
+          <button type="button" class="stat-roll" data-action="useUpgrade" data-item-id="{{a.itemId}}" data-upgrade-action="{{a.action}}" {{#unless a.available}}disabled{{/unless}}>{{localize "HOLLOWS.REFUGE.use"}}</button>
         </div>
         <div class="ability-text">{{a.description}}</div>
-        {{#if a.requires.length}}
-          <div class="muted">Requires: {{a.requires}}</div>
-        {{/if}}
       </div>
     {{/each}}
   </div>

@@ -1,5 +1,8 @@
 import { requestRefugeAction, applyEnterRefuge } from "../../../documents/actor/refuge.js";
 import { default as REFUGE_TABS } from "../refuge-tabs.mjs";
+import RefugeUpgradeData from "../../../data/items/refuge-upgrade.mjs";
+import { getActiveHunterForUser } from "../../../canvas/zone.js";
+import { confirmDialog, pickOne, resolveActionHunter } from "../../apps/selection-dialogs.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -10,6 +13,12 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     position: { width: 640, height: 640 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
+    actions: {
+      buyUpgrade: HollowsRefugeSheet.#buyUpgrade,
+      useUpgrade: HollowsRefugeSheet.#useUpgrade,
+      editUpgrade: HollowsRefugeSheet.#editUpgrade,
+      removeUpgrade: HollowsRefugeSheet.#removeUpgrade,
+    },
   };
 
   static PARTS = {
@@ -111,5 +120,70 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     event.preventDefault();
     if (await requestRefugeAction({ type: "enterRefuge", refugeId: this.actor.id })) return;
     await applyEnterRefuge(this.actor);
+  }
+
+  /** @inheritdoc */
+  async _onDropItem(event, item) {
+    if (item.type !== "refugeUpgrade") return null;
+    if (item.parent === this.actor) return super._onDropItem(event, item);
+    return this._purchaseUpgrade(item);
+  }
+
+  /** Confirm the purchase price before requesting installation. */
+  async _purchaseUpgrade(upgrade) {
+    const { bone, hearts } = upgrade.system.cost;
+    const confirmed = await confirmDialog({
+      title: game.i18n.localize("HOLLOWS.REFUGE.buyUpgrade"),
+      bodyHtml: game.i18n.format("HOLLOWS.REFUGE.confirmPurchase", {
+        name: foundry.utils.escapeHTML(upgrade.name), bone, hearts,
+      }),
+      yesLabel: game.i18n.localize("HOLLOWS.REFUGE.buy"),
+    });
+    if (!confirmed) return null;
+    if (await requestRefugeAction({ type: "buyUpgrade", refugeId: this.actor.id, upgradeUuid: upgrade.uuid })) return null;
+    return this.actor.system.buyUpgrade(upgrade);
+  }
+
+  /** Choose an upgrade from the world or a compendium. */
+  static async #buyUpgrade() {
+    const upgrades = await RefugeUpgradeData.getAvailableUpgrades();
+    const uuid = await pickOne({
+      title: game.i18n.localize("HOLLOWS.REFUGE.buyUpgrade"),
+      options: upgrades.map(item => ({ value: item.uuid, label: item.name })),
+    });
+    if (!uuid) return;
+    await this._purchaseUpgrade(await fromUuid(uuid));
+  }
+
+  /** Choose the recovering Hunter and execute the installed item's action. */
+  static async #useUpgrade(event, target) {
+    const activeHunter = game.user.isGM ? null : getActiveHunterForUser();
+    if (!game.user.isGM && !activeHunter) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.selectHunter"));
+      return;
+    }
+    const hunter = await resolveActionHunter(activeHunter, { title: game.i18n.localize("HOLLOWS.REFUGE.fullRecovery") });
+    if (!hunter) return;
+    const { itemId, upgradeAction: action } = target.dataset;
+    if (await requestRefugeAction({
+      type: "useUpgrade", refugeId: this.actor.id, itemId, action, hunterUuid: hunter.uuid,
+    })) return;
+    await this.actor.system.useUpgrade(itemId, action, hunter);
+  }
+
+  /** Open an installed upgrade for editing. */
+  static #editUpgrade(event, target) {
+    this.actor.items.get(target.dataset.itemId).sheet.render({ force: true });
+  }
+
+  /** Remove an installed upgrade without refunding its purchase price. */
+  static async #removeUpgrade(event, target) {
+    const item = this.actor.items.get(target.dataset.itemId);
+    const confirmed = await confirmDialog({
+      title: game.i18n.localize("HOLLOWS.REFUGE.removeUpgrade"),
+      bodyHtml: game.i18n.format("HOLLOWS.REFUGE.confirmRemoval", { name: foundry.utils.escapeHTML(item.name) }),
+      yesLabel: game.i18n.localize("HOLLOWS.REFUGE.remove"),
+    });
+    if (confirmed) await item.delete();
   }
 }
