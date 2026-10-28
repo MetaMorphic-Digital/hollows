@@ -19,7 +19,34 @@
   </section>
 
   <section class="sheet-section">
-    {{formGroup systemFields.actions value=system.actions label="HOLLOWS.REFUGE.actions" type="checkboxes" localize=true}}
+    <h2>{{localize "HOLLOWS.REFUGE.entryBenefits"}}</h2>
+    {{formGroup systemFields.recoverOnEntry value=system.recoverOnEntry label="HOLLOWS.REFUGE.recoverOnEntry" hint="HOLLOWS.REFUGE.recoverOnEntryHint" localize=true}}
+    <h2>{{localize "HOLLOWS.REFUGE.temporaryHealthBonus"}}</h2>
+    {{formGroup systemFields.temporaryHealthBonus.fields.resolve value=system.temporaryHealthBonus.resolve label="HOLLOWS.REFUGE.resolve" localize=true}}
+    {{formGroup systemFields.temporaryHealthBonus.fields.wounds value=system.temporaryHealthBonus.wounds label="HOLLOWS.REFUGE.wounds" localize=true}}
+  </section>
+
+  <section class="sheet-section">
+    <div class="ability-row">
+      <h2>{{localize "HOLLOWS.REFUGE.actions"}}</h2>
+      <button type="button" data-action="addAction">{{localize "HOLLOWS.REFUGE.addAction"}}</button>
+    </div>
+    {{#each actions as |action|}}
+      <fieldset>
+        {{formGroup @root.actionFields.type value=action.type name=(concat "system.actions." action.index ".type") label="HOLLOWS.REFUGE.actionType" localize=true}}
+        {{formGroup @root.actionFields.cost.fields.actions value=action.cost.actions name=(concat "system.actions." action.index ".cost.actions") label="HOLLOWS.REFUGE.actionCost" localize=true}}
+        {{formGroup @root.actionFields.cost.fields.bone value=action.cost.bone name=(concat "system.actions." action.index ".cost.bone") label="HOLLOWS.REFUGE.bone" localize=true}}
+        {{formGroup @root.actionFields.cost.fields.hearts value=action.cost.hearts name=(concat "system.actions." action.index ".cost.hearts") label="HOLLOWS.REFUGE.hearts" localize=true}}
+        {{#if action.temporary}}
+          {{formGroup @root.actionFields.resolve value=action.resolve name=(concat "system.actions." action.index ".resolve") label="HOLLOWS.REFUGE.resolve" localize=true}}
+          {{formGroup @root.actionFields.wounds value=action.wounds name=(concat "system.actions." action.index ".wounds") label="HOLLOWS.REFUGE.wounds" localize=true}}
+        {{/if}}
+        <button type="button" data-action="removeAction" data-index="{{action.index}}">{{localize "HOLLOWS.REFUGE.remove"}}</button>
+      </fieldset>
+    {{/each}}
+  </section>
+
+  <section class="sheet-section">
     <h2>{{localize "HOLLOWS.REFUGE.description"}}</h2>
     <textarea name="system.text" rows="8">{{system.text}}</textarea>
   </section>

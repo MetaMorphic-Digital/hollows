@@ -50,6 +50,7 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       }),
       refuge: new fields.SchemaField({
         id: new fields.StringField({ initial: "" }),
+        recoveryAvailable: new fields.BooleanField({ initial: false }),
         actions: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
           max: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
@@ -83,9 +84,12 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
   /** Restore the action allowance when starting a new visit. */
   async enterRefuge(refuge) {
     if (this.refuge.id === refuge.id) return false;
+    await refuge.system.activateUpgrades();
     await this.parent.update({
       "system.refuge.id": refuge.id,
       "system.refuge.actions.value": this.refuge.actions.max,
+      "system.refuge.recoveryAvailable": refuge.system.upgradeItems.some(item =>
+        item.system.recoverOnEntry && item.system.isAvailable(refuge)),
     });
     return true;
   }

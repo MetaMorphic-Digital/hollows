@@ -26,10 +26,34 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
       requiredNpcRoles: new fields.SetField(new fields.StringField({
         choices: Object.fromEntries(getRefugeNpcRoles().map(({ key, label }) => [key, label])),
       })),
-      actions: new fields.SetField(new fields.StringField({
-        choices: { fullRecovery: "HOLLOWS.REFUGE.fullRecovery" },
+      pending: new fields.BooleanField({ initial: false }),
+      recoverOnEntry: new fields.BooleanField({ initial: false }),
+      temporaryHealthBonus: new fields.SchemaField({
+        resolve: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        wounds: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
+      actions: new fields.ArrayField(new fields.SchemaField({
+        type: new fields.StringField({
+          initial: "fullRecovery",
+          choices: {
+            fullRecovery: "HOLLOWS.REFUGE.fullRecovery",
+            temporaryHealth: "HOLLOWS.REFUGE.temporaryHealth",
+          },
+        }),
+        cost: new fields.SchemaField({
+          actions: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+          bone: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+          hearts: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        }),
+        resolve: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        wounds: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       })),
     };
+  }
+
+  /** Whether this installed upgrade can provide its actions and benefits. */
+  isAvailable(refuge) {
+    return !this.pending && !this.getMissingNpcRoles(refuge).length;
   }
 
   /** Return required roles without an assigned NPC living in this Refuge. */

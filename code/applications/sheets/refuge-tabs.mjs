@@ -39,6 +39,7 @@ RefugeTabRegistry.register({
       text: item.system.text,
       category: item.system.schema.fields.category.choices[item.system.category],
       cost: item.system.cost,
+      pending: item.system.pending,
       missing: item.system.getMissingNpcRoles(sheet.actor)
         .map(key => getRefugeNpcRoles().find(role => role.key === key).label).join(", "),
     })),
@@ -52,15 +53,16 @@ RefugeTabRegistry.register({
   label: "Actions",
   order: 20,
   template: "systems/hollows/templates/actor/refuge/actions-tab.html",
-  hasContent: actor => actor.system.upgradeItems.some(item => item.system.actions.size),
+  hasContent: actor => actor.system.upgradeItems.some(item => item.system.actions.length),
   prepareContext: (sheet) => ({
-    actionsCatalog: sheet.actor.system.upgradeItems.flatMap(item => [...item.system.actions].map(action => ({
+    actionsCatalog: sheet.actor.system.upgradeItems.flatMap(item => item.system.actions.map((action, index) => ({
       itemId: item.id,
-      action,
-      name: item.system.schema.fields.actions.element.choices[action],
+      action: index,
+      name: item.system.schema.fields.actions.element.fields.type.choices[action.type],
+      cost: action.cost,
       upgradeName: item.name,
       description: item.system.text,
-      available: item.system.getMissingNpcRoles(sheet.actor).length === 0,
+      available: item.system.isAvailable(sheet.actor),
     }))),
   }),
 });

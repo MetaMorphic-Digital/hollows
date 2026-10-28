@@ -7,6 +7,10 @@ export default class HollowsRefugeUpgradeSheet extends HandlebarsApplicationMixi
     position: { width: 520, height: 600 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
+    actions: {
+      addAction: HollowsRefugeUpgradeSheet.#addAction,
+      removeAction: HollowsRefugeUpgradeSheet.#removeAction,
+    },
   };
 
   static PARTS = {
@@ -23,7 +27,25 @@ export default class HollowsRefugeUpgradeSheet extends HandlebarsApplicationMixi
       item: this.item,
       system: this.item.system,
       systemFields: this.item.system.schema.fields,
+      actionFields: this.item.system.schema.fields.actions.element.fields,
+      actions: this.item.system.actions.map((action, index) => ({
+        ...action, index, temporary: action.type === "temporaryHealth",
+      })),
     };
+  }
+
+  /** Add an action using the schema defaults. */
+  static async #addAction() {
+    const actions = this.item.system.toObject().actions;
+    actions.push(this.item.system.schema.fields.actions.element.getInitialValue());
+    await this.item.update({ "system.actions": actions });
+  }
+
+  /** Remove the selected action from the upgrade. */
+  static async #removeAction(event, target) {
+    const actions = this.item.system.toObject().actions;
+    actions.splice(Number(target.dataset.index), 1);
+    await this.item.update({ "system.actions": actions });
   }
 
   /** @inheritdoc */

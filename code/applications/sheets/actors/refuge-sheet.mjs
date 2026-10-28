@@ -18,6 +18,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       editUpgrade: HollowsRefugeSheet.#editUpgrade,
       removeUpgrade: HollowsRefugeSheet.#removeUpgrade,
       leaveRefuge: HollowsRefugeSheet.#leaveRefuge,
+      recoverOnEntry: HollowsRefugeSheet.#recoverOnEntry,
     },
   };
 
@@ -59,6 +60,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       img: hunter.img,
       actions: hunter.system.refuge.actions,
       canLeave: hunter.isOwner,
+      canRecover: hunter.isOwner && hunter.system.refuge.recoveryAvailable,
     }));
     data.canOpenRefuge = this.actor.system.enteringHunters.length > 0;
     const tabs = [];
@@ -74,15 +76,11 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
 
   /** @inheritdoc */
   _toggleDisabled(disabled) {
+    const controls = Array.from(this.element.querySelectorAll(
+      "[data-enter-refuge], [data-action='leaveRefuge'], [data-action='recoverOnEntry'], [data-action='useUpgrade']",
+    ), button => [button, button.disabled]);
     super._toggleDisabled(disabled);
-    this.element.querySelector("[data-enter-refuge]").disabled = this.actor.system.enteringHunters.length === 0;
-    for (const button of this.element.querySelectorAll("[data-action='leaveRefuge']")) {
-      button.disabled = !game.actors.get(button.dataset.hunterId).isOwner;
-    }
-    for (const button of this.element.querySelectorAll("[data-action='useUpgrade']")) {
-      const item = this.actor.items.get(button.dataset.itemId);
-      button.disabled = item.system.getMissingNpcRoles(this.actor).length > 0;
-    }
+    for (const [button, wasDisabled] of controls) button.disabled = wasDisabled;
   }
 
   async _onRender(context, options) {
@@ -153,7 +151,15 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   /** End only the selected Hunter's visit. */
   static async #leaveRefuge(event, target) {
     const hunter = game.actors.get(target.dataset.hunterId);
-    await hunter.update({ "system.refuge.id": "", "system.refuge.actions.value": 0 });
+    await hunter.update({
+      "system.refuge.id": "", "system.refuge.actions.value": 0, "system.refuge.recoveryAvailable": false,
+    });
+  }
+
+  /** Claim the selected Hunter's free recovery for this visit. */
+  static async #recoverOnEntry(event, target) {
+    const hunter = game.actors.get(target.dataset.hunterId);
+    await requestRefugeAction({ type: "recoverOnEntry", refugeId: this.actor.id, hunterUuid: hunter.uuid });
   }
 
   /** @inheritdoc */
@@ -189,9 +195,19 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     await this._purchaseUpgrade(await fromUuid(uuid));
   }
 
-  /** Choose a visitor with an action remaining and use the installed upgrade. */
+  /** Choose a visitor who can pay the action cost and use the upgrade. */
   static async #useUpgrade(event, target) {
-    const hunters = this.actor.system.visitingHunters.filter(hunter => hunter.isOwner && (hunter.system.refuge.actions.value > 0));
+    const { itemId, upgradeAction: action } = target.dataset;
+    const upgrade = this.actor.items.get(itemId).system;
+    const definition = upgrade.actions[action];
+    const { bone, hearts } = this.actor.system.resources;
+    if ((bone < definition.cost.bone) || (hearts < definition.cost.hearts)) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
+      return;
+    }
+    const hunters = this.actor.system.visitingHunters.filter(hunter => hunter.isOwner
+      && (hunter.system.refuge.actions.value >= definition.cost.actions)
+      && (!hunter.statuses.has("dead") || (definition.type === "fullRecovery")));
     if (!hunters.length) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.noAvailableHunters"));
       return;
@@ -202,7 +218,6 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     });
     const hunter = game.actors.get(hunterId);
     if (!hunter) return;
-    const { itemId, upgradeAction: action } = target.dataset;
     await requestRefugeAction({
       type: "useUpgrade", refugeId: this.actor.id, itemId, action, hunterUuid: hunter.uuid,
     });

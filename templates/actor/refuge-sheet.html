@@ -17,6 +17,9 @@
           <img src="{{hunter.img}}" alt="{{hunter.name}}" />
           <span class="visitor-name">{{hunter.name}}</span>
           <span class="visitor-actions" title="{{localize 'HOLLOWS.REFUGE.actions'}}">{{hunter.actions.value}}/{{hunter.actions.max}}</span>
+          {{#if hunter.canRecover}}
+            <button type="button" data-action="recoverOnEntry" data-hunter-id="{{hunter.id}}">{{localize "HOLLOWS.REFUGE.freeRecovery"}}</button>
+          {{/if}}
           {{#if hunter.canLeave}}
             <button type="button" data-action="leaveRefuge" data-hunter-id="{{hunter.id}}">{{localize "HOLLOWS.REFUGE.leaveRefuge"}}</button>
           {{/if}}

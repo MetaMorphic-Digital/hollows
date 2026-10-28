@@ -19,6 +19,9 @@
           {{/if}}
         </div>
         <div class="ability-text">{{upgrade.text}}</div>
+        {{#if upgrade.pending}}
+          <div class="muted">{{localize "HOLLOWS.REFUGE.pending"}}</div>
+        {{/if}}
         <div class="muted">{{localize "HOLLOWS.REFUGE.purchaseCost"}}: {{upgrade.cost.bone}} {{localize "HOLLOWS.REFUGE.bone"}}, {{upgrade.cost.hearts}} {{localize "HOLLOWS.REFUGE.hearts"}}</div>
         {{#if upgrade.missing}}
           <div class="muted">{{localize "HOLLOWS.REFUGE.missingNpcRoles" roles=upgrade.missing}}</div>

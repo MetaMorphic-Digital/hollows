@@ -93,6 +93,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     }
     const data = game.items.fromCompendium(upgrade, { clearFolder: true });
     foundry.utils.setProperty(data, "_stats.duplicateSource", upgrade.uuid);
+    data.system.pending = true;
     const [item] = await this.parent.createEmbeddedDocuments("Item", [data]);
     if (!item) return false;
     if (bone || hearts) {
@@ -104,26 +105,68 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     return item;
   }
 
+  /** Make purchased upgrades available when a Hunter starts a new visit. */
+  async activateUpgrades() {
+    const updates = this.upgradeItems.filter(item => item.system.pending)
+      .map(item => ({ _id: item.id, "system.pending": false }));
+    if (updates.length) await this.parent.updateEmbeddedDocuments("Item", updates);
+  }
+
+  /** Use the free recovery granted at the start of this Hunter's visit. */
+  async recoverOnEntry(hunter) {
+    if ((hunter.system.refuge.id !== this.parent.id) || !hunter.system.refuge.recoveryAvailable) return false;
+    const { applyRecover } = await import("../../documents/actor/refuge.js");
+    await applyRecover(this.parent, hunter);
+    await hunter.update({ "system.refuge.recoveryAvailable": false });
+    return true;
+  }
+
   /** Run an action supplied by an installed upgrade. */
-  async useUpgrade(itemId, action, hunter) {
+  async useUpgrade(itemId, actionIndex, hunter) {
     const upgrade = this.parent.items.get(itemId);
-    if (!upgrade.system.actions.has(action)) return false;
+    const action = upgrade.system.actions[actionIndex];
+    if (!action) return false;
+    if (upgrade.system.pending) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.pending"));
+      return false;
+    }
     if (hunter.system.refuge.id !== this.parent.id) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.hunterNotInRefuge"));
       return false;
     }
-    if (!hunter.system.refuge.actions.value) {
+    if (hunter.statuses.has("dead") && (action.type !== "fullRecovery")) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.mustRecover"));
+      return false;
+    }
+    const { cost } = action;
+    if (hunter.system.refuge.actions.value < cost.actions) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.noActionsRemaining"));
       return false;
     }
     if (!this.validateUpgradeRequirements(upgrade)) return false;
-    switch (action) {
-      case "fullRecovery": {
-        const { applyRecover } = await import("../../documents/actor/refuge.js");
-        await applyRecover(this.parent, hunter);
-        await hunter.update({ "system.refuge.actions.value": hunter.system.refuge.actions.value - 1 });
-        return true;
+    if ((this.resources.bone < cost.bone) || (this.resources.hearts < cost.hearts)) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
+      return false;
+    }
+    let { resolve, wounds } = action;
+    if (action.type === "temporaryHealth") {
+      for (const item of this.upgradeItems) {
+        if (!item.system.isAvailable(this.parent)) continue;
+        resolve += item.system.temporaryHealthBonus.resolve;
+        wounds += item.system.temporaryHealthBonus.wounds;
       }
     }
+    const { applyRecover } = await import("../../documents/actor/refuge.js");
+    await applyRecover(this.parent, hunter, { type: action.type, resolve, wounds });
+    if (cost.actions) {
+      await hunter.update({ "system.refuge.actions.value": hunter.system.refuge.actions.value - cost.actions });
+    }
+    if (cost.bone || cost.hearts) {
+      await this.parent.update({
+        "system.resources.bone": this.resources.bone - cost.bone,
+        "system.resources.hearts": this.resources.hearts - cost.hearts,
+      });
+    }
+    return true;
   }
 }
