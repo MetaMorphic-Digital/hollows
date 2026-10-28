@@ -29,12 +29,17 @@
   --hollows-color-blue-aside-bg: #4c596c;
   --hollows-color-blue-dark-aside-bg: #2b3745;
 
+  --hollows-color-brown-aside-bg: #5A2A18;
   --hollows-color-red-aside-bg: #561c39;
+  --hollows-color-red-light-aside-bg: #DF4A2A;
   --hollows-color-orange-aside-bg: #822519;
   --hollows-color-orange-light-aside-bg: #85443b;
 
   --hollows-color-mustard-aside-bg: #785933;
+  --hollows-color-yellow-aside-bg: #facf8f;
+
   --hollows-color-green-aside-bg: #5d5b34;
+  --hollows-color-green-forest-aside-bg: #4B502F;
 
   --hollows-color-white-aside-bg: #e2d3bc;
 }

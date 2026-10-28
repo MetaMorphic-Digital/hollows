@@ -59,6 +59,9 @@
       &.red {
         background-color: var(--hollows-color-red-aside-bg);
       }
+      &.red-light {
+        background-color: var(--hollows-color-red-light-aside-bg);
+      }
       &.orange {
         background-color: var(--hollows-color-orange-aside-bg);
       }
@@ -68,8 +71,15 @@
       &.mustard {
         background-color: var(--hollows-color-mustard-aside-bg);
       }
+      &.yellow {
+        background-color: var(--hollows-color-yellow-aside-bg);
+        color: black !important;
+      }
       &.green {
         background-color: var(--hollows-color-green-aside-bg);
+      }
+      &.green-forest {
+        background-color: var(--hollows-color-green-forest-aside-bg);
       }
       &.white {
         background-color: var(--hollows-color-white-aside-bg);
