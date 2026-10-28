@@ -1,3 +1,5 @@
+import RefugeData from "./refuge.mjs";
+
 export default class NpcData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
   static defineSchema() {
@@ -12,19 +14,12 @@ export default class NpcData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
-    this.#renderRefuges();
+    RefugeData.renderSheets(this.parent.id);
   }
 
   /** @inheritdoc */
   _onDelete(options, userId) {
     super._onDelete(options, userId);
-    this.#renderRefuges();
-  }
-
-  /** Refresh resident lists and upgrade availability when this NPC changes. */
-  #renderRefuges() {
-    for (const actor of game.actors) {
-      if ((actor.type === "refuge") && actor.system.residents.includes(this.parent.id)) actor.render(false);
-    }
+    RefugeData.renderSheets(this.parent.id);
   }
 }

@@ -4,14 +4,26 @@
       <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Refuge Name" />
       <div class="subline">Hollows Refuge</div>
     </div>
-    <div class="header-portrait">
-      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
-    </div>
   </header>
 
   <section class="sheet-section">
     <div class="ability-row">
-      <button type="button" class="stat-roll" data-enter-refuge>Enter Refuge (1 Bone, +3 Doom)</button>
+      <button type="button" class="stat-roll" data-enter-refuge {{#unless canOpenRefuge}}disabled{{/unless}}>{{localize "HOLLOWS.REFUGE.openRefuge"}}</button>
+    </div>
+    <h2>{{localize "HOLLOWS.REFUGE.currentVisitors"}}</h2>
+    <div class="refuge-visitors">
+      {{#each visitors as |hunter|}}
+        <div class="refuge-visitor">
+          <img src="{{hunter.img}}" alt="{{hunter.name}}" />
+          <span class="visitor-name">{{hunter.name}}</span>
+          <span class="visitor-actions" title="{{localize 'HOLLOWS.REFUGE.actions'}}">{{hunter.actions.value}}/{{hunter.actions.max}}</span>
+          {{#if hunter.canLeave}}
+            <button type="button" data-action="leaveRefuge" data-hunter-id="{{hunter.id}}">{{localize "HOLLOWS.REFUGE.leaveRefuge"}}</button>
+          {{/if}}
+        </div>
+      {{else}}
+        <p class="muted">{{localize "HOLLOWS.REFUGE.noVisitors"}}</p>
+      {{/each}}
     </div>
   </section>
 
@@ -21,7 +33,7 @@
     {{/each}}
   </nav>
 
-  <section class="refuge-tabs-content refuge-content">
+  <section class="refuge-tabs-content">
     {{#each tabs as |t|}}
       <div class="tab" data-tab="{{t.id}}" data-group="refugeTabs">{{{t.html}}}</div>
     {{/each}}

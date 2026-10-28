@@ -2,6 +2,13 @@ import { getRefugeNpcRoles } from "../refuge/action-handlers.js";
 import RefugeUpgradeData from "../items/refuge-upgrade.mjs";
 
 export default class RefugeData extends foundry.abstract.TypeDataModel {
+  /** Refresh Refuge sheets, optionally restricted to an NPC's residences. */
+  static renderSheets(residentId = null) {
+    for (const actor of game.actors) {
+      if ((actor.type === "refuge") && (!residentId || actor.system.residents.includes(residentId))) actor.render(false);
+    }
+  }
+
   /** @inheritdoc */
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -47,6 +54,18 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     return this.parent.items.filter(item => item.type === "refugeUpgrade").sort((a, b) => a.sort - b.sort);
   }
 
+  /** Hunters currently visiting this Refuge, in name order. */
+  get visitingHunters() {
+    return game.actors.filter(actor => (actor.type === "hunter") && (actor.system.refuge.id === this.parent.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  /** Online players' assigned Hunters who are outside this Refuge. */
+  get enteringHunters() {
+    return game.actors.filter(actor => (actor.type === "hunter") && (actor.system.refuge.id !== this.parent.id)
+      && game.users.some(user => user.active && !user.isGM && (user.character?.id === actor.id)));
+  }
+
   /** Report the NPCs missing from an upgrade's operating requirements. */
   validateUpgradeRequirements(upgrade) {
     const missing = upgrade.system.getMissingNpcRoles(this.parent);
@@ -89,11 +108,21 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
   async useUpgrade(itemId, action, hunter) {
     const upgrade = this.parent.items.get(itemId);
     if (!upgrade.system.actions.has(action)) return false;
+    if (hunter.system.refuge.id !== this.parent.id) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.hunterNotInRefuge"));
+      return false;
+    }
+    if (!hunter.system.refuge.actions.value) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.noActionsRemaining"));
+      return false;
+    }
     if (!this.validateUpgradeRequirements(upgrade)) return false;
     switch (action) {
       case "fullRecovery": {
         const { applyRecover } = await import("../../documents/actor/refuge.js");
-        return applyRecover(this.parent, hunter);
+        await applyRecover(this.parent, hunter);
+        await hunter.update({ "system.refuge.actions.value": hunter.system.refuge.actions.value - 1 });
+        return true;
       }
     }
   }

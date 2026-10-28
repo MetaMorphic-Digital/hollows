@@ -1,4 +1,4 @@
-import { dispatchToGM } from "../../helpers/queries.js";
+import { runUserQuery } from "../../helpers/queries.js";
 import { getActiveHollowActor } from "../../canvas/zone.js";
 import {
   getPrimaryRefugeActor,
@@ -8,10 +8,11 @@ import {
 import { applyInterceptors } from "../../helpers/extensions.js";
 import { removeCondition } from "./conditions.js";
 
+const REFUGE_ACTIONS = new foundry.utils.Semaphore(1);
+
+/** Send Refuge actions to the active GM for sequential execution. */
 export async function requestRefugeAction(data) {
-  if (game.user?.isGM) return false;
-  await dispatchToGM("refugeAction", data);
-  return true;
+  return runUserQuery(game.users.activeGM, "hollows.refugeAction", data);
 }
 
 // `extra` folds other fields into the same clamped resource update.
@@ -46,7 +47,6 @@ export async function addRefugeResources(deltaBone, deltaHearts) {
 
 /** Restore a Hunter's health and wake them from death in the Refuge. */
 export async function applyRecover(refuge, hunter) {
-  if (hunter?.type !== "hunter") return false;
   await hunter.update({
     "system.health.resolve.value": hunter.system.health.resolve.max,
     "system.health.wounds.value": hunter.system.health.wounds.max,
@@ -65,6 +65,8 @@ export async function applyRecover(refuge, hunter) {
 
 export async function applyEnterRefuge(refuge) {
   if (!refuge || refuge.type !== "refuge") return false;
+  const hunters = refuge.system.enteringHunters;
+  if (!hunters.length) return false;
   const bone = Math.max(0, Number(refuge.system?.resources?.bone ?? 0));
   if (bone < 1) {
     ui.notifications.warn("Entering the Refuge costs 1 Bone.");
@@ -79,6 +81,7 @@ export async function applyEnterRefuge(refuge) {
     if (cap > 0) next = Math.min(cap, next);
     await hollow.update({ "system.doom.current": next });
   }
+  for (const hunter of hunters) await hunter.system.enterRefuge(refuge);
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: refuge }),
     content: `<div class="hollows-chat">The Hunters enter the <strong>Refuge</strong> — <strong>-1 Bone</strong>, <strong>+3 Doom</strong>.</div>`
@@ -91,7 +94,7 @@ export async function applyRefugeActionPayload(data = {}) {
   const refuge = data.refugeId ? game.actors.get(String(data.refugeId)) : getPrimaryRefugeActor();
   if (!refuge || refuge.type !== "refuge") return;
   const handler = getRefugeActionHandler(type);
-  if (handler) await handler(refuge, data);
+  if (handler) return REFUGE_ACTIONS.add(handler, refuge, data);
 }
 
 registerRefugeActionHandler("buyUpgrade", async (refuge, data) => {

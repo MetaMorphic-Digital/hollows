@@ -1,8 +1,7 @@
-import { requestRefugeAction, applyEnterRefuge } from "../../../documents/actor/refuge.js";
+import { requestRefugeAction } from "../../../documents/actor/refuge.js";
 import { default as REFUGE_TABS } from "../refuge-tabs.mjs";
 import RefugeUpgradeData from "../../../data/items/refuge-upgrade.mjs";
-import { getActiveHunterForUser } from "../../../canvas/zone.js";
-import { confirmDialog, pickOne, resolveActionHunter } from "../../apps/selection-dialogs.mjs";
+import { confirmDialog, pickOne } from "../../apps/selection-dialogs.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -18,6 +17,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       useUpgrade: HollowsRefugeSheet.#useUpgrade,
       editUpgrade: HollowsRefugeSheet.#editUpgrade,
       removeUpgrade: HollowsRefugeSheet.#removeUpgrade,
+      leaveRefuge: HollowsRefugeSheet.#leaveRefuge,
     },
   };
 
@@ -30,6 +30,13 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
 
   get title() {
     return this.actor?.name ?? "Refuge";
+  }
+
+  /** @inheritdoc */
+  render(options = {}) {
+    const content = this.element?.querySelector(".window-content");
+    if (content) this._savedScrollTop = content.scrollTop;
+    return super.render(options);
   }
 
   async _prepareContext(options) {
@@ -46,6 +53,14 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   }
 
   async _prepareSheetContext(data) {
+    data.visitors = this.actor.system.visitingHunters.map(hunter => ({
+      id: hunter.id,
+      name: hunter.name,
+      img: hunter.img,
+      actions: hunter.system.refuge.actions,
+      canLeave: hunter.isOwner,
+    }));
+    data.canOpenRefuge = this.actor.system.enteringHunters.length > 0;
     const tabs = [];
     for (const def of REFUGE_TABS) {
       if (def.hasContent && !(await def.hasContent(this.actor))) continue;
@@ -57,19 +72,22 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     return data;
   }
 
+  /** @inheritdoc */
+  _toggleDisabled(disabled) {
+    super._toggleDisabled(disabled);
+    this.element.querySelector("[data-enter-refuge]").disabled = this.actor.system.enteringHunters.length === 0;
+    for (const button of this.element.querySelectorAll("[data-action='leaveRefuge']")) {
+      button.disabled = !game.actors.get(button.dataset.hunterId).isOwner;
+    }
+    for (const button of this.element.querySelectorAll("[data-action='useUpgrade']")) {
+      const item = this.actor.items.get(button.dataset.itemId);
+      button.disabled = item.system.getMissingNpcRoles(this.actor).length > 0;
+    }
+  }
+
   async _onRender(context, options) {
     await super._onRender(context, options);
     this.element.querySelector(".window-content")?.classList.add("hollows-sheet");
-
-    if (this.isEditable) {
-      this.element.querySelector("[data-edit=\"img\"]")?.addEventListener("click", () => {
-        new foundry.applications.apps.FilePicker.implementation({
-          type: "image",
-          current: this.document.img ?? "",
-          callback: async path => { await this.document.update({ img: path }); },
-        }).render({ force: true });
-      });
-    }
 
     this.element.querySelector("[data-enter-refuge]")?.addEventListener("click", this._onEnterRefuge.bind(this));
 
@@ -88,6 +106,10 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       if (!visible.includes(def.id) || (typeof def.activateListeners !== "function")) continue;
       const root = this.element.querySelector(`.refuge-tabs-content > .tab[data-tab="${def.id}"]`);
       if (root) def.activateListeners(this, root);
+    }
+    if (this._savedScrollTop) {
+      this.element.querySelector(".window-content").scrollTop = this._savedScrollTop;
+      this._savedScrollTop = 0;
     }
   }
 
@@ -118,8 +140,20 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
 
   async _onEnterRefuge(event) {
     event.preventDefault();
-    if (await requestRefugeAction({ type: "enterRefuge", refugeId: this.actor.id })) return;
-    await applyEnterRefuge(this.actor);
+    await requestRefugeAction({ type: "enterRefuge", refugeId: this.actor.id });
+  }
+
+  /** @inheritdoc */
+  async _onDropActor(event, actor) {
+    if (!game.user.isGM || (actor.type !== "hunter") || actor.pack) return null;
+    await actor.system.enterRefuge(this.actor);
+    return actor;
+  }
+
+  /** End only the selected Hunter's visit. */
+  static async #leaveRefuge(event, target) {
+    const hunter = game.actors.get(target.dataset.hunterId);
+    await hunter.update({ "system.refuge.id": "", "system.refuge.actions.value": 0 });
   }
 
   /** @inheritdoc */
@@ -140,8 +174,8 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       yesLabel: game.i18n.localize("HOLLOWS.REFUGE.buy"),
     });
     if (!confirmed) return null;
-    if (await requestRefugeAction({ type: "buyUpgrade", refugeId: this.actor.id, upgradeUuid: upgrade.uuid })) return null;
-    return this.actor.system.buyUpgrade(upgrade);
+    await requestRefugeAction({ type: "buyUpgrade", refugeId: this.actor.id, upgradeUuid: upgrade.uuid });
+    return null;
   }
 
   /** Choose an upgrade from the world or a compendium. */
@@ -155,20 +189,23 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     await this._purchaseUpgrade(await fromUuid(uuid));
   }
 
-  /** Choose the recovering Hunter and execute the installed item's action. */
+  /** Choose a visitor with an action remaining and use the installed upgrade. */
   static async #useUpgrade(event, target) {
-    const activeHunter = game.user.isGM ? null : getActiveHunterForUser();
-    if (!game.user.isGM && !activeHunter) {
-      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.selectHunter"));
+    const hunters = this.actor.system.visitingHunters.filter(hunter => hunter.isOwner && (hunter.system.refuge.actions.value > 0));
+    if (!hunters.length) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.noAvailableHunters"));
       return;
     }
-    const hunter = await resolveActionHunter(activeHunter, { title: game.i18n.localize("HOLLOWS.REFUGE.fullRecovery") });
+    const hunterId = hunters.length === 1 ? hunters[0].id : await pickOne({
+      title: game.i18n.localize("HOLLOWS.REFUGE.selectVisitor"),
+      options: hunters.map(hunter => ({ value: hunter.id, label: hunter.name })),
+    });
+    const hunter = game.actors.get(hunterId);
     if (!hunter) return;
     const { itemId, upgradeAction: action } = target.dataset;
-    if (await requestRefugeAction({
+    await requestRefugeAction({
       type: "useUpgrade", refugeId: this.actor.id, itemId, action, hunterUuid: hunter.uuid,
-    })) return;
-    await this.actor.system.useUpgrade(itemId, action, hunter);
+    });
   }
 
   /** Open an installed upgrade for editing. */

@@ -1,3 +1,5 @@
+import RefugeData from "./refuge.mjs";
+
 export default class HunterData extends foundry.abstract.TypeDataModel {
   static #resourceLimitModifiers = [];
 
@@ -46,6 +48,13 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
         appearance: new fields.StringField({ initial: "" }),
         notes: new fields.StringField({ initial: "" }),
       }),
+      refuge: new fields.SchemaField({
+        id: new fields.StringField({ initial: "" }),
+        actions: new fields.SchemaField({
+          value: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+          max: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        }),
+      }),
       health: new fields.SchemaField({
         resolve: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
@@ -67,6 +76,32 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 6, nullable: false }),
       }),
     };
+  }
+
+  /* -------------------------------------------------- */
+
+  /** Restore the action allowance when starting a new visit. */
+  async enterRefuge(refuge) {
+    if (this.refuge.id === refuge.id) return false;
+    await this.parent.update({
+      "system.refuge.id": refuge.id,
+      "system.refuge.actions.value": this.refuge.actions.max,
+    });
+    return true;
+  }
+
+  /** @inheritdoc */
+  _onUpdate(changed, options, userId) {
+    super._onUpdate(changed, options, userId);
+    if (("name" in changed) || ("img" in changed) || foundry.utils.hasProperty(changed, "system.refuge")) {
+      RefugeData.renderSheets();
+    }
+  }
+
+  /** @inheritdoc */
+  _onDelete(options, userId) {
+    super._onDelete(options, userId);
+    RefugeData.renderSheets();
   }
 
   /* -------------------------------------------------- */
