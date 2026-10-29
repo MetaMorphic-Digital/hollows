@@ -3,6 +3,7 @@ import { WeaponCatalog } from "../../data/weapons/registry.js";
 import { getAvailableWeaponForms } from "../../data/weapons/resolvers.js";
 import { getRefugeAllowedWeaponTiers } from "../../data/refuge/resolvers.js";
 import { STAT_LABELS } from "../../data/system-constants.js";
+import RefugeUpgradeData from "../../data/items/refuge-upgrade.mjs";
 
 /** Collect Refuge weapon choices before sending the action to the GM. */
 export default class RefugeRearmReforgeDialogs {
@@ -52,7 +53,7 @@ export default class RefugeRearmReforgeDialogs {
     if (choice.echoId) changes.push(hunter.items.get(choice.echoId).name);
     if (choice.stats) changes.push(Object.entries(choice.stats).map(([key, value]) => `${STAT_LABELS[key]} ${value}`).join(", "));
     const confirmed = await confirmDialog({
-      title: game.i18n.localize(`HOLLOWS.REFUGE.${action}`),
+      title: game.i18n.localize(RefugeUpgradeData.schema.fields.actions.element.fields.type.choices[action]),
       bodyHtml: `<p>${game.i18n.localize("HOLLOWS.REFUGE.confirmWeaponChanges")}</p>`
         + `<ul>${changes.map(change => `<li>${foundry.utils.escapeHTML(change)}</li>`).join("")}</ul>`,
     });

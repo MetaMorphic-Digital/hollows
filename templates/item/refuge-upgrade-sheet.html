@@ -19,6 +19,14 @@
       <label>{{localize "HOLLOWS.REFUGE.bone"}}{{formInput systemFields.cost.fields.bone value=system.cost.bone}}</label>
       <label>{{localize "HOLLOWS.REFUGE.hearts"}}{{formInput systemFields.cost.fields.hearts value=system.cost.hearts}}</label>
     </div>
+    {{formGroup systemFields.repeatable value=system.repeatable label="HOLLOWS.REFUGE.repeatable" localize=true}}
+    {{#if system.repeatable}}
+      <h4>{{localize "HOLLOWS.REFUGE.costIncrease"}}</h4>
+      <div class="num-grid">
+        <label>{{localize "HOLLOWS.REFUGE.bone"}}{{formInput systemFields.costIncrease.fields.bone value=system.costIncrease.bone}}</label>
+        <label>{{localize "HOLLOWS.REFUGE.hearts"}}{{formInput systemFields.costIncrease.fields.hearts value=system.costIncrease.hearts}}</label>
+      </div>
+    {{/if}}
     {{formGroup systemFields.requiredNpcRoles value=system.requiredNpcRoles label="HOLLOWS.REFUGE.requiredNpcRoles" type="checkboxes" localize=true}}
     {{formGroup systemFields.requiredUpgrades value=system.requiredUpgrades options=upgradeChoices label="HOLLOWS.REFUGE.requiredUpgrades" localize=true}}
     {{formGroup systemFields.requiresAnchoredEntity value=system.requiresAnchoredEntity label="HOLLOWS.REFUGE.requiresAnchoredEntity" localize=true}}
@@ -43,6 +51,25 @@
     <div class="num-grid">
       <label>{{localize "HOLLOWS.REFUGE.resolve"}}{{formInput systemFields.weaponDamage.fields.resolve value=system.weaponDamage.resolve}}</label>
       <label>{{localize "HOLLOWS.REFUGE.wounds"}}{{formInput systemFields.weaponDamage.fields.wounds value=system.weaponDamage.wounds}}</label>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <h3>{{localize "HOLLOWS.REFUGE.renewAction"}}</h3>
+    {{formGroup systemFields.renew.fields.marks value=system.renew.marks label="HOLLOWS.REFUGE.renewMarks" localize=true}}
+    {{formGroup systemFields.renew.fields.disadvantage value=system.renew.disadvantage label="HOLLOWS.REFUGE.renewDisadvantage" localize=true}}
+  </section>
+
+  <section class="sheet-section">
+    <h3>{{localize "HOLLOWS.REFUGE.revelAction"}}</h3>
+    {{formGroup systemFields.revel.fields.additionalEchoes value=system.revel.additionalEchoes label="HOLLOWS.REFUGE.additionalEchoes" localize=true}}
+    {{formGroup systemFields.revel.fields.advantage value=system.revel.advantage label="HOLLOWS.REFUGE.revelAdvantage" localize=true}}
+    {{formGroup systemFields.echoRollModifier value=system.echoRollModifier label="HOLLOWS.REFUGE.echoRollModifier" localize=true}}
+    <h4>{{localize "HOLLOWS.REFUGE.healthBonus"}}</h4>
+    <p class="muted">{{localize "HOLLOWS.REFUGE.healthBonusHint"}}</p>
+    <div class="num-grid">
+      <label>{{localize "HOLLOWS.REFUGE.resolve"}}{{formInput systemFields.healthBonus.fields.resolve value=system.healthBonus.resolve}}</label>
+      <label>{{localize "HOLLOWS.REFUGE.wounds"}}{{formInput systemFields.healthBonus.fields.wounds value=system.healthBonus.wounds}}</label>
     </div>
   </section>
 

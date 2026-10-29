@@ -4,6 +4,7 @@ import RefugeUpgradeData from "../../../data/items/refuge-upgrade.mjs";
 import { confirmDialog, pickOne } from "../../apps/selection-dialogs.mjs";
 import RefugeRearmReforgeDialogs from "../../apps/refuge-rearm-reforge-dialogs.mjs";
 import RefugeInstallation from "../../../documents/actor/refuge-installation.mjs";
+import RefugeRenewRevel from "../../../documents/actor/refuge-renew-revel.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -12,9 +13,10 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   static DEFAULT_OPTIONS = {
     classes: ["hollows", "sheet", "actor", "refuge"],
     position: { width: 640, height: 640 },
-    window: { resizable: true },
+    window: { resizable: true, contentClasses: ["hollows-sheet"] },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
+      enterRefuge: HollowsRefugeSheet.#enterRefuge,
       buyUpgrade: HollowsRefugeSheet.#buyUpgrade,
       useUpgrade: HollowsRefugeSheet.#useUpgrade,
       editUpgrade: HollowsRefugeSheet.#editUpgrade,
@@ -28,19 +30,13 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   static PARTS = {
     sheet: {
       template: "systems/hollows/templates/actor/refuge-sheet.html",
+      scrollable: [""],
       root: true,
     },
   };
 
   get title() {
     return this.actor?.name ?? "Refuge";
-  }
-
-  /** @inheritdoc */
-  render(options = {}) {
-    const content = this.element?.querySelector(".window-content");
-    if (content) this._savedScrollTop = content.scrollTop;
-    return super.render(options);
   }
 
   async _prepareContext(options) {
@@ -78,14 +74,15 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       const html = await foundry.applications.handlebars.renderTemplate(def.template, { ...data, ...tabContext });
       tabs.push({ id: def.id, label: def.label, html });
     }
-    data.tabs = tabs;
+    if (!tabs.some(tab => tab.id === this.tabGroups.refugeTabs)) this.tabGroups.refugeTabs = tabs[0].id;
+    data.tabs = tabs.map(tab => ({ ...tab, cssClass: tab.id === this.tabGroups.refugeTabs ? "active" : "" }));
     return data;
   }
 
   /** @inheritdoc */
   _toggleDisabled(disabled) {
     const controls = Array.from(this.element.querySelectorAll(
-      "[data-enter-refuge], [data-action='leaveRefuge'], [data-action='recoverOnEntry'], [data-action='useUpgrade'], [data-action='installationTest']",
+      "[data-action='enterRefuge'], [data-action='leaveRefuge'], [data-action='recoverOnEntry'], [data-action='useUpgrade'], [data-action='installationTest']",
     ), button => [button, button.disabled]);
     super._toggleDisabled(disabled);
     for (const [button, wasDisabled] of controls) button.disabled = wasDisabled;
@@ -93,59 +90,16 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
 
   async _onRender(context, options) {
     await super._onRender(context, options);
-    this.element.querySelector(".window-content")?.classList.add("hollows-sheet");
-
-    this.element.querySelector("[data-enter-refuge]")?.addEventListener("click", this._onEnterRefuge.bind(this));
-
-    const visible = (context.tabs || []).map((t) => t.id);
-    if (!visible.includes(this._activeTab)) this._activeTab = visible[0] || "";
-    for (const tab of this.element.querySelectorAll(".sheet-tabs[data-group='refugeTabs'] [data-tab]")) {
-      tab.addEventListener("click", (event) => {
-        event.preventDefault();
-        this._activeTab = tab.dataset.tab;
-        this._activateRefugeTab(this._activeTab);
-      });
-    }
-    this._activateRefugeTab(this._activeTab);
-
+    const visible = context.tabs.map(tab => tab.id);
     for (const def of REFUGE_TABS) {
-      if (!visible.includes(def.id) || (typeof def.activateListeners !== "function")) continue;
+      if (!visible.includes(def.id) || !def.activateListeners) continue;
       const root = this.element.querySelector(`.refuge-tabs-content > .tab[data-tab="${def.id}"]`);
-      if (root) def.activateListeners(this, root);
-    }
-    if (this._savedScrollTop) {
-      this.element.querySelector(".window-content").scrollTop = this._savedScrollTop;
-      this._savedScrollTop = 0;
+      def.activateListeners(this, root);
     }
   }
 
-  _activateRefugeTab(tabName) {
-    if (!tabName || !this.element) return;
-    for (const tab of this.element.querySelectorAll(".sheet-tabs[data-group='refugeTabs'] [data-tab]")) {
-      tab.classList.toggle("active", tab.dataset.tab === tabName);
-    }
-    for (const panel of this.element.querySelectorAll(".refuge-tabs-content > .tab")) {
-      panel.classList.toggle("active", panel.dataset.tab === tabName);
-    }
-  }
-
-  async _onChangeForm(formConfig, event) {
-    const input = event?.target;
-    const name = String(input?.name ?? "");
-    if ((input?.tagName !== "SELECT") && name && ((name === "name") || name.startsWith("system."))) {
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const value = input.type === "checkbox" ? input.checked
-        : input.type === "number" ? (Number(input.value) || 0)
-          : String(input.value ?? "");
-      await this.document.update({ [name]: value }, { render: false });
-      return;
-    }
-    return super._onChangeForm(formConfig, event);
-  }
-
-  async _onEnterRefuge(event) {
-    event.preventDefault();
+  /** Open a paid group visit through the Refuge action queue. */
+  static async #enterRefuge() {
     await requestRefugeAction({ type: "enterRefuge", refugeId: this.actor.id });
   }
 
@@ -184,7 +138,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
 
   /** Confirm the purchase price before requesting installation. */
   async _purchaseUpgrade(upgrade) {
-    const { bone, hearts } = upgrade.system.cost;
+    const { bone, hearts } = upgrade.system.getPurchaseCost(this.actor);
     const confirmed = await confirmDialog({
       title: game.i18n.localize("HOLLOWS.REFUGE.buyUpgrade"),
       bodyHtml: game.i18n.format("HOLLOWS.REFUGE.confirmPurchase", {
@@ -231,7 +185,11 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     });
     const hunter = game.actors.get(hunterId);
     if (!hunter) return;
-    const choice = await RefugeRearmReforgeDialogs.prepare(hunter, this.actor, definition.type);
+    const actionHandler = ["renew", "revel"].includes(definition.type) ? RefugeRenewRevel : RefugeRearmReforgeDialogs;
+    const choice = await actionHandler.prepare(hunter, this.actor, definition.type).catch(err => {
+      ui.notifications.warn(err.message);
+      return null;
+    });
     if (!choice) return;
     try {
       await requestRefugeAction({

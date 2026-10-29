@@ -11,7 +11,8 @@ export function getTotalStatForActor(actor, statKey) {
   const base = Number(actor.system?.stats?.[statKey] ?? 0);
   const mods = getWeaponStatModsForActor(actor);
   const echoMods = getEchoStatMods(actor);
-  const total = base + Number(mods[statKey] ?? 0) + Number(echoMods[statKey] ?? 0) + getStatModifier(actor, statKey) + getSpecialConditionStatDelta(actor, statKey);
+  const total = base + Number(mods[statKey] ?? 0) + Number(echoMods[statKey] ?? 0)
+    + actor.system.getRenewBonus(statKey) + getStatModifier(actor, statKey) + getSpecialConditionStatDelta(actor, statKey);
   return Math.max(1, Math.min(19, total));
 }
 

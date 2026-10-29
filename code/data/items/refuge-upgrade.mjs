@@ -23,6 +23,11 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
         bone: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         hearts: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       }),
+      repeatable: new fields.BooleanField({ initial: false }),
+      costIncrease: new fields.SchemaField({
+        bone: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        hearts: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
       requiredNpcRoles: new fields.SetField(new fields.StringField({
         choices: Object.fromEntries(getRefugeNpcRoles().map(({ key, label }) => [key, label])),
       })),
@@ -44,6 +49,19 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
         resolve: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         wounds: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       }),
+      healthBonus: new fields.SchemaField({
+        resolve: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        wounds: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
+      renew: new fields.SchemaField({
+        marks: new fields.NumberField({ initial: 3, integer: true, min: 1, max: 3 }),
+        disadvantage: new fields.BooleanField({ initial: false }),
+      }),
+      revel: new fields.SchemaField({
+        additionalEchoes: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        advantage: new fields.BooleanField({ initial: false }),
+      }),
+      echoRollModifier: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       actions: new fields.ArrayField(new fields.SchemaField({
         type: new fields.StringField({
           initial: "fullRecovery",
@@ -54,6 +72,8 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
             reforge: "HOLLOWS.REFUGE.reforge",
             removeEcho: "HOLLOWS.REFUGE.removeEcho",
             reshape: "HOLLOWS.REFUGE.reshape",
+            renew: "HOLLOWS.REFUGE.renewAction",
+            revel: "HOLLOWS.REFUGE.revelAction",
           },
         }),
         cost: new fields.SchemaField({
@@ -67,10 +87,39 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
     };
   }
 
+  /** @inheritdoc */
+  _onCreate(data, options, userId) {
+    super._onCreate(data, options, userId);
+    if (this.parent.actor?.type === "refuge") this.parent.actor.system.refreshHunters();
+  }
+
+  /** @inheritdoc */
+  _onUpdate(changed, options, userId) {
+    super._onUpdate(changed, options, userId);
+    if (this.parent.actor?.type === "refuge") this.parent.actor.system.refreshHunters();
+  }
+
+  /** @inheritdoc */
+  _onDelete(options, userId) {
+    super._onDelete(options, userId);
+    if (this.parent.actor?.type === "refuge") this.parent.actor.system.refreshHunters();
+  }
+
   /** The template shared by an upgrade and its imported or installed copies. */
   static getSourceUuid(item) {
     return item.uuid.startsWith("Compendium.") ? item.uuid
       : item._stats.compendiumSource || item._stats.duplicateSource || item.uuid;
+  }
+
+  /** Price of the next copy, including purchases awaiting installation. */
+  getPurchaseCost(refuge) {
+    const source = RefugeUpgradeData.getSourceUuid(this.parent);
+    const copies = this.repeatable ? refuge.system.upgradeItems
+      .filter(item => RefugeUpgradeData.getSourceUuid(item) === source).length : 0;
+    return {
+      bone: this.cost.bone + (copies * this.costIncrease.bone),
+      hearts: this.cost.hearts + (copies * this.costIncrease.hearts),
+    };
   }
 
   /** Whether this installed upgrade can provide its actions and benefits. */

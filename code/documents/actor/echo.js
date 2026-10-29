@@ -1,6 +1,6 @@
 import { ECHO_TABLE_NAMES, MALIGNANCY_LIST } from "../../data/echo/index.js";
 import { chooseHunterWeapon } from "../../helpers/weapon-utils.js";
-import { getUpgradeRank, getPrimaryRefugeActor } from "../../data/refuge/index.js";
+import { getPrimaryRefugeActor } from "../../data/refuge/index.js";
 import { getWeaponAbilityDocs, grantWeaponAbilityToHunter, isDuplicateWeaponAbility } from "./ability-grant.js";
 import { runUserQuery, dispatchToGM } from "../../helpers/queries.js";
 import { confirmDialog, pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
@@ -58,13 +58,13 @@ function pickTableResult(table, rollTotal) {
 
 async function promptTrophiesModifier() {
   const refuge = getPrimaryRefugeActor();
-  const max = refuge ? getUpgradeRank(refuge, "trophies") : 0;
+  const max = refuge?.system.benefits.echoRollModifier ?? 0;
   if (!max) return 0;
   const res = await promptForm({
     title: "Trophies Modifier",
     fields: [{ type: "number", name: "mod", label: `Trophies modifier (-${max} to +${max})`, min: -max, max, value: 0 }],
   });
-  return Number(res?.mod ?? 0);
+  return Math.clamp(Number(res?.mod ?? 0), -max, max);
 }
 
 // ─── Echo Roll Flow ───────────────────────────────────────────────────────────

@@ -38,7 +38,6 @@ RefugeTabRegistry.register({
       name: item.name,
       text: item.system.text,
       category: item.system.schema.fields.category.choices[item.system.category],
-      cost: item.system.cost,
       pending: item.system.pending,
       missing: item.system.getMissingRequirements(sheet.actor).join(", "),
     })),
@@ -100,22 +99,18 @@ RefugeTabRegistry.register({
       availableNpcs: game.actors.contents
         .filter((a) => a.type === "npc" && !residentIds.includes(a.id))
         .map((a) => ({ id: a.id, name: a.name })),
-      npcRoleRows: getRefugeNpcRoles().map((role) => ({
-        key: role.key,
-        label: role.label,
-        current: String(actor.system?.npcRoles?.[role.key] || ""),
-        candidates: roleCandidates,
-      })),
+      npcRoleRows: getRefugeNpcRoles().map(role => {
+        const current = actor.system.npcRoles[role.key];
+        const assigned = game.actors.get(current);
+        const candidates = [...roleCandidates];
+        if (assigned && !candidates.some(candidate => candidate.id === current)) {
+          candidates.push({ id: current, name: assigned.name });
+        }
+        return { key: role.key, label: role.label, current, candidates };
+      }),
     };
   },
   activateListeners: (sheet, root) => {
-    for (const el of root.querySelectorAll("[data-role-select]")) {
-      el.addEventListener("change", async (event) => {
-        const role = String(event.currentTarget.dataset.roleSelect || "");
-        if (!role) return;
-        await sheet.actor.update({ [`system.npcRoles.${role}`]: String(event.currentTarget.value || "") });
-      });
-    }
     root.querySelector("[data-resident-add]")?.addEventListener("click", async (event) => {
       event.preventDefault();
       const npcId = String(root.querySelector("[name=npcId]")?.value || "");

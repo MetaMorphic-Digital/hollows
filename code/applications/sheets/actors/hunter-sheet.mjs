@@ -1,4 +1,5 @@
 import { STAT_LABELS } from "../../../data/_module.mjs";
+import { getPrimaryRefugeActor } from "../../../data/refuge/resolvers.js";
 import { getActorZone } from "../../../canvas/zone.js";
 import { getTotalStatForActor } from "../../../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, getFocusLimit } from "../../../documents/actor/resources.js";
@@ -119,6 +120,11 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     data.actor = this.actor;
     data.system = this.actor.system;
     data.statLabels = STAT_LABELS;
+    const renewMarks = getPrimaryRefugeActor()?.system.benefits.renewMarks ?? 3;
+    data.renewStats = Object.fromEntries(Object.keys(this.actor.system.stats).map(stat => [stat, {
+      marks: Array.from({ length: renewMarks }, (_, index) => index < this.actor.system.statsMarks[stat]),
+      bonus: this.actor.system.getRenewBonus(stat),
+    }]));
     const statMods = getWeaponStatModsForActor(this.actor);
     data.statMods = statMods;
     data.statsTotal = Object.fromEntries(

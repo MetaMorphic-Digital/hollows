@@ -102,17 +102,22 @@
         <div class="stat-grid">
           {{#each system.stats as |value key|}}
             <div class="stat-row">
-              <div class="stat-label">{{lookup ../statLabels key}}</div>
+              <div class="stat-label">
+                {{lookup ../statLabels key}}
+                {{#with (lookup ../renewStats key) as |renew|}}
+                  {{#if renew.bonus}}<small class="muted">{{localize "HOLLOWS.REFUGE.renewAction"}} +{{renew.bonus}}</small>{{/if}}
+                {{/with}}
+              </div>
               <div class="stat-total">{{lookup ../statsTotal key}}</div>
               <div class="stat-base">
                 <div class="stat-base-label">Base</div>
                 <input class="stat-input" type="number" name="system.stats.{{key}}" value="{{value}}" />
               </div>
               <div class="stat-marks" data-stat="{{key}}">
-                {{#with (lookup ../system.statsMarks key) as |marks|}}
-                  <span class="stat-mark {{#if (gt marks 0)}}filled{{/if}}"></span>
-                  <span class="stat-mark {{#if (gt marks 1)}}filled{{/if}}"></span>
-                  <span class="stat-mark {{#if (gt marks 2)}}filled{{/if}}"></span>
+                {{#with (lookup ../renewStats key) as |renew|}}
+                  {{#each renew.marks as |filled|}}
+                    <span class="stat-mark {{#if filled}}filled{{/if}}"></span>
+                  {{/each}}
                 {{/with}}
               </div>
               <button type="button" class="stat-roll" data-roll="{{key}}">Roll</button>

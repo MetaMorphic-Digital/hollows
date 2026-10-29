@@ -1,4 +1,5 @@
 import RefugeData from "./refuge.mjs";
+import { STAT_LABELS } from "../system-constants.js";
 import { getPrimaryRefugeActor } from "../refuge/resolvers.js";
 import { getHunterEquipmentItemsForSlot } from "../../documents/actor/hunter-equipment.js";
 
@@ -52,6 +53,13 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       }),
       refuge: new fields.SchemaField({
         id: new fields.StringField({ initial: "" }),
+        renewals: new fields.ArrayField(new fields.SchemaField({
+          hollowId: new fields.StringField(),
+          stat: new fields.StringField({ choices: ["none", ...Object.keys(STAT_LABELS)] }),
+        })),
+        revelEchoes: new fields.ArrayField(new fields.SchemaField({
+          hollowId: new fields.StringField(), echoId: new fields.StringField(),
+        })),
         installationTests: new fields.ArrayField(new fields.SchemaField({
           id: new fields.StringField(), name: new fields.StringField(),
         })),
@@ -110,6 +118,35 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
     return true;
   }
 
+  /** Temporary Renew increases still in effect for this stat. */
+  getRenewBonus(stat) {
+    return this.refuge.renewals.filter(renewal => renewal.stat === stat).length;
+  }
+
+  /** Death ends temporary Renew increases but retains the once-per-Hollow record. */
+  async clearRenewBonuses() {
+    if (!this.refuge.renewals.some(renewal => renewal.stat !== "none")) return;
+    await this.parent.update({
+      "system.refuge.renewals": this.refuge.renewals.map(renewal => ({ ...renewal, stat: "none" })),
+    });
+  }
+
+  /** End Renew and Revel effects belonging to a cleansed Hollow. */
+  async clearHollowBenefits(hollowId) {
+    const { renewals, revelEchoes } = this.refuge;
+    if (![...renewals, ...revelEchoes].some(entry => entry.hollowId === hollowId)) return;
+    const remainingEchoes = revelEchoes.filter(entry => entry.hollowId !== hollowId);
+    const updates = revelEchoes.filter(entry => (entry.hollowId === hollowId)
+      && !remainingEchoes.some(other => other.echoId === entry.echoId))
+      .map(entry => this.parent.items.get(entry.echoId)).filter(Boolean)
+      .map(echo => ({ _id: echo.id, "system.state": [...echo.system.state].filter(state => state !== "suppressed") }));
+    if (updates.length) await this.parent.updateEmbeddedDocuments("Item", updates);
+    await this.parent.update({
+      "system.refuge.renewals": renewals.filter(entry => entry.hollowId !== hollowId),
+      "system.refuge.revelEchoes": remainingEchoes,
+    });
+  }
+
   /** @inheritdoc */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
@@ -154,6 +191,10 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       resolveBonus += healthBonus.resolve || 0;
       woundsBonus += healthBonus.wounds || 0;
     }
+
+    const benefits = getPrimaryRefugeActor()?.system.benefits;
+    resolveBonus += Math.max(0, Math.min(benefits?.resolve ?? 0, 10 - resolveBonus));
+    woundsBonus += Math.max(0, Math.min(benefits?.wounds ?? 0, 10 - woundsBonus));
 
     const penalty = this.parent.getFlag("hollows", "battleMaxPenalty") || {};
     this.health.resolve.max = Math.max(0, HunterData.getResourceLimit(this.parent, "resolve", resolveBonus) - (Number(penalty.resolve) || 0));

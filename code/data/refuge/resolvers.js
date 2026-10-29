@@ -8,11 +8,6 @@ export function getPrimaryRefugeActor() {
   return named || refuges[0];
 }
 
-export function getUpgradeRank(refugeActor, upgradeId) {
-  const raw = Number(refugeActor?.system?.upgrades?.[upgradeId] ?? 0);
-  return Number.isNaN(raw) ? 0 : Math.max(0, raw);
-}
-
 /** Weapon-ability tiers granted by available upgrades, including the base Tier 1. */
 export function getRefugeAllowedWeaponTiers(refugeActor) {
   const tiers = new Set([1]);

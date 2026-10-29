@@ -5,7 +5,7 @@
     {{#each npcRoleRows as |role|}}
       <div class="hollows-form-row">
         <div class="stat-label">{{role.label}}</div>
-        <select data-role-select="{{role.key}}">
+        <select name="system.npcRoles.{{role.key}}">
           <option value="">None</option>
           {{#each role.candidates as |c|}}
             <option value="{{c.id}}" {{#if (eq c.id role.current)}}selected{{/if}}>{{c.name}}</option>

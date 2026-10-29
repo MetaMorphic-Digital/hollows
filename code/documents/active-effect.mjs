@@ -22,6 +22,7 @@ export default class HollowsActiveEffect extends foundry.documents.ActiveEffect 
   async #enterRefugeOnDeath() {
     if (!game.user.isActiveGM || (this.parent?.type !== "hunter")) return;
     if (!this.active || !this.statuses.has("dead")) return;
+    await this.parent.system.clearRenewBonuses();
     const refuge = getPrimaryRefugeActor();
     if (refuge) await requestRefugeAction({ type: "enterHunter", refugeId: refuge.id, hunterUuid: this.parent.uuid });
   }

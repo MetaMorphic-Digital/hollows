@@ -148,7 +148,6 @@ async function normalizeActorDefaults(actor) {
     let changed = false;
     if (actor.system?.resources?.bone === undefined) { updateData["system.resources.bone"] = 0; changed = true; }
     if (actor.system?.resources?.hearts === undefined) { updateData["system.resources.hearts"] = 0; changed = true; }
-    if (!actor.system?.upgrades || typeof actor.system.upgrades !== "object") { updateData["system.upgrades"] = {}; changed = true; }
     if (!Array.isArray(actor.system?.residents)) { updateData["system.residents"] = []; changed = true; }
     if (actor.system?.notes === undefined) { updateData["system.notes"] = ""; changed = true; }
     if (changed) await actor.update(updateData);

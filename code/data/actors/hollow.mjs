@@ -1,5 +1,14 @@
 export default class HollowData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
+  async _onUpdate(changed, options, userId) {
+    super._onUpdate(changed, options, userId);
+    if (!game.user.isActiveGM || (changed.system?.status !== "cleansed")) return;
+    for (const hunter of game.actors.filter(actor => actor.type === "hunter")) {
+      await hunter.system.clearHollowBenefits(this.parent.id);
+    }
+  }
+
+  /** @inheritdoc */
   static defineSchema() {
     const fields = foundry.data.fields;
     const stepSchema = () => new fields.SchemaField({
