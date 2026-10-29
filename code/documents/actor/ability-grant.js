@@ -4,23 +4,10 @@
  * consumed by Refuge, character creation, and Echo.
  */
 import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
-import { getWeaponAbilityPack } from "../../helpers/weapon-utils.js";
-import { getContentPacks } from "../../helpers/extensions.js";
-
-function getWeaponAbilityPacks() {
-  return [
-    getWeaponAbilityPack(),
-    ...getContentPacks("weapon-abilities").map((id) => game.packs.get(id)),
-  ].filter(Boolean);
-}
+import { WeaponCatalog } from "../../data/weapons/registry.js";
 
 export async function getWeaponAbilityDocs(weaponType, tier) {
-  const packDocs = await Promise.all(getWeaponAbilityPacks().map((p) => p.getDocuments()));
-  return packDocs.flat()
-    .filter(d => d.type === "weaponAbility")
-    .filter(d => String(d.system?.weaponType || "") === String(weaponType || ""))
-    .filter(d => Number(d.system?.tier ?? 0) === Number(tier ?? 0))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  return WeaponCatalog.getDocuments("weaponAbility", { weaponType, tier });
 }
 
 export async function chooseAbilityDoc(docs, title) {

@@ -109,11 +109,20 @@ registerRefugeActionHandler("buyUpgrade", async (refuge, data) => {
 });
 registerRefugeActionHandler("useUpgrade", async (refuge, data) => {
   const hunter = await fromUuid(data.hunterUuid);
-  return refuge.system.useUpgrade(data.itemId, data.action, hunter);
+  return refuge.system.useUpgrade(data.itemId, data.action, hunter, data.choice);
 });
 registerRefugeActionHandler("recoverOnEntry", async (refuge, data) => {
   const hunter = await fromUuid(data.hunterUuid);
   return refuge.system.recoverOnEntry(hunter);
 });
 registerRefugeActionHandler("enterRefuge", async (refuge) => applyEnterRefuge(refuge));
+registerRefugeActionHandler("enterHunter", async (refuge, data) => {
+  const hunter = await fromUuid(data.hunterUuid);
+  await hunter.system.enterRefuge(refuge);
+});
+registerRefugeActionHandler("installationTest", async (refuge, data) => {
+  const hunter = await fromUuid(data.hunterUuid);
+  const { default: RefugeInstallation } = await import("./refuge-installation.mjs");
+  await RefugeInstallation.apply(hunter, data.testId, data.config);
+});
 registerRefugeActionHandler("spendBone", async (refuge, data) => spendRefugeBone(refuge, data.amount));

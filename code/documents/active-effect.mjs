@@ -1,4 +1,5 @@
 import { getPrimaryRefugeActor } from "../data/refuge/resolvers.js";
+import { requestRefugeAction } from "./actor/refuge.js";
 
 /**
  * System implementation of the ActiveEffect class.
@@ -22,6 +23,6 @@ export default class HollowsActiveEffect extends foundry.documents.ActiveEffect 
     if (!game.user.isActiveGM || (this.parent?.type !== "hunter")) return;
     if (!this.active || !this.statuses.has("dead")) return;
     const refuge = getPrimaryRefugeActor();
-    if (refuge) await this.parent.system.enterRefuge(refuge);
+    if (refuge) await requestRefugeAction({ type: "enterHunter", refugeId: refuge.id, hunterUuid: this.parent.uuid });
   }
 }

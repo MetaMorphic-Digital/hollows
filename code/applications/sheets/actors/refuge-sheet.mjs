@@ -2,6 +2,8 @@ import { requestRefugeAction } from "../../../documents/actor/refuge.js";
 import { default as REFUGE_TABS } from "../refuge-tabs.mjs";
 import RefugeUpgradeData from "../../../data/items/refuge-upgrade.mjs";
 import { confirmDialog, pickOne } from "../../apps/selection-dialogs.mjs";
+import RefugeRearmReforgeDialogs from "../../apps/refuge-rearm-reforge-dialogs.mjs";
+import RefugeInstallation from "../../../documents/actor/refuge-installation.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -19,6 +21,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       removeUpgrade: HollowsRefugeSheet.#removeUpgrade,
       leaveRefuge: HollowsRefugeSheet.#leaveRefuge,
       recoverOnEntry: HollowsRefugeSheet.#recoverOnEntry,
+      installationTest: HollowsRefugeSheet.#installationTest,
     },
   };
 
@@ -46,6 +49,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       ...context,
       actor: this.actor,
       system: this.actor.system,
+      systemFields: this.actor.system.schema.fields,
       editable: this.isEditable,
       owner: this.document.isOwner,
       limited: this.document.limited,
@@ -54,6 +58,10 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   }
 
   async _prepareSheetContext(data) {
+    data.installationTests = game.actors.filter(actor => (actor.type === "hunter") && actor.isOwner)
+      .flatMap(hunter => hunter.system.refuge.installationTests.slice(0, 1).map(test => ({
+        hunterId: hunter.id, hunterName: hunter.name, name: test.name,
+      })));
     data.visitors = this.actor.system.visitingHunters.map(hunter => ({
       id: hunter.id,
       name: hunter.name,
@@ -77,7 +85,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   /** @inheritdoc */
   _toggleDisabled(disabled) {
     const controls = Array.from(this.element.querySelectorAll(
-      "[data-enter-refuge], [data-action='leaveRefuge'], [data-action='recoverOnEntry'], [data-action='useUpgrade']",
+      "[data-enter-refuge], [data-action='leaveRefuge'], [data-action='recoverOnEntry'], [data-action='useUpgrade'], [data-action='installationTest']",
     ), button => [button, button.disabled]);
     super._toggleDisabled(disabled);
     for (const [button, wasDisabled] of controls) button.disabled = wasDisabled;
@@ -144,7 +152,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   /** @inheritdoc */
   async _onDropActor(event, actor) {
     if (!game.user.isGM || (actor.type !== "hunter") || actor.pack) return null;
-    await actor.system.enterRefuge(this.actor);
+    await requestRefugeAction({ type: "enterHunter", refugeId: this.actor.id, hunterUuid: actor.uuid });
     return actor;
   }
 
@@ -160,6 +168,11 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
   static async #recoverOnEntry(event, target) {
     const hunter = game.actors.get(target.dataset.hunterId);
     await requestRefugeAction({ type: "recoverOnEntry", refugeId: this.actor.id, hunterUuid: hunter.uuid });
+  }
+
+  /** Resolve the selected Hunter's next installation test. */
+  static async #installationTest(event, target) {
+    await RefugeInstallation.prompt(game.actors.get(target.dataset.hunterId), this.actor);
   }
 
   /** @inheritdoc */
@@ -218,9 +231,15 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     });
     const hunter = game.actors.get(hunterId);
     if (!hunter) return;
-    await requestRefugeAction({
-      type: "useUpgrade", refugeId: this.actor.id, itemId, action, hunterUuid: hunter.uuid,
-    });
+    const choice = await RefugeRearmReforgeDialogs.prepare(hunter, this.actor, definition.type);
+    if (!choice) return;
+    try {
+      await requestRefugeAction({
+        type: "useUpgrade", refugeId: this.actor.id, itemId, action, hunterUuid: hunter.uuid, choice,
+      });
+    } catch (err) {
+      if (game.user.isActiveGM) ui.notifications.warn(err.message);
+    }
   }
 
   /** Open an installed upgrade for editing. */

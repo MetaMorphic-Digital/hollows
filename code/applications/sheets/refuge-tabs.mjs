@@ -40,8 +40,7 @@ RefugeTabRegistry.register({
       category: item.system.schema.fields.category.choices[item.system.category],
       cost: item.system.cost,
       pending: item.system.pending,
-      missing: item.system.getMissingNpcRoles(sheet.actor)
-        .map(key => getRefugeNpcRoles().find(role => role.key === key).label).join(", "),
+      missing: item.system.getMissingRequirements(sheet.actor).join(", "),
     })),
   }),
 });

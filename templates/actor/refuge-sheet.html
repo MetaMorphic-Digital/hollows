@@ -30,6 +30,16 @@
     </div>
   </section>
 
+  {{#if installationTests.length}}
+    <section class="sheet-section">
+      <h2>{{localize "HOLLOWS.REFUGE.installationTests"}}</h2>
+      <p class="muted">{{localize "HOLLOWS.REFUGE.installationTestsHint"}}</p>
+      {{#each installationTests as |test|}}
+        <button type="button" class="stat-roll" data-action="installationTest" data-hunter-id="{{test.hunterId}}">{{test.hunterName}} — {{test.name}}</button>
+      {{/each}}
+    </section>
+  {{/if}}
+
   <nav class="sheet-tabs tabs" data-group="refugeTabs">
     {{#each tabs as |t|}}
       <a class="item" data-tab="{{t.id}}">{{localize t.label}}</a>

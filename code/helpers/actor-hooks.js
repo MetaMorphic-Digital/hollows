@@ -69,6 +69,7 @@ export function registerActorHooks() {
     if (options?.hollowsSkipEquipmentSlotCheck) return;
     if (applyInterceptorsSync("hunter-equipment-pre-create", { actor, item, data, options }, true) === false) return false;
     if (item.type === "relic") {
+      if (!actor.system.validateEquipmentSlot("relic")) return false;
       replaceHunterRelicFlow(actor, item.toObject());
       return false;
     }
@@ -76,6 +77,7 @@ export function registerActorHooks() {
     const category = foundry.utils.getProperty(data, "system.category") ?? item.system?.category;
     const slot = getEquipmentSlotKey(category);
     if (!slot) return;
+    if (!actor.system.validateEquipmentSlot(slot)) return false;
     const existing = getHunterEquipmentItemsForSlot(actor, slot);
     if (existing.length >= 1) {
       ui.notifications.warn(`Only one ${slot} equipment can be equipped at a time.`);
@@ -92,6 +94,7 @@ export function registerActorHooks() {
     const category = foundry.utils.getProperty(changes, "system.category");
     const slot = getEquipmentSlotKey(category);
     if (!slot) return;
+    if (!actor.system.validateEquipmentSlot(slot)) return false;
     const existing = getHunterEquipmentItemsForSlot(actor, slot).filter((entry) => entry.id !== item.id);
     if (existing.length >= 1) {
       ui.notifications.warn(`Only one ${slot} equipment can be equipped at a time.`);

@@ -1,7 +1,5 @@
 // Side-effect-free refuge reads shared by the attack pipeline, echo, and the
 // mechanic registry.
-import { getRefugeUpgrades, getRefugeDefaultUpgradeIds } from "./upgrades.js";
-import { getRefugeWeaponBonusProviders, getRefugeWeaponTierProviders } from "./action-handlers.js";
 
 export function getPrimaryRefugeActor() {
   const refuges = game.actors.contents.filter(a => a.type === "refuge");
@@ -15,32 +13,27 @@ export function getUpgradeRank(refugeActor, upgradeId) {
   return Number.isNaN(raw) ? 0 : Math.max(0, raw);
 }
 
-export function getInstalledUpgradeSet(refugeActor) {
-  const defaults = getRefugeDefaultUpgradeIds();
-  const installed = new Set();
-  for (const u of getRefugeUpgrades()) {
-    if (defaults.has(u.id) || getUpgradeRank(refugeActor, u.id) > 0) installed.add(u.id);
-  }
-  return installed;
-}
-
-// Weapon-ability tiers the refuge grants; base system allows Tier 1 only.
+/** Weapon-ability tiers granted by available upgrades, including the base Tier 1. */
 export function getRefugeAllowedWeaponTiers(refugeActor) {
   const tiers = new Set([1]);
-  for (const provider of getRefugeWeaponTierProviders()) {
-    for (const tier of provider(refugeActor) || []) tiers.add(Number(tier));
+  for (const item of refugeActor?.system.upgradeItems ?? []) {
+    if (item.system.isAvailable(refugeActor)) {
+      for (const tier of item.system.weaponTiers) tiers.add(tier);
+    }
   }
   return [...tiers].sort((a, b) => a - b);
 }
 
-// Weapon damage bonus from installed refuge upgrades; base system has none.
+/** Sum the available upgrades that grant damage to this weapon type. */
 export function getRefugeWeaponDamageBonus(weapon, refugeActor) {
   const bonus = { resolve: 0, wounds: 0 };
   if (!weapon || !refugeActor) return bonus;
-  for (const provider of getRefugeWeaponBonusProviders()) {
-    const b = provider(weapon, refugeActor) || {};
-    bonus.resolve += Number(b.resolve || 0);
-    bonus.wounds += Number(b.wounds || 0);
+  for (const item of refugeActor.system.upgradeItems) {
+    if (!item.system.isAvailable(refugeActor)) continue;
+    const damage = item.system.weaponDamage;
+    if (!damage.types.has(weapon.system.weaponType)) continue;
+    bonus.resolve += damage.resolve;
+    bonus.wounds += damage.wounds;
   }
   return bonus;
 }

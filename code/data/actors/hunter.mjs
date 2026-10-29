@@ -1,4 +1,6 @@
 import RefugeData from "./refuge.mjs";
+import { getPrimaryRefugeActor } from "../refuge/resolvers.js";
+import { getHunterEquipmentItemsForSlot } from "../../documents/actor/hunter-equipment.js";
 
 export default class HunterData extends foundry.abstract.TypeDataModel {
   static #resourceLimitModifiers = [];
@@ -50,6 +52,9 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       }),
       refuge: new fields.SchemaField({
         id: new fields.StringField({ initial: "" }),
+        installationTests: new fields.ArrayField(new fields.SchemaField({
+          id: new fields.StringField(), name: new fields.StringField(),
+        })),
         recoveryAvailable: new fields.BooleanField({ initial: false }),
         actions: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
@@ -80,6 +85,17 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
   }
 
   /* -------------------------------------------------- */
+
+  /** Report a conflict between the Relic and Battle Equipment slots. */
+  validateEquipmentSlot(slot) {
+    if (!["battle", "relic"].includes(slot)) return true;
+    const refuge = getPrimaryRefugeActor();
+    if (refuge?.system.upgradeItems.some(item => item.system.extraRelicSlot && item.system.isAvailable(refuge))) return true;
+    const otherSlot = slot === "battle" ? "relic" : "battle";
+    if (!getHunterEquipmentItemsForSlot(this.parent, otherSlot).length) return true;
+    ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.sharedBattleSlot"));
+    return false;
+  }
 
   /** Restore the action allowance when starting a new visit. */
   async enterRefuge(refuge) {

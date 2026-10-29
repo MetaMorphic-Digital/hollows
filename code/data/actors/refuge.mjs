@@ -28,6 +28,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       unlockedExploration: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       unlockedBattle: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       notes: new fields.StringField({ initial: "" }),
+      anchoredEntity: new fields.BooleanField({ initial: false }),
     };
   }
 
@@ -37,13 +38,10 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     if (this.parent.items.size) return;
     const defaults = await RefugeUpgradeData.getAvailableUpgrades({ defaultsOnly: true });
     const upgrades = await Promise.all(defaults.map(({ uuid }) => fromUuid(uuid)));
-    const sources = new Map(upgrades.map(item => [
-      item.pack ? item.uuid : item._stats.compendiumSource || item.uuid, item,
-    ]));
     this.parent.updateSource({
-      items: Array.from(sources.values(), item => {
+      items: upgrades.map(item => {
         const itemData = game.items.fromCompendium(item, { clearFolder: true });
-        foundry.utils.setProperty(itemData, "_stats.duplicateSource", item.uuid);
+        foundry.utils.setProperty(itemData, "_stats.duplicateSource", RefugeUpgradeData.getSourceUuid(item));
         return itemData;
       }),
     });
@@ -66,13 +64,12 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       && game.users.some(user => user.active && !user.isGM && (user.character?.id === actor.id)));
   }
 
-  /** Report the NPCs missing from an upgrade's operating requirements. */
+  /** Report unmet requirements before buying or using an upgrade. */
   validateUpgradeRequirements(upgrade) {
-    const missing = upgrade.system.getMissingNpcRoles(this.parent);
+    const missing = upgrade.system.getMissingRequirements(this.parent);
     if (!missing.length) return true;
-    const roles = getRefugeNpcRoles();
-    ui.notifications.warn(game.i18n.format("HOLLOWS.REFUGE.missingNpcRoles", {
-      roles: missing.map(key => roles.find(role => role.key === key).label).join(", "),
+    ui.notifications.warn(game.i18n.format("HOLLOWS.REFUGE.missingRequirements", {
+      requirements: missing.join(", "),
     }));
     return false;
   }
@@ -80,8 +77,8 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
   /** Purchase an upgrade template using the Refuge's Bone and Hearts. */
   async buyUpgrade(upgrade) {
     if (upgrade.type !== "refugeUpgrade") return false;
-    const source = upgrade.pack ? upgrade.uuid : upgrade._stats.compendiumSource || upgrade.uuid;
-    if (this.upgradeItems.some(item => (item._stats.compendiumSource || item._stats.duplicateSource) === source)) {
+    const source = RefugeUpgradeData.getSourceUuid(upgrade);
+    if (this.upgradeItems.some(item => RefugeUpgradeData.getSourceUuid(item) === source)) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.alreadyInstalled"));
       return false;
     }
@@ -92,7 +89,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       return false;
     }
     const data = game.items.fromCompendium(upgrade, { clearFolder: true });
-    foundry.utils.setProperty(data, "_stats.duplicateSource", upgrade.uuid);
+    foundry.utils.setProperty(data, "_stats.duplicateSource", source);
     data.system.pending = true;
     const [item] = await this.parent.createEmbeddedDocuments("Item", [data]);
     if (!item) return false;
@@ -107,9 +104,11 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
 
   /** Make purchased upgrades available when a Hunter starts a new visit. */
   async activateUpgrades() {
-    const updates = this.upgradeItems.filter(item => item.system.pending)
-      .map(item => ({ _id: item.id, "system.pending": false }));
-    if (updates.length) await this.parent.updateEmbeddedDocuments("Item", updates);
+    const upgrades = this.upgradeItems.filter(item => item.system.pending);
+    if (!upgrades.length) return;
+    const { default: RefugeInstallation } = await import("../../documents/actor/refuge-installation.mjs");
+    await RefugeInstallation.queue(upgrades);
+    await this.parent.updateEmbeddedDocuments("Item", upgrades.map(item => ({ _id: item.id, "system.pending": false })));
   }
 
   /** Use the free recovery granted at the start of this Hunter's visit. */
@@ -122,7 +121,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
   }
 
   /** Run an action supplied by an installed upgrade. */
-  async useUpgrade(itemId, actionIndex, hunter) {
+  async useUpgrade(itemId, actionIndex, hunter, choice) {
     const upgrade = this.parent.items.get(itemId);
     const action = upgrade.system.actions[actionIndex];
     if (!action) return false;
@@ -156,8 +155,13 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
         wounds += item.system.temporaryHealthBonus.wounds;
       }
     }
-    const { applyRecover } = await import("../../documents/actor/refuge.js");
-    await applyRecover(this.parent, hunter, { type: action.type, resolve, wounds });
+    if (["fullRecovery", "temporaryHealth"].includes(action.type)) {
+      const { applyRecover } = await import("../../documents/actor/refuge.js");
+      await applyRecover(this.parent, hunter, { type: action.type, resolve, wounds });
+    } else {
+      const { default: RefugeRearmReforge } = await import("../../documents/actor/refuge-rearm-reforge.mjs");
+      await RefugeRearmReforge.apply(hunter, action.type, choice);
+    }
     if (cost.actions) {
       await hunter.update({ "system.refuge.actions.value": hunter.system.refuge.actions.value - cost.actions });
     }
