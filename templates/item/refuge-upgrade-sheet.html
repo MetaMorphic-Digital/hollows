@@ -61,6 +61,12 @@
   </section>
 
   <section class="sheet-section">
+    <h3>{{localize "HOLLOWS.REFUGE.categories.research"}}</h3>
+    {{formGroup systemFields.research.fields.advantage value=system.research.advantage label="HOLLOWS.REFUGE.researchAdvantage" localize=true}}
+    {{formGroup systemFields.research.fields.anyStat value=system.research.anyStat label="HOLLOWS.REFUGE.researchAnyStat" hint="HOLLOWS.REFUGE.researchAnyStatHint" localize=true}}
+  </section>
+
+  <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.revelAction"}}</h3>
     {{formGroup systemFields.revel.fields.additionalEchoes value=system.revel.additionalEchoes label="HOLLOWS.REFUGE.additionalEchoes" localize=true}}
     {{formGroup systemFields.revel.fields.advantage value=system.revel.advantage label="HOLLOWS.REFUGE.revelAdvantage" localize=true}}

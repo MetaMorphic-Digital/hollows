@@ -1,6 +1,22 @@
 import { getRefugeNpcRoles } from "../refuge/action-handlers.js";
 
 export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
+  static ACTIONS = {
+    fullRecovery: { label: "HOLLOWS.REFUGE.fullRecovery", group: "recover" },
+    temporaryHealth: { label: "HOLLOWS.REFUGE.temporaryHealth", group: "recover" },
+    rearm: { label: "HOLLOWS.REFUGE.rearm", group: "weapons" },
+    reforge: { label: "HOLLOWS.REFUGE.reforge", group: "weapons" },
+    removeEcho: { label: "HOLLOWS.REFUGE.removeEcho", group: "weapons" },
+    reshape: { label: "HOLLOWS.REFUGE.reshape", group: "weapons" },
+    renew: { label: "HOLLOWS.REFUGE.renewAction", group: "renewRevel" },
+    revel: { label: "HOLLOWS.REFUGE.revelAction", group: "renewRevel" },
+    uncoverEdge: { label: "HOLLOWS.REFUGE.uncoverEdge", group: "research" },
+    craftAnchor: { label: "HOLLOWS.REFUGE.craftAnchor", group: "research" },
+    openHeart: { label: "HOLLOWS.REFUGE.openHeart", group: "research" },
+    closeHeart: { label: "HOLLOWS.REFUGE.closeHeart", group: "research" },
+    essenceSyphon: { label: "HOLLOWS.REFUGE.essenceSyphon", group: "research" },
+  };
+
   /** @inheritdoc */
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -62,19 +78,14 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
         advantage: new fields.BooleanField({ initial: false }),
       }),
       echoRollModifier: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      research: new fields.SchemaField({
+        advantage: new fields.BooleanField({ initial: false }),
+        anyStat: new fields.BooleanField({ initial: false }),
+      }),
       actions: new fields.ArrayField(new fields.SchemaField({
         type: new fields.StringField({
           initial: "fullRecovery",
-          choices: {
-            fullRecovery: "HOLLOWS.REFUGE.fullRecovery",
-            temporaryHealth: "HOLLOWS.REFUGE.temporaryHealth",
-            rearm: "HOLLOWS.REFUGE.rearm",
-            reforge: "HOLLOWS.REFUGE.reforge",
-            removeEcho: "HOLLOWS.REFUGE.removeEcho",
-            reshape: "HOLLOWS.REFUGE.reshape",
-            renew: "HOLLOWS.REFUGE.renewAction",
-            revel: "HOLLOWS.REFUGE.revelAction",
-          },
+          choices: Object.fromEntries(Object.entries(this.ACTIONS).map(([type, { label }]) => [type, label])),
         }),
         cost: new fields.SchemaField({
           actions: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
@@ -122,6 +133,14 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
     };
   }
 
+  /** Minimum price before choosing payment, or the final price including the player's choices. */
+  getActionCost(action, choice) {
+    const cost = { ...action.cost };
+    if ((action.type === "craftAnchor") && (!choice || choice.relicId)) cost.bone = 0;
+    if (action.type === "uncoverEdge") cost.bone += choice?.bone ?? 0;
+    return cost;
+  }
+
   /** Whether this installed upgrade can provide its actions and benefits. */
   isAvailable(refuge) {
     return !this.pending && !this.getMissingRequirements(refuge).length;
@@ -131,7 +150,7 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
   getMissingRequirements(refuge) {
     const roles = getRefugeNpcRoles();
     const missing = this.getMissingNpcRoles(refuge).map(key => roles.find(role => role.key === key).label);
-    if (this.requiresAnchoredEntity && !refuge.system.anchoredEntity) {
+    if (this.requiresAnchoredEntity && !refuge.system.anchoredEntities.size) {
       missing.push(game.i18n.localize("HOLLOWS.REFUGE.anchoredEntity"));
     }
     const installed = new Set(refuge.system.upgradeItems.filter(item => !item.system.pending)

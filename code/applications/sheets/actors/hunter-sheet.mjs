@@ -199,7 +199,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
       relic,
     };
     data.relicText = relic ? activeRelicEffect(relic).text || "" : "";
-    data.relicHasUse = relicHasActiveUse(relic);
+    data.relicHasUse = relic?.system.anchor.enabled || relicHasActiveUse(relic);
     const echoes = this.actor.items.filter(i => i.type === "echo");
     data.echoes = {
       boons: echoes.filter(e => String(e.system?.echoType || "") === "boon"),
@@ -418,6 +418,10 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
 
   /** Resolve a relic effect. */
   async _useRelicEffect(item) {
+    if (item.system.anchor.enabled) {
+      const { default: Anchor } = await import("../../../documents/item/anchor.mjs");
+      return Anchor.use(item);
+    }
     const eff = activeRelicEffect(item);
     await postEffectTextChat(item, {
       speaker: ChatMessage.getSpeaker({ actor: this.actor }),

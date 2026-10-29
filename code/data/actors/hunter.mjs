@@ -53,6 +53,10 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       }),
       refuge: new fields.SchemaField({
         id: new fields.StringField({ initial: "" }),
+        heart: new fields.SchemaField({
+          state: new fields.StringField({ initial: "none", choices: ["none", "open", "closed"] }),
+          hollowId: new fields.StringField({ initial: "" }),
+        }),
         renewals: new fields.ArrayField(new fields.SchemaField({
           hollowId: new fields.StringField(),
           stat: new fields.StringField({ choices: ["none", ...Object.keys(STAT_LABELS)] }),
@@ -123,18 +127,27 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
     return this.refuge.renewals.filter(renewal => renewal.stat === stat).length;
   }
 
-  /** Death ends temporary Renew increases but retains the once-per-Hollow record. */
-  async clearRenewBonuses() {
-    if (!this.refuge.renewals.some(renewal => renewal.stat !== "none")) return;
+  /** The Hunter's contribution when determining Entity Enhancements. */
+  get enhancementWeight() {
+    if (this.refuge.heart.state === "closed") return 0;
+    if ((this.refuge.heart.state === "open") || this.parent.items.some(item => (item.type === "relic") && item.system.anchor.enabled)) return 2;
+    return 1;
+  }
+
+  /** Death ends temporary Renew and Heart effects, retaining Renew usage. */
+  async clearDeathBenefits() {
+    if ((this.refuge.heart.state === "none") && !this.refuge.renewals.some(renewal => renewal.stat !== "none")) return;
     await this.parent.update({
       "system.refuge.renewals": this.refuge.renewals.map(renewal => ({ ...renewal, stat: "none" })),
+      "system.refuge.heart": { state: "none", hollowId: "" },
     });
   }
 
-  /** End Renew and Revel effects belonging to a cleansed Hollow. */
+  /** End temporary effects belonging to a cleansed Hollow. */
   async clearHollowBenefits(hollowId) {
     const { renewals, revelEchoes } = this.refuge;
-    if (![...renewals, ...revelEchoes].some(entry => entry.hollowId === hollowId)) return;
+    const clearHeart = this.refuge.heart.hollowId === hollowId;
+    if (!clearHeart && ![...renewals, ...revelEchoes].some(entry => entry.hollowId === hollowId)) return;
     const remainingEchoes = revelEchoes.filter(entry => entry.hollowId !== hollowId);
     const updates = revelEchoes.filter(entry => (entry.hollowId === hollowId)
       && !remainingEchoes.some(other => other.echoId === entry.echoId))
@@ -144,6 +157,7 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
     await this.parent.update({
       "system.refuge.renewals": renewals.filter(entry => entry.hollowId !== hollowId),
       "system.refuge.revelEchoes": remainingEchoes,
+      ...(clearHeart ? { "system.refuge.heart": { state: "none", hollowId: "" } } : {}),
     });
   }
 

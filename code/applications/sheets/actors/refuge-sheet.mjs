@@ -5,6 +5,7 @@ import { confirmDialog, pickOne } from "../../apps/selection-dialogs.mjs";
 import RefugeRearmReforgeDialogs from "../../apps/refuge-rearm-reforge-dialogs.mjs";
 import RefugeInstallation from "../../../documents/actor/refuge-installation.mjs";
 import RefugeRenewRevel from "../../../documents/actor/refuge-renew-revel.mjs";
+import RefugeResearch from "../../../documents/actor/refuge-research.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -168,7 +169,8 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     const upgrade = this.actor.items.get(itemId).system;
     const definition = upgrade.actions[action];
     const { bone, hearts } = this.actor.system.resources;
-    if ((bone < definition.cost.bone) || (hearts < definition.cost.hearts)) {
+    const minimumCost = upgrade.getActionCost(definition);
+    if ((bone < minimumCost.bone) || (hearts < minimumCost.hearts)) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
       return;
     }
@@ -185,12 +187,20 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     });
     const hunter = game.actors.get(hunterId);
     if (!hunter) return;
-    const actionHandler = ["renew", "revel"].includes(definition.type) ? RefugeRenewRevel : RefugeRearmReforgeDialogs;
-    const choice = await actionHandler.prepare(hunter, this.actor, definition.type).catch(err => {
+    const group = RefugeUpgradeData.ACTIONS[definition.type].group;
+    const actionHandler = {
+      weapons: RefugeRearmReforgeDialogs, renewRevel: RefugeRenewRevel, research: RefugeResearch,
+    }[group];
+    const choice = actionHandler ? await actionHandler.prepare(hunter, this.actor, definition).catch(err => {
       ui.notifications.warn(err.message);
       return null;
-    });
+    }) : {};
     if (!choice) return;
+    const cost = upgrade.getActionCost(definition, choice);
+    if ((this.actor.system.resources.bone < cost.bone) || (this.actor.system.resources.hearts < cost.hearts)) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
+      return;
+    }
     try {
       await requestRefugeAction({
         type: "useUpgrade", refugeId: this.actor.id, itemId, action, hunterUuid: hunter.uuid, choice,

@@ -1,4 +1,4 @@
-import { runUserQuery } from "../../helpers/queries.js";
+import { runUserQuery, COMBAT_QUERY_TIMEOUT } from "../../helpers/queries.js";
 import { getActiveHollowActor } from "../../canvas/zone.js";
 import {
   getPrimaryRefugeActor,
@@ -13,7 +13,7 @@ const REFUGE_ACTIONS = new foundry.utils.Semaphore(1);
 
 /** Send Refuge actions to the active GM for sequential execution. */
 export async function requestRefugeAction(data) {
-  return runUserQuery(game.users.activeGM, "hollows.refugeAction", data);
+  return runUserQuery(game.users.activeGM, "hollows.refugeAction", data, { timeout: COMBAT_QUERY_TIMEOUT });
 }
 
 // `extra` folds other fields into the same clamped resource update.

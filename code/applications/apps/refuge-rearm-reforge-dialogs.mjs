@@ -26,10 +26,10 @@ export default class RefugeRearmReforgeDialogs {
   }
 
   /** Return a complete choice, or null when the action is cancelled. */
-  static async prepare(hunter, refuge, action) {
+  static async prepare(hunter, refuge, { type }) {
     const chooser = new this(hunter, refuge);
     let choice;
-    switch (action) {
+    switch (type) {
       case "rearm": choice = await chooser.#rearm(); break;
       case "reforge": choice = await chooser.#reforge(); break;
       case "reshape": choice = await chooser.#reshape(); break;
@@ -39,7 +39,6 @@ export default class RefugeRearmReforgeDialogs {
         choice = echoId ? { echoId } : null;
         break;
       }
-      default: return {};
     }
     if (!choice) return null;
     const changes = await Promise.all((choice.weapons || []).map(async pick => {
@@ -53,7 +52,7 @@ export default class RefugeRearmReforgeDialogs {
     if (choice.echoId) changes.push(hunter.items.get(choice.echoId).name);
     if (choice.stats) changes.push(Object.entries(choice.stats).map(([key, value]) => `${STAT_LABELS[key]} ${value}`).join(", "));
     const confirmed = await confirmDialog({
-      title: game.i18n.localize(RefugeUpgradeData.schema.fields.actions.element.fields.type.choices[action]),
+      title: game.i18n.localize(RefugeUpgradeData.ACTIONS[type].label),
       bodyHtml: `<p>${game.i18n.localize("HOLLOWS.REFUGE.confirmWeaponChanges")}</p>`
         + `<ul>${changes.map(change => `<li>${foundry.utils.escapeHTML(change)}</li>`).join("")}</ul>`,
     });

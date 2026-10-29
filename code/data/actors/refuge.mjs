@@ -27,7 +27,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       unlockedExploration: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       unlockedBattle: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       notes: new fields.StringField({ initial: "" }),
-      anchoredEntity: new fields.BooleanField({ initial: false }),
+      anchoredEntities: new fields.SetField(new fields.StringField()),
     };
   }
 
@@ -51,11 +51,12 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     return this.parent.items.filter(item => item.type === "refugeUpgrade").sort((a, b) => a.sort - b.sort);
   }
 
-  /** Renew, Revel and health benefits supplied by available upgrades. */
+  /** Benefits supplied by available upgrades. */
   get benefits() {
     const benefits = {
       renewMarks: 3, renewDisadvantage: false, revelEchoLimit: 1, revelAdvantage: false,
       resolve: 0, wounds: 0, echoRollModifier: 0,
+      researchAdvantage: false, researchAnyStat: false,
     };
     for (const item of this.upgradeItems) {
       const upgrade = item.system;
@@ -67,6 +68,8 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       benefits.resolve += upgrade.healthBonus.resolve;
       benefits.wounds += upgrade.healthBonus.wounds;
       benefits.echoRollModifier += upgrade.echoRollModifier;
+      benefits.researchAdvantage ||= upgrade.research.advantage;
+      benefits.researchAnyStat ||= upgrade.research.anyStat;
     }
     return benefits;
   }
@@ -88,7 +91,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
   /** @inheritdoc */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
-    if (["npcRoles", "residents", "anchoredEntity"].some(key => key in (changed.system || {})) || ("name" in changed)) {
+    if (["npcRoles", "residents", "anchoredEntities"].some(key => key in (changed.system || {})) || ("name" in changed)) {
       this.refreshHunters();
     }
   }
@@ -184,15 +187,14 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.mustRecover"));
       return false;
     }
-    const { cost } = action;
+    const cost = upgrade.system.getActionCost(action, choice);
     if (hunter.system.refuge.actions.value < cost.actions) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.noActionsRemaining"));
       return false;
     }
     if (!this.validateUpgradeRequirements(upgrade)) return false;
     if ((this.resources.bone < cost.bone) || (this.resources.hearts < cost.hearts)) {
-      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
-      return false;
+      throw new Error(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
     }
     let { resolve, wounds } = action;
     if (action.type === "temporaryHealth") {
@@ -202,12 +204,16 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
         wounds += item.system.temporaryHealthBonus.wounds;
       }
     }
-    if (["fullRecovery", "temporaryHealth"].includes(action.type)) {
+    const group = RefugeUpgradeData.ACTIONS[action.type].group;
+    if (group === "recover") {
       const { applyRecover } = await import("../../documents/actor/refuge.js");
       await applyRecover(this.parent, hunter, { type: action.type, resolve, wounds });
-    } else if (["renew", "revel"].includes(action.type)) {
+    } else if (group === "renewRevel") {
       const { default: RefugeRenewRevel } = await import("../../documents/actor/refuge-renew-revel.mjs");
       await RefugeRenewRevel.apply(hunter, this.parent, action.type, choice);
+    } else if (group === "research") {
+      const { default: RefugeResearch } = await import("../../documents/actor/refuge-research.mjs");
+      await RefugeResearch.apply(hunter, this.parent, action.type, choice);
     } else {
       const { default: RefugeRearmReforge } = await import("../../documents/actor/refuge-rearm-reforge.mjs");
       await RefugeRearmReforge.apply(hunter, action.type, choice);

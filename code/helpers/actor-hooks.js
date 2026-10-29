@@ -149,7 +149,7 @@ export function registerActorHooks() {
     HOLLOWS_HUNTER_CORRUPTION_PRE_UPDATE.set(actor.id, current);
   });
 
-  Hooks.on("updateActor", async (actor, changed) => {
+  Hooks.on("updateActor", async (actor, changed, options) => {
     if (!actor || (actor.type !== "hunter")) return;
     const corruptionChanged = foundry.utils.hasProperty(changed, "system.corruption.value");
     if (!corruptionChanged) return;
@@ -157,7 +157,7 @@ export function registerActorHooks() {
     HOLLOWS_HUNTER_CORRUPTION_PRE_UPDATE.delete(actor.id);
     if (prev === undefined || prev === null) return;
     const next = Number(actor.system?.corruption?.value ?? 0);
-    if (next <= prev) return;
+    if ((next <= prev) || options.hollowsSkipEcho) return;
     await handleCorruptionIncrease(actor, prev, next);
   });
 

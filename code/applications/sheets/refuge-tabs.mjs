@@ -72,6 +72,10 @@ RefugeTabRegistry.register({
   label: "Resources",
   order: 30,
   template: "systems/hollows/templates/actor/refuge/resources-tab.html",
+  prepareContext: () => ({
+    entityChoices: game.actors.filter(actor => actor.type === "entity")
+      .map(actor => ({ value: actor.id, label: actor.name })),
+  }),
 });
 
 // ─── Residents ────────────────────────────────────────────────────────────────

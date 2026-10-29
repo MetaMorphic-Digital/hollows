@@ -318,7 +318,13 @@ export async function resolveEntityKillRewardsFromMessage(message) {
         default: true,
         callback: async (_e, _b, dialog) => {
           const isLord = !!dialog.element.querySelector("[name=isLord]")?.checked;
-          const resourcesOk = await addRefugeResources(isLord ? 5 : 3, isLord ? 1 : 0);
+          const anchored = defeatedEntity.statuses.has("anchored");
+          const extraBone = hunters.filter(hunter => hunter.system.refuge.heart.state === "open").length * 2;
+          const resourcesOk = await addRefugeResources((isLord ? 5 : 3) + extraBone, (isLord && !anchored) ? 1 : 0);
+          if (anchored && resourcesOk) {
+            const refuge = getPrimaryRefugeActor();
+            await refuge.update({ "system.anchoredEntities": [...new Set([...refuge.system.anchoredEntities, defeatedEntity.id])] });
+          }
           if (!resourcesOk) {
             ui.notifications.warn("No Refuge actor found. Create a Refuge actor to store Bone/Hearts.");
           }

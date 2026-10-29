@@ -245,6 +245,14 @@ function registerCategoryBHandlers() {
 // ---------------------------------------------------------------------------
 
 function registerCategoryDHandlers() {
+  registerHandler("hollows.refugeResearchPrompt", async data => {
+    const { default: RefugeResearch } = await import("../documents/actor/refuge-research.mjs");
+    return RefugeResearch.prompt(data);
+  });
+  registerHandler("hollows.anchorUse", async data => {
+    const { default: Anchor } = await import("../documents/item/anchor.mjs");
+    return Anchor.apply(data);
+  });
   registerHandler("hollows.incursionRoll", async (payload = {}) => {
     return await promptIncursionRollQuery(payload);
   });

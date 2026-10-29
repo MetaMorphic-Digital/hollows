@@ -1,5 +1,6 @@
 import { getEntityEnhancementItems } from "../../data/entity/resolvers.js";
 import { getContentPacks } from "../../helpers/extensions.js";
+import { getActiveSceneHunters } from "../../canvas/zone.js";
 import {
   configureEnhancementBuilder,
   getBuilderActionChoiceLabel,
@@ -126,10 +127,14 @@ export async function promptEntityEnhancementSelection() {
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
   if (!items.length) { ui.notifications.warn("No Entity Enhancements available."); return null; }
   const options = items.map((doc) => `<option value="${doc.id}">${doc.name}</option>`).join("");
+  const hunterCount = game.i18n.format("HOLLOWS.REFUGE.enhancementHunters", {
+    count: getActiveSceneHunters().reduce((count, hunter) => count + hunter.system.enhancementWeight, 0),
+  });
   return await foundry.applications.api.DialogV2.wait({
     window: { title: "Add Enhancement", width: 480 },
     content: `
         <form class="hollows-roll-dialog">
+          <p class="muted">${hunterCount}</p>
           <div class="form-group">
             <label>Enhancement</label>
             <select name="enhancementId">${options}</select>

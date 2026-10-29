@@ -5,7 +5,7 @@ import { pickOne, pickMany, confirmDialog } from "../../applications/apps/select
 /** Renew stat progression and Revel's temporary Echo suppression. */
 export default class RefugeRenewRevel {
   /** Collect the visitor's choice before sending the action to the GM. */
-  static async prepare(hunter, refuge, type) {
+  static async prepare(hunter, refuge, { type }) {
     const hollow = getActiveHollowActor();
     if (!hollow) throw new Error(game.i18n.localize("HOLLOWS.REFUGE.activeHollowRequired"));
     if (type === "renew") {

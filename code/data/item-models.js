@@ -1,4 +1,5 @@
 import { effectGroupsField } from "./relic/effect-schema.js";
+import { STAT_LABELS } from "./system-constants.js";
 
 // Shared effect-builder schema used by Rumour, Relic and the nested Cypher
 // block. Relics/Cyphers opt into `uses`; Rumours are used from the Hollow sheet
@@ -22,6 +23,11 @@ export class RelicDataModel extends foundry.abstract.TypeDataModel {
     return {
       ...effectBuilderFields({ uses: true }),
       deleteWhenUsed: new fields.BooleanField({ initial: false }),
+      anchor: new fields.SchemaField({
+        enabled: new fields.BooleanField({ initial: false }),
+        entityId: new fields.StringField({ initial: "" }),
+        stat: new fields.StringField({ initial: "hard", choices: STAT_LABELS }),
+      }),
       // Cypher upgrade: a relic the GM marks upgradable transforms into a Cypher
       // when its trigger fires (see checkCypherUpgrades). The upgraded form swaps
       // in cypherName, the Cypher art, and the nested `cypher` effect block (same
