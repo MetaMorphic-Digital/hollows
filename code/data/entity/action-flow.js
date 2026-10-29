@@ -1,7 +1,8 @@
+import BattleEquipment from "../../documents/item/battle-equipment.mjs";
 import { chooseOneTarget, chooseOneZone, promptForZoneSelection } from "../../applications/apps/selection-dialogs.mjs";
 import { filterZonesByGroup, getAdjacentZones, getTokenZone, getZoneCurseValue, getZoneList, getActiveEntityActor, sceneHunterTokens } from "../../canvas/zone.js";
 import { matchesEntityAttackConditions, scaleDynamicValue } from "./action-rules.js";
-import { applyInterceptors } from "../../helpers/extensions.js";
+import ScriptCompiler from "../../documents/item/script-compiler.mjs";
 import { adjustEntityResource } from "../../documents/actor/resources.js";
 import { resolveEntitySourceValue } from "../../documents/entity/entity-stats.js";
 
@@ -200,7 +201,8 @@ export async function resolveRestoreResolve(config, entityActor) {
       restoreAmount = resolveEntitySourceValue(source, { entityActor, zones });
     }
   }
-  restoreAmount = await applyInterceptors("entity-restore", { entityActor }, restoreAmount);
+  restoreAmount = await BattleEquipment.modifyResolveRecovery(restoreAmount);
+  restoreAmount = await ScriptCompiler.runInterceptors("entity-restore", { entityActor }, restoreAmount);
   if (restoreAmount > 0) {
     await adjustEntityResource(entityActor, { resolve: restoreAmount });
     await ChatMessage.create({

@@ -101,7 +101,9 @@ function registerSubtypes() {
     weapon: data.items.WeaponData,
     weaponForm: data.items.WeaponFormData,
   });
-  CONFIG.Item.compendiumIndexFields.push("system.default", "system.weaponType", "system.tier");
+  CONFIG.Item.compendiumIndexFields.push(
+    "system.default", "system.weaponType", "system.tier", "system.category", "system.subtype", "system.malignancy",
+  );
 }
 
 /* -------------------------------------------------- */

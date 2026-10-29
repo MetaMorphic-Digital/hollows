@@ -21,7 +21,6 @@ export class IncomingDamageModifier extends Mechanic {
     this.delta = { resolve: 0, wounds: 0, ...(config.delta || {}) };
     this.note = config.note || "";
     this.apply = typeof config.apply === "function" ? config.apply : null;
-    this.reaction = config.reaction || null;
   }
 
   active(carrier) {

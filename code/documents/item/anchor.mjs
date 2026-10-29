@@ -11,6 +11,8 @@ import { addThreatToZone } from "../../canvas/overlays.js";
 
 /** Use an Anchor against its broken Entity from a Close area. */
 export default class Anchor {
+  static #attempts = new foundry.utils.Semaphore(1);
+
   /** Prompt the bearer before sending the attempt to the active GM. */
   static async use(item) {
     try {
@@ -24,10 +26,11 @@ export default class Anchor {
     }
   }
 
-  /** Check the target and position again when resolving a delayed player response. */
+  /** Validate the bearer, target and position for an Anchor attempt. */
   static #target(item) {
     const entity = getActiveEntityActor();
-    if (!game.combat?.started || !entity || (entity.id !== item.system.anchor.entityId)
+    if (!item || !game.combat?.started || !entity || (entity.id !== item.system.anchor.entityId)
+      || item.actor.statuses.has("dying") || item.actor.statuses.has("dead")
       || (entity.system.health.resolve.value > 0) || entity.statuses.has("anchored")
       || !ZONE_GROUPS.close.includes(getActorZone(item.actor))) {
       throw new Error(game.i18n.localize("HOLLOWS.REFUGE.anchorUnavailable"));
@@ -46,8 +49,13 @@ export default class Anchor {
     });
   }
 
+  /** Resolve Anchor attempts sequentially on the active GM. */
+  static apply(data) {
+    return this.#attempts.add(() => this.#resolve(data));
+  }
+
   /** Resolve Threat, permanent penalties and consumption on the GM. */
-  static async apply({ itemUuid, config }) {
+  static async #resolve({ itemUuid, config }) {
     const item = await fromUuid(itemUuid);
     const entity = this.#target(item);
     const hunter = item.actor;

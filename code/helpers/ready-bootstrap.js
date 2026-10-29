@@ -2,46 +2,6 @@ import { ensureWeaponAbilityCompendiumFolders, isShotgunWeapon, syncHunterLoaded
 import { getHollowsWeaponIndex, setHollowsWeaponIndex } from "./runtime-state.js";
 import { getWeaponPackDocs } from "../data/weapons/index.js";
 
-async function normalizeHollowsSheetFlags() {
-  if (!game.user?.isGM) return;
-
-  const actors = game.actors?.contents || [];
-  for (const actor of actors) {
-    if (!actor || !["hunter", "entity", "npc", "refuge", "thrall", "hollow", "hazard"].includes(actor.type)) continue;
-    const sheetClass = actor.getFlag("core", "sheetClass");
-    if (sheetClass) {
-      const normalized = String(sheetClass).toLowerCase();
-      if (normalized.includes("core") || !normalized.startsWith("hollows.")) {
-        await actor.unsetFlag("core", "sheetClass");
-        if (actor.sheet) actor.sheet.close();
-        actor._sheet = null;
-      }
-    }
-
-    for (const item of actor.items?.contents || []) {
-      const itemSheetClass = item.getFlag("core", "sheetClass");
-      if (!itemSheetClass) continue;
-      const normalizedItem = String(itemSheetClass).toLowerCase();
-      if (normalizedItem.includes("core") || !normalizedItem.startsWith("hollows.")) {
-        await item.unsetFlag("core", "sheetClass");
-        if (item.sheet) item.sheet.close();
-        item._sheet = null;
-      }
-    }
-  }
-
-  for (const item of game.items?.contents || []) {
-    const itemSheetClass = item.getFlag("core", "sheetClass");
-    if (!itemSheetClass) continue;
-    const normalizedItem = String(itemSheetClass).toLowerCase();
-    if (normalizedItem.includes("core") || !normalizedItem.startsWith("hollows.")) {
-      await item.unsetFlag("core", "sheetClass");
-      if (item.sheet) item.sheet.close();
-      item._sheet = null;
-    }
-  }
-}
-
 async function buildWeaponIndex() {
   const docs = await getWeaponPackDocs();
   const index = new Map();
@@ -178,11 +138,9 @@ async function normalizeActorDefaultsForWorld() {
 }
 
 export async function runHollowsReady() {
-  await normalizeHollowsSheetFlags();
   await buildWeaponIndex();
   await hydrateWeaponsFromPack();
   await ensureWeaponCoreDefaults();
   await normalizeActorDefaultsForWorld();
   await ensureWeaponAbilityCompendiumFolders();
-  Hooks.callAll("hollows.ready");
 }

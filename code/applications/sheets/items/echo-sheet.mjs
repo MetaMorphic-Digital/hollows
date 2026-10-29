@@ -1,11 +1,7 @@
 import EffectBuilderItemSheet from "./effect-builder.mjs";
 import { MALIGNANCY_LIST } from "../../../data/echo/index.js";
 import { createDefaultEffectGroup } from "../../../data/relic/effect-schema.js";
-import { WEAPONS } from "../../../data/weapons/config.js";
-
-function choiceMap(entries) {
-  return Object.fromEntries(entries.map((entry) => [entry.value, entry.label]));
-}
+import { getWeaponTypeChoices } from "../../../data/weapons/index.js";
 
 function hunterWeaponChoices(actor) {
   return (actor?.items || [])
@@ -47,6 +43,9 @@ export default class HollowsEchoSheet extends EffectBuilderItemSheet {
     const context = await super._prepareContext(options);
     const category = String(this.item.system?.category || "seed");
     const parent = this.item.parent?.type === "hunter" ? this.item.parent : null;
+    const weaponTypeChoices = await getWeaponTypeChoices([
+      ...(parent?.items.documentsByType.weapon ?? []).map(weapon => weapon.system.weaponType), this.item.system.weaponType,
+    ]);
     return {
       ...context,
       item: this.item,
@@ -61,10 +60,7 @@ export default class HollowsEchoSheet extends EffectBuilderItemSheet {
       echoTypeChoices: { boon: "Boon", bane: "Bane" },
       categoryChoices: { seed: "Seed", weapon: "Weapon", malignancy: "Malignancy" },
       malignancyChoices: MALIGNANCY_LIST.map(name => ({ value: name, label: name })),
-      weaponTypeChoices: choiceMap(Object.values(WEAPONS).map((weapon) => ({
-        value: weapon.key,
-        label: weapon.label,
-      }))),
+      weaponTypeChoices,
       weaponChoices: hunterWeaponChoices(parent),
       hasHunterParent: !!parent,
       replaceDyingOutcomeChoices: {

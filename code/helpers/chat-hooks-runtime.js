@@ -32,7 +32,7 @@ import {
 } from "../data/actions/defence-options.js";
 import { applyEffects } from "../data/mechanics/dsl/effects.js";
 import { applySetupRollButtonState } from "./setup-roll-state.js";
-import { applyInterceptors } from "./extensions.js";
+import ScriptCompiler from "../documents/item/script-compiler.mjs";
 import { promptForm } from "../applications/apps/selection-dialogs.mjs";
 
 export function registerChatMessageHooks() {
@@ -486,7 +486,7 @@ export function registerChatMessageHooks() {
         },
       });
 
-      await applyInterceptors("defence-resolved", { actor: target, target, targetTokenUuid }, null);
+      await ScriptCompiler.runInterceptors("defence-resolved", { actor: target, target, targetTokenUuid }, null);
 
       for (const override of activeOverrides) {
         if (evaluateStatOverrideSuccess(override, { roll: r, statValue, damageType, damageValue })) {

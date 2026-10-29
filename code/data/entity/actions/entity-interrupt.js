@@ -24,7 +24,7 @@ import {
   getEntityActionCost,
   getEntityInterruptCost,
 } from "../../../documents/entity/entity-threat.js";
-import { getEntitySelfActionTargetingOverride } from "../../../helpers/entity-dispatchers.js";
+import { getEnhancementBuilderActionTargetingOverride } from "../../../documents/entity/enhancement-builder-passive.js";
 import {
   builderGeneratedAbilityFeasible,
   executeBuilderGeneratedAbility,
@@ -81,7 +81,7 @@ const interruptPipeline = {
     }
     const { interruptCost, interruptCostType } = ctx.scratch;
     const interruptZoneFilter = (z) => isThreatZone(z) && (interruptCostType !== "threat" || interruptCost <= 0 || getThreatInZone(z) > 0);
-    const targetOverride = getEntitySelfActionTargetingOverride(ctx.entityActor, {
+    const targetOverride = getEnhancementBuilderActionTargetingOverride(ctx.entityActor, {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       actionKind: "interrupt",

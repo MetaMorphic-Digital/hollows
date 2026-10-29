@@ -1,4 +1,5 @@
-import { getRefugeNpcRoles } from "../refuge/action-handlers.js";
+import HollowsItem from "../../documents/item.mjs";
+import { NPC_ROLES } from "../refuge/resolvers.js";
 import RefugeUpgradeData from "../items/refuge-upgrade.mjs";
 
 export default class RefugeData extends foundry.abstract.TypeDataModel {
@@ -18,14 +19,12 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
         hearts: new fields.NumberField({ initial: 0, integer: true }),
       }),
       npcRoles: new fields.SchemaField(Object.fromEntries(
-        getRefugeNpcRoles().map(({ key }) => [key, new fields.StringField({ initial: "" })]),
+        NPC_ROLES.map(({ key }) => [key, new fields.StringField({ initial: "" })]),
       )),
       residents: new fields.ArrayField(
         new fields.StringField({ initial: "" }),
         { initial: [] },
       ),
-      unlockedExploration: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
-      unlockedBattle: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       notes: new fields.StringField({ initial: "" }),
       anchoredEntities: new fields.SetField(new fields.StringField()),
     };
@@ -38,11 +37,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     const defaults = await RefugeUpgradeData.getAvailableUpgrades({ defaultsOnly: true });
     const upgrades = await Promise.all(defaults.map(({ uuid }) => fromUuid(uuid)));
     this.parent.updateSource({
-      items: upgrades.map(item => {
-        const itemData = game.items.fromCompendium(item, { clearFolder: true });
-        foundry.utils.setProperty(itemData, "_stats.duplicateSource", RefugeUpgradeData.getSourceUuid(item));
-        return itemData;
-      }),
+      items: upgrades.map(HollowsItem.toEmbeddedData),
     });
   }
 
@@ -57,6 +52,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       renewMarks: 3, renewDisadvantage: false, revelEchoLimit: 1, revelAdvantage: false,
       resolve: 0, wounds: 0, echoRollModifier: 0,
       researchAdvantage: false, researchAnyStat: false,
+      explorationSlots: 1, battleSlots: 1, extraRelicSlot: false,
     };
     for (const item of this.upgradeItems) {
       const upgrade = item.system;
@@ -70,6 +66,8 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       benefits.echoRollModifier += upgrade.echoRollModifier;
       benefits.researchAdvantage ||= upgrade.research.advantage;
       benefits.researchAnyStat ||= upgrade.research.anyStat;
+      benefits.extraRelicSlot ||= upgrade.extraRelicSlot;
+      for (const slot of upgrade.extraEquipmentSlots) benefits[`${slot}Slots`] = 2;
     }
     return benefits;
   }
@@ -127,8 +125,8 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
   /** Purchase an upgrade template using the Refuge's Bone and Hearts. */
   async buyUpgrade(upgrade) {
     if (upgrade.type !== "refugeUpgrade") return false;
-    const source = RefugeUpgradeData.getSourceUuid(upgrade);
-    if (!upgrade.system.repeatable && this.upgradeItems.some(item => RefugeUpgradeData.getSourceUuid(item) === source)) {
+    const source = HollowsItem.getSourceUuid(upgrade);
+    if (!upgrade.system.repeatable && this.upgradeItems.some(item => HollowsItem.getSourceUuid(item) === source)) {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.alreadyInstalled"));
       return false;
     }
@@ -138,8 +136,7 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
       ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.insufficientResources"));
       return false;
     }
-    const data = game.items.fromCompendium(upgrade, { clearFolder: true });
-    foundry.utils.setProperty(data, "_stats.duplicateSource", source);
+    const data = HollowsItem.toEmbeddedData(upgrade);
     data.system.pending = true;
     const [item] = await this.parent.createEmbeddedDocuments("Item", [data]);
     if (!item) return false;
@@ -214,6 +211,9 @@ export default class RefugeData extends foundry.abstract.TypeDataModel {
     } else if (group === "research") {
       const { default: RefugeResearch } = await import("../../documents/actor/refuge-research.mjs");
       await RefugeResearch.apply(hunter, this.parent, action.type, choice);
+    } else if (group === "resupply") {
+      const { default: RefugeResupply } = await import("../../documents/actor/refuge-resupply.mjs");
+      await RefugeResupply.apply(hunter, this.parent, action.type, choice);
     } else {
       const { default: RefugeRearmReforge } = await import("../../documents/actor/refuge-rearm-reforge.mjs");
       await RefugeRearmReforge.apply(hunter, action.type, choice);

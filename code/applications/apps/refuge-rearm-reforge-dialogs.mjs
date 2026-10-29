@@ -1,5 +1,5 @@
 import { pickOne, pickMany, promptForm, confirmDialog } from "./selection-dialogs.mjs";
-import { WeaponCatalog } from "../../data/weapons/registry.js";
+import { ItemCatalog } from "../../data/item-catalog.js";
 import { getAvailableWeaponForms } from "../../data/weapons/resolvers.js";
 import { getRefugeAllowedWeaponTiers } from "../../data/refuge/resolvers.js";
 import { STAT_LABELS } from "../../data/system-constants.js";
@@ -158,7 +158,7 @@ export default class RefugeRearmReforgeDialogs {
 
   /** Choose a weapon template, form and any stat or attack variant. */
   async #chooseWeapon(old, excluded) {
-    this.weaponIndex ??= await WeaponCatalog.getIndex("weapon");
+    this.weaponIndex ??= await ItemCatalog.getIndex("weapon");
     const entries = this.weaponIndex.filter(item => !excluded.includes(item.system.weaponType));
     const uuid = await pickOne({
       title: `${game.i18n.localize("HOLLOWS.REFUGE.reforge")}: ${old.name}`,
@@ -194,7 +194,7 @@ export default class RefugeRearmReforgeDialogs {
 
   /** Choose each replacement from the unlocked tiers, excluding retained and already chosen abilities. */
   async #replaceAbilities(current, weapons) {
-    this.abilityIndex ??= await WeaponCatalog.getIndex("weaponAbility");
+    this.abilityIndex ??= await ItemCatalog.getIndex("weaponAbility");
     const occupied = new Set(this.hunter.items.filter(item => (item.type === "weaponAbility") && !current.includes(item))
       .map(item => this.#abilityKey(item)));
     const choices = [];

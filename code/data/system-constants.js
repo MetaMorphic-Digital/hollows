@@ -79,7 +79,3 @@ export const HOLLOWS_CONDITIONS = {
     icon: "icons/svg/aura.svg",
   },
 };
-
-export function registerCondition(key, def) {
-  HOLLOWS_CONDITIONS[key] = def;
-}

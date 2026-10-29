@@ -1,8 +1,6 @@
 import {
   confirmReplaceHunterRelic,
   applyRelicReplacementForHunter,
-  getEquipmentSlotKey,
-  getHunterEquipmentItemsForSlot,
   syncEquipmentSlotsFromItems,
 } from "../documents/actor/hunter-equipment.js";
 import { isShotgunWeapon, setShotgunsLoaded } from "./weapon-utils.js";
@@ -21,7 +19,7 @@ import {
 } from "../documents/entity/entity-enhancements.js";
 import { runDeathInterceptors, runOnDeathEffects } from "./weapon-abilities/dispatchers.js";
 import { syncHunterLoadedStatusFromShotguns } from "./weapon-utils.js";
-import { applyInterceptors, applyInterceptorsSync } from "./extensions.js";
+import ScriptCompiler from "../documents/item/script-compiler.mjs";
 
 const HOLLOWS_ENTITY_RESOLVE_PRE_UPDATE = new Map();
 const HOLLOWS_HUNTER_CORRUPTION_PRE_UPDATE = new Map();
@@ -67,39 +65,23 @@ export function registerActorHooks() {
     const actor = item?.parent;
     if (!actor || actor.type !== "hunter") return;
     if (options?.hollowsSkipEquipmentSlotCheck) return;
-    if (applyInterceptorsSync("hunter-equipment-pre-create", { actor, item, data, options }, true) === false) return false;
     if (item.type === "relic") {
       if (!actor.system.validateEquipmentSlot("relic")) return false;
       replaceHunterRelicFlow(actor, item.toObject());
       return false;
     }
     if (item.type !== "equipment") return;
-    const category = foundry.utils.getProperty(data, "system.category") ?? item.system?.category;
-    const slot = getEquipmentSlotKey(category);
-    if (!slot) return;
-    if (!actor.system.validateEquipmentSlot(slot)) return false;
-    const existing = getHunterEquipmentItemsForSlot(actor, slot);
-    if (existing.length >= 1) {
-      ui.notifications.warn(`Only one ${slot} equipment can be equipped at a time.`);
-      return false;
-    }
+    const slot = foundry.utils.getProperty(data, "system.category") ?? item.system?.category;
+    if (!actor.system.validateEquipmentSlot(slot, item)) return false;
   });
 
-  Hooks.on("preUpdateItem", (item, changes, options) => {
+  Hooks.on("preUpdateItem", (item, changes) => {
     if (item.type !== "equipment") return;
     const actor = item?.parent;
     if (!actor || actor.type !== "hunter") return;
     if (!foundry.utils.hasProperty(changes, "system.category")) return;
-    if (applyInterceptorsSync("hunter-equipment-pre-update", { actor, item, changes, options }, true) === false) return false;
-    const category = foundry.utils.getProperty(changes, "system.category");
-    const slot = getEquipmentSlotKey(category);
-    if (!slot) return;
-    if (!actor.system.validateEquipmentSlot(slot)) return false;
-    const existing = getHunterEquipmentItemsForSlot(actor, slot).filter((entry) => entry.id !== item.id);
-    if (existing.length >= 1) {
-      ui.notifications.warn(`Only one ${slot} equipment can be equipped at a time.`);
-      return false;
-    }
+    const slot = foundry.utils.getProperty(changes, "system.category");
+    if (!actor.system.validateEquipmentSlot(slot, item)) return false;
   });
 
   Hooks.on("updateActor", async (actor, changed) => {
@@ -108,7 +90,7 @@ export function registerActorHooks() {
     const resolveChanged = foundry.utils.hasProperty(changed, "system.health.resolve.value");
     if (!resolveChanged) return;
     const resolveValue = Number(actor.system?.health?.resolve?.value ?? 0);
-    if (resolveValue <= 0) await applyInterceptors("hunter-broken", { actor }, null);
+    if (resolveValue <= 0) await ScriptCompiler.runInterceptors("hunter-broken", { actor }, null);
   });
 
   Hooks.on("updateActor", async (actor, changed) => {
@@ -292,7 +274,7 @@ export function registerActorHooks() {
     if (isShotgunWeapon(item)) {
       await syncHunterLoadedStatusFromShotguns(actor);
     }
-    await applyInterceptors("weapon-removed", { actor, item }, null);
+    await ScriptCompiler.runInterceptors("weapon-removed", { actor, item }, null);
   });
 
   Hooks.on("deleteItem", async (item) => {

@@ -30,6 +30,24 @@
           "name": "Regimental Peon",
           "text": "Cannon-fodder in the Crown infantry.\nBoundaries, borders and kings be damned; you are the Isles. You\nand yours have fought and died for generations to keep this place\nsafe. (Not that it's safe any more.) Your ancestors knew what it\nmeant to be part of something great, and they bound their blood to\nthe Crown. That blood runs in you still whether you like it or not,\nand everyone expects you to do your duty. Maybe you were honour-\nbranded when you came of age to remind you, and everyone else, of\nthe promises sworn on your behalf: promises that you felt powerless\neither to escape or to uphold.\nRoll with advantage during exploration when you: withstand\nhorrible conditions, march for hours, stand in the rain, and so on."
         }
+      ],
+      "seeds": [
+        {
+          "name": "Abolitionist",
+          "text": "Something made you want to tear it all down.\nYou felt resentment growing on the streets each day. You found\nothers who thought like you and dreamed of a better world, and\nyou did what you could to make that world a reality. Then:\nl Your royalist family discovered your intentions and tried to hand you over to the Crown.\nl You incited a riot which burned a tenement to the ground, killing dozens.\nl You took the life of a royal, and had to disappear. l Agents of the Crown rooted out your revolutionary cell and made\nan example of your comrades."
+        },
+        {
+          "name": "Deserter",
+          "text": "You ran from your duty, and people got hurt.\nWhether a soldier, a noble, a servant or a peon, every member of\nsociety has a place within the Crown's domain if they uphold their\nduty. You did not uphold your duty; you betrayed the trust of people\nwho were relying on you. Nothing has been the same ever since you:\nl Got drunk on watch, passed out, and let enemy skirmishers ambush your squadmates.\nl Married for love, not for standing, and watched your family name crumble to dust.\nl Were caught smuggling your child out of the regimental grounds so they wouldn't be drafted for life.\nl Sent your squad forward into a trap and hid from danger instead of warning them."
+        },
+        {
+          "name": "Murderer",
+          "text": "You killed someone you shouldn't have.\nPeople kill each other all the time. Disputes over control of territory,\nfrustration at infidelity or insubordination, and Friday night gin-\nbrawls are all staples of life in the Isles. For young people looking\nfor work in the industrial shanties, getting your head kicked in is\njust an occupational hazard (and one that some people relish using\nas leverage). But things were different when you killed:\nl A noble, with powerful and vengeful connections. l Your sibling, in a fit of rage that passed and left you filled with regret. l Your officer, after she issued an order that got your squad killed. l Your son, after you discovered what he did at night."
+        },
+        {
+          "name": "Sole Survivor",
+          "text": "Everyone died, except you.\nThe new power blocs of the Isles scramble\nto strip influence from the dying Crown.\nNoble houses are wiped off the map with\nthe stroke of a pen, or in secret with fire\nand shot; desperate troops are denied\nreinforcements as commanders shelter in\nbunkers; household staff are driven from\ntheir homes and starve in the streets when\ntheir masters are deposed. You were the\nonly survivor after:\nl Your regiment was drawn into a Hollow and unable to escape.\nl Infidelity, and a dinner party massacre, left you the last member of your family alive.\nl The staff of a cruel household were all but wiped out in a month from a coughing sickness.\nl Your second squad was massacred, and you were discharged after being deemed bad luck."
+        }
       ]
     },
     {
@@ -61,6 +79,24 @@
         {
           "name": "Professional",
           "text": "Change the world at the stroke of a pen.\nClose in the wake of the rise of the machines came the rise of the\nmanagers. As capitalists and warriors marshalled men to achieve great\nends, administrators and bureaucrats helped turn their commands\ninto plans. Step by incremental step, rules and regulations emerged\nfrom the chaos along with their creator-followers: lawyers, accountants,\nteachers, tax collectors, civil servants and the countless other fussy,\nmeticulous beancounters that meet in convivial associations to hear\nspeeches, commiserate over their bosses, and make the world tick\nover. You were one of them: your hands are soft, your heart is hard,\nand you know what it's like to swallow pride, rage and desire down,\nday after day, to make someone else's dreams come true.\nRoll with advantage during exploration when you: use the rules to\nget what you want, offer self-serving counsel, subsume fury into precise\naction, and so on."
+        }
+      ],
+      "seeds": [
+        {
+          "name": "Betrayer",
+          "text": "You turned against those who relied on you.\nThe House holds loyalty in low regard; trust is something to be\nextracted from a patsy rather than placed in a dear friend. You\nusually had no compunction against turning on those closest to you,\nbut you never recovered after you:\nl Planted evidence so one of your underlings was hanged for crimes that you committed.\nl Drunkenly confessed your infidelities to your husband, who used them to blackmail you.\nl Embezzled thousands of pounds from your employer, doomed your factory, and left hundreds hungry.\nl Slipped up, and when your wife found out that you were drinking again after all your promises to stop, she left you."
+        },
+        {
+          "name": "Class Traitor",
+          "text": "You stepped outside of your station.\nAny good Islander knows that their country is a great and impossibly\ncomplex machine, and what keeps it in functional order is the rigid\nadherence to class. The circumstances of a citizen's birth, sex, upbringing,\nprofession and marriage all combine to create a place for them\nwithin the class system, and venturing outside of your pre-ordained\nconstraints is a recipe for disaster. Things were never the same after:\nl You debased yourself before a noble court for the chance to join, and they laughed you out of town.\nl Your workmates found your poetry, read it aloud before the first shift, and beat the tar out of you for writing it.\nl You married for love, they died penniless, and your social-climber family turned their backs on you.\nl They uncovered your records, and found out that you had funded the royalists that stormed the barracks."
+        },
+        {
+          "name": "Criminal",
+          "text": "You broke the law and got caught.\nWhen the Crown was the sole administrator of justice\nin the Isles, any nearby noble could pass sentence on\nan offender as they saw fit, and most of them favoured\nexile or death. The House generally prefers to keep\ncriminals alive outside of grievous offences such\nas murder, for which they are often executed and\nputs them to work in terrible conditions in exchange\nfor their room and board. You were caught,\nconvicted and press-ganged into labour after:\nl You (unintentionally, your lawyer proved) killed your best friend when you shoved them during an argument and they cracked their head open on the fireplace.\nl Protesting against your working conditions, you sabotaged machinery in your workplace and people got seriously hurt.\nl They took your child away, and her foster parents reported you for breaking into their house.\nl You put three men in the hospital after they hassled you in the street, but one of them was the County Minister's son."
+        },
+        {
+          "name": "Scapegoat",
+          "text": "Someone had to take the fall.\nEveryone has something to hide. You made the\nmistake of upsetting someone in charge or\nsimply being too exploitable to ignore. In an effort\nto divert attention away from their own mistakes or\nto exact revenge, your superiors made something\npublic you'd desperately hoped you could keep\nsecret. Your life was ruined after:\nl Your boss pinned the blame for a gruesome industrial accident solely on your head.\nl Your County Minister revealed your opium addiction to the gutter press after you tried to oust her from power.\nl You were thrown in prison for your part in a murder, whilst everyone else walked free.\nl The women in town revealed your love affair (and child) with someone outside of your class."
         }
       ]
     },
@@ -94,6 +130,24 @@
           "name": "Vindicator",
           "text": "Returning the wicked and their gardens of sin to the soil.\nFarming is made as much of death as it is growth. Weeds should\nbe scoured out lest they overgrow crops and sap the life from the\nsoil; weak plants must be pulled and composted to let their stronger\nbrothers flourish, and unwanted flowers pruned away; disease and\nblight can send whole fields to the bonfire so as not to infect others.\nYou were a Vindicator for the Temple, and you performed these\nsame doleful duties upon the people and places of the Isles deemed\nunsuitable execution, destruction, absolution and rebirth.\nRoll with advantage during exploration when you: interrogate and\npry, quietly murder people, dig six-foot holes, raze structures to the\nground, and so on."
         }
+      ],
+      "seeds": [
+        {
+          "name": "Heretic",
+          "text": "You worship forbidden masters.\nThere are countless splinter sects within the Viridian church that delve\ninto dark and difficult territory. Gruesome sacrifice, trafficking with\nMalignancies, and salting the earth are amongst the most abominable\nsins a Viridian can commit, and you did so in service of the great\nfecund god that moulders beneath the soil. You were cast out by your\npeers, or you walked away yourself, after years of membership in:\nl The Butchers, who speak the secret language of knives on pigskin, and scry with the entrails of beasts.\nl The Harvest Folk, who pay tribute to Hunger and burn crops as offerings.\nl The Sign of the Scourge, who seek to eradicate and isolate cursed parts of the buried deities.\nl The Rosa Caelesti, who believe that Hollows are the first step on the road to apotheosis, and helped you make one."
+        },
+        {
+          "name": "Lost Soul",
+          "text": "Misery tore your faith to shreds.\nWith the meat-grinder of war on the horizon, and terrible\ndestitution both within and without their cities, the inhabitants of\nthe Isles are no strangers to loss; your faith was tested, and it failed.\nYou were a devout worshipper until:\nl You discovered the wickedness that lay in your bishop's black heart. l Your temple commune was torn apart by a Hollow's cruel influence. l You saw the last war from the frontlines as a chaplain. l You were trapped in the ruins of a collapsing temple and left for dead."
+        },
+        {
+          "name": "Outcast",
+          "text": "Your beliefs saw you exiled from your community.\nThe Viridians are not welcome everywhere. Followers of the Old\nFaith still practiced in the ruined cities of the Isles scowl at the\nthought of communing with the earth, the Crown's ancestor-worship\nand exceptionalism has struggled to make peace with the egalitarian\ngarden church, and members of the House can find the slow pace of\nthe sect infuriating at best. You were forced to leave your home after:\nl Your upwardly-mobile Crown family publicly disowned you when they found your woodland shrine to the gods.\nl House militia evicted you from your family farm and claimed it as state property.\nl Old Faith Watchers burned your temple to the ground during a service, lest it attract the gods' attention.\nl A noble's hunting party ran through your land, and when you protested, you were branded as an outlaw."
+        },
+        {
+          "name": "Sinner",
+          "text": "Your crimes cannot be absolved.\nThe Viridian faith is, on the whole, a permissive one. Worshippers\nare free to marry as they choose, give thanks to the land in their\nown way, and pursue an individual relationship with the divine - but\nthere are a few unforgivable sins. You were kicked out for good\nafter you:\nl Mixed your father's ashes with salt, to erase his essence from heaven.\nl Sold your pigs to a House abattoir to cover your gambling debts.\nl Dropped your lantern after too much gin, and burned down the storehouse.\nl Beat your commune elder to a bloody pulp when you found out he was sleeping with your wife."
+        }
       ]
     },
     {
@@ -125,6 +179,24 @@
         {
           "name": "Test Subject",
           "text": "Medical curiosities and aberrations.\nDestitute and desperate, you submitted yourself to experimentation\nand went under the keen knives of the Conclave. After the\nexperiments concluded, you were left with a network of scars,\nresonant metals implanted under your skin, and an uncanny\nsense of the Malignancies that gnaw ravenous at the Isles. You've\nbeen haunted by visions of unreal worlds and monsters beyond\nreckoning but you believe you can find peace by delving headlong\ninto the nightmare and bleeding it dry.\nRoll with advantage during exploration when you: use your\nunnatural senses, withstand punishment or torture, escape a dire\nsituation, and so on."
+        }
+      ],
+      "seeds": [
+        {
+          "name": "Adrift",
+          "text": "You lost something irreplaceable.\nBecoming part of an organisation as secretive and vicious as the\nConclave requires that the prospective member give up any hope of a\nnormal life. Those in the upper echelons are isolated hermits, wracked\nwith anxiety and melancholia. You sacrificed a lot in your quest for\narcane power, but you cannot forgive yourself for giving up:\nl Your family, who have no memory of you following your arcane initiation.\nl Your faith, and desecrating an altar to prove it to your masters. l Your first-born, to the masked figures who granted you power. l Your one chance at happiness by marrying the man you loved."
+        },
+        {
+          "name": "Cursed",
+          "text": "You are wracked with magical backlash.\nThe Isles abound with curses. Pockets of bad magic lurk out of human\nsight waiting to latch on to whoever has the hubris to mess with them.\nStreet-hawkers sell cut-price hexes ready to damn your enemies and\ncall down the wrath of the gods upon their heads. Most of this stuff is\nnothing more than fancy words and posturing, but you:\nl Robbed the sprawling barrow of an ancient monarch and watched your loved ones die.\nl Stained your soul with ritual impurity that draws carrion-eaters toward you.\nl Bore witness to a monstrous hound on the moor, and are now confronted with visions of your death.\nl Witnessed a rival sorcerer carving your name into an execration tablet, and then watched your life crumble to ruin."
+        },
+        {
+          "name": "Hollow-Born",
+          "text": "You were raised in someone else's personal hell.\nMost Hunters carry a terrible Seed within them thanks to trauma not you. You were born and raised in a Hollow and your soul was stained from the start. You may have been rescued by an enterprising Hunter, or escaped under your own power, but the Hollow resonates with you still. On bad nights, you dream of:\nl The rusted mechanical womb from which you tumbled, bloody and fully-formed.\nl Your father, the Lord of the Hollow, crowning you as the Princess of Thorns.\nl Your brother's death at the hands of a towering black-masked Hunter.\nl The writhing, protean form of a Grand Malignancy splayed above the city skyline."
+        },
+        {
+          "name": "Obliviated",
+          "text": "You have been purged from the annals of history.\nAs esoteric as the beliefs of the Conclave's inner circle might be, there are activities that even they forbid. You were severed from all Conclave support and communication, and your name scourged from every record, thanks to your involvement with:\nl The Seven Men of Hawthorne, in hock to Dominion, who seek to oust the Crown.\nl Your family: a deviant pack of cannibals who kill and eat other arcanists for power.\nl The Crimson Players, a radical sect devoted to destroying forbidden knowledge and those who bear it.\nl A shadowy House agency who enforce ancient pacts to maintain power over the Isles."
         }
       ]
     },

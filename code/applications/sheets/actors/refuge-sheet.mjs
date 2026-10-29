@@ -6,6 +6,7 @@ import RefugeRearmReforgeDialogs from "../../apps/refuge-rearm-reforge-dialogs.m
 import RefugeInstallation from "../../../documents/actor/refuge-installation.mjs";
 import RefugeRenewRevel from "../../../documents/actor/refuge-renew-revel.mjs";
 import RefugeResearch from "../../../documents/actor/refuge-research.mjs";
+import RefugeResupply from "../../../documents/actor/refuge-resupply.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -20,11 +21,15 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       enterRefuge: HollowsRefugeSheet.#enterRefuge,
       buyUpgrade: HollowsRefugeSheet.#buyUpgrade,
       useUpgrade: HollowsRefugeSheet.#useUpgrade,
-      editUpgrade: HollowsRefugeSheet.#editUpgrade,
+      editUpgrade: HollowsRefugeSheet.#editItem,
+      editEquipment: HollowsRefugeSheet.#editItem,
+      removeEquipment: HollowsRefugeSheet.#removeEquipment,
       removeUpgrade: HollowsRefugeSheet.#removeUpgrade,
       leaveRefuge: HollowsRefugeSheet.#leaveRefuge,
       recoverOnEntry: HollowsRefugeSheet.#recoverOnEntry,
       installationTest: HollowsRefugeSheet.#installationTest,
+      addResident: HollowsRefugeSheet.#addResident,
+      removeResident: HollowsRefugeSheet.#removeResident,
     },
   };
 
@@ -48,6 +53,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
       system: this.actor.system,
       systemFields: this.actor.system.schema.fields,
       editable: this.isEditable,
+      isGM: game.user.isGM,
       owner: this.document.isOwner,
       limited: this.document.limited,
     };
@@ -89,14 +95,21 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     for (const [button, wasDisabled] of controls) button.disabled = wasDisabled;
   }
 
-  async _onRender(context, options) {
-    await super._onRender(context, options);
-    const visible = context.tabs.map(tab => tab.id);
-    for (const def of REFUGE_TABS) {
-      if (!visible.includes(def.id) || !def.activateListeners) continue;
-      const root = this.element.querySelector(`.refuge-tabs-content > .tab[data-tab="${def.id}"]`);
-      def.activateListeners(this, root);
-    }
+  /** Add an NPC to this Refuge and mark them present. */
+  static async #addResident() {
+    const npc = game.actors.get(this.element.querySelector("[name=npcId]").value);
+    if (!npc) return;
+    const residents = this.actor.system.residents;
+    if (!residents.includes(npc.id)) await this.actor.update({ "system.residents": [...residents, npc.id] });
+    if (!npc.system.inRefuge) await npc.update({ "system.inRefuge": true });
+  }
+
+  /** Remove an NPC from this Refuge and mark them absent. */
+  static async #removeResident(event, target) {
+    const npcId = target.dataset.npcId;
+    await this.actor.update({ "system.residents": this.actor.system.residents.filter(id => id !== npcId) });
+    const npc = game.actors.get(npcId);
+    if (npc?.system.inRefuge) await npc.update({ "system.inRefuge": false });
   }
 
   /** Open a paid group visit through the Refuge action queue. */
@@ -132,6 +145,10 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
 
   /** @inheritdoc */
   async _onDropItem(event, item) {
+    if ((item.type === "equipment") && game.user.isGM) {
+      await requestRefugeAction({ type: "unlockEquipment", refugeId: this.actor.id, itemUuid: item.uuid });
+      return null;
+    }
     if (item.type !== "refugeUpgrade") return null;
     if (item.parent === this.actor) return super._onDropItem(event, item);
     return this._purchaseUpgrade(item);
@@ -190,6 +207,7 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     const group = RefugeUpgradeData.ACTIONS[definition.type].group;
     const actionHandler = {
       weapons: RefugeRearmReforgeDialogs, renewRevel: RefugeRenewRevel, research: RefugeResearch,
+      resupply: RefugeResupply,
     }[group];
     const choice = actionHandler ? await actionHandler.prepare(hunter, this.actor, definition).catch(err => {
       ui.notifications.warn(err.message);
@@ -210,9 +228,19 @@ export default class HollowsRefugeSheet extends HandlebarsApplicationMixin(Actor
     }
   }
 
-  /** Open an installed upgrade for editing. */
-  static #editUpgrade(event, target) {
+  /** Open an embedded item for editing. */
+  static #editItem(event, target) {
     this.actor.items.get(target.dataset.itemId).sheet.render({ force: true });
+  }
+
+  /** Remove an equipment option from the Refuge's stock. */
+  static async #removeEquipment(event, target) {
+    const item = this.actor.items.get(target.dataset.itemId);
+    const confirmed = await confirmDialog({
+      title: game.i18n.localize("HOLLOWS.EQUIPMENT.stock"),
+      bodyHtml: game.i18n.format("HOLLOWS.EQUIPMENT.removeStock", { name: foundry.utils.escapeHTML(item.name) }),
+    });
+    if (confirmed) await item.delete();
   }
 
   /** Remove an installed upgrade without refunding its purchase price. */

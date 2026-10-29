@@ -13,7 +13,7 @@ import {
   shouldConfigureHunterTokenForActor,
   shouldConfigureHunterTokenForNewActor,
 } from "../data/actor-models.js";
-import { applyInterceptors } from "./extensions.js";
+import ScriptCompiler from "../documents/item/script-compiler.mjs";
 import { runOnMove, runTerrainDiscardOnMove } from "./weapon-abilities/dispatchers.js";
 import { triggerUseOnManoeuvre } from "../data/actions/use.js";
 
@@ -167,7 +167,7 @@ export function registerCanvasHooks() {
       }
     }
     if ((nextZone !== prevZone) && game.user.isActiveGM) {
-      await applyInterceptors("hunter-zone-changed", { actor, fromZone: prevZone, toZone: nextZone }, null);
+      await ScriptCompiler.runInterceptors("hunter-zone-changed", { actor, fromZone: prevZone, toZone: nextZone }, null);
     }
     if (prevZone && nextZone && prevZone !== nextZone) {
       const movedByOwner = !!mover && !mover.isGM && !!actor?.testUserPermission?.(mover, "OWNER");

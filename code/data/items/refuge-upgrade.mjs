@@ -1,4 +1,5 @@
-import { getRefugeNpcRoles } from "../refuge/action-handlers.js";
+import HollowsItem from "../../documents/item.mjs";
+import { NPC_ROLES } from "../refuge/resolvers.js";
 
 export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
   static ACTIONS = {
@@ -15,6 +16,9 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
     openHeart: { label: "HOLLOWS.REFUGE.openHeart", group: "research" },
     closeHeart: { label: "HOLLOWS.REFUGE.closeHeart", group: "research" },
     essenceSyphon: { label: "HOLLOWS.REFUGE.essenceSyphon", group: "research" },
+    resupply: { label: "HOLLOWS.REFUGE.resupply", group: "resupply" },
+    unlockExploration: { label: "HOLLOWS.REFUGE.unlockExploration", group: "resupply" },
+    unlockBattle: { label: "HOLLOWS.REFUGE.unlockBattle", group: "resupply" },
   };
 
   /** @inheritdoc */
@@ -45,7 +49,7 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
         hearts: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       }),
       requiredNpcRoles: new fields.SetField(new fields.StringField({
-        choices: Object.fromEntries(getRefugeNpcRoles().map(({ key, label }) => [key, label])),
+        choices: Object.fromEntries(NPC_ROLES.map(({ key, label }) => [key, label])),
       })),
       requiredUpgrades: new fields.SetField(new fields.StringField()),
       requiresAnchoredEntity: new fields.BooleanField({ initial: false }),
@@ -58,6 +62,9 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
         wounds: new fields.NumberField({ initial: 0, integer: true }),
       }),
       extraRelicSlot: new fields.BooleanField({ initial: false }),
+      extraEquipmentSlots: new fields.SetField(new fields.StringField({ choices: {
+        exploration: "HOLLOWS.EQUIPMENT.exploration", battle: "HOLLOWS.EQUIPMENT.battle",
+      } })),
       hardTestOnInstall: new fields.BooleanField({ initial: false }),
       pending: new fields.BooleanField({ initial: false }),
       recoverOnEntry: new fields.BooleanField({ initial: false }),
@@ -116,17 +123,11 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
     if (this.parent.actor?.type === "refuge") this.parent.actor.system.refreshHunters();
   }
 
-  /** The template shared by an upgrade and its imported or installed copies. */
-  static getSourceUuid(item) {
-    return item.uuid.startsWith("Compendium.") ? item.uuid
-      : item._stats.compendiumSource || item._stats.duplicateSource || item.uuid;
-  }
-
   /** Price of the next copy, including purchases awaiting installation. */
   getPurchaseCost(refuge) {
-    const source = RefugeUpgradeData.getSourceUuid(this.parent);
+    const source = HollowsItem.getSourceUuid(this.parent);
     const copies = this.repeatable ? refuge.system.upgradeItems
-      .filter(item => RefugeUpgradeData.getSourceUuid(item) === source).length : 0;
+      .filter(item => HollowsItem.getSourceUuid(item) === source).length : 0;
     return {
       bone: this.cost.bone + (copies * this.costIncrease.bone),
       hearts: this.cost.hearts + (copies * this.costIncrease.hearts),
@@ -148,13 +149,12 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
 
   /** Unmet operating requirements for an installed upgrade. */
   getMissingRequirements(refuge) {
-    const roles = getRefugeNpcRoles();
-    const missing = this.getMissingNpcRoles(refuge).map(key => roles.find(role => role.key === key).label);
+    const missing = this.getMissingNpcRoles(refuge).map(key => game.i18n.localize(NPC_ROLES.find(role => role.key === key).label));
     if (this.requiresAnchoredEntity && !refuge.system.anchoredEntities.size) {
       missing.push(game.i18n.localize("HOLLOWS.REFUGE.anchoredEntity"));
     }
     const installed = new Set(refuge.system.upgradeItems.filter(item => !item.system.pending)
-      .map(item => RefugeUpgradeData.getSourceUuid(item)));
+      .map(item => HollowsItem.getSourceUuid(item)));
     for (const uuid of this.requiredUpgrades) {
       if (!installed.has(uuid)) missing.push(fromUuidSync(uuid)?.name || uuid);
     }
@@ -182,7 +182,7 @@ export default class RefugeUpgradeData extends foundry.abstract.TypeDataModel {
     const items = [...game.items.filter(item => item.visible), ...indexes.flatMap(index => index.contents)]
       .filter(item => (item.type === "refugeUpgrade") && (!defaultsOnly || item.system?.default));
     const upgrades = new Map(items.map(item => {
-      const sourceUuid = this.getSourceUuid(item);
+      const sourceUuid = HollowsItem.getSourceUuid(item);
       return [sourceUuid, { uuid: item.uuid, sourceUuid, name: item.name }];
     }));
     return [...upgrades.values()].sort((a, b) => a.name.localeCompare(b.name));

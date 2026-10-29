@@ -119,11 +119,3 @@ export function getEnhancementBuilderActionTargetingOverride(entityActor, contex
   };
   return {};
 }
-
-export const enhancementBuilderSelfActionModifier = {
-  match: () => true,
-  getDamageDelta: getEnhancementBuilderActionDamageDelta,
-  getCostDelta: getEnhancementBuilderActionCostDelta,
-  getTNDelta: getEnhancementBuilderActionTNDelta,
-  getTargetingOverride: getEnhancementBuilderActionTargetingOverride
-};

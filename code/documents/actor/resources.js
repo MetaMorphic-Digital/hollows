@@ -20,7 +20,7 @@ function asDelta(value) {
 function resourceState(value, max = 0, delta = 0, { allowTemporary = false } = {}) {
   const before = Math.max(0, Number(value ?? 0) || 0);
   const cap = Math.max(0, Number(max ?? 0) || 0) || 999;
-  const after = Math.max(0, allowTemporary ? before + delta : Math.min(cap, before + delta));
+  const after = Math.max(0, allowTemporary ? before + delta : Math.min(Math.max(before, cap), before + delta));
   return { before, after, changed: after !== before };
 }
 

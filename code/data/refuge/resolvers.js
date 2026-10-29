@@ -1,5 +1,4 @@
-// Side-effect-free refuge reads shared by the attack pipeline, echo, and the
-// mechanic registry.
+// Side-effect-free Refuge reads for weapon bonuses, upgrades, and NPC roles.
 
 export function getPrimaryRefugeActor() {
   const refuges = game.actors.contents.filter(a => a.type === "refuge");
@@ -32,3 +31,12 @@ export function getRefugeWeaponDamageBonus(weapon, refugeActor) {
   }
   return bonus;
 }
+
+// NPC roles surfaced on the refuge sheet.
+export const NPC_ROLES = [
+  { key: "keeper", label: "HOLLOWS.REFUGE.npcRoles.keeper" },
+  { key: "doctor", label: "HOLLOWS.REFUGE.npcRoles.doctor" },
+  { key: "apprentice", label: "HOLLOWS.REFUGE.npcRoles.apprentice" },
+  { key: "smith", label: "HOLLOWS.REFUGE.npcRoles.smith" },
+  { key: "magus", label: "HOLLOWS.REFUGE.npcRoles.magus" },
+];

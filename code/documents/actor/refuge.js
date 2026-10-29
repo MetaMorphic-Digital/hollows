@@ -1,11 +1,6 @@
 import { runUserQuery, COMBAT_QUERY_TIMEOUT } from "../../helpers/queries.js";
 import { getActiveHollowActor } from "../../canvas/zone.js";
-import {
-  getPrimaryRefugeActor,
-  getRefugeActionHandler,
-  registerRefugeActionHandler,
-} from "../../data/refuge/index.js";
-import { applyInterceptors } from "../../helpers/extensions.js";
+import { getPrimaryRefugeActor } from "../../data/refuge/index.js";
 import { removeCondition } from "./conditions.js";
 import { adjustHunterResource } from "./resources.js";
 
@@ -65,7 +60,6 @@ export async function applyRecover(refuge, hunter, { type = "fullRecovery", reso
       name: foundry.utils.escapeHTML(hunter.name), resolve, wounds,
     })}</div>`,
   });
-  await applyInterceptors("refuge-recover", { actor: hunter, refuge, hunter, mode: temporary ? "temp" : "full" });
   return true;
 }
 
@@ -99,30 +93,35 @@ export async function applyRefugeActionPayload(data = {}) {
   const type = String(data.type || "");
   const refuge = data.refugeId ? game.actors.get(String(data.refugeId)) : getPrimaryRefugeActor();
   if (!refuge || refuge.type !== "refuge") return;
-  const handler = getRefugeActionHandler(type);
+  const handler = REFUGE_HANDLERS[type];
   if (handler) return REFUGE_ACTIONS.add(handler, refuge, data);
 }
 
-registerRefugeActionHandler("buyUpgrade", async (refuge, data) => {
-  const upgrade = await fromUuid(data.upgradeUuid);
-  return refuge.system.buyUpgrade(upgrade);
-});
-registerRefugeActionHandler("useUpgrade", async (refuge, data) => {
-  const hunter = await fromUuid(data.hunterUuid);
-  return refuge.system.useUpgrade(data.itemId, data.action, hunter, data.choice);
-});
-registerRefugeActionHandler("recoverOnEntry", async (refuge, data) => {
-  const hunter = await fromUuid(data.hunterUuid);
-  return refuge.system.recoverOnEntry(hunter);
-});
-registerRefugeActionHandler("enterRefuge", async (refuge) => applyEnterRefuge(refuge));
-registerRefugeActionHandler("enterHunter", async (refuge, data) => {
-  const hunter = await fromUuid(data.hunterUuid);
-  await hunter.system.enterRefuge(refuge);
-});
-registerRefugeActionHandler("installationTest", async (refuge, data) => {
-  const hunter = await fromUuid(data.hunterUuid);
-  const { default: RefugeInstallation } = await import("./refuge-installation.mjs");
-  await RefugeInstallation.apply(hunter, data.testId, data.config);
-});
-registerRefugeActionHandler("spendBone", async (refuge, data) => spendRefugeBone(refuge, data.amount));
+const REFUGE_HANDLERS = {
+  buyUpgrade: async (refuge, data) => {
+    const upgrade = await fromUuid(data.upgradeUuid);
+    return refuge.system.buyUpgrade(upgrade);
+  },
+  useUpgrade: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    return refuge.system.useUpgrade(data.itemId, data.action, hunter, data.choice);
+  },
+  recoverOnEntry: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    return refuge.system.recoverOnEntry(hunter);
+  },
+  enterRefuge: applyEnterRefuge,
+  enterHunter: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    await hunter.system.enterRefuge(refuge);
+  },
+  unlockEquipment: async (refuge, data) => {
+    const { default: RefugeResupply } = await import("./refuge-resupply.mjs");
+    return RefugeResupply.unlock(refuge, [await fromUuid(data.itemUuid)]);
+  },
+  installationTest: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    const { default: RefugeInstallation } = await import("./refuge-installation.mjs");
+    await RefugeInstallation.apply(hunter, data.testId, data.config);
+  },
+};

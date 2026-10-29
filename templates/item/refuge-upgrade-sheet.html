@@ -33,6 +33,11 @@
     {{formGroup systemFields.hardTestOnInstall value=system.hardTestOnInstall label="HOLLOWS.REFUGE.hardTestOnInstall" hint="HOLLOWS.REFUGE.hardTestOnInstallHint" localize=true}}
   </section>
 
+  <button type="button" class="group-add" data-action="toggleAdditional" aria-expanded="{{showAdditional}}">
+    {{localize additionalSettingsLabel}}
+  </button>
+
+  {{#if sections.recover}}
   <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.entryBenefits"}}</h3>
     {{formGroup systemFields.recoverOnEntry value=system.recoverOnEntry label="HOLLOWS.REFUGE.recoverOnEntry" hint="HOLLOWS.REFUGE.recoverOnEntryHint" localize=true}}
@@ -42,7 +47,9 @@
       <label>{{localize "HOLLOWS.REFUGE.wounds"}}{{formInput systemFields.temporaryHealthBonus.fields.wounds value=system.temporaryHealthBonus.wounds}}</label>
     </div>
   </section>
+  {{/if}}
 
+  {{#if sections.weapons}}
   <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.weaponBenefits"}}</h3>
     {{formGroup systemFields.weaponTiers value=system.weaponTiers label="HOLLOWS.REFUGE.weaponTiers" type="checkboxes" localize=true}}
@@ -53,19 +60,25 @@
       <label>{{localize "HOLLOWS.REFUGE.wounds"}}{{formInput systemFields.weaponDamage.fields.wounds value=system.weaponDamage.wounds}}</label>
     </div>
   </section>
+  {{/if}}
 
+  {{#if sections.renew}}
   <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.renewAction"}}</h3>
     {{formGroup systemFields.renew.fields.marks value=system.renew.marks label="HOLLOWS.REFUGE.renewMarks" localize=true}}
     {{formGroup systemFields.renew.fields.disadvantage value=system.renew.disadvantage label="HOLLOWS.REFUGE.renewDisadvantage" localize=true}}
   </section>
+  {{/if}}
 
+  {{#if sections.research}}
   <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.categories.research"}}</h3>
     {{formGroup systemFields.research.fields.advantage value=system.research.advantage label="HOLLOWS.REFUGE.researchAdvantage" localize=true}}
     {{formGroup systemFields.research.fields.anyStat value=system.research.anyStat label="HOLLOWS.REFUGE.researchAnyStat" hint="HOLLOWS.REFUGE.researchAnyStatHint" localize=true}}
   </section>
+  {{/if}}
 
+  {{#if sections.revel}}
   <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.revelAction"}}</h3>
     {{formGroup systemFields.revel.fields.additionalEchoes value=system.revel.additionalEchoes label="HOLLOWS.REFUGE.additionalEchoes" localize=true}}
@@ -78,6 +91,14 @@
       <label>{{localize "HOLLOWS.REFUGE.wounds"}}{{formInput systemFields.healthBonus.fields.wounds value=system.healthBonus.wounds}}</label>
     </div>
   </section>
+  {{/if}}
+
+  {{#if sections.resupply}}
+  <section class="sheet-section">
+    <h3>{{localize "HOLLOWS.REFUGE.resupply"}}</h3>
+    {{formGroup systemFields.extraEquipmentSlots value=system.extraEquipmentSlots label="HOLLOWS.EQUIPMENT.extraSlots" type="checkboxes" localize=true}}
+  </section>
+  {{/if}}
 
   <section class="sheet-section">
     <h3>{{localize "HOLLOWS.REFUGE.actions"}}</h3>
@@ -87,7 +108,7 @@
           <span>{{localize (lookup @root.actionFields.type.choices action.type)}}</span>
           <button type="button" class="stat-roll danger" data-action="removeAction" data-index="{{action.index}}">{{localize "HOLLOWS.REFUGE.remove"}}</button>
         </div>
-        {{formGroup @root.actionFields.type value=action.type name=(concat "system.actions." action.index ".type") label="HOLLOWS.REFUGE.actionType" localize=true}}
+        {{formGroup @root.actionFields.type value=action.type choices=action.typeChoices name=(concat "system.actions." action.index ".type") label="HOLLOWS.REFUGE.actionType" localize=true}}
         <div class="num-grid">
           <label>{{localize "HOLLOWS.REFUGE.actionCost"}}{{formInput @root.actionFields.cost.fields.actions value=action.cost.actions name=(concat "system.actions." action.index ".cost.actions")}}</label>
           <label>{{localize "HOLLOWS.REFUGE.bone"}}{{formInput @root.actionFields.cost.fields.bone value=action.cost.bone name=(concat "system.actions." action.index ".cost.bone")}}</label>

@@ -1,6 +1,6 @@
-/** Weapon templates supplied by visible Item compendiums. */
-export class WeaponCatalog {
-  /** Read the index fields needed to choose weapons and abilities. */
+/** Item templates supplied by visible compendiums. */
+export class ItemCatalog {
+  /** List indexed items of a type from visible compendiums. */
   static async getIndex(type) {
     const packs = game.packs.filter(pack => (pack.documentName === "Item") && pack.visible);
     const indexes = await Promise.all(packs.map(pack => pack.getIndex({
@@ -11,16 +11,11 @@ export class WeaponCatalog {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  /** Load the matching weapon or ability templates. */
+  /** Load item templates, optionally filtered by weapon type and tier. */
   static async getDocuments(type, { weaponType, tier } = {}) {
     const entries = (await this.getIndex(type)).filter(item =>
       (!weaponType || (item.system.weaponType === weaponType))
       && ((tier === undefined) || (item.system.tier === tier)));
     return Promise.all(entries.map(item => fromUuid(item.uuid)));
   }
-}
-
-/** Load the available Weapon templates. */
-export async function getWeaponPackDocs() {
-  return WeaponCatalog.getDocuments("weapon");
 }

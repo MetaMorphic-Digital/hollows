@@ -1,3 +1,4 @@
+import HollowsItem from "../../documents/item.mjs";
 import RefugeData from "./refuge.mjs";
 import { STAT_LABELS } from "../system-constants.js";
 import { getPrimaryRefugeActor } from "../refuge/resolvers.js";
@@ -98,21 +99,40 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
 
   /* -------------------------------------------------- */
 
-  /** Report a conflict between the Relic and Battle Equipment slots. */
-  validateEquipmentSlot(slot) {
-    if (!["battle", "relic"].includes(slot)) return true;
+  /** Equipment slots supplied by available Refuge upgrades. */
+  getEquipmentLimit(slot) {
+    return getPrimaryRefugeActor()?.system.benefits[`${slot}Slots`] ?? 1;
+  }
+
+  /** Report occupied slots or duplicate equipment before equipping an item. */
+  validateEquipmentSlot(slot, incoming = null) {
     const refuge = getPrimaryRefugeActor();
-    if (refuge?.system.upgradeItems.some(item => item.system.extraRelicSlot && item.system.isAvailable(refuge))) return true;
-    const otherSlot = slot === "battle" ? "relic" : "battle";
-    if (!getHunterEquipmentItemsForSlot(this.parent, otherSlot).length) return true;
-    ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.sharedBattleSlot"));
-    return false;
+    const separateRelic = refuge?.system.benefits.extraRelicSlot;
+    if ((slot === "relic") && !separateRelic
+      && (getHunterEquipmentItemsForSlot(this.parent, "battle").length >= this.getEquipmentLimit("battle"))) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.sharedBattleSlot"));
+      return false;
+    }
+    if (slot === "relic") return true;
+    const items = getHunterEquipmentItemsForSlot(this.parent, slot).filter(item => item.id !== incoming?.id);
+    const relicSlot = (slot === "battle") && !separateRelic && getHunterEquipmentItemsForSlot(this.parent, "relic").length ? 1 : 0;
+    if (items.length + relicSlot >= this.getEquipmentLimit(slot)) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.EQUIPMENT.slotsFull"));
+      return false;
+    }
+    if (incoming && items.some(item => HollowsItem.getSourceUuid(item) === HollowsItem.getSourceUuid(incoming))) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.EQUIPMENT.duplicate"));
+      return false;
+    }
+    return true;
   }
 
   /** Restore the action allowance when starting a new visit. */
   async enterRefuge(refuge) {
     if (this.refuge.id === refuge.id) return false;
     await refuge.system.activateUpgrades();
+    const { default: RefugeResupply } = await import("../../documents/actor/refuge-resupply.mjs");
+    await RefugeResupply.unlock(refuge, this.parent.items.filter(item => item.type === "equipment"));
     await this.parent.update({
       "system.refuge.id": refuge.id,
       "system.refuge.actions.value": this.refuge.actions.max,

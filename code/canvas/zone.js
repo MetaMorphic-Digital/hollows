@@ -287,10 +287,3 @@ export function getActiveHunterForUser() {
   if (character?.type === "hunter") return character;
   return null;
 }
-
-/** List all hunter actors by name. */
-export function getAllHuntersSorted() {
-  return game.actors.contents
-    .filter(a => a?.type === "hunter")
-    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
-}

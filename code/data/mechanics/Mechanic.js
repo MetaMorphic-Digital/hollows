@@ -13,7 +13,7 @@
  *     it receives and when it is consulted. Absent means "always".
  *
  * Subclasses add mechanic-specific fields and methods (match/run/apply).
- * Registered and scripted mechanics use the same dispatchers.
+ * System and scripted mechanics use the same dispatchers.
  */
 export class Mechanic {
   constructor({ key, weapon, tier, name, text, when } = {}) {

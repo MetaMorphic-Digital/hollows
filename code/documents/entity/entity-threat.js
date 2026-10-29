@@ -4,7 +4,7 @@ import {
 import { spendThreatFromZones } from "../../canvas/overlays.js";
 import { adjustEntityResource } from "../actor/resources.js";
 import { runRelicTriggers } from "../../data/relic/apply-effect.js";
-import { getEntitySelfActionCostDelta } from "../../helpers/entity-dispatchers.js";
+import { getEnhancementBuilderActionCostDelta } from "./enhancement-builder-passive.js";
 import { getEntityAbilityCostDelta } from "../../helpers/weapon-abilities/dispatchers.js";
 
 export function getEntityActionCost(action, amountOverride = null) {
@@ -19,7 +19,7 @@ export function getEntityInterruptCost(interrupt, entityActor, interruptItem = n
   const { type, amount } = getEntityActionCost(interrupt);
   if (type !== "threat") return amount;
   const abilityDelta = getEntityAbilityCostDelta(entityActor, "interrupt").threat || 0;
-  const selfDelta = getEntitySelfActionCostDelta(entityActor, {
+  const selfDelta = getEnhancementBuilderActionCostDelta(entityActor, {
     actionItem: interruptItem,
     actionConfig: interrupt,
     actionKind: "interrupt",
@@ -31,7 +31,7 @@ export function getEntityInterruptCost(interrupt, entityActor, interruptItem = n
 export function getEntityAttackCost(attack, entityActor, attackItem = null) {
   const { type, amount } = getEntityActionCost(attack);
   if (type !== "threat") return amount;
-  const selfDelta = getEntitySelfActionCostDelta(entityActor, {
+  const selfDelta = getEnhancementBuilderActionCostDelta(entityActor, {
     actionItem: attackItem,
     actionConfig: attack,
     actionKind: "attack",

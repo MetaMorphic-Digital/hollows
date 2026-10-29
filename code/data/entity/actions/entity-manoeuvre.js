@@ -27,7 +27,6 @@ import {
 } from "../action-flow.js";
 import { requestAfterAttackApply } from "../../../documents/entity/attack-effects.js";
 import { applyEntityActionCost } from "../../../documents/entity/entity-threat.js";
-import { adjustEntityResource } from "../../../documents/actor/resources.js";
 import { runEntityActionPauses } from "../../../helpers/weapon-abilities/dispatchers.js";
 import { performEntityAttack } from "./entity-attack.js";
 import { createEntityNoticeCard, createEntityTestRequest } from "../action-cards.js";
@@ -293,6 +292,9 @@ export async function performEntityProwl(entityActor, options = {}) {
     return false;
   }
 
+  const pause = await runEntityActionPauses({ actionType: "prowl", stage: "beforeResolve", entityActor });
+  if (pause.cancelled) return false;
+
   const cost = Math.max(0, Number(options.cost ?? 0) || 0);
   if (cost > 0 && options.spendCostFromSourceZone) {
     const paid = await applyEntityActionCost(null, entityActor, [], [selection.sourceZone], {
@@ -303,8 +305,6 @@ export async function performEntityProwl(entityActor, options = {}) {
     if (!paid && options.costFailureMessage) ui.notifications.warn(options.costFailureMessage);
     if (!paid) return false;
   }
-
-  await runEntityActionPauses({ actionType: "prowl", stage: "beforeResolve", entityActor });
 
   for (const entry of hunters) {
     const actor = entry.actor;
@@ -342,11 +342,9 @@ export async function openEntityProwlDialog(entityActor) {
 /** Shrug Off: restores 3 Resolve. */
 export async function applyEntityShrugOff(entityActor) {
   if (!entityActor || entityActor.type !== "entity") return;
-  await adjustEntityResource(entityActor, { resolve: 3 });
-  await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: entityActor }),
-    content: `<div class="hollows-chat"><strong>${entityActor.name}</strong> uses <strong>Shrug Off</strong> and restores <strong>3 Resolve</strong>.</div>`,
-  });
+  const pause = await runEntityActionPauses({ actionType: "shrugOff", stage: "beforeResolve", entityActor });
+  if (pause.cancelled) return false;
+  await resolveRestoreResolve({ restoreResolve: { enabled: true, mode: "fixed", fixed: 3 } }, entityActor);
 }
 
 /** Open Turn Around for Close-zone hunters. */
@@ -376,7 +374,8 @@ export async function openEntityTurnAroundDialog(entityActor) {
         default: true,
         callback: async (_e, _b, dialog) => {
           const direction = String(dialog.element.querySelector("[name=direction]")?.value || "clockwise");
-          await runEntityActionPauses({ actionType: "turnAround", stage: "beforeResolve", entityActor });
+          const pause = await runEntityActionPauses({ actionType: "turnAround", stage: "beforeResolve", entityActor });
+          if (pause.cancelled) return;
           if (!closeHunters.length) {
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: entityActor }),

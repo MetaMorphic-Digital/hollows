@@ -3,17 +3,10 @@
  * compendium docs and grant them to a hunter. Shared, not Refuge-owned:
  * consumed by Refuge, character creation, and Echo.
  */
-import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
-import { WeaponCatalog } from "../../data/weapons/registry.js";
+import { ItemCatalog } from "../../data/item-catalog.js";
 
 export async function getWeaponAbilityDocs(weaponType, tier) {
-  return WeaponCatalog.getDocuments("weaponAbility", { weaponType, tier });
-}
-
-export async function chooseAbilityDoc(docs, title) {
-  if (!docs.length) return null;
-  const id = await pickOne({ title, label: "Ability", options: docs.map(d => ({ value: d.id, label: d.name })) });
-  return id ? docs.find(d => d.id === id) || null : null;
+  return ItemCatalog.getDocuments("weaponAbility", { weaponType, tier });
 }
 
 export function isDuplicateWeaponAbility(hunter, abilityDoc) {

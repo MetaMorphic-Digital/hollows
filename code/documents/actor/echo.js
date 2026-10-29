@@ -6,7 +6,7 @@ import { runUserQuery, dispatchToGM } from "../../helpers/queries.js";
 import { confirmDialog, pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
 import { getActiveHollowActor } from "../../canvas/zone.js";
 import { setActorFlagSafe } from "../../utils/flag-utils.js";
-import { getContentPacks } from "../../helpers/extensions.js";
+import { ItemCatalog } from "../../data/item-catalog.js";
 
 const esc = (value) => foundry.utils.escapeHTML(String(value ?? ""));
 
@@ -14,16 +14,15 @@ const esc = (value) => foundry.utils.escapeHTML(String(value ?? ""));
 
 // ─── Echo Compendium ──────────────────────────────────────────────────────────
 
-export function getEchoPacks() {
-  return getContentPacks("echoes").map((id) => game.packs.get(id)).filter(Boolean);
-}
-
 function getEchoTablePacks() {
-  return getContentPacks("echo-tables").map((id) => game.packs.get(id)).filter(Boolean);
+  return game.packs.filter(pack => (pack.documentName === "RollTable") && pack.visible);
 }
 
-export function hasEchoRollContent() {
-  return getEchoTablePacks().length > 0;
+/** Whether the four Echo tables are available to this user. */
+export async function hasEchoRollContent() {
+  const indexes = await Promise.all(getEchoTablePacks().map(pack => pack.getIndex()));
+  const names = new Set(indexes.flatMap(index => index.contents.map(entry => entry.name)));
+  return Object.values(ECHO_TABLE_NAMES).every(name => names.has(name));
 }
 
 // ─── Table Helpers ────────────────────────────────────────────────────────────
@@ -35,23 +34,6 @@ async function getEchoTableByName(name) {
     if (entry) return pack.getDocument(entry._id);
   }
   return null;
-}
-
-function pickTableResult(table, rollTotal) {
-  if (typeof table.getResultsForRoll === "function") {
-    const res = table.getResultsForRoll(rollTotal);
-    if (Array.isArray(res) && res.length) return res[0];
-  }
-  const results = Array.isArray(table.results)
-    ? table.results
-    : (Array.isArray(table.results?.contents) ? table.results.contents : []);
-  const hit = results.find(r => {
-    const range = Array.isArray(r.range) ? r.range : [];
-    const min = Number(range[0] ?? 0);
-    const max = Number(range[1] ?? 0);
-    return rollTotal >= min && rollTotal <= max;
-  });
-  return hit || null;
 }
 
 // ─── Trophies ─────────────────────────────────────────────────────────────────
@@ -75,11 +57,11 @@ async function rollEchoCategory() {
     ui.notifications?.warn?.("Echo Category table not found.");
     return null;
   }
-  const formula = table.formula || table.system?.formula || "1d6";
+  const formula = table.formula;
   const roll = await (new Roll(formula)).evaluate();
   const total = Number(roll.total ?? 0);
-  const result = pickTableResult(table, total);
-  const label = String(result?.text || "").trim();
+  const result = table.getResultsForRoll(total)[0];
+  const label = String(result?.name || result?.description || "").trim();
   if (!label) ui.notifications?.warn?.("Echo Category roll returned no result.");
   return { label, total };
 }
@@ -90,11 +72,11 @@ async function rollEchoTableWithCorruption(tableName, corruption, modifier = 0) 
     ui.notifications?.warn?.(`Echo table not found: ${tableName}`);
     return null;
   }
-  const formula = table.formula || table.system?.formula || "1d20";
+  const formula = table.formula;
   const roll = await (new Roll(formula)).evaluate();
   const total = Number(roll.total ?? 0) + Number(corruption ?? 0) + Number(modifier ?? 0);
-  const result = pickTableResult(table, total);
-  const label = String(result?.text || "").trim();
+  const result = table.getResultsForRoll(total)[0];
+  const label = String(result?.name || result?.description || "").trim();
   if (!label) ui.notifications?.warn?.(`Echo table '${tableName}' returned no result.`);
   return { label, total, roll };
 }
@@ -145,37 +127,20 @@ async function chooseEchoReplacement(actor, echoType) {
   });
 }
 
-async function findEchoKeyByMatch({ subtype = "", weaponType = null, malignancy = null } = {}) {
-  for (const pack of getEchoPacks()) {
-    const index = await pack.getIndex({ fields: ["system.subtype", "system.weaponType", "system.malignancy", "system.key"] });
-    const entry = index.find(e => {
-      const s = e.system || {};
-      if (String(s.subtype || "") !== String(subtype)) return false;
-      if (weaponType != null && String(s.weaponType || "") !== String(weaponType)) return false;
-      if (malignancy != null && String(s.malignancy || "") !== String(malignancy)) return false;
-      return true;
-    });
-    if (entry) return String(entry.system?.key || entry._id || "");
-  }
-  return "";
+/** Find a compendium Echo matching the rolled subtype and optional weapon or malignancy. */
+async function findEchoUuidByMatch({ subtype, weaponType, malignancy }) {
+  const entries = await ItemCatalog.getIndex("echo");
+  const entry = entries.find(({ system }) => (system.subtype === subtype)
+    && ((weaponType === undefined) || (system.weaponType === weaponType))
+    && ((malignancy === undefined) || (system.malignancy === malignancy)));
+  return entry?.uuid || "";
 }
 
-export async function createEchoFromCompendium(actor, echoKey, overrides = {}) {
-  let doc = null;
-  for (const pack of getEchoPacks()) {
-    const index = await pack.getIndex({ fields: ["system.key", "name"] });
-    const entry = index.find(e =>
-      String(e._id || "") === String(echoKey || "") ||
-      String(e.name || "") === String(echoKey || "") ||
-      String(e.system?.key || "") === String(echoKey || ""),
-    );
-    if (entry) {
-      doc = await pack.getDocument(entry._id);
-      break;
-    }
-  }
+/** Add an Echo selected from a compendium or the world. */
+export async function addEchoFromUuid(actor, uuid, overrides = {}) {
+  const doc = await fromUuid(uuid);
   if (!doc) {
-    ui.notifications.warn(`Echo not found: ${echoKey}`);
+    ui.notifications.warn(`Echo not found: ${uuid}`);
     return null;
   }
   return addEchoFromDoc(actor, doc, overrides);
@@ -201,16 +166,10 @@ export async function addEchoFromDoc(actor, doc, overrides = {}) {
   return created?.[0] || null;
 }
 
-export async function addEchoById(actor, id) {
-  const worldItem = game.items?.get(String(id || ""));
-  if (worldItem?.type === "echo") return addEchoFromDoc(actor, worldItem);
-  return createEchoFromCompendium(actor, id);
-}
-
 export async function handleCorruptionIncrease(actor, prevValue, nextValue) {
   if (!actor) return;
   if (!game.user?.isGM) return;
-  if (!hasEchoRollContent()) return;
+  if (!(await hasEchoRollContent())) return;
   const owners = game.users.filter(u => !u.isGM && actor.testUserPermission(u, "OWNER"));
   const owner = owners.find(u => u.active) || null;
   try {
@@ -262,8 +221,8 @@ async function rollSeedEcho(actor, attempt = 0) {
     echoRollLine(result, corruption, trophyMod),
     `Result: <strong>${esc(label || "None")}</strong>.`,
   ]);
-  const echoId = await findEchoKeyByMatch({ subtype: label.toLowerCase() });
-  if (!echoId) return;
+  const echoUuid = await findEchoUuidByMatch({ subtype: label.toLowerCase() });
+  if (!echoUuid) return;
   const proceed = await confirmDialog({
     title: "Seed Echo",
     bodyHtml: `<p>Result: <strong>${esc(label)}</strong> (rolled ${result?.total ?? "?"}).</p>`,
@@ -271,15 +230,16 @@ async function rollSeedEcho(actor, attempt = 0) {
     noLabel: "Cancel",
   });
   if (!proceed) return;
-  const created = await createEchoFromCompendium(actor, echoId);
+  const created = await addEchoFromUuid(actor, echoUuid);
   if (created?.duplicate) return rollSeedEcho(actor, attempt + 1);
   if (created) {
     await postEchoGained(actor, created, ` (Seed / ${esc(label)})`);
   }
 }
 
-async function createBoundWeaponEcho(actor, echoId, weapon, weaponType, displayName) {
-  const created = await createEchoFromCompendium(actor, echoId, {
+/** Grant a Weapon Echo, bind it to its source weapon, and announce it in chat. */
+async function createBoundWeaponEcho(actor, echoUuid, weapon, weaponType, displayName) {
+  const created = await addEchoFromUuid(actor, echoUuid, {
     name: displayName,
     system: { sourceWeaponId: weapon.id, weaponType },
   });
@@ -311,17 +271,17 @@ async function rollWeaponEcho(actor, attempt = 0) {
   if (!proceed) return;
 
   if (label === "Scar") {
-    const echoId = await findEchoKeyByMatch({ subtype: "scar", weaponType });
-    if (!echoId) return;
-    const created = await createBoundWeaponEcho(actor, echoId, weapon, weaponType, `Scar (${weapon.name})`);
+    const echoUuid = await findEchoUuidByMatch({ subtype: "scar", weaponType });
+    if (!echoUuid) return;
+    const created = await createBoundWeaponEcho(actor, echoUuid, weapon, weaponType, `Scar (${weapon.name})`);
     if (created?.duplicate) return rollWeaponEcho(actor, attempt + 1);
     return;
   }
 
   if (label === "Reinforcement" || label === "Honing" || label === "Secret") {
-    const echoId = await findEchoKeyByMatch({ subtype: label.toLowerCase() });
-    if (!echoId) return;
-    const created = await createBoundWeaponEcho(actor, echoId, weapon, weaponType, `${label} (${weapon.name})`);
+    const echoUuid = await findEchoUuidByMatch({ subtype: label.toLowerCase() });
+    if (!echoUuid) return;
+    const created = await createBoundWeaponEcho(actor, echoUuid, weapon, weaponType, `${label} (${weapon.name})`);
     if (created?.duplicate) return rollWeaponEcho(actor, attempt + 1);
   }
 }
@@ -337,9 +297,9 @@ async function rollMalignancyEcho(actor, attempt = 0) {
     });
     if (!pick) return;
     await actor.update({ "system.malignancy": pick });
-    const infectionId = await findEchoKeyByMatch({ subtype: "infection" });
-    const created = infectionId
-      ? await createEchoFromCompendium(actor, infectionId, { name: `Infection (${pick})`, system: { malignancy: pick } })
+    const infectionUuid = await findEchoUuidByMatch({ subtype: "infection" });
+    const created = infectionUuid
+      ? await addEchoFromUuid(actor, infectionUuid, { name: `Infection (${pick})`, system: { malignancy: pick } })
       : null;
     if (created?.duplicate) return rollMalignancyEcho(actor, attempt + 1);
     if (created) {
@@ -359,8 +319,8 @@ async function rollMalignancyEcho(actor, attempt = 0) {
     echoRollLine(result, corruption, trophyMod),
     `Result: <strong>${esc(label || "None")}</strong>.`,
   ]);
-  const echoId = await findEchoKeyByMatch({ subtype: label.toLowerCase(), malignancy });
-  if (!echoId) return;
+  const echoUuid = await findEchoUuidByMatch({ subtype: label.toLowerCase(), malignancy });
+  if (!echoUuid) return;
   const proceed = await confirmDialog({
     title: "Malignancy Echo",
     bodyHtml: `<p>Malignancy: <strong>${esc(malignancy)}</strong>.</p><p>Result: <strong>${esc(label)}</strong> (rolled ${result?.total ?? "?"}).</p>`,
@@ -368,7 +328,7 @@ async function rollMalignancyEcho(actor, attempt = 0) {
     noLabel: "Cancel",
   });
   if (!proceed) return;
-  const created = await createEchoFromCompendium(actor, echoId);
+  const created = await addEchoFromUuid(actor, echoUuid);
   if (created?.duplicate) return rollMalignancyEcho(actor, attempt + 1);
   if (created) await postEchoGained(actor, created);
 }

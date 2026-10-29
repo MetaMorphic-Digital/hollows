@@ -1,8 +1,22 @@
 {
   "HOLLOWS": {
     "REFUGE": {
+      "tabs": {
+        "actions": "Actions",
+        "resources": "Resources",
+        "residents": "Residents"
+      },
+      "npcRoles": {
+        "keeper": "Keeper",
+        "doctor": "Doctor",
+        "apprentice": "Apprentice",
+        "smith": "Smith",
+        "magus": "Magus"
+      },
       "upgrades": "Upgrades",
       "category": "Category",
+      "additionalSettings": "Additional Settings",
+      "hideAdditionalSettings": "Hide Additional Settings",
       "default": "Starting Upgrade",
       "defaultHint": "Added automatically when a new Refuge is created.",
       "categories": {
@@ -31,7 +45,7 @@
       "anchorPayment": "Pay Bone or Sacrifice an Unused Relic",
       "anchorPayBone": "Pay the action's Bone cost",
       "anchorName": "Anchor: {name}",
-      "anchorUnavailable": "Use this Anchor in combat, from a Close area, against its chosen Entity at 0 Resolve. The Entity must not already be Anchored.",
+      "anchorUnavailable": "Use this Anchor in combat, from a Close area, against its chosen Entity at 0 Resolve. The bearer must not be Dying or dead, and the Entity must not already be Anchored.",
       "anchorSuccess": "{name} is Anchored: all Defences and maximum Resolve reduced by {penalty}. The Anchor is consumed. No Heart is awarded when this Entity is defeated.",
       "anchoredEntities": "Entities Held in the Refuge",
       "researchAdvantage": "Advantage When Uncovering an Edge",
@@ -139,7 +153,11 @@
       "use": "Use",
       "available": "Available",
       "locked": "Locked",
-      "noUpgrades": "No upgrades installed. Buy an upgrade or drag one onto this sheet."
+      "noUpgrades": "No upgrades installed. Buy an upgrade or drag one onto this sheet.",
+      "resupply": "Resupply",
+      "unlockExploration": "Unlock Exploration Equipment",
+      "unlockBattle": "Unlock Battle Equipment",
+      "deleteUpgrade": "Delete"
     },
     "SCRIPT": {
       "modes": {
@@ -458,6 +476,97 @@
       "errorZone": "{zone}: placement rules do not allow Threat here.",
       "errorRuleTotal": "{rule}: at most {max} Threat.",
       "errorRuleZone": "{rule}: at most {max} Threat per zone."
+    },
+    "EQUIPMENT": {
+      "category": "Category",
+      "exploration": "Exploration Equipment",
+      "battle": "Battle Equipment",
+      "effect": "Effects",
+      "used": "Exhausted",
+      "slotsFull": "There is no free equipment slot.",
+      "duplicate": "You cannot carry the same piece of equipment twice.",
+      "nothingToUnlock": "All available equipment of this kind is already unlocked.",
+      "chooseUpTo": "Choose up to {limit} different items.",
+      "replaceRelic": "This loadout uses the slot occupied by your Relic or Anchor. Replace it?",
+      "missingItem": "The selected equipment is no longer available.",
+      "resupplied": "{name} replenishes their equipment.",
+      "stock": "Unlocked Equipment",
+      "removeStock": "Remove {name} from the unlocked equipment? Carried copies will remain equipped.",
+      "stockHint": "Carried equipment is added when a Hunter enters. The GM can also drop Equipment here to unlock it.",
+      "extraSlots": "Additional Equipment Slot",
+      "towards": "Towards the Entity",
+      "away": "Away from the Entity",
+      "addEffect": "Add Effect",
+      "trigger": "When to Use",
+      "zone": "Bearer Must Be In",
+      "resolveCost": "Resolve Cost",
+      "triggers": {
+        "onUse": "Manual use",
+        "combatStart": "At combat start",
+        "weaponEmpty": "When a weapon becomes empty",
+        "entityManoeuvre": "Before an Entity manoeuvre",
+        "entityRestore": "Before the Entity restores Resolve"
+      },
+      "zones": {
+        "any": "Any area",
+        "close": "Close",
+        "ranged": "Ranged",
+        "support": "Support"
+      },
+      "effects": {
+        "resource": "Restore or lose health",
+        "capacity": "Restore weapon capacity",
+        "nextAttack": "Modify the next weapon attack",
+        "condition": "Add or remove a condition",
+        "threat": "Change Threat",
+        "cancelAction": "Cancel the Entity manoeuvre",
+        "recovery": "Multiply Entity Resolve recovery",
+        "movement": "Movement reminder"
+      },
+      "target": "Affected Hunters",
+      "targets": {
+        "self": "Bearer",
+        "chosen": "Choose a Hunter",
+        "zone": "Hunters in the bearer's area",
+        "close": "Hunters in Close",
+        "all": "All Hunters on the scene"
+      },
+      "resource": "Resource",
+      "resourceMode": "Change",
+      "resourceModes": {
+        "heal": "Heal",
+        "full": "Heal to maximum",
+        "temporary": "Add temporary points",
+        "lose": "Lose points"
+      },
+      "amount": "Amount",
+      "weaponTypes": "Weapon Types (empty means any)",
+      "fullCapacity": "Refill completely",
+      "resolveDamage": "Resolve Damage",
+      "woundDamage": "Wound Damage",
+      "condition": "Condition",
+      "conditionMode": "Change",
+      "addCondition": "Add",
+      "removeCondition": "Remove",
+      "freeTerrain": "Does not affect the terrain pool",
+      "insufficientTerrain": "Not enough {condition} tokens in the terrain pool.",
+      "threatMode": "Threat Change",
+      "threatModes": {
+        "remove": "Remove a chosen amount",
+        "towards": "Shift all Threat one area towards the bearer"
+      },
+      "multiplier": "Recovery Multiplier (rounded down)",
+      "direction": "Direction",
+      "chooseDirection": "Choose when used",
+      "attack": "Make an attack",
+      "attackStat": "Attack With",
+      "defence": "Against",
+      "requiresZone": "You must be in {zone} to use this equipment.",
+      "noWeapon": "No equipped weapon matches this effect.",
+      "shiftHint": "<p>Shift each area's Threat to an adjacent area towards {zone}. Threat already in your area stays there.</p>",
+      "moveTowards": "Reposition all Hunters towards the Entity.",
+      "moveAway": "Reposition all Hunters away from the Entity.",
+      "incompatibleTrigger": "{effect} requires a different trigger. Change the trigger or remove the effect."
     }
   },
   "TYPES": {
@@ -483,6 +592,5 @@
       "weaponForm": "Weapon Form"
     }
   },
-
   "hollows.HollowsJournalEntrySheet": "Hollows - Journal Entry Sheet"
 }

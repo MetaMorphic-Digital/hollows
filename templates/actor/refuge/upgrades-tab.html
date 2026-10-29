@@ -15,7 +15,9 @@
           </div>
           {{#if @root.editable}}
             <button type="button" class="stat-roll" data-action="editUpgrade" data-item-id="{{upgrade.id}}">{{localize "HOLLOWS.REFUGE.edit"}}</button>
-            <button type="button" class="stat-roll danger" data-action="removeUpgrade" data-item-id="{{upgrade.id}}">{{localize "HOLLOWS.REFUGE.remove"}}</button>
+          {{/if}}
+          {{#if @root.isGM}}
+            <button type="button" class="stat-roll danger" data-action="removeUpgrade" data-item-id="{{upgrade.id}}">{{localize "HOLLOWS.REFUGE.deleteUpgrade"}}</button>
           {{/if}}
         </div>
         <div class="ability-text">{{upgrade.text}}</div>

@@ -5,22 +5,54 @@
       <div class="subline">Hollows Equipment</div>
     </div>
     <div class="header-portrait">
-      <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
+      <img src="{{item.img}}" data-action="editImage" data-edit="img" alt="{{item.name}}" />
     </div>
   </header>
 
   <section class="sheet-section">
     <h2>Details</h2>
-    <div class="hollows-form-row">
-      <div class="stat-label">Category</div>
-      <select name="system.category">
-        <option value="exploration" {{#if (eq system.category "exploration")}}selected{{/if}}>Exploration</option>
-        <option value="battle" {{#if (eq system.category "battle")}}selected{{/if}}>Battle</option>
-      </select>
-    </div>
-    <div class="hollows-form-section">
-      <h3>Description</h3>
-      <textarea name="system.text" rows="10">{{system.text}}</textarea>
-    </div>
+    {{formGroup systemFields.category value=system.category label="HOLLOWS.EQUIPMENT.category" localize=true}}
+    {{#if (eq system.category "battle")}}
+      {{formGroup systemFields.used value=system.used label="HOLLOWS.EQUIPMENT.used" localize=true}}
+      {{formGroup systemFields.trigger value=system.trigger label="HOLLOWS.EQUIPMENT.trigger" localize=true}}
+      {{formGroup systemFields.zone value=system.zone label="HOLLOWS.EQUIPMENT.zone" localize=true}}
+      {{formGroup systemFields.resolveCost value=system.resolveCost label="HOLLOWS.EQUIPMENT.resolveCost" localize=true}}
+    {{/if}}
+  </section>
+
+  {{#if (eq system.category "battle")}}
+    <section class="sheet-section">
+      {{formGroup systemFields.attack.fields.enabled value=system.attack.enabled label="HOLLOWS.EQUIPMENT.attack" localize=true}}
+      {{#if system.attack.enabled}}
+        {{formGroup systemFields.attack.fields.stat value=system.attack.stat label="HOLLOWS.EQUIPMENT.attackStat" localize=true}}
+        {{formGroup systemFields.attack.fields.defence value=system.attack.defence label="HOLLOWS.EQUIPMENT.defence" localize=true}}
+        <div class="num-grid">
+          <label>{{localize "HOLLOWS.EQUIPMENT.resolveDamage"}}{{formInput systemFields.attack.fields.resolve value=system.attack.resolve}}</label>
+          <label>{{localize "HOLLOWS.EQUIPMENT.woundDamage"}}{{formInput systemFields.attack.fields.wounds value=system.attack.wounds}}</label>
+        </div>
+      {{/if}}
+    </section>
+
+    <section class="sheet-section">
+      <h3>{{localize "HOLLOWS.EQUIPMENT.effect"}}</h3>
+      {{#each effects}}
+        <div class="group-card">
+          <input type="hidden" name="system.effects.{{index}}.type" value="{{type}}" />
+          <div class="group-head">
+            <span>{{localize label}}</span>
+            <button type="button" class="stat-roll danger" data-action="removeEffect" data-index="{{index}}">{{localize "HOLLOWS.REFUGE.remove"}}</button>
+          </div>
+          {{#each fields}}
+            {{formGroup field value=value name=name options=options localize=true}}
+          {{/each}}
+        </div>
+      {{/each}}
+      <button type="button" class="group-add" data-action="addEffect">{{localize "HOLLOWS.EQUIPMENT.addEffect"}}</button>
+    </section>
+  {{/if}}
+
+  <section class="sheet-section">
+    <h3>Description</h3>
+    <textarea name="system.text" rows="6">{{system.text}}</textarea>
   </section>
 </form>

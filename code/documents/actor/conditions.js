@@ -4,29 +4,13 @@ import { setActorFlagSafe } from "../../utils/flag-utils.js";
 import { addTerrainPoolTag } from "../../canvas/terrain-pool.js";
 import { runGMQuery } from "../../helpers/queries.js";
 import { getEffectiveWeaponCapacity } from "../../data/weapons/index.js";
-import { getActiveSceneHunters, getActiveEntityActor } from "../../canvas/zone.js";
+import { getActiveEntityActor } from "../../canvas/zone.js";
 import { registerManoeuvreAvailabilityProvider } from "../../data/actions/manoeuvre-availability.js";
-import { applyInterceptors } from "../../helpers/extensions.js";
+import ScriptCompiler from "../item/script-compiler.mjs";
 
 const TERRAIN_TAG_KEYS = Object.freeze(
   Object.entries(HOLLOWS_CONDITIONS).filter(([, cfg]) => cfg?.terrain).map(([key]) => key),
 );
-
-/** Return the Staff owner associated with a Briar holder. */
-export function getBriarOwnerId(actor) {
-  return actor.getFlag("hollows", "briarOwnerId") || "";
-}
-
-/** Associate a Briar holder with its Staff owner, or clear the association. */
-export async function setBriarOwnerId(actor, ownerId = "") {
-  if (ownerId) await actor.setFlag("hollows", "briarOwnerId", ownerId);
-  else await actor.unsetFlag("hollows", "briarOwnerId");
-}
-
-/** Find the Hunter holding this owner's Briar on the current scene. */
-export function findBriarHolderByOwner(ownerId) {
-  return getActiveSceneHunters().find(actor => actor.statuses.has("briar") && (getBriarOwnerId(actor) === ownerId)) || null;
-}
 
 export function getConditionEffects(actor, key) {
   const cfg = HOLLOWS_CONDITIONS[key];
@@ -59,7 +43,7 @@ export async function removeCondition(actor, key, opts = {}) {
   const existing = getConditionEffects(actor, key);
   if (!existing.length) return;
 
-  const destroyed = opts.destroyed && await applyInterceptors("terrain-destroy", { actor, key }, true);
+  const destroyed = opts.destroyed && await ScriptCompiler.runInterceptors("terrain-destroy", { actor, key }, true);
   const ids = existing.map(e => e.id);
   await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
 

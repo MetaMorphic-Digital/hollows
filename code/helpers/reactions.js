@@ -1,58 +1,26 @@
-/**
- * Reaction registry — collects all `Reaction` instances declared across the
- * codebase and registers their player-side handlers with CONFIG.queries.
- */
+/** Player-side handlers for Baptism and granted manoeuvres. */
 
 import { Reaction } from "../data/mechanics/Reaction.js";
-import { MECHANIC_BUCKETS } from "./mechanic-registry.js";
 import { BAPTISM_REWARD } from "../documents/entity/baptism.js";
 import { GRANT_MANOEUVRE } from "../data/actions/index.js";
 
-// GRANT_MANOEUVRE (generic "grant a manoeuvre") and BAPTISM_REWARD (entity
-// reward) are general reactions, not weapon abilities — they stay named here.
-// Weapon-ability reactions are NOT named-exported: resolve them by key via
-// getReactionByKey so the lookup tracks the full bucket registry, not a manual
-// list that silently drifts out of sync.
 export {
   Reaction,
   BAPTISM_REWARD,
   GRANT_MANOEUVRE
 };
 
-// Built lazily (a function, not a module-eval const) so every cross-module
-// reaction import is initialised before the list is read — avoids a
-// circular-import temporal-dead-zone error.
+/** Resolve the system reactions after their modules have initialized. */
 export function getAllReactions() {
   return [
-    ...MECHANIC_BUCKETS.reactions,
     BAPTISM_REWARD,
     GRANT_MANOEUVRE,
   ];
 }
 
+/** Install the system reactions in the query handlers. */
 export function registerReactions(registerHandler) {
-  for (const reaction of getAllReactions()) {
-    // Defensive: an accidental non-Reaction in the list (e.g. an OnAttackResultAction
-    // mixed in by mistake) would throw and abort the loop, leaving every Reaction
-    // after it unregistered. Skip with a warning instead.
-    if (typeof reaction?.register !== "function") {
-      console.warn("Hollows | reactions list contains non-Reaction entry, skipping:", reaction?.key, reaction);
-      continue;
-    }
-    try {
-      reaction.register(registerHandler);
-    } catch (err) {
-      console.error("Hollows | Reaction register failed:", reaction?.key, err);
-    }
-  }
-}
-
-// Resolve a Reaction instance by its `key` from the full reaction registry.
-// Single source of truth for reaction-routed mechanics (OnDefenceResultAction,
-// IncomingDamageModifier). Returns null if not found.
-export function getReactionByKey(key) {
-  if (!key) return null;
-  return getAllReactions().find((reaction) => reaction.key === String(key)) || null;
+  for (const reaction of getAllReactions()) reaction.register(registerHandler);
 }
 
 export function primaryOwnerOf(actor) {
