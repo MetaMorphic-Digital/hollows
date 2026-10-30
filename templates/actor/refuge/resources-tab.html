@@ -1,5 +1,5 @@
 <section class="sheet-section">
-  <h2>Resources</h2>
+  <h2>{{localize "HOLLOWS.REFUGE.tabs.resources"}}</h2>
   <div class="health-grid">
     <div class="health-row">
       <div class="health-label">Bone</div>
@@ -10,6 +10,21 @@
       <input type="number" name="system.resources.hearts" value="{{system.resources.hearts}}" />
     </div>
   </div>
+  {{formGroup systemFields.anchoredEntities value=system.anchoredEntities options=entityChoices label="HOLLOWS.REFUGE.anchoredEntities" localize=true}}
+</section>
+<section class="sheet-section">
+  <h2>{{localize "HOLLOWS.EQUIPMENT.stock"}}</h2>
+  <p class="muted">{{localize "HOLLOWS.EQUIPMENT.stockHint"}}</p>
+  {{#each equipmentStock}}
+    <div class="hollows-form-row">
+      <strong>{{name}}</strong>
+      <span>{{localize category}}</span>
+      {{#if @root.editable}}
+        <button type="button" class="stat-roll compact" data-action="editEquipment" data-item-id="{{id}}">Edit</button>
+        <button type="button" class="stat-roll danger compact" data-action="removeEquipment" data-item-id="{{id}}">Remove</button>
+      {{/if}}
+    </div>
+  {{/each}}
 </section>
 <section class="sheet-section">
   <h2>Notes</h2>

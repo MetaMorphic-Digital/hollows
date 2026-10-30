@@ -102,17 +102,22 @@
         <div class="stat-grid">
           {{#each system.stats as |value key|}}
             <div class="stat-row">
-              <div class="stat-label">{{lookup ../statLabels key}}</div>
+              <div class="stat-label">
+                {{lookup ../statLabels key}}
+                {{#with (lookup ../renewStats key) as |renew|}}
+                  {{#if renew.bonus}}<small class="muted">{{localize "HOLLOWS.REFUGE.renewAction"}} +{{renew.bonus}}</small>{{/if}}
+                {{/with}}
+              </div>
               <div class="stat-total">{{lookup ../statsTotal key}}</div>
               <div class="stat-base">
                 <div class="stat-base-label">Base</div>
                 <input class="stat-input" type="number" name="system.stats.{{key}}" value="{{value}}" />
               </div>
               <div class="stat-marks" data-stat="{{key}}">
-                {{#with (lookup ../system.statsMarks key) as |marks|}}
-                  <span class="stat-mark {{#if (gt marks 0)}}filled{{/if}}"></span>
-                  <span class="stat-mark {{#if (gt marks 1)}}filled{{/if}}"></span>
-                  <span class="stat-mark {{#if (gt marks 2)}}filled{{/if}}"></span>
+                {{#with (lookup ../renewStats key) as |renew|}}
+                  {{#each renew.marks as |filled|}}
+                    <span class="stat-mark {{#if filled}}filled{{/if}}"></span>
+                  {{/each}}
                 {{/with}}
               </div>
               <button type="button" class="stat-roll" data-roll="{{key}}">Roll</button>
@@ -125,24 +130,32 @@
         <h2>Equipment</h2>
         <div class="hollows-form-section">
           <h3>Exploration</h3>
-          {{#if equipmentSlots.exploration}}
-            <div class="hollows-form-value"><strong>{{equipmentSlots.exploration.name}}</strong></div>
-            <div class="hollows-form-value multiline">{{equipmentSlots.exploration.system.text}}</div>
-          {{else}}
-            <div class="muted">None selected.</div>
-          {{/if}}
-        </div>
-        <div class="hollows-form-section">
-          <h3>Battle</h3>
-          {{#if equipmentSlots.battle}}
-            <div class="hollows-form-value"><strong>{{equipmentSlots.battle.name}}</strong></div>
-            <div class="hollows-form-value multiline">{{equipmentSlots.battle.system.text}}</div>
+          {{#each equipmentSlots.exploration}}
+            <div class="hollows-form-value"><strong>{{name}}</strong></div>
+            <div class="hollows-form-value multiline">{{system.text}}</div>
             <div class="equipment-actions">
-              <button type="button" class="stat-roll danger compact" data-action="delete-equipment" data-slot="battle">Delete</button>
+              <button type="button" class="stat-roll danger compact" data-action="delete-equipment" data-item-id="{{id}}">Delete</button>
             </div>
           {{else}}
             <div class="muted">None selected.</div>
-          {{/if}}
+          {{/each}}
+        </div>
+        <div class="hollows-form-section">
+          <h3>Battle</h3>
+          {{#each equipmentSlots.battle}}
+            <div class="hollows-form-value"><strong>{{name}}</strong> {{#if system.used}}({{localize "HOLLOWS.EQUIPMENT.used"}}){{/if}}</div>
+            <div class="hollows-form-value multiline">{{system.text}}</div>
+            <div class="equipment-actions">
+              {{#if @root.canUseBattleEquipment}}
+                {{#if system.hasManualUse}}
+                  <button type="button" class="stat-roll compact" data-action="use-equipment" data-item-id="{{id}}" {{disabled system.used}}>Use</button>
+                {{/if}}
+              {{/if}}
+              <button type="button" class="stat-roll danger compact" data-action="delete-equipment" data-item-id="{{id}}">Delete</button>
+            </div>
+          {{else}}
+            <div class="muted">None selected.</div>
+          {{/each}}
         </div>
         <div class="hollows-form-section">
           <h3>Relic</h3>
@@ -155,7 +168,7 @@
               {{else}}
                 <button type="button" class="stat-roll compact" data-action="chat-relic">Chat</button>
               {{/if}}
-              <button type="button" class="stat-roll danger compact" data-action="delete-equipment" data-slot="relic">Delete</button>
+              <button type="button" class="stat-roll danger compact" data-action="delete-equipment">Delete</button>
             </div>
           {{else}}
             <div class="muted">None selected.</div>

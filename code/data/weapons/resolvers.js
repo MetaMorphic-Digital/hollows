@@ -1,4 +1,18 @@
 import WeaponFormData from "../items/weapon-form.mjs";
+import { ItemCatalog } from "../item-catalog.js";
+
+/** Load the available Weapon templates. */
+export async function getWeaponPackDocs() {
+  return ItemCatalog.getDocuments("weapon");
+}
+
+/** Read weapon types from visible compendiums, including types already stored on the item. */
+export async function getWeaponTypeChoices(extraTypes = []) {
+  const weapons = await ItemCatalog.getIndex("weapon");
+  const types = new Set(weapons.map(weapon => weapon.system.weaponType));
+  for (const type of extraTypes) if (type) types.add(type);
+  return Object.fromEntries([...types].sort().map(type => [type, type]));
+}
 
 function getWeaponType(weaponOrType) {
   if (typeof weaponOrType === "string") return weaponOrType;

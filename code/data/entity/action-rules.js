@@ -23,7 +23,7 @@ import { getTotalStatForActor } from "../../documents/actor/hunter-combat.js";
 import { doesEntitySpecialConditionApply, getEffectiveEntityStat, isEntityEngineAbilityActive, resolveEntitySourceValue, resolvePassiveAmount } from "../../documents/entity/entity-stats.js";
 import { getEntityEngineAbilities } from "./resolvers.js";
 import { entityAbilityModifyDelta } from "../relic/passive.js";
-import { getEntitySelfActionDamageDelta, getEntitySelfActionTNDelta } from "../../helpers/entity-dispatchers.js";
+import { getEnhancementBuilderActionDamageDelta, getEnhancementBuilderActionTNDelta } from "../../documents/entity/enhancement-builder-passive.js";
 import { getEntityActionCost, getEntityInterruptCost } from "../../documents/entity/entity-threat.js";
 import { isFailureOutcomeLabel, isSuccessOutcomeLabel } from "../../dice/roll-outcome.js";
 
@@ -110,9 +110,9 @@ function getEntityPassiveSpecialActionBonus(entityActor, actionItem = null, targ
 function getEntityActionDamageBonus(entityActor, actionItem = null, targetToken = null, actionKind = "attack") {
   let resolve = 0;
   let wounds = 0;
-  const registered = getEntitySelfActionDamageDelta(entityActor, { actionItem, targetToken, actionKind });
-  resolve += registered.resolve;
-  wounds += registered.wounds;
+  const enhancement = getEnhancementBuilderActionDamageDelta(entityActor, { actionItem, targetToken, actionKind });
+  resolve += enhancement.resolve;
+  wounds += enhancement.wounds;
   const passive = getEntityPassiveSpecialActionBonus(entityActor, actionItem, targetToken, actionKind);
   resolve += passive.resolve;
   wounds += passive.wounds;
@@ -126,7 +126,7 @@ function getEntityActionTNBonus(entityActor, actionItem = null, targetToken = nu
   const context = getEntityActionPassiveContext(actionItem, targetToken, actionKind);
   const base = getActivePassiveSpecials(entityActor, ["actionsTN"], context)
     .reduce((total, passive) => total + resolvePassiveAmount(passive, "single", entityActor), 0);
-  return base + entityAbilityModifyDelta(entityActor, actionItem?.id).tn + getEntitySelfActionTNDelta(entityActor, context);
+  return base + entityAbilityModifyDelta(entityActor, actionItem?.id).tn + getEnhancementBuilderActionTNDelta(entityActor, context);
 }
 
 // ─── Damage resolution ──────────────────────────────────────────────────────────

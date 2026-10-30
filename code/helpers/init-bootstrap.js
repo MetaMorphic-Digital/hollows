@@ -11,7 +11,7 @@ import { registerTerrainDiscardProvider } from "../data/actions/terrain-discard-
 import { registerManoeuvreAvailabilityProvider } from "../data/actions/manoeuvre-availability.js";
 import { registerThreatEnhancementModifier } from "../documents/entity/entity-threat.js";
 import HunterData from "../data/actors/hunter.mjs";
-import { registerService } from "./extensions.js";
+import BattleEquipment from "../documents/item/battle-equipment.mjs";
 
 export function runHollowsInit() {
   console.log("Hollows | System init (Blackjack Engine)");
@@ -32,6 +32,7 @@ export function runHollowsInit() {
   preloadHollowsTemplates();
 
   registerQueries();
+  BattleEquipment.register();
   registerScriptProviders();
 
   if (!game.hollows) game.hollows = {};
@@ -78,17 +79,6 @@ function registerScriptProviders() {
   registerThreatEnhancementModifier((actor, value) => {
     for (const mechanic of ScriptCompiler.getProviders("threatEnhancement", actor)) {
       value = mechanic.run(actor, { value }) ?? value;
-    }
-    return value;
-  });
-  registerService("scriptInterceptors", async (event, ctx, value) => {
-    for (const mechanic of ScriptCompiler.getProviders("interceptor", ctx.actor, ctx.item)) {
-      if (mechanic.event !== event) continue;
-      const actor = ctx.actor ?? mechanic.carrier;
-      const carrier = mechanic.matchCarrier ? mechanic.matchCarrier(actor, { ...ctx, value }) : mechanic.carrier;
-      if (!carrier) continue;
-      const result = await mechanic.run(actor, { ...ctx, carrier, value });
-      if (result != null) value = result;
     }
     return value;
   });

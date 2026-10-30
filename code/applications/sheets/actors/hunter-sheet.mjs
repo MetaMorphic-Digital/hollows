@@ -1,4 +1,6 @@
+import { ItemCatalog } from "../../../data/item-catalog.js";
 import { STAT_LABELS } from "../../../data/_module.mjs";
+import { getPrimaryRefugeActor } from "../../../data/refuge/resolvers.js";
 import { getActorZone } from "../../../canvas/zone.js";
 import { getTotalStatForActor } from "../../../documents/actor/hunter-combat.js";
 import { adjustHunterResource, getFocusCount, getFocusLimit } from "../../../documents/actor/resources.js";
@@ -14,12 +16,12 @@ import { getWeaponStatModsForActor } from "../../../data/actor-models.js";
 import { cleanupWeaponAbilitiesForActor, isShotgunWeapon } from "../../../helpers/weapon-utils.js";
 import { addCondition, removeCondition } from "../../../documents/actor/conditions.js";
 import { getActiveCurseConfig } from "../../../canvas/overlays.js";
-import { deleteHunterEquipmentSlot, getHunterEquipmentItemForSlot } from "../../../documents/actor/hunter-equipment.js";
+import { deleteHunterEquipmentSlot, getHunterEquipmentItemForSlot, getHunterEquipmentItemsForSlot } from "../../../documents/actor/hunter-equipment.js";
 import { activeRelicEffect } from "../../../documents/item/relic-cypher.js";
 import { postEffectTextChat, relicHasActiveUse, runEffectGroups } from "../../../data/relic/apply-effect.js";
 import {
-  addEchoById, applySeedEchoEffect,
-  getEchoPacks, hasEchoRollContent, rollEchoFlow,
+  addEchoFromUuid, applySeedEchoEffect,
+  hasEchoRollContent, rollEchoFlow,
 } from "../../../documents/actor/echo.js";
 import { hasEchoRestriction } from "../../../data/echo/index.js";
 import { isNewHunterActor, openCharacterCreationWizard } from "../../apps/character-creation.mjs";
@@ -119,6 +121,11 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     data.actor = this.actor;
     data.system = this.actor.system;
     data.statLabels = STAT_LABELS;
+    const renewMarks = getPrimaryRefugeActor()?.system.benefits.renewMarks ?? 3;
+    data.renewStats = Object.fromEntries(Object.keys(this.actor.system.stats).map(stat => [stat, {
+      marks: Array.from({ length: renewMarks }, (_, index) => index < this.actor.system.statsMarks[stat]),
+      bonus: this.actor.system.getRenewBonus(stat),
+    }]));
     const statMods = getWeaponStatModsForActor(this.actor);
     data.statMods = statMods;
     data.statsTotal = Object.fromEntries(
@@ -182,25 +189,26 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     data.isDead = this.actor.statuses.has("dead");
     data.isNewHunter = isNewHunterActor(this.actor);
     data.combatStarted = !!game.combat?.started;
+    data.canUseBattleEquipment = data.combatStarted && !data.isDead && !data.isDying;
     data.currentZone = getActorZone(this.actor);
     data.isInSupport = data.currentZone === "Support";
     data.focusCount = getFocusCount(this.actor);
     data.focusLimit = getFocusLimit(this.actor);
     const relic = getHunterEquipmentItemForSlot(this.actor, "relic");
     data.equipmentSlots = {
-      exploration: getHunterEquipmentItemForSlot(this.actor, "exploration"),
-      battle: getHunterEquipmentItemForSlot(this.actor, "battle"),
+      exploration: getHunterEquipmentItemsForSlot(this.actor, "exploration"),
+      battle: getHunterEquipmentItemsForSlot(this.actor, "battle"),
       relic,
     };
     data.relicText = relic ? activeRelicEffect(relic).text || "" : "";
-    data.relicHasUse = relicHasActiveUse(relic);
+    data.relicHasUse = relic?.system.anchor.enabled || relicHasActiveUse(relic);
     const echoes = this.actor.items.filter(i => i.type === "echo");
     data.echoes = {
       boons: echoes.filter(e => String(e.system?.echoType || "") === "boon"),
       banes: echoes.filter(e => String(e.system?.echoType || "") === "bane"),
     };
     data.echoCounts = { boon: data.echoes.boons.length, bane: data.echoes.banes.length };
-    data.canRollEcho = hasEchoRollContent();
+    data.canRollEcho = await hasEchoRollContent();
     data.malignancy = this.actor.system?.malignancy || "";
     data.isGM = !!game.user?.isGM;
     return data;
@@ -211,8 +219,6 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     await super._onRender(context, options);
     const wc = this.element.querySelector(".window-content");
     wc?.classList.add("hollows-sheet");
-
-    this._renderEquipmentDeleteButtons(this.element);
 
     if (this.isEditable) {
       this.element.querySelector("[data-edit=\"img\"]")?.addEventListener("click", () => {
@@ -249,31 +255,13 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     bind("[data-action='use-relic']", this._onUseRelic);
     bind("[data-action='chat-relic']", this._onChatRelic);
     bind("[data-action='delete-equipment']", this._onDeleteEquipment);
+    bind("[data-action='use-equipment']", this._onUseEquipment);
     bind("[data-action='roll-echo']", this._onRollEcho);
     bind("[data-action='add-echo']", this._onAddEcho);
     bind("[data-action='echo-toggle']", this._onToggleEcho);
     bind("[data-action='echo-delete']", this._onDeleteEcho);
     bind("[data-action='echo-trigger']", this._onTriggerEcho);
     bind("[data-action='echo-reset']", this._onResetEchoes);
-  }
-
-  /** Add delete controls for equipped gear. */
-  _renderEquipmentDeleteButtons(html) {
-    const sections = html.querySelectorAll(".sheet-section.equipment .hollows-form-section");
-    const explorationSection = sections[0];
-    const relicUseButton = sections[2]?.querySelector("[data-action='use-relic']");
-    if (relicUseButton) relicUseButton.classList.toggle("muted", !!relicUseButton.disabled);
-    if (getHunterEquipmentItemForSlot(this.actor, "exploration") && explorationSection) {
-      let actions = explorationSection.querySelector(".equipment-actions");
-      if (!actions) {
-        actions = document.createElement("div");
-        actions.className = "equipment-actions";
-        explorationSection.appendChild(actions);
-      }
-      if (!actions.querySelector("[data-slot='exploration']")) {
-        actions.insertAdjacentHTML("beforeend", "<button type=\"button\" class=\"stat-roll danger compact\" data-action=\"delete-equipment\" data-slot=\"exploration\">Delete</button>");
-      }
-    }
   }
 
   /** Stop actions blocked by a Burden. */
@@ -412,6 +400,10 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
 
   /** Resolve a relic effect. */
   async _useRelicEffect(item) {
+    if (item.system.anchor.enabled) {
+      const { default: Anchor } = await import("../../../documents/item/anchor.mjs");
+      return Anchor.use(item);
+    }
     const eff = activeRelicEffect(item);
     await postEffectTextChat(item, {
       speaker: ChatMessage.getSpeaker({ actor: this.actor }),
@@ -432,8 +424,9 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
   /** Delete equipped gear. */
   async _onDeleteEquipment(event) {
     event.preventDefault();
-    const slot = String(event.currentTarget.dataset.slot || "");
-    if (!["exploration", "battle", "relic"].includes(slot)) return;
+    const itemId = event.currentTarget.dataset.itemId;
+    if (itemId) return this.actor.items.get(itemId).delete();
+    const slot = "relic";
     const item = getHunterEquipmentItemForSlot(this.actor, slot);
     if (!item) {
       ui.notifications.warn("No equipment in that slot.");
@@ -442,6 +435,12 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     const removed = await deleteHunterEquipmentSlot(this.actor, slot);
     if (!removed) return;
     ui.notifications.info(`${item.name} removed.`);
+  }
+
+  /** Use the selected Battle Equipment on the active GM. */
+  async _onUseEquipment(event) {
+    const { default: BattleEquipment } = await import("../../../documents/item/battle-equipment.mjs");
+    await BattleEquipment.use(this.actor.items.get(event.currentTarget.dataset.itemId));
   }
 
   /** Post relic text without using it. */
@@ -468,13 +467,10 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
       ui.notifications.warn("Only the GM can add Echoes directly.");
       return;
     }
-    const packOptions = [];
-    for (const pack of getEchoPacks()) {
-      const index = await pack.getIndex();
-      for (const entry of index) packOptions.push(`<option value="${entry._id}">${entry.name}</option>`);
-    }
-    const worldOptions = (game.items?.filter(i => i.type === "echo") || [])
-      .map(i => `<option value="${i.id}">${i.name}</option>`);
+    const entries = await ItemCatalog.getIndex("echo");
+    const packOptions = entries.map(item => `<option value="${item.uuid}">${foundry.utils.escapeHTML(item.name)}</option>`);
+    const worldOptions = game.items.filter(item => (item.type === "echo") && item.visible)
+      .map(item => `<option value="${item.uuid}">${foundry.utils.escapeHTML(item.name)}</option>`);
     if (!packOptions.length && !worldOptions.length) {
       ui.notifications.warn("No Echoes available in compendiums or world items.");
       return;
@@ -487,21 +483,21 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
         <form class="hollows-roll-dialog">
           <div class="form-group">
             <label>Echo</label>
-            <select name="echoId">${groups}</select>
+            <select name="echoUuid">${groups}</select>
           </div>
         </form>
       `;
-    const pickId = await foundry.applications.api.DialogV2.wait({
+    const echoUuid = await foundry.applications.api.DialogV2.wait({
       window: { title: "Add Echo" },
       content: echoContent,
       buttons: [
-        { action: "add", label: "Add", default: true, callback: (_e, _b, dialog) => String(dialog.element.querySelector("[name=echoId]")?.value || "") },
+        { action: "add", label: "Add", default: true, callback: (_e, _b, dialog) => String(dialog.element.querySelector("[name=echoUuid]")?.value || "") },
         { action: "cancel", label: "Cancel", callback: () => null },
       ],
       rejectClose: false,
     }) ?? "";
-    if (!pickId) return;
-    await addEchoById(this.actor, pickId);
+    if (!echoUuid) return;
+    await addEchoFromUuid(this.actor, echoUuid);
   }
 
   /** Toggle Echo suppression. */

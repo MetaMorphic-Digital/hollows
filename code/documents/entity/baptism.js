@@ -3,7 +3,6 @@ import { getWeaponAbilityDocs, isDuplicateWeaponAbility, grantWeaponAbilityToHun
 import { addRefugeResources } from "../actor/refuge.js";
 import { evaluateResult } from "../../dice/roll-outcome.js";
 import { getActiveEntityActor } from "../../canvas/zone.js";
-import { applyInterceptors } from "../../helpers/extensions.js";
 import { getTotalStatForActor } from "../actor/hunter-combat.js";
 import { adjustHunterResource } from "../actor/resources.js";
 import { Reaction } from "../../data/mechanics/Reaction.js";
@@ -269,7 +268,6 @@ export async function applyBaptismRecovery(hunters) {
 export async function resolveEntityKillRewardsFromMessage(message) {
   if (!game.user?.isGM || !message) return;
   const defeatedEntity = getActiveEntityActor();
-  if (!(await applyInterceptors("entity-kill-rewards", { entity: defeatedEntity }, true))) return;
   const hunters = (() => {
     const list = [];
     const seen = new Set();
@@ -318,7 +316,13 @@ export async function resolveEntityKillRewardsFromMessage(message) {
         default: true,
         callback: async (_e, _b, dialog) => {
           const isLord = !!dialog.element.querySelector("[name=isLord]")?.checked;
-          const resourcesOk = await addRefugeResources(isLord ? 5 : 3, isLord ? 1 : 0);
+          const anchored = defeatedEntity.statuses.has("anchored");
+          const extraBone = hunters.filter(hunter => hunter.system.refuge.heart.state === "open").length * 2;
+          const resourcesOk = await addRefugeResources((isLord ? 5 : 3) + extraBone, (isLord && !anchored) ? 1 : 0);
+          if (anchored && resourcesOk) {
+            const refuge = getPrimaryRefugeActor();
+            await refuge.update({ "system.anchoredEntities": [...new Set([...refuge.system.anchoredEntities, defeatedEntity.id])] });
+          }
           if (!resourcesOk) {
             ui.notifications.warn("No Refuge actor found. Create a Refuge actor to store Bone/Hearts.");
           }

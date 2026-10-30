@@ -7,7 +7,6 @@ export class OnDefenceResultAction extends Mechanic {
     this.result = config.result || "any";
     this.damageType = config.damageType || null;
     this.scope = config.scope || "self";
-    this.reaction = config.reaction || null;
     this.redirectsDamage = !!config.redirectsDamage;
     this.effects = Array.isArray(config.effects) ? config.effects : [];
   }

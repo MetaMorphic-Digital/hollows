@@ -34,7 +34,7 @@ import {
   getEntityAttackCost,
   promptEntityThreatEnhance,
 } from "../../../documents/entity/entity-threat.js";
-import { getEntitySelfActionTargetingOverride } from "../../../helpers/entity-dispatchers.js";
+import { getEnhancementBuilderActionTargetingOverride } from "../../../documents/entity/enhancement-builder-passive.js";
 import {
   runEntityActionPauses,
   runOnEntityAttack,
@@ -83,7 +83,7 @@ const attackPipeline = {
       ctx.selectedZones = [];
       return options.forcedTargets;
     }
-    const targetOverride = getEntitySelfActionTargetingOverride(ctx.entityActor, {
+    const targetOverride = getEnhancementBuilderActionTargetingOverride(ctx.entityActor, {
       actionItem: ctx.actionItem,
       actionConfig: ctx.action,
       actionKind: "attack",

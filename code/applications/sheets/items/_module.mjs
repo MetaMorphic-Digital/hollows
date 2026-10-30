@@ -3,6 +3,7 @@ export { default as HollowsEchoSheet } from "./echo-sheet.mjs";
 export { default as HollowsEntityAbilitySheet } from "./entity-ability-sheet.mjs";
 export { default as HollowsEntityEnhancementSheet } from "./entity-enhancement-sheet.mjs";
 export { default as HollowsEquipmentSheet } from "./equipment-sheet.mjs";
+export { default as HollowsRefugeUpgradeSheet } from "./refuge-upgrade-sheet.mjs";
 export { default as HollowsRelicSheet } from "./relic-sheet.mjs";
 export { default as HollowsRumourSheet } from "./rumour-sheet.mjs";
 export { default as HollowsWeaponAbilitySheet } from "./weapon-ability-sheet.mjs";

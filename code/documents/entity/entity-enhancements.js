@@ -1,5 +1,6 @@
 import { getEntityEnhancementItems } from "../../data/entity/resolvers.js";
-import { getContentPacks } from "../../helpers/extensions.js";
+import { ItemCatalog } from "../../data/item-catalog.js";
+import { getActiveSceneHunters } from "../../canvas/zone.js";
 import {
   configureEnhancementBuilder,
   getBuilderActionChoiceLabel,
@@ -119,20 +120,20 @@ export async function syncGeneratedEnhancementAbility(enhancementItem) {
 }
 
 export async function promptEntityEnhancementSelection() {
-  const packs = getContentPacks("entity-enhancements").map((id) => game.packs.get(id)).filter(Boolean);
-  const docs = (await Promise.all(packs.map((pack) => pack.getDocuments()))).flat();
-  const items = docs
-    .filter((doc) => doc.type === "entityEnhancement")
-    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+  const items = await ItemCatalog.getDocuments("entityEnhancement");
   if (!items.length) { ui.notifications.warn("No Entity Enhancements available."); return null; }
-  const options = items.map((doc) => `<option value="${doc.id}">${doc.name}</option>`).join("");
+  const options = items.map((doc) => `<option value="${doc.uuid}">${foundry.utils.escapeHTML(doc.name)}</option>`).join("");
+  const hunterCount = game.i18n.format("HOLLOWS.REFUGE.enhancementHunters", {
+    count: getActiveSceneHunters().reduce((count, hunter) => count + hunter.system.enhancementWeight, 0),
+  });
   return await foundry.applications.api.DialogV2.wait({
     window: { title: "Add Enhancement", width: 480 },
     content: `
         <form class="hollows-roll-dialog">
+          <p class="muted">${hunterCount}</p>
           <div class="form-group">
             <label>Enhancement</label>
-            <select name="enhancementId">${options}</select>
+            <select name="enhancementUuid">${options}</select>
           </div>
           <div class="form-group">
             <div class="muted" data-enhancement-meta></div>
@@ -146,19 +147,19 @@ export async function promptEntityEnhancementSelection() {
     render: (_e, dialog) => {
       const el = dialog.element;
       const update = () => {
-        const id = String(el.querySelector("[name=enhancementId]")?.value || "");
-        const doc = items.find((item) => item.id === id);
+        const uuid = String(el.querySelector("[name=enhancementUuid]")?.value || "");
+        const doc = items.find((item) => item.uuid === uuid);
         const category = String(doc?.system?.category || "default");
         const text = String(doc?.system?.text || "");
         el.querySelector("[data-enhancement-meta]").innerHTML = `<strong>${foundry.utils.escapeHTML(category)}</strong>`;
         el.querySelector("[data-enhancement-desc]").innerHTML = foundry.utils.escapeHTML(text).replace(/\n/g, "<br>");
       };
-      el.querySelector("[name=enhancementId]").addEventListener("change", update);
+      el.querySelector("[name=enhancementUuid]").addEventListener("change", update);
       update();
     },
     rejectClose: false,
     buttons: [
-      { action: "apply", label: "Add", default: true, callback: (_e, _b, dialog) => items.find((item) => item.id === String(dialog.element.querySelector("[name=enhancementId]")?.value || "")) || null },
+      { action: "apply", label: "Add", default: true, callback: (_e, _b, dialog) => items.find((item) => item.uuid === String(dialog.element.querySelector("[name=enhancementUuid]")?.value || "")) || null },
       { action: "cancel", label: "Cancel", callback: () => null }
     ]
   }) ?? null;

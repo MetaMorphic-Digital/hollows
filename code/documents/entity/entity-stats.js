@@ -1,7 +1,7 @@
 import { getActiveHollowActor, getActiveSceneHunterCount, getThreatInZone, getTokenZone, getZoneCurseValue, getZoneList, getHuntersInZone, sumCurseInZones, sumThreatInZones, sumCurseOnHunters } from "../../canvas/zone.js";
 import { getEntityTerrainTotal } from "../actor/conditions.js";
 import { computeEntityConditionFlags, evaluateEntityStateCondition } from "./entity-conditions.js";
-import { MECHANIC_BUCKETS } from "../../helpers/mechanic-registry.js";
+import { EDGE_MODIFIERS } from "../../data/entity/mechanics.js";
 import { getEntityStatDelta } from "../../helpers/weapon-abilities/dispatchers.js";
 import { relicEntityStatDelta } from "../../data/relic/passive.js";
 import { getEntityEngineAbilities } from "../../data/entity/resolvers.js";
@@ -185,7 +185,7 @@ export function getEntitySelfStatDelta(entityActor, stat, context = {}) {
     hunterCount: context.hunterCount ?? getActiveSceneHunterCount(),
   };
   let total = 0;
-  for (const modifier of MECHANIC_BUCKETS.entitySelfStatModifier || []) {
+  for (const modifier of EDGE_MODIFIERS) {
     if (!modifier.match(entityActor, { stat: key, context: state })) continue;
     total += modifier.value(entityActor, state);
   }

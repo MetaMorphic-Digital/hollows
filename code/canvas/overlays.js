@@ -183,8 +183,9 @@ export async function addCurseToZone(zoneId, amount = 1) {
 
 // ─── Curse / Threat shift (entity grid manoeuvres) ─────────────────────
 
-function nextHopTowardZone(start, goal) {
-  if (!start || !goal || start === goal) return null;
+/** Find adjacent Threat zones on the shortest paths to a destination. */
+export function nextHopsTowardZone(start, goal) {
+  if (!start || !goal || (start === goal)) return [];
   const dist = { [goal]: 0 };
   const queue = [goal];
   while (queue.length) {
@@ -194,13 +195,7 @@ function nextHopTowardZone(start, goal) {
       if (dist[nb] === undefined) { dist[nb] = dist[z] + 1; queue.push(nb); }
     }
   }
-  let best = null;
-  let bestDist = Infinity;
-  for (const nb of getAdjacentZones(start)) {
-    if (nb === "Support") continue;
-    if (dist[nb] !== undefined && dist[nb] < bestDist) { bestDist = dist[nb]; best = nb; }
-  }
-  return best;
+  return getAdjacentZones(start).filter(nb => isThreatZone(nb) && (dist[nb] === dist[start] - 1));
 }
 
 /**
@@ -229,7 +224,7 @@ export async function shiftGridResource({ resource = "threat", direction = "towa
       if (src === zone || src === "Support") continue;
       const n = cap(has(src));
       if (n <= 0) continue;
-      const dest = nextHopTowardZone(src, zone);
+      const dest = nextHopsTowardZone(src, zone)[0];
       if (dest) moves.push({ from: src, to: dest, n });
     }
   } else if (direction === "intoTargetZone") {

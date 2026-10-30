@@ -1,14 +1,33 @@
-.hollows.sheet.actor.refuge .sheet-header,
-.hollows.sheet.actor.refuge .sheet-tabs[data-group='refugeTabs'] {
+.refuge-visitors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.refuge-visitor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-light-primary);
+  border-radius: 4px;
+}
+
+.refuge-visitor img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.refuge-visitor button {
+  width: auto;
   flex: 0 0 auto;
 }
 
-.refuge-content {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+.refuge-visitor .visitor-actions {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .refuge-tabs-content > .tab {
@@ -22,16 +41,11 @@
 }
 
 .hollows.sheet.actor.refuge .window-content {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.hollows.sheet.actor.refuge .window-content > form.hollows-sheet {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+.hollows.sheet.actor.refuge .sheet-header {
+  grid-template-columns: 1fr;
 }

@@ -19,7 +19,6 @@
  *   - `dispatchToGM(event, payload)` targets the active GM by short event name.
  */
 
-import { HANDLERS } from "./queries-state.js";
 import { applyAdvanceTurnGM, applyPassInitiativeGM, getCombatTurnKey, isSameCombatTurn } from "./combat-runtime.js";
 import { applyFirstPickSelection, finishEntityTurnAndBeginFirstPick } from "./combat-first-pick.js";
 import { promptIncursionRollQuery } from "../documents/actor/incursion.js";
@@ -42,23 +41,17 @@ export const COMBAT_QUERY_TIMEOUT = 300_000;
 // Sender-side permission hardening needs sender metadata and is deferred to a
 // later hardening pass.
 
-// HANDLERS lives in a dependency-free module (queries-state.js) so it is always
-// initialised before ability modules that call registerHandler() at eval time,
-// even under circular import. See queries-state.js for the full rationale.
+const HANDLERS = new Map();
 
 /**
  * Register a query handler. Wraps in error serialization.
- * Call from `registerQueries()` only — handlers must be in place before any
- * client can send.
+ * Called during system initialization, before clients can send requests.
  */
 export function registerHandler(name, fn) {
   if (HANDLERS.has(name)) {
     console.warn(`Hollows | Query handler ${name} already registered; overwriting`);
   }
   HANDLERS.set(name, fn);
-  // If CONFIG.queries was already populated by registerQueries(), wire this
-  // late-registered handler in immediately — lets ability modules register
-  // from their own `Hooks.once("init")` callback regardless of init order.
   if (typeof CONFIG?.queries === "object" && CONFIG.queries !== null) {
     CONFIG.queries[name] = buildDispatcher(name, fn);
   }
@@ -245,6 +238,14 @@ function registerCategoryBHandlers() {
 // ---------------------------------------------------------------------------
 
 function registerCategoryDHandlers() {
+  registerHandler("hollows.refugeResearchPrompt", async data => {
+    const { default: RefugeResearch } = await import("../documents/actor/refuge-research.mjs");
+    return RefugeResearch.prompt(data);
+  });
+  registerHandler("hollows.anchorUse", async data => {
+    const { default: Anchor } = await import("../documents/item/anchor.mjs");
+    return Anchor.apply(data);
+  });
   registerHandler("hollows.incursionRoll", async (payload = {}) => {
     return await promptIncursionRollQuery(payload);
   });
@@ -435,7 +436,7 @@ export function getRegisteredHandlerCount() {
 
 /**
  * Dispatch an event to the GM through `CONFIG.queries`. Every event has a handler
- * registered (in `registerQueries()` or an ability module's own init); an
+ * registered during system initialization; an
  * unregistered event throws via `runGMQuery` — fail loud, never a silent no-op.
  */
 export async function dispatchToGM(eventName, payload, opts = {}) {

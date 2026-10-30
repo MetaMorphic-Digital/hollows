@@ -43,6 +43,19 @@ export class ScriptedProvider extends Mechanic {
 
 /** Compile item scripts into the existing mechanic classes. */
 export default class ScriptCompiler {
+  /** Run item scripts for a gameplay event, passing each result to the next handler. */
+  static async runInterceptors(event, ctx, value) {
+    for (const mechanic of this.getProviders("interceptor", ctx.actor, ctx.item)) {
+      if (mechanic.event !== event) continue;
+      const actor = ctx.actor ?? mechanic.carrier;
+      const carrier = mechanic.matchCarrier ? mechanic.matchCarrier(actor, { ...ctx, value }) : mechanic.carrier;
+      if (!carrier) continue;
+      const result = await mechanic.run(actor, { ...ctx, carrier, value });
+      if (result != null) value = result;
+    }
+    return value;
+  }
+
   /** @type {WeakMap<Item, Map<string, {stamp: string, mechanics: Mechanic[]}>>} Cached results per script field. */
   static #cache = new WeakMap();
 

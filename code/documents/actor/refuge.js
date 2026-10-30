@@ -1,22 +1,14 @@
-import { dispatchToGM } from "../../helpers/queries.js";
+import { runUserQuery, COMBAT_QUERY_TIMEOUT } from "../../helpers/queries.js";
 import { getActiveHollowActor } from "../../canvas/zone.js";
-import {
-  getPrimaryRefugeActor,
-  getRefugeActionHandler,
-  registerRefugeActionHandler,
-  registerRefugeActions,
-  canRecover,
-  getRecoverOptions,
-  getRecoverAmounts
-} from "../../data/refuge/index.js";
-import { pickOne, resolveActionHunter } from "../../applications/apps/selection-dialogs.mjs";
-import { applyInterceptors } from "../../helpers/extensions.js";
+import { getPrimaryRefugeActor } from "../../data/refuge/index.js";
+import { removeCondition } from "./conditions.js";
 import { adjustHunterResource } from "./resources.js";
 
+const REFUGE_ACTIONS = new foundry.utils.Semaphore(1);
+
+/** Send Refuge actions to the active GM for sequential execution. */
 export async function requestRefugeAction(data) {
-  if (game.user?.isGM) return false;
-  await dispatchToGM("refugeAction", data);
-  return true;
+  return runUserQuery(game.users.activeGM, "hollows.refugeAction", data, { timeout: COMBAT_QUERY_TIMEOUT });
 }
 
 // `extra` folds other fields into the same clamped resource update.
@@ -49,39 +41,32 @@ export async function addRefugeResources(deltaBone, deltaHearts) {
   return true;
 }
 
-export async function applyRecover(refuge, hunter, mode = "full") {
-  if (!refuge || refuge.type !== "refuge" || !hunter) return false;
-  const recovery = getRecoverAmounts(refuge, hunter, mode);
-  if (recovery.mode === "full") {
-    await adjustHunterResource(hunter, {
-      resolve: recovery.resolveValue,
-      wounds: recovery.woundsValue
-    });
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: refuge }),
-      content: `<div class="hollows-chat"><strong>${hunter.name}</strong> fully recovers.</div>`
-    });
+/** Restore lost health and wake a Hunter, or grant temporary health. */
+export async function applyRecover(refuge, hunter, { type = "fullRecovery", resolve = 0, wounds = 0 } = {}) {
+  const temporary = type === "temporaryHealth";
+  if (temporary) {
+    await adjustHunterResource(hunter, { resolve, wounds }, { allowTemporary: true });
   } else {
-    await adjustHunterResource(hunter, {
-      resolve: recovery.resolveDelta,
-      wounds: recovery.woundsDelta
-    }, { allowTemporary: true });
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: refuge }),
-      content: `
-        <div class="hollows-chat">
-          <div><strong>${hunter.name}</strong> gains temporary recovery.</div>
-          <div>Resolve +${recovery.resolveDelta}, Wounds +${recovery.woundsDelta}</div>
-        </div>
-      `
+    await hunter.update({
+      "system.health.resolve.value": Math.max(hunter.system.health.resolve.value, hunter.system.health.resolve.max),
+      "system.health.wounds.value": Math.max(hunter.system.health.wounds.value, hunter.system.health.wounds.max),
     });
+    await removeCondition(hunter, "dead");
+    await removeCondition(hunter, "dying");
   }
-  await applyInterceptors("refuge-recover", { actor: hunter, refuge, hunter, mode });
+  await ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor: refuge }),
+    content: `<div class="hollows-chat">${game.i18n.format(temporary ? "HOLLOWS.REFUGE.temporaryHealthGained" : "HOLLOWS.REFUGE.recovered", {
+      name: foundry.utils.escapeHTML(hunter.name), resolve, wounds,
+    })}</div>`,
+  });
   return true;
 }
 
 export async function applyEnterRefuge(refuge) {
   if (!refuge || refuge.type !== "refuge") return false;
+  const hunters = refuge.system.enteringHunters;
+  if (!hunters.length) return false;
   const bone = Math.max(0, Number(refuge.system?.resources?.bone ?? 0));
   if (bone < 1) {
     ui.notifications.warn("Entering the Refuge costs 1 Bone.");
@@ -96,6 +81,7 @@ export async function applyEnterRefuge(refuge) {
     if (cap > 0) next = Math.min(cap, next);
     await hollow.update({ "system.doom.current": next });
   }
+  for (const hunter of hunters) await hunter.system.enterRefuge(refuge);
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: refuge }),
     content: `<div class="hollows-chat">The Hunters enter the <strong>Refuge</strong> — <strong>-1 Bone</strong>, <strong>+3 Doom</strong>.</div>`
@@ -103,47 +89,39 @@ export async function applyEnterRefuge(refuge) {
   return true;
 }
 
-export async function applySetUnlocks(refuge, kind, list = []) {
-  if (!refuge || refuge.type !== "refuge") return false;
-  const key = String(kind || "") === "exploration" ? "system.unlockedExploration" : "system.unlockedBattle";
-  await refuge.update({ [key]: Array.isArray(list) ? list : [] });
-  return true;
-}
-
 export async function applyRefugeActionPayload(data = {}) {
   const type = String(data.type || "");
   const refuge = data.refugeId ? game.actors.get(String(data.refugeId)) : getPrimaryRefugeActor();
   if (!refuge || refuge.type !== "refuge") return;
-  const handler = getRefugeActionHandler(type);
-  if (handler) await handler(refuge, data);
+  const handler = REFUGE_HANDLERS[type];
+  if (handler) return REFUGE_ACTIONS.add(handler, refuge, data);
 }
 
-async function openRecover(refuge, hunter = null) {
-  if (!canRecover(refuge)) return;
-  const target = await resolveActionHunter(hunter, { title: "Recover" });
-  if (!target) return;
-  const recoverOptions = getRecoverOptions(refuge);
-  let mode = "full";
-  if (recoverOptions.length > 1) {
-    mode = await pickOne({
-      title: "Recover",
-      label: "Recovery Type",
-      options: recoverOptions.map((o) => ({ value: o.id, label: o.label }))
-    });
-    if (!mode) return;
-  }
-  await applyRecover(refuge, target, mode);
-}
-
-registerRefugeActions([{
-  id: "recover",
-  name: "Recover",
-  category: "Recover",
-  requires: [],
-  description: "Restore lost Resolve and Wounds.",
-  open: openRecover
-}]);
-
-registerRefugeActionHandler("enterRefuge", async (refuge) => applyEnterRefuge(refuge));
-registerRefugeActionHandler("spendBone", async (refuge, data) => spendRefugeBone(refuge, data.amount));
-registerRefugeActionHandler("setUnlocks", async (refuge, data) => applySetUnlocks(refuge, String(data.kind || ""), Array.isArray(data.list) ? data.list : []));
+const REFUGE_HANDLERS = {
+  buyUpgrade: async (refuge, data) => {
+    const upgrade = await fromUuid(data.upgradeUuid);
+    return refuge.system.buyUpgrade(upgrade);
+  },
+  useUpgrade: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    return refuge.system.useUpgrade(data.itemId, data.action, hunter, data.choice);
+  },
+  recoverOnEntry: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    return refuge.system.recoverOnEntry(hunter);
+  },
+  enterRefuge: applyEnterRefuge,
+  enterHunter: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    await hunter.system.enterRefuge(refuge);
+  },
+  unlockEquipment: async (refuge, data) => {
+    const { default: RefugeResupply } = await import("./refuge-resupply.mjs");
+    return RefugeResupply.unlock(refuge, [await fromUuid(data.itemUuid)]);
+  },
+  installationTest: async (refuge, data) => {
+    const hunter = await fromUuid(data.hunterUuid);
+    const { default: RefugeInstallation } = await import("./refuge-installation.mjs");
+    await RefugeInstallation.apply(hunter, data.testId, data.config);
+  },
+};

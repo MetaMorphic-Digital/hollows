@@ -13,7 +13,7 @@ import { buildStandardRollCardHtml } from "../../applications/ui/roll-card.js";
 import { HunterStatRollFlow } from "../../dice/flow.js";
 import { triggerUseOnManoeuvre } from "./use.js";
 import { pickOne, promptForm } from "../../applications/apps/selection-dialogs.mjs";
-import { applyInterceptors } from "../../helpers/extensions.js";
+import ScriptCompiler from "../../documents/item/script-compiler.mjs";
 
 export async function openTakeCoverForActor(actor, opts = {}) {
   if (!actor || actor.type !== "hunter") return;
@@ -96,7 +96,7 @@ export async function openTakeCoverForActor(actor, opts = {}) {
     const claimZone = targetZone;
 
     const applyTerrainTag = async () => {
-      const replaced = await applyInterceptors("take-cover", {
+      const replaced = await ScriptCompiler.runInterceptors("take-cover", {
         actor: targetActor, userId: game.user?.id || "", zone: claimZone, token: targetToken, tag,
       }, "");
       if (!replaced) {

@@ -3,6 +3,19 @@
  * @extends {foundry.documents.Item}
  */
 export default class HollowsItem extends foundry.documents.Item {
+  /** The source shared by a template, its index entry, and imported copies. */
+  static getSourceUuid(item) {
+    return item.uuid.startsWith("Compendium.") ? item.uuid
+      : item._stats.compendiumSource || item._stats.duplicateSource || item.uuid;
+  }
+
+  /** Prepare an embedded copy that retains its original template identity. */
+  static toEmbeddedData(item) {
+    const data = game.items.fromCompendium(item, { clearFolder: true });
+    foundry.utils.setProperty(data, "_stats.duplicateSource", HollowsItem.getSourceUuid(item));
+    return data;
+  }
+
   /** @type {{path: string, text: string, name?: string, enabled: boolean}[]} */
   get scriptSlots() {
     if (this.type === "weapon") return [

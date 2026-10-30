@@ -1,4 +1,4 @@
-import { getHuntersInZone, getAllHuntersSorted } from "../../canvas/zone.js";
+import { getHuntersInZone } from "../../canvas/zone.js";
 
 const { DialogV2 } = foundry.applications.api;
 const esc = (v) => foundry.utils.escapeHTML(String(v ?? ""));
@@ -113,18 +113,6 @@ export async function promptForm({
       { action: "cancel", label: "Cancel", callback: () => null },
     ],
   }) ?? null;
-}
-
-export async function resolveActionHunter(hunter, { title = "Choose Hunter" } = {}) {
-  if (hunter) return hunter;
-  if (!game.user?.isGM) return null;
-  const hunters = getAllHuntersSorted();
-  if (!hunters.length) {
-    ui.notifications.warn("No Hunters found.");
-    return null;
-  }
-  const id = await pickOne({ title, label: "Hunter", options: hunters.map((h) => ({ value: h.id, label: h.name })) });
-  return id ? game.actors.get(id) : null;
 }
 
 export async function chooseOneZone(zones) {

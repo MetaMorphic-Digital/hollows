@@ -40,6 +40,11 @@
       "type": "Item"
     },
     {
+      "name": "refuge-upgrades",
+      "label": "HOLLOWS.PACKS.REFUGE_UPGRADES",
+      "type": "Item"
+    },
+    {
       "name": "hollows-grisham-priory",
       "label": "The Sins of Grisham Priory",
       "path": "packs/hollows-grisham-priory",
@@ -56,6 +61,7 @@
         "weapon-abilities",
         "quickstart",
         "weapon-forms",
+        "refuge-upgrades",
         "hollows-grisham-priory"
       ]
     }
@@ -82,6 +88,7 @@
       "weaponAbility": {},
       "weaponForm": {},
       "equipment": {},
+      "refugeUpgrade": {},
       "echo": {},
       "entityAbility": {},
       "entityEnhancement": {},

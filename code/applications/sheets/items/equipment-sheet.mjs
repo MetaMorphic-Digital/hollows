@@ -1,69 +1,65 @@
+import EquipmentData from "../../../data/items/equipment.mjs";
+import { HOLLOWS_CONDITIONS } from "../../../data/system-constants.js";
+import { getWeaponTypeChoices } from "../../../data/weapons/index.js";
+import { pickOne } from "../../apps/selection-dialogs.mjs";
+
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
 
 export default class HollowsEquipmentSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
   static DEFAULT_OPTIONS = {
-    classes: ["hollows", "sheet", "item", "equipment"],
-    position: { width: 560, height: 760 },
-    window: { resizable: true },
+    classes: ["hollows", "sheet", "item", "builder", "equipment"],
+    position: { width: 520, height: 600 },
+    window: { resizable: true, contentClasses: ["hollows-sheet"] },
     form: { submitOnChange: true, closeOnSubmit: false },
+    actions: { addEffect: HollowsEquipmentSheet.#addEffect, removeEffect: HollowsEquipmentSheet.#removeEffect },
   };
 
   static PARTS = {
-    sheet: {
-      template: "systems/hollows/templates/item/equipment-sheet.html",
-      root: true,
-    },
+    sheet: { template: "systems/hollows/templates/item/equipment-sheet.html", scrollable: [""], root: true },
   };
 
-  get title() {
-    return this.item?.name ?? "Equipment";
-  }
-
+  /** @inheritdoc */
   async _prepareContext(options) {
-    const context = await super._prepareContext(options);
+    const system = this.item.system;
+    const fields = system.schema.fields.effects.element.fields;
+    const weaponChoices = system.effects.some(effect => ["capacity", "nextAttack"].includes(effect.type))
+      ? await getWeaponTypeChoices(system.effects.flatMap(effect => Array.from(effect.weaponTypes))) : {};
     return {
-      ...context,
-      item: this.item,
-      system: this.item.system,
-      editable: this.isEditable,
-      owner: this.document.isOwner,
-      limited: this.document.limited,
+      ...await super._prepareContext(options), item: this.item, system, systemFields: system.schema.fields,
+      effects: system.effects.map((effect, index) => ({
+        index, type: effect.type, label: EquipmentData.EFFECTS[effect.type].label,
+        fields: EquipmentData.EFFECTS[effect.type].fields.filter(key => {
+          if (key === "amount") return !((effect.type === "resource") && (effect.resourceMode === "full"))
+            && !((effect.type === "capacity") && effect.full) && !((effect.type === "threat") && (effect.threatMode === "towards"));
+          if (key === "freeTerrain") return HOLLOWS_CONDITIONS[effect.condition].terrain;
+          return true;
+        }).map(key => ({
+          field: fields[key], name: "system.effects." + index + "." + key, value: effect[key],
+          options: key === "weaponTypes" ? Object.entries(weaponChoices).map(([value, label]) => ({ value, label })) : undefined,
+        })),
+      })),
     };
   }
 
-  async _onRender(context, options) {
-    await super._onRender(context, options);
-    const wc = this.element.querySelector(".window-content");
-    wc?.classList.add("hollows-sheet");
-    if (this._savedScrollTop && wc) {
-      wc.scrollTop = this._savedScrollTop;
-      this._savedScrollTop = 0;
-    }
-    if (this.isEditable) {
-      this.element.querySelector("[data-edit=\"img\"]")?.addEventListener("click", () => {
-        new foundry.applications.apps.FilePicker.implementation({
-          type: "image",
-          current: this.document.img ?? "",
-          callback: async path => { await this.document.update({ img: path }); },
-        }).render({ force: true });
-      });
-    }
+  /** Add an effect supported by the selected trigger. */
+  static async #addEffect() {
+    const type = await pickOne({
+      title: game.i18n.localize("HOLLOWS.EQUIPMENT.addEffect"),
+      options: Object.entries(EquipmentData.EFFECTS)
+        .filter(([, definition]) => !definition.trigger || (definition.trigger === this.item.system.trigger))
+        .map(([value, { label }]) => ({ value, label: game.i18n.localize(label) })),
+    });
+    if (!type) return;
+    const effects = this.item.system.toObject().effects;
+    effects.push({ ...this.item.system.schema.fields.effects.element.getInitialValue(), type });
+    await this.item.update({ "system.effects": effects });
   }
 
-  async _onChangeForm(formConfig, event) {
-    const input = event?.target;
-    const name = String(input?.name ?? "");
-    if (input?.tagName !== "SELECT" && name && (name === "name" || name.startsWith("system."))) {
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const value = input.type === "checkbox" ? input.checked
-        : input.type === "number" ? (Number(input.value) || 0)
-          : String(input.value ?? "");
-      await this.document.update({ [name]: value }, { render: false });
-      return;
-    }
-    this._savedScrollTop = this.element?.querySelector(".window-content")?.scrollTop ?? 0;
-    return super._onChangeForm(formConfig, event);
+  /** Remove the selected effect. */
+  static async #removeEffect(event, target) {
+    const effects = this.item.system.toObject().effects;
+    effects.splice(Number(target.dataset.index), 1);
+    await this.item.update({ "system.effects": effects });
   }
 }

@@ -3,30 +3,10 @@
  * compendium docs and grant them to a hunter. Shared, not Refuge-owned:
  * consumed by Refuge, character creation, and Echo.
  */
-import { pickOne } from "../../applications/apps/selection-dialogs.mjs";
-import { getWeaponAbilityPack } from "../../helpers/weapon-utils.js";
-import { getContentPacks } from "../../helpers/extensions.js";
-
-function getWeaponAbilityPacks() {
-  return [
-    getWeaponAbilityPack(),
-    ...getContentPacks("weapon-abilities").map((id) => game.packs.get(id)),
-  ].filter(Boolean);
-}
+import { ItemCatalog } from "../../data/item-catalog.js";
 
 export async function getWeaponAbilityDocs(weaponType, tier) {
-  const packDocs = await Promise.all(getWeaponAbilityPacks().map((p) => p.getDocuments()));
-  return packDocs.flat()
-    .filter(d => d.type === "weaponAbility")
-    .filter(d => String(d.system?.weaponType || "") === String(weaponType || ""))
-    .filter(d => Number(d.system?.tier ?? 0) === Number(tier ?? 0))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-export async function chooseAbilityDoc(docs, title) {
-  if (!docs.length) return null;
-  const id = await pickOne({ title, label: "Ability", options: docs.map(d => ({ value: d.id, label: d.name })) });
-  return id ? docs.find(d => d.id === id) || null : null;
+  return ItemCatalog.getDocuments("weaponAbility", { weaponType, tier });
 }
 
 export function isDuplicateWeaponAbility(hunter, abilityDoc) {

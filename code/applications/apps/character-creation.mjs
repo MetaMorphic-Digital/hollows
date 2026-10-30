@@ -1,8 +1,8 @@
 import { getAvailableWeaponForms, getWeaponPackDocs } from "../../data/weapons/index.js";
 import WeaponFormData from "../../data/items/weapon-form.mjs";
+import HollowsItem from "../../documents/item.mjs";
 import { getWeaponAbilityDocs, grantWeaponAbilityToHunter } from "../../documents/actor/ability-grant.js";
-import { getContentPacks } from "../../helpers/extensions.js";
-import { getEquipmentPackDocs } from "../../documents/actor/hunter-equipment.js";
+import { getEquipmentDocs } from "../../documents/actor/hunter-equipment.js";
 
 export function isNewHunterActor(actor) {
   if (!actor || actor.type !== "hunter") return false;
@@ -26,20 +26,6 @@ async function loadCharacterCreationData() {
     return null;
   }
   const data = await response.json();
-  for (const url of getContentPacks("character-creation")) {
-    const extraResponse = await fetch(url);
-    if (!extraResponse.ok) continue;
-    const extra = await extraResponse.json();
-    for (const extraFaction of extra?.factions || []) {
-      const faction = data.factions.find(f => f.id === extraFaction.id);
-      if (!faction) {
-        data.factions.push(extraFaction);
-        continue;
-      }
-      if (extraFaction.origins?.length) faction.origins = [...(faction.origins || []), ...extraFaction.origins];
-      if (extraFaction.seeds?.length) faction.seeds = [...(faction.seeds || []), ...extraFaction.seeds];
-    }
-  }
   game.hollowsCharacterCreation = game.hollowsCharacterCreation || {};
   game.hollowsCharacterCreation.data = data;
   return data;
@@ -480,8 +466,8 @@ async function promptWeaponSelection(actor, weaponDocsByType, weaponTypeBlacklis
   }) ?? null;
 }
 
-async function promptEquipmentSelection(kind, title, stateKey, state, allowBack = false) {
-  const docs = await getEquipmentPackDocs(kind);
+/** Choose equipment for a creation step, preserving the selection when navigating back. */
+async function promptEquipmentSelection(docs, title, stateKey, state, allowBack = false) {
   const items = docs
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
   if (!items.length) {
@@ -489,14 +475,14 @@ async function promptEquipmentSelection(kind, title, stateKey, state, allowBack 
     return null;
   }
   const options = items
-    .map(d => `<option value="${d.id}">${d.name}</option>`)
+    .map(d => `<option value="${d.uuid}">${foundry.utils.escapeHTML(d.name)}</option>`)
     .join("");
-  const defaultId = state?.[stateKey] || items[0].id;
+  const defaultUuid = state?.[stateKey] || items[0].uuid;
   const content = `
       <form class="hollows-roll-dialog">
         <div class="form-group">
           <label>Equipment</label>
-          <select name="equipmentId">${options}</select>
+          <select name="equipmentUuid">${options}</select>
         </div>
         <div class="form-group">
           <label>Description</label>
@@ -509,8 +495,8 @@ async function promptEquipmentSelection(kind, title, stateKey, state, allowBack 
     buttons.push({ action: "back", label: "Back", callback: (_e, _b, _dialog) => ({ __back: true }) });
   }
   buttons.push({ action: "next", label: "Next", default: true, callback: (_e, _b, dialog) => {
-    const id = String(dialog.element.querySelector("[name=equipmentId]")?.value || "");
-    return items.find(d => d.id === id) || null;
+    const uuid = String(dialog.element.querySelector("[name=equipmentUuid]")?.value || "");
+    return items.find(d => d.uuid === uuid) || null;
   } });
   return await foundry.applications.api.DialogV2.wait({
     window: { title },
@@ -518,12 +504,12 @@ async function promptEquipmentSelection(kind, title, stateKey, state, allowBack 
     render: (_e, dialog) => {
       const el = dialog.element;
       const update = () => {
-        const id = String(el.querySelector("[name=equipmentId]")?.value || "");
-        const doc = items.find(d => d.id === id);
+        const uuid = String(el.querySelector("[name=equipmentUuid]")?.value || "");
+        const doc = items.find(d => d.uuid === uuid);
         el.querySelector("[data-equip-desc]").innerHTML = formatLongText(doc?.system?.text || "");
       };
-      el.querySelector("[name=equipmentId]").value = defaultId;
-      el.querySelector("[name=equipmentId]").addEventListener("change", update);
+      el.querySelector("[name=equipmentUuid]").value = defaultUuid;
+      el.querySelector("[name=equipmentUuid]").addEventListener("change", update);
       update();
     },
     buttons,
@@ -558,8 +544,11 @@ export async function openCharacterCreationWizard(actor) {
   const steps = ["faction", "origin"];
   if (data.factions.some(f => (f.seeds || []).length)) steps.push("seed");
   steps.push("stats", "weapon1", "weapon2");
-  if (getContentPacks("exploration-equipment").length) steps.push("equipExploration");
-  if (getContentPacks("battle-equipment").length) steps.push("equipBattle");
+  const [explorationEquipment, battleEquipment] = await Promise.all([
+    getEquipmentDocs("exploration"), getEquipmentDocs("battle"),
+  ]);
+  if (explorationEquipment.length) steps.push("equipExploration");
+  if (battleEquipment.length) steps.push("equipBattle");
   let stepIndex = 0;
   let faction = null;
   let originPick = null;
@@ -633,31 +622,31 @@ export async function openCharacterCreationWizard(actor) {
     }
     if (step === "equipExploration") {
       const result = await promptEquipmentSelection(
-        "exploration",
+        explorationEquipment,
         "Character Creation: Exploration Equipment",
-        "explorationEquipId",
+        "explorationEquipUuid",
         state,
         allowBack,
       );
       if (!result) return;
       if (result?.__back) { stepIndex -= 1; continue; }
       explorationEquip = result;
-      state.explorationEquipId = explorationEquip.id;
+      state.explorationEquipUuid = explorationEquip.uuid;
       stepIndex += 1;
       continue;
     }
     if (step === "equipBattle") {
       const result = await promptEquipmentSelection(
-        "battle",
+        battleEquipment,
         "Character Creation: Battle Equipment",
-        "battleEquipId",
+        "battleEquipUuid",
         state,
         allowBack,
       );
       if (!result) return;
       if (result?.__back) { stepIndex -= 1; continue; }
       battleEquip = result;
-      state.battleEquipId = battleEquip.id;
+      state.battleEquipUuid = battleEquip.uuid;
       stepIndex += 1;
       continue;
     }
@@ -739,8 +728,7 @@ export async function openCharacterCreationWizard(actor) {
 
   const applyEquipment = async (doc) => {
     if (!doc) return null;
-    const payload = foundry.utils.deepClone(doc.toObject());
-    delete payload._id;
+    const payload = HollowsItem.toEmbeddedData(doc);
     const created = await actor.createEmbeddedDocuments("Item", [payload]);
     return created?.[0] || null;
   };

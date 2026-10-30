@@ -2,12 +2,21 @@
   <header class="sheet-header">
     <div class="header-left">
       <input class="name" name="name" type="text" value="{{item.name}}" placeholder="Relic Name" />
-      <div class="subline">{{#if system.upgraded}}Cypher{{else}}Relic{{/if}}</div>
+      <div class="subline">{{#if system.anchor.enabled}}Anchor{{else}}{{#if system.upgraded}}Cypher{{else}}Relic{{/if}}{{/if}}</div>
     </div>
     <div class="header-portrait">
       <img src="{{item.img}}" data-edit="img" alt="{{item.name}}" />
     </div>
   </header>
+
+  <section class="sheet-section">
+    {{formGroup anchorFields.enabled value=system.anchor.enabled label="HOLLOWS.REFUGE.isAnchor" localize=true}}
+    {{#if system.anchor.enabled}}
+      {{formGroup anchorFields.entityId value=system.anchor.entityId options=entityChoices valueAttr="id" labelAttr="name" blank="" label="HOLLOWS.REFUGE.anchorEntity" localize=true}}
+      {{formGroup anchorFields.stat value=system.anchor.stat label="HOLLOWS.REFUGE.anchorStat" localize=true}}
+      <p class="muted">{{localize "HOLLOWS.REFUGE.anchorHint"}}</p>
+    {{/if}}
+  </section>
 
   <section class="sheet-section">
     <h2>Play text</h2>

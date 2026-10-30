@@ -13,7 +13,7 @@ import { createSetupRollMessage, getCombatantBracket, getCombatantOwners, getCom
 import { getTerrainTagKeys, removeCondition } from "./actor/conditions.js";
 import { initializeHunterCoreStatesForCombat } from "./actor/hunter-combat.js";
 import { getFocusCount, setFocusCount } from "./actor/resources.js";
-import { applyInterceptors } from "../helpers/extensions.js";
+import ScriptCompiler from "./item/script-compiler.mjs";
 import { COMBAT_QUERY_TIMEOUT, runUserQuery } from "../helpers/queries.js";
 import { getEffectiveEntityStat } from "./entity/entity-stats.js";
 
@@ -164,12 +164,13 @@ export default class HollowsCombat extends foundry.documents.Combat {
     const COMBAT_RESET_FLAGS = {
       echoReplaceDyingUsed: _del,
       battleMaxPenalty: _del,
+      equipmentAttackBonuses: _del,
       dyingRevivedOnce: false,
     };
 
     const hunters = new Set(this.combatants.map(c => c.actor).filter(a => a?.type === "hunter"));
     for (const actor of hunters) {
-      await applyInterceptors("combat-reset-hunter", { actor }, null);
+      await ScriptCompiler.runInterceptors("combat-reset-hunter", { actor }, null);
       for (const tag of getTerrainTagKeys()) {
         if (actor.statuses.has(tag)) await removeCondition(actor, tag, { skipPoolRefund: true });
       }

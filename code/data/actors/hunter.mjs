@@ -1,3 +1,9 @@
+import HollowsItem from "../../documents/item.mjs";
+import RefugeData from "./refuge.mjs";
+import { STAT_LABELS } from "../system-constants.js";
+import { getPrimaryRefugeActor } from "../refuge/resolvers.js";
+import { getHunterEquipmentItemsForSlot } from "../../documents/actor/hunter-equipment.js";
+
 export default class HunterData extends foundry.abstract.TypeDataModel {
   static #resourceLimitModifiers = [];
 
@@ -46,6 +52,28 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
         appearance: new fields.StringField({ initial: "" }),
         notes: new fields.StringField({ initial: "" }),
       }),
+      refuge: new fields.SchemaField({
+        id: new fields.StringField({ initial: "" }),
+        heart: new fields.SchemaField({
+          state: new fields.StringField({ initial: "none", choices: ["none", "open", "closed"] }),
+          hollowId: new fields.StringField({ initial: "" }),
+        }),
+        renewals: new fields.ArrayField(new fields.SchemaField({
+          hollowId: new fields.StringField(),
+          stat: new fields.StringField({ choices: ["none", ...Object.keys(STAT_LABELS)] }),
+        })),
+        revelEchoes: new fields.ArrayField(new fields.SchemaField({
+          hollowId: new fields.StringField(), echoId: new fields.StringField(),
+        })),
+        installationTests: new fields.ArrayField(new fields.SchemaField({
+          id: new fields.StringField(), name: new fields.StringField(),
+        })),
+        recoveryAvailable: new fields.BooleanField({ initial: false }),
+        actions: new fields.SchemaField({
+          value: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+          max: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        }),
+      }),
       health: new fields.SchemaField({
         resolve: new fields.SchemaField({
           value: new fields.NumberField({ initial: 0 }),
@@ -67,6 +95,104 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 6, nullable: false }),
       }),
     };
+  }
+
+  /* -------------------------------------------------- */
+
+  /** Equipment slots supplied by available Refuge upgrades. */
+  getEquipmentLimit(slot) {
+    return getPrimaryRefugeActor()?.system.benefits[`${slot}Slots`] ?? 1;
+  }
+
+  /** Report occupied slots or duplicate equipment before equipping an item. */
+  validateEquipmentSlot(slot, incoming = null) {
+    const refuge = getPrimaryRefugeActor();
+    const separateRelic = refuge?.system.benefits.extraRelicSlot;
+    if ((slot === "relic") && !separateRelic
+      && (getHunterEquipmentItemsForSlot(this.parent, "battle").length >= this.getEquipmentLimit("battle"))) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.REFUGE.sharedBattleSlot"));
+      return false;
+    }
+    if (slot === "relic") return true;
+    const items = getHunterEquipmentItemsForSlot(this.parent, slot).filter(item => item.id !== incoming?.id);
+    const relicSlot = (slot === "battle") && !separateRelic && getHunterEquipmentItemsForSlot(this.parent, "relic").length ? 1 : 0;
+    if (items.length + relicSlot >= this.getEquipmentLimit(slot)) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.EQUIPMENT.slotsFull"));
+      return false;
+    }
+    if (incoming && items.some(item => HollowsItem.getSourceUuid(item) === HollowsItem.getSourceUuid(incoming))) {
+      ui.notifications.warn(game.i18n.localize("HOLLOWS.EQUIPMENT.duplicate"));
+      return false;
+    }
+    return true;
+  }
+
+  /** Restore the action allowance when starting a new visit. */
+  async enterRefuge(refuge) {
+    if (this.refuge.id === refuge.id) return false;
+    await refuge.system.activateUpgrades();
+    const { default: RefugeResupply } = await import("../../documents/actor/refuge-resupply.mjs");
+    await RefugeResupply.unlock(refuge, this.parent.items.filter(item => item.type === "equipment"));
+    await this.parent.update({
+      "system.refuge.id": refuge.id,
+      "system.refuge.actions.value": this.refuge.actions.max,
+      "system.refuge.recoveryAvailable": refuge.system.upgradeItems.some(item =>
+        item.system.recoverOnEntry && item.system.isAvailable(refuge)),
+    });
+    return true;
+  }
+
+  /** Temporary Renew increases still in effect for this stat. */
+  getRenewBonus(stat) {
+    return this.refuge.renewals.filter(renewal => renewal.stat === stat).length;
+  }
+
+  /** The Hunter's contribution when determining Entity Enhancements. */
+  get enhancementWeight() {
+    if (this.refuge.heart.state === "closed") return 0;
+    if ((this.refuge.heart.state === "open") || this.parent.items.some(item => (item.type === "relic") && item.system.anchor.enabled)) return 2;
+    return 1;
+  }
+
+  /** Death ends temporary Renew and Heart effects, retaining Renew usage. */
+  async clearDeathBenefits() {
+    if ((this.refuge.heart.state === "none") && !this.refuge.renewals.some(renewal => renewal.stat !== "none")) return;
+    await this.parent.update({
+      "system.refuge.renewals": this.refuge.renewals.map(renewal => ({ ...renewal, stat: "none" })),
+      "system.refuge.heart": { state: "none", hollowId: "" },
+    });
+  }
+
+  /** End temporary effects belonging to a cleansed Hollow. */
+  async clearHollowBenefits(hollowId) {
+    const { renewals, revelEchoes } = this.refuge;
+    const clearHeart = this.refuge.heart.hollowId === hollowId;
+    if (!clearHeart && ![...renewals, ...revelEchoes].some(entry => entry.hollowId === hollowId)) return;
+    const remainingEchoes = revelEchoes.filter(entry => entry.hollowId !== hollowId);
+    const updates = revelEchoes.filter(entry => (entry.hollowId === hollowId)
+      && !remainingEchoes.some(other => other.echoId === entry.echoId))
+      .map(entry => this.parent.items.get(entry.echoId)).filter(Boolean)
+      .map(echo => ({ _id: echo.id, "system.state": [...echo.system.state].filter(state => state !== "suppressed") }));
+    if (updates.length) await this.parent.updateEmbeddedDocuments("Item", updates);
+    await this.parent.update({
+      "system.refuge.renewals": renewals.filter(entry => entry.hollowId !== hollowId),
+      "system.refuge.revelEchoes": remainingEchoes,
+      ...(clearHeart ? { "system.refuge.heart": { state: "none", hollowId: "" } } : {}),
+    });
+  }
+
+  /** @inheritdoc */
+  _onUpdate(changed, options, userId) {
+    super._onUpdate(changed, options, userId);
+    if (("name" in changed) || ("img" in changed) || foundry.utils.hasProperty(changed, "system.refuge")) {
+      RefugeData.renderSheets();
+    }
+  }
+
+  /** @inheritdoc */
+  _onDelete(options, userId) {
+    super._onDelete(options, userId);
+    RefugeData.renderSheets();
   }
 
   /* -------------------------------------------------- */
@@ -99,6 +225,10 @@ export default class HunterData extends foundry.abstract.TypeDataModel {
       resolveBonus += healthBonus.resolve || 0;
       woundsBonus += healthBonus.wounds || 0;
     }
+
+    const benefits = getPrimaryRefugeActor()?.system.benefits;
+    resolveBonus += Math.max(0, Math.min(benefits?.resolve ?? 0, 10 - resolveBonus));
+    woundsBonus += Math.max(0, Math.min(benefits?.wounds ?? 0, 10 - woundsBonus));
 
     const penalty = this.parent.getFlag("hollows", "battleMaxPenalty") || {};
     this.health.resolve.max = Math.max(0, HunterData.getResourceLimit(this.parent, "resolve", resolveBonus) - (Number(penalty.resolve) || 0));

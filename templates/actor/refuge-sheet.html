@@ -4,26 +4,51 @@
       <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="Refuge Name" />
       <div class="subline">Hollows Refuge</div>
     </div>
-    <div class="header-portrait">
-      <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
-    </div>
   </header>
 
   <section class="sheet-section">
     <div class="ability-row">
-      <button type="button" class="stat-roll" data-enter-refuge>Enter Refuge (1 Bone, +3 Doom)</button>
+      <button type="button" class="stat-roll" data-action="enterRefuge" {{#unless canOpenRefuge}}disabled{{/unless}}>{{localize "HOLLOWS.REFUGE.openRefuge"}}</button>
+    </div>
+    <h2>{{localize "HOLLOWS.REFUGE.currentVisitors"}}</h2>
+    <div class="refuge-visitors">
+      {{#each visitors as |hunter|}}
+        <div class="refuge-visitor">
+          <img src="{{hunter.img}}" alt="{{hunter.name}}" />
+          <span class="visitor-name">{{hunter.name}}</span>
+          <span class="visitor-actions" title="{{localize 'HOLLOWS.REFUGE.actions'}}">{{hunter.actions.value}}/{{hunter.actions.max}}</span>
+          {{#if hunter.canRecover}}
+            <button type="button" data-action="recoverOnEntry" data-hunter-id="{{hunter.id}}">{{localize "HOLLOWS.REFUGE.freeRecovery"}}</button>
+          {{/if}}
+          {{#if hunter.canLeave}}
+            <button type="button" data-action="leaveRefuge" data-hunter-id="{{hunter.id}}">{{localize "HOLLOWS.REFUGE.leaveRefuge"}}</button>
+          {{/if}}
+        </div>
+      {{else}}
+        <p class="muted">{{localize "HOLLOWS.REFUGE.noVisitors"}}</p>
+      {{/each}}
     </div>
   </section>
 
+  {{#if installationTests.length}}
+    <section class="sheet-section">
+      <h2>{{localize "HOLLOWS.REFUGE.installationTests"}}</h2>
+      <p class="muted">{{localize "HOLLOWS.REFUGE.installationTestsHint"}}</p>
+      {{#each installationTests as |test|}}
+        <button type="button" class="stat-roll" data-action="installationTest" data-hunter-id="{{test.hunterId}}">{{test.hunterName}} — {{test.name}}</button>
+      {{/each}}
+    </section>
+  {{/if}}
+
   <nav class="sheet-tabs tabs" data-group="refugeTabs">
     {{#each tabs as |t|}}
-      <a class="item" data-tab="{{t.id}}">{{t.label}}</a>
+      <a class="item {{t.cssClass}}" data-action="tab" data-group="refugeTabs" data-tab="{{t.id}}">{{localize t.label}}</a>
     {{/each}}
   </nav>
 
-  <section class="refuge-tabs-content refuge-content">
+  <section class="refuge-tabs-content">
     {{#each tabs as |t|}}
-      <div class="tab" data-tab="{{t.id}}" data-group="refugeTabs">{{{t.html}}}</div>
+      <div class="tab {{t.cssClass}}" data-tab="{{t.id}}" data-group="refugeTabs">{{{t.html}}}</div>
     {{/each}}
   </section>
 </form>

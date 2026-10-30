@@ -40,7 +40,13 @@ export default class HollowsRelicSheet extends EffectBuilderItemSheet {
     const { label, choices } = cypherTargetChoices(this.item.system?.cypherTrigger);
     context.cypherTargetLabel = label;
     context.cypherTargetChoices = choices;
+    context.anchorFields = this.item.system.schema.fields.anchor.fields;
     return context;
+  }
+
+  /** @inheritdoc */
+  _needsRerender(name) {
+    return (name === "system.anchor.enabled") || super._needsRerender(name);
   }
 
   async _onChangeForm(formConfig, event) {

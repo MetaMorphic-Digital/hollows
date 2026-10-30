@@ -8,7 +8,6 @@ export class OnAttackResultAction extends Mechanic {
     this.damageType = config.damageType || null;
     this.weaponType = config.weaponType || null;
     this.scope = config.scope || "self";
-    this.reaction = config.reaction || null;
     this.timing = config.timing || "immediate";
     this.rateLimit = config.rateLimit || null;
     this.prompt = config.prompt || null;
