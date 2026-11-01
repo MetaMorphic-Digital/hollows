@@ -47,7 +47,10 @@
     &.stat,
     &.color-stat {
       color: var(--hollows-color-stat);
+      font-size: 0.9em;
       font-weight: 800;
+      font-variant: small-caps;
+
       @container inline-aside, weapon-section {
         color: var(--hollows-color-stat-alt);
       }
@@ -73,6 +76,9 @@
     &[href] {
       color: var(--hollows-color-crit-success);
       text-shadow: 0 0 4px white;
+      font-size: 0.9em;
+      font-weight: bold;
+      font-variant: small-caps;
     }
 
     &.content-link,
@@ -87,6 +93,10 @@
         display: none;
       }
     }
+  }
+
+  .text-center {
+    text-align: center;
   }
 
   .small-caps {
