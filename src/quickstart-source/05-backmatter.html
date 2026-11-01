@@ -1,0 +1,576 @@
+<div>
+  <h2>Core Mechanic</h2>
+  <h2>
+    Roll a d20 and compare <br>to the stat and TN
+  </h2>
+  <table>
+    <colgroup>
+      <col>
+      <col>
+      <col>
+      <col>
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th colspan="2" scope="colgroup">
+          <p>Result</p>
+        </th>
+        <th scope="col">
+          <p>Attack</p>
+        </th>
+        <th scope="col">
+          <p>Defend</p>
+        </th>
+        <th scope="col">
+          <p>Explore</p>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan="2" headers="th_12_r0_c0">
+          <p>Under Stat</p>
+          <p>
+            <br>
+          </p>
+        </td>
+        <td rowspan="2" headers="th_12_r0_c0">
+          <p>Under TN</p>
+        </td>
+        <td colspan="3" headers="th_12_r0_c2">
+          <p>Success</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c2">
+          <p>
+            Deal Resolve <br>damage, place 1 Threat
+          </p>
+        </td>
+        <td headers="th_12_r0_c3">
+          <p>
+            Suffer <br>
+            Resolve <br>damage
+          </p>
+        </td>
+        <td headers="th_12_r0_c4">
+          <p>Suffer Resolve damage, bypass hazard</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c0"></td>
+        <td rowspan="2" headers="th_12_r0_c0">
+          <p>Match/ beat TN</p>
+        </td>
+        <td colspan="3" headers="th_12_r0_c2">
+          <p>Superior Success</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c0">
+          <p>
+            <br>
+          </p>
+        </td>
+        <td headers="th_12_r0_c2">
+          <p>
+            Deal Wound <br>damage, place 1 Threat
+          </p>
+        </td>
+        <td headers="th_12_r0_c3">
+          <p>Suffer no damage</p>
+        </td>
+        <td headers="th_12_r0_c4">
+          <p>Avoid all harm, bypass hazard</p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" headers="th_12_r0_c0">
+          <p>Equal to Stat</p>
+        </td>
+        <td colspan="3" headers="th_12_r0_c2">
+          <p>Critical Success</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c0"></td>
+        <td headers="th_12_r0_c0"></td>
+        <td headers="th_12_r0_c2">
+          <p>
+            Deal Wound <br>
+            damage +1, <br>place 1 Threat
+          </p>
+        </td>
+        <td headers="th_12_r0_c3">
+          <p>Suffer no damage;</p>
+          <p>
+            if Thrall,<br>reduce Doom by 1
+          </p>
+        </td>
+        <td headers="th_12_r0_c4">
+          <p>
+            Avoid all harm, <br>bypass hazard, and reduce Doom by 1
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" headers="th_12_r0_c0">
+          <p>Over Stat</p>
+        </td>
+        <td headers="th_12_r0_c2">
+          <p>Failure</p>
+        </td>
+        <td headers="th_12_r0_c3"></td>
+        <td headers="th_12_r0_c4"></td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c0"></td>
+        <td headers="th_12_r0_c0"></td>
+        <td headers="th_12_r0_c2">
+          <p>No damage, no threat</p>
+        </td>
+        <td headers="th_12_r0_c3">
+          <p>Suffer Wound damage</p>
+        </td>
+        <td headers="th_12_r0_c4">
+          <p>Suffer Wound damage, do not bypass hazard</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c0">
+          <p>20</p>
+        </td>
+        <td headers="th_12_r0_c0"></td>
+        <td colspan="3" headers="th_12_r0_c2">
+          <p>Critical Failure</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_12_r0_c0"></td>
+        <td headers="th_12_r0_c0"></td>
+        <td headers="th_12_r0_c2">
+          <p>No damage, no threat; if Thrall, add +1 Doom</p>
+        </td>
+        <td headers="th_12_r0_c3">
+          <p>Suffer Wound damage; if Thrall, add +1 Doom</p>
+        </td>
+        <td headers="th_12_r0_c4">
+          <p>Suffer Wound damage, do not bypass hazard, add +1 Doom</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Advantage: Roll 2d20, and the player picks which to use.</p>
+  <p>Disadvantage: Roll 2d20, and the GM picks which to use.</p>
+  <p>
+    For general rolls, players roll under their relevant stat and check success,
+    failure or critical success accordingly.
+  </p>
+  <h2>Combat</h2>
+  <h3>Setting Up Turn Order</h3>
+  <p class="no-indent">
+    Roll <strong>Sharp</strong>
+    vs Entity’s <strong>Ranged</strong> Defence:
+  </p>
+  <ul>
+    <li>
+      <strong>On a standard success,</strong> either place your token anywhere
+      on the grid or act before the Entity.
+    </li>
+    <li>
+      <strong>On a superior success</strong>, do both.
+    </li>
+    <li>
+      <strong>On a crit success,</strong>
+      do both <em>and</em> get an extra
+      manoeuvre on your first turn.
+    </li>
+  </ul>
+  <p>
+    <strong>On Each Turn, pick one:</strong>
+  </p>
+  <p>1 attack &amp; 1 manoeuvre</p>
+  <p>2 manoeuvres</p>
+  <p>
+    When a Hunter turn ends, the Entity gets an <strong>Interrupt</strong> if
+    the GM so decides and pays the cost.
+  </p>
+  <h3>Hunter Manoeuvres</h3>
+  <ul>
+    <li>
+      <strong>Focus</strong>: Gain Focus, to a maximum of 1. You may spend Focus
+      to gain advantage on your next roll.
+    </li>
+    <li>
+      <strong>Guard</strong>: Restore 2 Resolve, or attempt to revive a dying
+      Hunter in your area.
+    </li>
+    <li>
+      <strong>Move</strong>: Travel between two adjacent (facing sides only; not
+      diagonal) grid areas.
+    </li>
+    <li>
+      <strong>Reload</strong>: Regain 1 Capacity on a Weapon you are holding, up
+      to its maximum.
+    </li>
+    <li>
+      <strong>Take Cover</strong>: Claim a terrain tag – roll
+      <strong class="stat">Strong</strong>
+      for <strong>Elevated</strong> or
+      <strong class="stat">Quick</strong>
+      for <strong>Sheltered</strong>. On a
+      failure either:
+    </li>
+    <li>
+      Suffer 1 Resolve damage as you over-exert yourself; <em>or</em>
+    </li>
+    <li>
+      Place 1 Threat on your area as you draw attention to yourself; <em>or</em>
+    </li>
+    <li>Return the terrain tag to the pool.</li>
+    <li>
+      Use: Activate an ability, item or power as defined in its description.
+    </li>
+  </ul>
+  <h3>Support Area and Support Manoeuvres</h3>
+  <p class="no-indent">
+    When you start your turn in Support, restore Capacity to max and restore 2
+    Resolve. You also have access to these support manoevures:
+  </p>
+  <ul>
+    <li>
+      <strong>Recover</strong>
+      : Roll <strong class="stat">Hard</strong>. On any
+      success, restore 4 Resolve or 2 Wounds (your choice). On a failure,
+      restore 2 Resolve.
+    </li>
+    <li>
+      Heal: Roll <strong class="stat">Wise</strong>. On a success, restore 2
+      Wounds to another Hunter in Support or restore 1 Wound to yourself. On a
+      failure, restore 1 Wound to another Hunter in Support.
+    </li>
+  </ul>
+  <h3>Terrain Types</h3>
+  <ul>
+    <li>
+      <strong>Elevated</strong>
+      . Roll <strong class="stat">Strong</strong> to
+      claim. All attacks are rolled with advantage.
+    </li>
+    <li>
+      <strong>Sheltered</strong>
+      . Roll <strong class="stat">Quick</strong> to
+      claim. When the Entity inflicts damage on you, take 1 less damage.
+    </li>
+  </ul>
+</div>
+
+<div>
+  <h2>GM cheat Sheet</h2>
+  <h3>Core Mechanic</h3>
+  <p class="no-indent">Roll a D20 and compare to the stat and TN:</p>
+  <table>
+    <colgroup>
+      <col>
+      <col>
+      <col>
+      <col>
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th colspan="2" scope="colgroup">
+          <p>Result</p>
+        </th>
+        <th scope="col">
+          <p>Attack</p>
+        </th>
+        <th scope="col">
+          <p>Defend</p>
+        </th>
+        <th scope="col">
+          <p>Explore</p>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan="2" headers="th_13_r0_c0">
+          <p>Under Stat</p>
+          <p>
+            <br>
+          </p>
+        </td>
+        <td rowspan="2" headers="th_13_r0_c0">
+          <p>Under TN</p>
+        </td>
+        <td colspan="3" headers="th_13_r0_c2">
+          <p>Success</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c2">
+          <p>
+            Deal Resolve <br>damage, place 1 Threat
+          </p>
+        </td>
+        <td headers="th_13_r0_c3">
+          <p>
+            Suffer <br>
+            Resolve <br>damage
+          </p>
+        </td>
+        <td headers="th_13_r0_c4">
+          <p>
+            Suffer Resolve damage, <br>bypass hazard
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c0"></td>
+        <td rowspan="2" headers="th_13_r0_c0">
+          <p>Match/ beat TN</p>
+        </td>
+        <td colspan="3" headers="th_13_r0_c2">
+          <p>Superior Success</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c0">
+          <p>
+            <br>
+          </p>
+        </td>
+        <td headers="th_13_r0_c2">
+          <p>
+            Deal Wound <br>damage, place 1 Threat
+          </p>
+        </td>
+        <td headers="th_13_r0_c3">
+          <p>Suffer no damage</p>
+        </td>
+        <td headers="th_13_r0_c4">
+          <p>Avoid all harm, bypass hazard</p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" headers="th_13_r0_c0">
+          <p>Equal to Stat</p>
+        </td>
+        <td colspan="3" headers="th_13_r0_c2">
+          <p>Critical Success</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c0"></td>
+        <td headers="th_13_r0_c0"></td>
+        <td headers="th_13_r0_c2">
+          <p>
+            Deal Wound <br>
+            damage +2, <br>place 1 Threat
+          </p>
+        </td>
+        <td headers="th_13_r0_c3">
+          <p>Suffer no damage;</p>
+          <p>
+            if Thrall,<br>reduce Doom by 1
+          </p>
+        </td>
+        <td headers="th_13_r0_c4">
+          <p>
+            Avoid all harm, <br>bypass hazard, and reduce Doom by 1
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" headers="th_13_r0_c0">
+          <p>Over Stat</p>
+        </td>
+        <td headers="th_13_r0_c2">
+          <p>Failure</p>
+        </td>
+        <td headers="th_13_r0_c3"></td>
+        <td headers="th_13_r0_c4"></td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c0"></td>
+        <td headers="th_13_r0_c0"></td>
+        <td headers="th_13_r0_c2">
+          <p>No damage, no threat</p>
+        </td>
+        <td headers="th_13_r0_c3">
+          <p>Suffer Wound damage</p>
+        </td>
+        <td headers="th_13_r0_c4">
+          <p>Suffer Wound damage, do not bypass hazard</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c0">
+          <p>20</p>
+        </td>
+        <td headers="th_13_r0_c0"></td>
+        <td colspan="3" headers="th_13_r0_c2">
+          <p>Critical Failure</p>
+        </td>
+      </tr>
+      <tr>
+        <td headers="th_13_r0_c0"></td>
+        <td headers="th_13_r0_c0"></td>
+        <td headers="th_13_r0_c2">
+          <p>No damage, no threat; if Thrall, add +1 Doom</p>
+        </td>
+        <td headers="th_13_r0_c3">
+          <p>Suffer Wound damage; if Thrall, add +1 Doom</p>
+        </td>
+        <td headers="th_13_r0_c4">
+          <p>Suffer Wound damage, do not bypass hazard, add +1 Doom</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    <strong>Advantage</strong>: Roll 2d20, and the player picks which to use.
+  </p>
+  <p>
+    <strong>Disadvantage</strong>: Roll 2d20, and the GM picks which to use.
+  </p>
+  <p class="no-indent">
+    For general rolls, players roll under their relevant stat and check success,
+    failure or critical success accordingly.
+  </p>
+  <h3>Entity Standard Manoeuvres</h3>
+  <ul>
+    <li>
+      <strong>Prowl</strong>. Target one area and one adjacent area. All Hunters
+      in the first area test <strong class="stat">Quick</strong>. On a failure,
+      they are Repositioned to the adjacent area.
+    </li>
+    <li>
+      <strong>Shrug Off</strong>. Restore 3 Resolve.
+    </li>
+    <li>
+      <strong>Turn Around</strong>. All Hunters in Close are Repositioned
+      clockwise or counter-clockwise – choose one and apply it to all targets.
+    </li>
+  </ul>
+  <h3>Stats</h3>
+  <ul>
+    <li>
+      <strong class="stat">Strong:</strong> destructive, athletic or vicious.
+    </li>
+    <li>
+      <strong class="stat">Hard:</strong> tough, resistant, grim or
+      intimidating.
+    </li>
+    <li>
+      <strong class="stat">Quick:</strong> fast, decisive, sneaky or deceitful.
+    </li>
+    <li>
+      <strong class="stat">Sharp:</strong> keen-eyed, aware and intelligent.
+    </li>
+    <li>
+      <strong class="stat">Wise</strong>: intuitive, introspective or mystical.
+    </li>
+  </ul>
+  <h3>Health: Resolve and Wounds</h3>
+  <p class="no-indent">
+    <strong>Resolve</strong> is a measure of stamina, determination and physical
+    fitness. Narrate Resolve damage as the target dodging, blocking, shrugging
+    off the pain, becoming tired, losing heart.
+  </p>
+  <p>
+    <strong>Wounds</strong> are a measure of how much punishment the target can
+    take before its body gives up. Narrate Wound damage as (gruesome) physical
+    injuries.
+  </p>
+  <p>
+    A Hunter or Entity with 0 Resolve is <strong>Broken</strong>. Often,
+    Entities have an ability that triggers When First Broken. If the Entity
+    recovers Resolve and becomes Broken again, this ability doesn’t trigger a
+    second time. Successful attacks against a Broken target inflict the attack’s
+    listed Wound damage instead of Resolve.
+  </p>
+  <p>
+    An Entity with 0 Wounds is dead. A Hunter with 0 Wounds is dying. If they
+    have any Resolve remaining, they lose it when they are reduced to 0 Wounds.
+    They must succeed on a Hard roll on their turn to revive themselves with 1
+    Resolve and 1 Wound; if they fail, they die and awaken back at the Sanctum.
+    A Hunter can revive a dying Hunter to 1 Resolve and 1 Wound by making a
+    Guard manoeuvre in their area and forgoing the usual Resolve recovery.
+  </p>
+  <h3>Threat</h3>
+  <p class="no-indent">You have two main ways to add Threat to the grid:</p>
+  <ul>
+    <li>
+      <strong>When a Hunter hits with an attack</strong>, place 1 Threat on
+      their area in response.
+    </li>
+    <li>
+      <strong>When the Entity’s turn ends</strong>, place Threat equal to the
+      Entity’s Threat Per Round. After the Entity has made both of their
+      actions, at the end of their turn, place Threat as follows:
+    </li>
+  </ul>
+  <table>
+    <colgroup>
+      <col>
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">
+          <p>Threat</p>
+        </th>
+        <th scope="col">
+          <p>Outcome</p>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <p>
+            Less than <br>Threat Cap
+          </p>
+        </td>
+        <td>
+          <p>
+            Place Threat equal to Threat per Round, <br>up to the Cap
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Equal or higher</p>
+        </td>
+        <td>
+          <p>
+            Remove Threat down to Cap, then Shift Threat equal to Threat per
+            Round
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="no-indent">Entities spend Threat in three ways:</p>
+  <ul>
+    <li>
+      After a Hunter’s turn ends, you can spend Threat to trigger an Interrupt
+      action in the target area.
+    </li>
+    <li>
+      When an Entity makes an attack, you may spend Threat in their target area
+      to increase all defence rolls made against that attack by 2 for each
+      Threat spent. If the attack affects multiple areas, each of these areas is
+      handled separately, and Threat spent in an area affects all defence rolls
+      made in that area.
+    </li>
+    <li>
+      Some attacks or manoeuvres require Threat to be spent as part of their
+      activation. Costs for individual abilities are listed in their
+      descriptions.
+    </li>
+  </ul>
+</div>
