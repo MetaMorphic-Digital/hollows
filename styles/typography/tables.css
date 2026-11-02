@@ -26,7 +26,6 @@
         background-color: transparent;
         border: none;
         text-indent: 0;
-        font-weight: bold;
       }
 
       --outcome-table-inline-cell-padding: 0.375rem;
@@ -52,6 +51,10 @@
       }
 
       tbody {
+        td:not(td:last-child) {
+          font-weight: bold;
+        }
+
         tr:nth-child(1),
         tr:nth-child(2) {
           color: var(--hollows-color-success);
@@ -110,6 +113,99 @@
           }
         }
       }
+    }
+  }
+
+  table {
+    p {
+      text-indent: 0;
+    }
+  }
+
+  --outcome-table-color-medium-dark: #574B84;
+  --outcome-table-color-darkest: #3C346B;
+  --outcome-table-color-medium-light: #6F6298;
+  --outcome-table-color-lightest: #8A7DAD;
+  table.basic {
+    margin: 8px 12px;
+
+    p {
+      margin: 0;
+    }
+
+    tr {
+      background-color: transparent;
+    }
+
+    thead {
+      font-family: var(--hollows-font-cobblestone);
+      background-color: transparent;
+      border: none;
+
+      tr {
+        color: var(--outcome-table-color-darkest);
+        font-size: 1.25rem;
+
+        th {
+          padding: 0;
+          padding-bottom: 4px;
+        }
+      }
+    }
+
+    tbody {
+      tr:nth-child(1),
+      tr:nth-child(2) {
+        td {
+          border-top: var(--outcome-table-color-medium-dark) solid 4px;
+
+          &:not(td:last-child) {
+            color: var(--outcome-table-color-darkest);
+          }
+        }
+      }
+
+
+      tr:nth-child(3) {
+        td {
+          border-top: var(--outcome-table-color-darkest) solid 4px;
+
+          &:not(td:last-child) {
+            color: var(--outcome-table-color-darkest);
+          }
+        }
+      }
+
+      tr:nth-child(4) {
+        td {
+          border-top: var(--outcome-table-color-medium-light) solid 4px;
+
+          &:not(td:last-child) {
+            color: var(--outcome-table-color-medium-light);
+          }
+        }
+
+      }
+
+      tr:nth-child(5) {
+        td {
+          border-top: var(--outcome-table-color-lightest) solid 4px;
+
+          &:not(td:last-child) {
+            color: var(--outcome-table-color-lightest);
+          }
+        }
+      }
+
+      td {
+        padding: 3px;
+        padding-bottom: 6px;
+
+        &:not(td:last-child) {
+          font-weight: bold;
+        }
+      }
+
     }
   }
 }
