@@ -3,164 +3,166 @@
   <h2>
     Roll a d20 and compare <br>to the stat and TN
   </h2>
-  <table>
-    <colgroup>
-      <col>
-      <col>
-      <col>
-      <col>
-      <col>
-    </colgroup>
-    <thead>
-      <tr>
-        <th colspan="2" scope="colgroup">
-          <p>Result</p>
-        </th>
-        <th scope="col">
-          <p>Attack</p>
-        </th>
-        <th scope="col">
-          <p>Defend</p>
-        </th>
-        <th scope="col">
-          <p>Explore</p>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td rowspan="2" headers="th_12_r0_c0">
-          <p>Under Stat</p>
-          <p>
-            <br>
-          </p>
-        </td>
-        <td rowspan="2" headers="th_12_r0_c0">
-          <p>Under TN</p>
-        </td>
-        <td colspan="3" headers="th_12_r0_c2">
-          <p>Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c2">
-          <p>
-            Deal Resolve <br>damage, place 1 Threat
-          </p>
-        </td>
-        <td headers="th_12_r0_c3">
-          <p>
-            Suffer <br>
-            Resolve <br>damage
-          </p>
-        </td>
-        <td headers="th_12_r0_c4">
-          <p>Suffer Resolve damage, bypass hazard</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c0"></td>
-        <td rowspan="2" headers="th_12_r0_c0">
-          <p>Match/ beat TN</p>
-        </td>
-        <td colspan="3" headers="th_12_r0_c2">
-          <p>Superior Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c0">
-          <p>
-            <br>
-          </p>
-        </td>
-        <td headers="th_12_r0_c2">
-          <p>
-            Deal Wound <br>damage, place 1 Threat
-          </p>
-        </td>
-        <td headers="th_12_r0_c3">
-          <p>Suffer no damage</p>
-        </td>
-        <td headers="th_12_r0_c4">
-          <p>Avoid all harm, bypass hazard</p>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" headers="th_12_r0_c0">
-          <p>Equal to Stat</p>
-        </td>
-        <td colspan="3" headers="th_12_r0_c2">
-          <p>Critical Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c0"></td>
-        <td headers="th_12_r0_c0"></td>
-        <td headers="th_12_r0_c2">
-          <p>
-            Deal Wound <br>
-            damage +1, <br>place 1 Threat
-          </p>
-        </td>
-        <td headers="th_12_r0_c3">
-          <p>Suffer no damage;</p>
-          <p>
-            if Thrall,<br>reduce Doom by 1
-          </p>
-        </td>
-        <td headers="th_12_r0_c4">
-          <p>
-            Avoid all harm, <br>bypass hazard, and reduce Doom by 1
-          </p>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" headers="th_12_r0_c0">
-          <p>Over Stat</p>
-        </td>
-        <td headers="th_12_r0_c2">
-          <p>Failure</p>
-        </td>
-        <td headers="th_12_r0_c3"></td>
-        <td headers="th_12_r0_c4"></td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c0"></td>
-        <td headers="th_12_r0_c0"></td>
-        <td headers="th_12_r0_c2">
-          <p>No damage, no threat</p>
-        </td>
-        <td headers="th_12_r0_c3">
-          <p>Suffer Wound damage</p>
-        </td>
-        <td headers="th_12_r0_c4">
-          <p>Suffer Wound damage, do not bypass hazard</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c0">
-          <p>20</p>
-        </td>
-        <td headers="th_12_r0_c0"></td>
-        <td colspan="3" headers="th_12_r0_c2">
-          <p>Critical Failure</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_12_r0_c0"></td>
-        <td headers="th_12_r0_c0"></td>
-        <td headers="th_12_r0_c2">
-          <p>No damage, no threat; if Thrall, add +1 Doom</p>
-        </td>
-        <td headers="th_12_r0_c3">
-          <p>Suffer Wound damage; if Thrall, add +1 Doom</p>
-        </td>
-        <td headers="th_12_r0_c4">
-          <p>Suffer Wound damage, do not bypass hazard, add +1 Doom</p>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="outcome-table">
+    <table>
+      <colgroup>
+        <col>
+        <col>
+        <col>
+        <col>
+        <col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th colspan="2" scope="colgroup">
+            <p>Result</p>
+          </th>
+          <th scope="col">
+            <p>Attack</p>
+          </th>
+          <th scope="col">
+            <p>Defend</p>
+          </th>
+          <th scope="col">
+            <p>Explore</p>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="2" headers="th_12_r0_c0">
+            <p>Under Stat</p>
+            <p>
+              <br>
+            </p>
+          </td>
+          <td rowspan="2" headers="th_12_r0_c0">
+            <p>Under TN</p>
+          </td>
+          <td colspan="3" headers="th_12_r0_c2">
+            <p>Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c2">
+            <p>
+              Deal Resolve <br>damage, place 1 Threat
+            </p>
+          </td>
+          <td headers="th_12_r0_c3">
+            <p>
+              Suffer <br>
+              Resolve <br>damage
+            </p>
+          </td>
+          <td headers="th_12_r0_c4">
+            <p>Suffer Resolve damage, bypass hazard</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c0"></td>
+          <td rowspan="2" headers="th_12_r0_c0">
+            <p>Match/ beat TN</p>
+          </td>
+          <td colspan="3" headers="th_12_r0_c2">
+            <p>Superior Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c0">
+            <p>
+              <br>
+            </p>
+          </td>
+          <td headers="th_12_r0_c2">
+            <p>
+              Deal Wound <br>damage, place 1 Threat
+            </p>
+          </td>
+          <td headers="th_12_r0_c3">
+            <p>Suffer no damage</p>
+          </td>
+          <td headers="th_12_r0_c4">
+            <p>Avoid all harm, bypass hazard</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" headers="th_12_r0_c0">
+            <p>Equal to Stat</p>
+          </td>
+          <td colspan="3" headers="th_12_r0_c2">
+            <p>Critical Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c0"></td>
+          <td headers="th_12_r0_c0"></td>
+          <td headers="th_12_r0_c2">
+            <p>
+              Deal Wound <br>
+              damage +1, <br>place 1 Threat
+            </p>
+          </td>
+          <td headers="th_12_r0_c3">
+            <p>Suffer no damage;</p>
+            <p>
+              if Thrall,<br>reduce Doom by 1
+            </p>
+          </td>
+          <td headers="th_12_r0_c4">
+            <p>
+              Avoid all harm, <br>bypass hazard, and reduce Doom by 1
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" headers="th_12_r0_c0">
+            <p>Over Stat</p>
+          </td>
+          <td headers="th_12_r0_c2">
+            <p>Failure</p>
+          </td>
+          <td headers="th_12_r0_c3"></td>
+          <td headers="th_12_r0_c4"></td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c0"></td>
+          <td headers="th_12_r0_c0"></td>
+          <td headers="th_12_r0_c2">
+            <p>No damage, no threat</p>
+          </td>
+          <td headers="th_12_r0_c3">
+            <p>Suffer Wound damage</p>
+          </td>
+          <td headers="th_12_r0_c4">
+            <p>Suffer Wound damage, do not bypass hazard</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c0">
+            <p>20</p>
+          </td>
+          <td headers="th_12_r0_c0"></td>
+          <td colspan="3" headers="th_12_r0_c2">
+            <p>Critical Failure</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_12_r0_c0"></td>
+          <td headers="th_12_r0_c0"></td>
+          <td headers="th_12_r0_c2">
+            <p>No damage, no threat; if Thrall, add +1 Doom</p>
+          </td>
+          <td headers="th_12_r0_c3">
+            <p>Suffer Wound damage; if Thrall, add +1 Doom</p>
+          </td>
+          <td headers="th_12_r0_c4">
+            <p>Suffer Wound damage, do not bypass hazard, add +1 Doom</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <p>Advantage: Roll 2d20, and the player picks which to use.</p>
   <p>Disadvantage: Roll 2d20, and the GM picks which to use.</p>
   <p>
@@ -270,166 +272,168 @@
   <h2>GM cheat Sheet</h2>
   <h3>Core Mechanic</h3>
   <p class="no-indent">Roll a D20 and compare to the stat and TN:</p>
-  <table>
-    <colgroup>
-      <col>
-      <col>
-      <col>
-      <col>
-      <col>
-    </colgroup>
-    <thead>
-      <tr>
-        <th colspan="2" scope="colgroup">
-          <p>Result</p>
-        </th>
-        <th scope="col">
-          <p>Attack</p>
-        </th>
-        <th scope="col">
-          <p>Defend</p>
-        </th>
-        <th scope="col">
-          <p>Explore</p>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td rowspan="2" headers="th_13_r0_c0">
-          <p>Under Stat</p>
-          <p>
-            <br>
-          </p>
-        </td>
-        <td rowspan="2" headers="th_13_r0_c0">
-          <p>Under TN</p>
-        </td>
-        <td colspan="3" headers="th_13_r0_c2">
-          <p>Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c2">
-          <p>
-            Deal Resolve <br>damage, place 1 Threat
-          </p>
-        </td>
-        <td headers="th_13_r0_c3">
-          <p>
-            Suffer <br>
-            Resolve <br>damage
-          </p>
-        </td>
-        <td headers="th_13_r0_c4">
-          <p>
-            Suffer Resolve damage, <br>bypass hazard
-          </p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c0"></td>
-        <td rowspan="2" headers="th_13_r0_c0">
-          <p>Match/ beat TN</p>
-        </td>
-        <td colspan="3" headers="th_13_r0_c2">
-          <p>Superior Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c0">
-          <p>
-            <br>
-          </p>
-        </td>
-        <td headers="th_13_r0_c2">
-          <p>
-            Deal Wound <br>damage, place 1 Threat
-          </p>
-        </td>
-        <td headers="th_13_r0_c3">
-          <p>Suffer no damage</p>
-        </td>
-        <td headers="th_13_r0_c4">
-          <p>Avoid all harm, bypass hazard</p>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" headers="th_13_r0_c0">
-          <p>Equal to Stat</p>
-        </td>
-        <td colspan="3" headers="th_13_r0_c2">
-          <p>Critical Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c0"></td>
-        <td headers="th_13_r0_c0"></td>
-        <td headers="th_13_r0_c2">
-          <p>
-            Deal Wound <br>
-            damage +2, <br>place 1 Threat
-          </p>
-        </td>
-        <td headers="th_13_r0_c3">
-          <p>Suffer no damage;</p>
-          <p>
-            if Thrall,<br>reduce Doom by 1
-          </p>
-        </td>
-        <td headers="th_13_r0_c4">
-          <p>
-            Avoid all harm, <br>bypass hazard, and reduce Doom by 1
-          </p>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" headers="th_13_r0_c0">
-          <p>Over Stat</p>
-        </td>
-        <td headers="th_13_r0_c2">
-          <p>Failure</p>
-        </td>
-        <td headers="th_13_r0_c3"></td>
-        <td headers="th_13_r0_c4"></td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c0"></td>
-        <td headers="th_13_r0_c0"></td>
-        <td headers="th_13_r0_c2">
-          <p>No damage, no threat</p>
-        </td>
-        <td headers="th_13_r0_c3">
-          <p>Suffer Wound damage</p>
-        </td>
-        <td headers="th_13_r0_c4">
-          <p>Suffer Wound damage, do not bypass hazard</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c0">
-          <p>20</p>
-        </td>
-        <td headers="th_13_r0_c0"></td>
-        <td colspan="3" headers="th_13_r0_c2">
-          <p>Critical Failure</p>
-        </td>
-      </tr>
-      <tr>
-        <td headers="th_13_r0_c0"></td>
-        <td headers="th_13_r0_c0"></td>
-        <td headers="th_13_r0_c2">
-          <p>No damage, no threat; if Thrall, add +1 Doom</p>
-        </td>
-        <td headers="th_13_r0_c3">
-          <p>Suffer Wound damage; if Thrall, add +1 Doom</p>
-        </td>
-        <td headers="th_13_r0_c4">
-          <p>Suffer Wound damage, do not bypass hazard, add +1 Doom</p>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="outcome-table">
+    <table>
+      <colgroup>
+        <col>
+        <col>
+        <col>
+        <col>
+        <col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th colspan="2" scope="colgroup">
+            <p>Result</p>
+          </th>
+          <th scope="col">
+            <p>Attack</p>
+          </th>
+          <th scope="col">
+            <p>Defend</p>
+          </th>
+          <th scope="col">
+            <p>Explore</p>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="2" headers="th_13_r0_c0">
+            <p>Under Stat</p>
+            <p>
+              <br>
+            </p>
+          </td>
+          <td rowspan="2" headers="th_13_r0_c0">
+            <p>Under TN</p>
+          </td>
+          <td colspan="3" headers="th_13_r0_c2">
+            <p>Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c2">
+            <p>
+              Deal Resolve <br>damage, place 1 Threat
+            </p>
+          </td>
+          <td headers="th_13_r0_c3">
+            <p>
+              Suffer <br>
+              Resolve <br>damage
+            </p>
+          </td>
+          <td headers="th_13_r0_c4">
+            <p>
+              Suffer Resolve damage, <br>bypass hazard
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c0"></td>
+          <td rowspan="2" headers="th_13_r0_c0">
+            <p>Match/ beat TN</p>
+          </td>
+          <td colspan="3" headers="th_13_r0_c2">
+            <p>Superior Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c0">
+            <p>
+              <br>
+            </p>
+          </td>
+          <td headers="th_13_r0_c2">
+            <p>
+              Deal Wound <br>damage, place 1 Threat
+            </p>
+          </td>
+          <td headers="th_13_r0_c3">
+            <p>Suffer no damage</p>
+          </td>
+          <td headers="th_13_r0_c4">
+            <p>Avoid all harm, bypass hazard</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" headers="th_13_r0_c0">
+            <p>Equal to Stat</p>
+          </td>
+          <td colspan="3" headers="th_13_r0_c2">
+            <p>Critical Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c0"></td>
+          <td headers="th_13_r0_c0"></td>
+          <td headers="th_13_r0_c2">
+            <p>
+              Deal Wound <br>
+              damage +2, <br>place 1 Threat
+            </p>
+          </td>
+          <td headers="th_13_r0_c3">
+            <p>Suffer no damage;</p>
+            <p>
+              if Thrall,<br>reduce Doom by 1
+            </p>
+          </td>
+          <td headers="th_13_r0_c4">
+            <p>
+              Avoid all harm, <br>bypass hazard, and reduce Doom by 1
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" headers="th_13_r0_c0">
+            <p>Over Stat</p>
+          </td>
+          <td headers="th_13_r0_c2">
+            <p>Failure</p>
+          </td>
+          <td headers="th_13_r0_c3"></td>
+          <td headers="th_13_r0_c4"></td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c0"></td>
+          <td headers="th_13_r0_c0"></td>
+          <td headers="th_13_r0_c2">
+            <p>No damage, no threat</p>
+          </td>
+          <td headers="th_13_r0_c3">
+            <p>Suffer Wound damage</p>
+          </td>
+          <td headers="th_13_r0_c4">
+            <p>Suffer Wound damage, do not bypass hazard</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c0">
+            <p>20</p>
+          </td>
+          <td headers="th_13_r0_c0"></td>
+          <td colspan="3" headers="th_13_r0_c2">
+            <p>Critical Failure</p>
+          </td>
+        </tr>
+        <tr>
+          <td headers="th_13_r0_c0"></td>
+          <td headers="th_13_r0_c0"></td>
+          <td headers="th_13_r0_c2">
+            <p>No damage, no threat; if Thrall, add +1 Doom</p>
+          </td>
+          <td headers="th_13_r0_c3">
+            <p>Suffer Wound damage; if Thrall, add +1 Doom</p>
+          </td>
+          <td headers="th_13_r0_c4">
+            <p>Suffer Wound damage, do not bypass hazard, add +1 Doom</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <p>
     <strong>Advantage</strong>: Roll 2d20, and the player picks which to use.
   </p>
@@ -513,7 +517,7 @@
       actions, at the end of their turn, place Threat as follows:
     </li>
   </ul>
-  <table>
+  <table class="basic">
     <colgroup>
       <col>
       <col>
