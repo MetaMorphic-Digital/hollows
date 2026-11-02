@@ -2,7 +2,7 @@
   <img class="chapter-header" src="systems/hollows/assets/art/street-furnace.webp">
 
   <div class="book-intro">
-    <h1 class="chapter-title">Introduction</h1>
+    <h1 class="chapter-title" data-no-toc>Introduction</h1>
     <p class="chapter-intro">
       In wretched dimensional backwaters, vicious creatures stalk the blasted
       landscape and spread sickness, blight and madness through the wider
@@ -33,16 +33,31 @@
 
 <h2>How To Play</h2>
 <p class="no-indent">
-  Firstly, you’ll need to get some friends together. Most of you will be
-  playing Hunters; one of you will take on the role of the Gamesmaster (or
-  GM), who’s in charge of running the game and steering the story. If you’re
-  reading this, odds are that you’ll be the Gamesmaster – that’s how these
-  things normally shake out.
+  Firstly, you’ll need to get some friends together. Most of you
+  will be playing Hunters; one of you will take on the role of the
+  Gamesmaster (or GM), who’s in charge of running the game and
+  steering the story. If you’re reading this, odds are that you’ll be the
+  Gamesmaster – that’s how these things normally shake out.
+</p>
+<p>
+  If you’re meeting up in person to play this game, you’ll need to copy,
+  print or be prepared to tear out several pages of this document.
 </p>
 <aside class="isles">
   <p class="no-indent">
-    As part of the core <em>Hollows</em> crowdfunding campaign, we will be creating a custom set of tokens which you’ll be able to buy alongside the core book.
-    If you’d like to create your own set of tokens, here’s what you’ll need, with some notes on how we made this work for playtesting:
+    The Hollows component
+    kit is a stylish box of
+    tokens and pieces to use
+    with the game. You can
+    buy it, along with the core
+    book, at rrdgames.com/
+    grisham- hollows – or you
+    can find print and play
+    tokens at rrdgames.com/
+    grisham-resources . If
+    you’d like to create your
+    own set of tokens, here’s
+    what you’ll need:
   </p>
   <ul>
     <li>A printout of the tactical grid. We recommend making this at A3 (or tabloid/ledger size, in the US).</li>
@@ -51,9 +66,9 @@
     <li>Two different kinds of terrain token, at least 4 of each. We used: poker chips.</li>
     <li>At least one Curse token per player. We used: 6-sided dice.</li>
     <li>An Entity token. We used: chess pieces, crystals.</li>
-    <li>A Bleeding token for the Knife. We used: coin</li>
-    <li>Two Ready tokens for the Armour. We used: coin</li>
-    <li>A Loaded token for the Shotgun. We used: coin</li>
+    <li>A Bleeding token for the Knife. We used: coins</li>
+    <li>Two Ready tokens for the Armour. We used: coins</li>
+    <li>A Loaded token for the Shotgun. We used: coins</li>
     <li>One Focus token per player, plus an extra four for the Rifle. We used: pennies, paperclips.</li>
     <li>Resolve and Wound tokens for each player including the GM. We used: tiddlywinks, spin-down D20s.</li>
     <li>Two D20s per player, or a pool you can all pick from to roll.</li>
@@ -89,10 +104,8 @@
 <p>
   If you’re playing online, there is a downloadable asset pack available which
   includes form-fillable versions of the character sheets, and a large
-  tactical grid image that you can use with your play tool of choice. At the
-  time of writing, we are working on a Tabletop Simulator integration to help
-  make play streamlined and seamless, as well as other VTT integrations. The
-  latest info on these will always be available at <a class="external-link" href="https://rrdgames.com/hollows-resources">rrdgames.com/hollows-resources</a>.
+  tactical grid image that you can use with your play tool of choice. The
+  latest info on these will always be available at <a class="external-link" href="https://rrdgames.com/grisham-resources">rrdgames.com/grisham-resources</a>.
 </p>
 
 <h3>Want more Hollows?</h3>
@@ -286,114 +299,123 @@
 </p>
 <p>You are a Hunter.</p>
 
-<h2>How Hollows Works</h2>
-<p class="no-indent">
-  Much of <em>Hollows</em> takes place as an unstructured conversation between
-  the players and the Gamesmaster, but when it’s exciting to introduce a
-  random element, players roll twenty-sided dice (D20s) to determine the
-  outcome of their actions.
-</p>
+<div>
+  <h2>How Hollows Works</h2>
+  <p class="no-indent">
+    Much of <em>Hollows</em> takes place as an unstructured conversation between
+    the players and the Gamesmaster, but when it’s exciting to introduce a
+    random element, players roll twenty-sided dice (D20s) to determine the
+    outcome of their actions.
+  </p>
+  <h3>Rolling Dice</h3>
+  <p class="no-indent">
+    When you roll a D20 to resolve an action, you will compare the result to two
+    numbers – the stat you’re using to make the roll (<a>page 7</a>) and the
+    Target Number (TN). If an action doesn’t state which stat to use, determine
+    the correct one with the GM. The GM will know, or make up, the Target
+    Number. In combat, the TN is the same as the relevant Defence stat of the
+    Entity the Hunters are currently fighting. When exploring, the TN is usually
+    defined by the Hazard or Thrall the Hunters are trying to get past.
+  </p>
+  <aside class="outcome-table">
+    <table>
+      <thead>
+        <tr>
+          <th colspan="2" scope="col">
+            <p>Dice Result</p>
+          </th>
+          <th scope="col">
+            <p>Outcome</p>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p>Under Stat</p>
+          </td>
+          <td>
+            <p>Under TN</p>
+          </td>
+          <td>
+            <p>Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <p>Match or beat TN</p>
+          </td>
+          <td>
+            <p>Superior Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <p>Equal to Stat</p>
+          </td>
+          <td>
+            <p>Critical Success</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <p>Over Stat</p>
+          </td>
+          <td>
+            <p>Failure</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <p>20</p>
+          </td>
+          <td></td>
+          <td>
+            <p>Critical Failure</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </aside>
+  <p class="no-indent">
+    This mechanic, and the steps of success, are the same regardless of whether
+    you are exploring, fighting, defending yourself, or doing any other action.
+    The stakes will be different in different situations; if the mechanical
+    details aren’t specified in the rules, work with the GM to apply the results
+    to your situation.
+  </p>
+  <p>
+    If you are told to roll with advantage, roll two D20s and choose whichever
+    result you prefer to resolve the action. If you are told to roll with
+    disadvantage, roll two D20s and the GM can choose either result. Advantage
+    and disadvantage cancel each other out, and you should never roll more than
+    2D20 to resolve a single action.
+  </p>
+  <p>
+    Sometimes, in situations where a Hunter's abilities are the key
+    deciding factor in whether an action succeeds, players might be
+    asked to “test" a stat, with no TN. In that case, there's no superior
+    success: any roll under the stat is a success, and the other outcomes
+    stay the same.
+  </p>
+  <p>
+    Later in this book, we go into more detail on what each result means in
+    specific situations – attacking (<a>page 16</a>
+    ), defending (<a>page 18</a
+      >
+    ), exploration (<a>page 24</a>) and more. Not all actions have outcomes
+    listed for every dice result – we encourage the Gamesmaster to use their
+    judgement and create a fun experience for everyone present by making their
+    own rulings in response to player actions.
+  </p>
+  <p>
+    <em>Hollows</em> is a hard game. Failure is part of play, so failure should
+    be interesting – work together to decide how adversity drives the story
+    forward.
+  </p>
+</div>
 
-<h3>Rolling Dice</h3>
-<p class="no-indent">
-  When you roll a D20 to resolve an action, you will compare the result to two
-  numbers – the stat you’re using to make the roll (<a>page 7</a>) and the
-  Target Number (TN). If an action doesn’t state which stat to use, determine
-  the correct one with the GM. The GM will know, or make up, the Target
-  Number. In combat, the TN is the same as the relevant Defence stat of the
-  Entity the Hunters are currently fighting. When exploring, the TN is usually
-  defined by the Hazard or Thrall the Hunters are trying to get past.
-</p>
-<aside class="outcome-table">
-  <table>
-    <thead>
-      <tr>
-        <th colspan="2" scope="col">
-          <p>Dice Result</p>
-        </th>
-        <th scope="col">
-          <p>Outcome</p>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <p>Under Stat</p>
-        </td>
-        <td>
-          <p>Under TN</p>
-        </td>
-        <td>
-          <p>Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <p>Match or beat TN</p>
-        </td>
-        <td>
-          <p>Superior Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <p>Equal to Stat</p>
-        </td>
-        <td>
-          <p>Critical Success</p>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <p>Over Stat</p>
-        </td>
-        <td>
-          <p>Failure</p>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <p>20</p>
-        </td>
-        <td></td>
-        <td>
-          <p>Critical Failure</p>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</aside>
-<p class="no-indent">
-  This mechanic, and the steps of success, are the same regardless of whether
-  you are exploring, fighting, defending yourself, or doing any other action.
-  The stakes will be different in different situations; if the mechanical
-  details aren’t specified in the rules, work with the GM to apply the results
-  to your situation.
-</p>
-<p>
-  If you are told to roll with advantage, roll two D20s and choose whichever
-  result you prefer to resolve the action. If you are told to roll with
-  disadvantage, roll two D20s and the GM can choose either result. Advantage
-  and disadvantage cancel each other out, and you should never roll more than
-  2D20 to resolve a single action.
-</p>
-<p>
-  Later in this book, we go into more detail on what each result means in
-  specific situations – attacking (<a>page 16</a>
-  ), defending (<a>page 18</a
-    >
-  ), exploration (<a>page 24</a>) and more. Not all actions have outcomes
-  listed for every dice result – we encourage the Gamesmaster to use their
-  judgement and create a fun experience for everyone present by making their
-  own rulings in response to player actions.
-</p>
-<p>
-  <em>Hollows</em> is a hard game. Failure is part of play, so failure should
-  be interesting – work together to decide how adversity drives the story
-  forward.
-</p>
 <aside class="isles">
   <h4 class="isles-heading">Blackjack Rules</h4>
   <p class="no-indent">
@@ -408,12 +430,13 @@
     Success, though, if you’re lucky.)
   </p>
 </aside>
+
 <aside>
   <h4 class="isles-heading">Glossary</h4>
   <p class="no-indent">
     There is a full rules glossary available online, updated with the latest
     version of the rules and any errata. You can find it at
-    <a class="external-link" href="https://rrdgames.com/hollows-glossary">rrdgames.com/hollows-glossary</a> or scan the code below.
+    <a class="external-link" href="https://rrdgames.com/hollows-glossary">rrdgames.com/hollows-glossary</a>.
   </p>
 </aside>
 
@@ -426,24 +449,24 @@
     follows:
   </p>
   <p>
-    <strong class="stat">Description:</strong> Each Hunter has a brief paragraph
+    <strong class="keyword">Description:</strong> Each Hunter has a brief paragraph
     describing their outlook, motivations and behaviour. Change this entirely if
     you want – it’s just a suggestion.
   </p>
   <p>
-    <strong class="stat">Play X If You Want To...:</strong> Three bullet points
+    <strong class="keyword">Play X If You Want To...:</strong> Three bullet points
     that summarise the Hunter’s role in combat – whether they’re a damage dealer
     or a support character, a precision shooter or a wild brawler, etc.
   </p>
   <p>
-    <strong class="stat">Background:</strong> The Hunter’s background offers
+    <strong class="keyword">Background:</strong> The Hunter’s background offers
     details on who they were before they chose this life. The Isles is a big
     place, and Hunters arise from all sorts of origins. When you act in
     accordance with your background during the Exploration phase, roll with
     advantage.
   </p>
   <p>
-    <strong class="stat">Statistics:</strong> There are five statistics
+    <strong class="keyword">Statistics:</strong> There are five statistics
     (hereafter called stats) that govern your performance in <em>Hollows</em>.
     No stat can be increased above 19. The human average is around 7 – but
     Hunters are more, and less, than human.
@@ -468,35 +491,6 @@
       science, mysticism, and the ways of the Hollow.
     </li>
   </ul>
-  <p>
-    <strong class="stat">Resolve and Wounds:</strong> In addition to their
-    stats, a Hunter also has two main measures of health.
-  </p>
-  <p>
-    <strong class="stat">Resolve</strong> is a measure of stamina, determination
-    and physical fitness; <strong class="stat">Wounds</strong> are a measure of
-    how much punishment you can take before your body gives up and you die.
-  </p>
-  <p>
-    A Hunter or Entity with 0 Resolve is Broken. If a Broken character would
-    suffer Resolve damage, they suffer Wound damage instead; successful attacks
-    against them all use the attack’s listed Wound damage instead of its
-    Resolve. An Entity with 0 Wounds is dead; a Hunter with 0 Wounds is dying or
-    dead.
-  </p>
-  <p>
-    <strong class="stat">Weapons:</strong> Each Hunter carries two Weapons –
-    terrible tools of destruction bound up tight with their malaise. Each Weapon
-    has a profile which details how much damage it does, where it can attack
-    from and what stat it uses to attack Entities (<a>page 16</a>).
-  </p>
-  <p>
-    <strong class="stat">Abilities:</strong> The rancid energy bubbling within a
-    Hollow floods your Weapons with power and lets you do things you’d never
-    have imagined. At the start of the game, pick one ability from the list
-    given for each of your Weapons. Each time you kill an Entity, you gain
-    access to another ability of your choosing.
-  </p>
 </div>
 <aside class="isles">
   <h4 class="isles-heading">
@@ -516,6 +510,38 @@
     them.
   </p>
 </aside>
+<div>
+  <p>
+    <strong class="keyword">Resolve and Wounds:</strong> In addition to their
+    stats, a Hunter also has two main measures of health.
+  </p>
+  <p>
+    <strong class="keyword">Resolve</strong> is a measure of stamina, determination
+    and physical fitness; <strong class="keyword">Wounds</strong> are a measure of
+    how much punishment you can take before your body gives up and you die.
+  </p>
+  <p>
+    A Hunter or Entity with 0 Resolve is Broken. If a Broken character would
+    suffer Resolve damage, they suffer Wound damage instead; successful attacks
+    against them all use the attack’s listed Wound damage instead of its
+    Resolve. An Entity with 0 Wounds is dead; a Hunter with 0 Wounds is dying or
+    dead.
+  </p>
+  <p>
+    <strong class="keyword">Weapons:</strong> Each Hunter carries two Weapons –
+    terrible tools of destruction bound up tight with their malaise. Each Weapon
+    has a profile which details how much damage it does, where it can attack
+    from and what stat it uses to attack Entities (<a>page 16</a>).
+  </p>
+  <p>
+    <strong class="keyword">Abilities:</strong> The rancid energy bubbling within a
+    Hollow floods your Weapons with power and lets you do things you’d never
+    have imagined. At the start of the game, pick one ability from the list
+    given for each of your Weapons. Each time you kill an Entity, you gain
+    access to another ability of your choosing.
+  </p>
+</div>
+
 <aside class="isles">
   <h4 class="isles-heading">Sawn-off Characters</h4>
   <p class="no-indent">
