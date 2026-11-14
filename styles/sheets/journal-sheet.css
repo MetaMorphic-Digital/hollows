@@ -116,6 +116,10 @@
       aside:not(.inline) {
         color: var(--color-text-primary);
       }
+
+      .weapon-section {
+        margin: 0 -50px;
+      }
     }
   }
 
@@ -143,7 +147,7 @@
   .weapon-section {
     container-name: weapon-section;
     background: var(--hollows-color-weapon-choice-bg);
-    margin: 0 -18px 0 -52px;
+    margin: 0 -144px 0 -52px;
     padding: 0 2em;
 
     /* Groups of .weapon-section don't need margin between each other */
