@@ -11,6 +11,7 @@
 
       padding: 0;
       margin-inline: var(--book-intro-margin-neg);
+      mask-image: none;
     }
 
     .book-intro {

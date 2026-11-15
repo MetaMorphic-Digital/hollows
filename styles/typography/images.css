@@ -1,0 +1,26 @@
+.hollows {
+  img {
+    mask-image:
+    linear-gradient(to bottom, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent),
+    linear-gradient(to right, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+    mask-composite: intersect;
+
+    transition: filter 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+    &:hover {
+      filter: drop-shadow(4px 4px 8px black);
+      transform: scale(1.01);
+    }
+  }
+
+  .full-image-container {
+    grid-column: 1 / -1 !important;
+    margin: 0 0 0 -40px;
+  }
+
+  @container journal (width < 820px) {
+    .full-image-container {
+      margin: 0 -40px;
+    }
+  }
+}
