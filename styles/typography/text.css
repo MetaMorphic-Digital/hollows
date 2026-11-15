@@ -27,7 +27,8 @@
   }
 
   i.choice-marker {
-    font-size: 3em;
+    font-size: 2em;
+
     &::before {
       content: "";
       display: inline-block;

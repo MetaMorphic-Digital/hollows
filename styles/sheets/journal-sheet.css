@@ -1,6 +1,10 @@
 .hollows.journal-sheet {
   /*--journal-grid-collapse-threshold: 34.375rem;*/
 
+  .journal-entry-pages {
+    scrollbar-color: var(--hollows-color-success) var(--hollows-color-book-intro);
+  }
+
   .window-content {
     flex-direction: row !important;
   }
@@ -147,7 +151,7 @@
   .weapon-section {
     container-name: weapon-section;
     background: var(--hollows-color-weapon-choice-bg);
-    margin: 0 -144px 0 -52px;
+    margin: 0 -185px 0 -52px;
     padding: 0 2em;
 
     /* Groups of .weapon-section don't need margin between each other */
