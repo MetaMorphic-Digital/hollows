@@ -105,6 +105,10 @@
       font-family: var(--hollows-font-go-around-the-books);
 
       transform: rotate(4deg);
+
+      p {
+        text-align: center;
+      }
     }
 
     @container journal (width < 820px) {
