@@ -95,6 +95,7 @@
         grid-column: 2 !important;
       }
 
+
       .column-both {
         grid-column: 1 / -1 !important;
       }
@@ -111,9 +112,12 @@
         grid-template-columns: 1fr;
 
         > *,
-        .column-gutter,
         .column-both {
           grid-column: 1 !important;
+        }
+
+        .column-gutter {
+          display: none;
         }
       }
 
