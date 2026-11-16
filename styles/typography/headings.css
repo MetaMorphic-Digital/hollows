@@ -32,4 +32,10 @@
     font-family: var(--hollows-font-cobblestone-aged);
     text-transform: uppercase;
   }
+
+  h5 {
+    font-family: var(--hollows-font-cobblestone);
+    font-size: 0.9rem;
+    text-transform: small-caps;
+  }
 }
