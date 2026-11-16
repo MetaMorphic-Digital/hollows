@@ -419,10 +419,11 @@
       clear: both;
 
       &:is(img) {
-        width: 300px;
+        max-width: 300px;
       }
     }
   }
+
   .float-left {
     max-width: 350px;
     margin: 0 auto;
@@ -434,7 +435,7 @@
       clear: both;
 
       &:is(img) {
-        width: 300px;
+        max-width: 300px;
       }
     }
   }

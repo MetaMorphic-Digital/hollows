@@ -11,6 +11,10 @@
       filter: drop-shadow(4px 4px 8px black);
       transform: scale(1.01);
     }
+
+    &.no-mask  {
+      mask-image: none;
+    }
   }
 
   .full-image-container {
