@@ -135,6 +135,7 @@
               {{ability.name}}
               <span class="ability-duration-badge">{{#if (eq ability.system.durationType "temporary")}}Temporary{{else}}Permanent{{/if}}</span>
             </div>
+            <button type="button" class="stat-roll" data-action="editAbility" data-ability-id="{{ability.id}}">{{localize "HOLLOWS.COMMON.edit"}}</button>
             <button type="button" class="stat-roll danger" data-action="unbindAbility" data-ability-id="{{ability.id}}">Unbind</button>
             <button type="button" class="stat-roll danger" data-action="deleteAbility" data-ability-id="{{ability.id}}">Remove</button>
           </div>

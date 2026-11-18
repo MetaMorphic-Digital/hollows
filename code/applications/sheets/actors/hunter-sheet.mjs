@@ -717,7 +717,7 @@ export default class HollowsHunterSheet extends HandlebarsApplicationMixin(Actor
     const itemId = event.currentTarget.dataset.itemId;
     const item = this.actor.items.get(itemId);
     if (!item) return;
-    await item.delete();
+    if (!(await item.deleteDialog())) return;
     await cleanupWeaponAbilitiesForActor(this.actor);
   }
 

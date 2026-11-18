@@ -40,6 +40,11 @@ export default class HollowsWeaponSheet extends HandlebarsApplicationMixin(ItemS
         await this.item.update({ "system.attackProfiles": profiles });
         this.render();
       },
+      editAbility: function(event, target) {
+        const sheet = this.item.parent.items.get(target.dataset.abilityId).sheet;
+        sheet.addEventListener("close", () => this.render(), { once: true });
+        sheet.render({ force: true });
+      },
       unbindAbility: async function(event, target) {
         if (!this.isEditable) return;
         return this._onUnbindAbility(event, target);
